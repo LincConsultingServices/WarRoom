@@ -669,18 +669,7 @@
   @apply flex gap-4 flex-wrap;
 }
 
-.submit-pitch-btn {
-  @apply inline-flex items-center justify-center px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
-  @apply text-base font-bold text-white text-center;
-  @apply bg-gradient-to-r from-primary via-primary to-yellow-600;
-  @apply hover:from-primary/90 hover:via-primary/90 hover:to-yellow-600/90;
-  @apply active:from-primary/80 active:via-primary/80 active:to-yellow-600/80;
-  @apply shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200;
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
-  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
-  @apply cursor-pointer;
-}
-
+.submit-pitch-btn,
 .respond-btn,
 .final-report-btn {
   @apply inline-flex items-center justify-center px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
