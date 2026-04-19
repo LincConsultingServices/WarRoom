@@ -531,7 +531,7 @@ export default function WarRoomSimulation() {
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                     >
-                                        {pitchRecorder.isRecording ? '⏹' : pitchRecorder.audioBlob ? '🔄' : '🎤'}
+                                        {pitchRecorder.isRecording ? 'Stop Recording' : pitchRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
                                     </motion.button>
                                 </div>
 
@@ -542,9 +542,9 @@ export default function WarRoomSimulation() {
                                             <span className="rec-text">Recording... {Math.max(0, 60 - pitchRecorder.recordingTime)}s left</span>
                                         </>
                                     ) : pitchRecorder.audioBlob ? (
-                                        <span className="rec-done">✅ Pitch recorded ({pitchRecorder.recordingTime}s) — Tap 🔄 to re-record</span>
+                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) — Select Record Again to re-record</span>
                                     ) : (
-                                        <span className="rec-hint">Tap the microphone to start recording</span>
+                                        <span className="rec-hint">Select Start Recording to begin your pitch</span>
                                     )}
                                 </div>
 
@@ -594,7 +594,7 @@ export default function WarRoomSimulation() {
                                     </div>
                                 )}
                                 <motion.button className="submit-pitch-btn" onClick={handleContinueFromPitch} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                    Continue to Investor Questions →
+                                    Continue to Investor Questions
                                 </motion.button>
                             </motion.div>
                         )}
@@ -609,7 +609,7 @@ export default function WarRoomSimulation() {
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                             >
-                                {isSubmitting ? 'Analyzing Pitch...' : '🚀 Submit Pitch for Analysis'}
+                                {isSubmitting ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
                             </motion.button>
                         )}
                     </motion.div>
@@ -661,7 +661,7 @@ export default function WarRoomSimulation() {
                                     <p>{currentInvestorReaction}</p>
                                 </div>
                                 <motion.button className="respond-btn" onClick={handleContinueToNextInvestor} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                    {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor →` : `View Panel Decisions →`}
+                                    {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor` : `View Panel Decisions`}
                                 </motion.button>
                             </motion.div>
                         )}
@@ -690,16 +690,16 @@ export default function WarRoomSimulation() {
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                         >
-                                            {responseRecorder.isRecording ? '⏹' : responseRecorder.audioBlob ? '🔄' : '🎤'}
+                                            {responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
                                         </motion.button>
                                     </div>
                                     <div className="recording-status">
                                         {responseRecorder.isRecording ? (
                                             <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 30 - responseRecorder.recordingTime)}s left</span></>
                                         ) : responseRecorder.audioBlob ? (
-                                            <span className="rec-done">✅ Response recorded ({responseRecorder.recordingTime}s)</span>
+                                            <span className="rec-done">Response recorded ({responseRecorder.recordingTime}s)</span>
                                         ) : (
-                                            <span className="rec-hint">Tap the microphone to record your response (30s max)</span>
+                                            <span className="rec-hint">Select Start Recording to record your response (30s max)</span>
                                         )}
                                     </div>
                                     {responseRecorder.isRecording && (
@@ -711,7 +711,7 @@ export default function WarRoomSimulation() {
 
                                 {responseRecorder.audioBlob && (
                                     <motion.button className="respond-btn" onClick={handleRespondToInvestorAudio} disabled={isSubmitting} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                        {isSubmitting ? 'Analyzing Response...' : '🚀 Submit Response →'}
+                                        {isSubmitting ? 'Analyzing Response...' : 'Submit Response'}
                                     </motion.button>
                                 )}
                             </motion.div>
@@ -881,7 +881,7 @@ export default function WarRoomSimulation() {
                                                 onClick={negotiationRecorder.isRecording ? negotiationRecorder.stopRecording : negotiationRecorder.startRecording}
                                                 disabled={isNegVoiceSubmitting || negRound >= MAX_NEG_ROUNDS}
                                             >
-                                                {negotiationRecorder.isRecording ? '⏹️' : '🎤'}
+                                                {negotiationRecorder.isRecording ? 'Stop Recording' : 'Start Recording'}
                                             </button>
                                         </div>
 
@@ -892,7 +892,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         ) : negotiationRecorder.audioBlob ? (
                                             <div className="recording-status">
-                                                <span className="rec-done">✅ Response recorded ({negotiationRecorder.recordingTime}s)</span>
+                                                <span className="rec-done">Response recorded ({negotiationRecorder.recordingTime}s)</span>
                                             </div>
                                         ) : negRound >= MAX_NEG_ROUNDS ? (
                                             <div className="recording-status">
@@ -900,7 +900,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         ) : (
                                             <div className="recording-status">
-                                                <span className="rec-hint">Tap the microphone to record your response (15s max)</span>
+                                                <span className="rec-hint">Select Start Recording to record your response (15s max)</span>
                                             </div>
                                         )}
 
@@ -919,7 +919,7 @@ export default function WarRoomSimulation() {
                                                 initial={{ scale: 0.9, opacity: 0 }}
                                                 animate={{ scale: 1, opacity: 1 }}
                                             >
-                                                {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? '🎯 Submit Final Decision →' : '🚀 Submit Voice Counter →'}
+                                                {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Decision' : 'Submit Voice Counter'}
                                             </motion.button>
                                         )}
                                     </div>
@@ -939,7 +939,7 @@ export default function WarRoomSimulation() {
                                         whileHover={{ scale: 1.02, borderColor: 'rgba(239,68,68,0.8)' }}
                                         whileTap={{ scale: 0.98 }}
                                     >
-                                        🚶 Walk Away from This Offer
+                                        Walk Away from This Offer
                                     </motion.button>
                                 </div>
                             </motion.div>
@@ -980,7 +980,7 @@ export default function WarRoomSimulation() {
                                     </div>
                                 </div>
                                 <button className="final-report-btn" onClick={handleEndSimulation} style={{ position: 'relative', zIndex: 10 }}>
-                                    Complete Simulation & View Report →
+                                    Complete Simulation and View Report
                                 </button>
                             </motion.div>
                         )}
@@ -996,7 +996,7 @@ export default function WarRoomSimulation() {
                                 transition={{ delay: 0.5 + offers.length * 0.15 }}
                                 style={{ marginTop: '2rem' }}
                             >
-                                Walk Away from All Offers →
+                                Walk Away from All Offers
                             </motion.button>
                         )}
                     </motion.div>

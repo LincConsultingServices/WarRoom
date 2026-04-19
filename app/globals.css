@@ -570,13 +570,13 @@
 }
 
 .end-btn {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg;
-  @apply text-sm font-bold text-white;
+  @apply inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl;
+  @apply text-base font-bold text-white;
   @apply bg-gradient-to-r from-destructive/90 to-red-600/90;
   @apply hover:from-destructive hover:to-red-600 active:from-destructive/80 active:to-red-600/80;
   @apply shadow-lg hover:shadow-xl transition-all duration-200;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2;
-  @apply cursor-pointer font-mono uppercase tracking-wider;
+  @apply cursor-pointer uppercase tracking-wide;
 }
 
 .warroom-main {
@@ -670,8 +670,8 @@
 }
 
 .submit-pitch-btn {
-  @apply inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg;
-  @apply text-base font-bold text-white;
+  @apply inline-flex items-center justify-center px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
+  @apply text-base font-bold text-white text-center;
   @apply bg-gradient-to-r from-primary via-primary to-yellow-600;
   @apply hover:from-primary/90 hover:via-primary/90 hover:to-yellow-600/90;
   @apply active:from-primary/80 active:via-primary/80 active:to-yellow-600/80;
@@ -679,6 +679,44 @@
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
   @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
   @apply cursor-pointer;
+}
+
+.respond-btn,
+.final-report-btn {
+  @apply inline-flex items-center justify-center px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
+  @apply text-base font-bold text-white text-center;
+  @apply bg-gradient-to-r from-primary via-primary to-yellow-600;
+  @apply hover:from-primary/90 hover:via-primary/90 hover:to-yellow-600/90;
+  @apply active:from-primary/80 active:via-primary/80 active:to-yellow-600/80;
+  @apply shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
+  @apply cursor-pointer;
+}
+
+.recording-zone {
+  @apply p-6 rounded-xl border border-border/50 bg-card/60;
+}
+
+.mic-button-wrapper {
+  @apply relative flex items-center justify-center mx-auto;
+}
+
+.mic-button {
+  @apply inline-flex items-center justify-center min-h-14 px-6 rounded-xl;
+  @apply text-sm font-bold text-white text-center leading-tight;
+  @apply bg-primary hover:bg-primary/90 active:bg-primary/80;
+  @apply border border-primary/40 shadow-lg transition-all duration-200;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.mic-button.active {
+  @apply bg-red-600 hover:bg-red-600/90 active:bg-red-700 border-red-400;
+}
+
+.mic-button.done {
+  @apply bg-emerald-600 hover:bg-emerald-600/90 active:bg-emerald-700 border-emerald-400;
 }
 
 .continue-btn {
@@ -980,6 +1018,13 @@
   }
 
   .end-btn {
+    @apply w-full;
+  }
+
+  .submit-pitch-btn,
+  .respond-btn,
+  .final-report-btn,
+  .mic-button {
     @apply w-full;
   }
 
