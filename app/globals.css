@@ -576,7 +576,7 @@
   @apply hover:from-destructive hover:to-red-600 active:from-destructive/80 active:to-red-600/80;
   @apply shadow-lg hover:shadow-xl transition-all duration-200;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2;
-  @apply cursor-pointer uppercase tracking-wide;
+  @apply cursor-pointer font-mono uppercase tracking-wide;
 }
 
 .warroom-main {
@@ -672,7 +672,7 @@
 .submit-pitch-btn,
 .respond-btn,
 .final-report-btn {
-  @apply inline-flex items-center justify-center px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl min-h-14 w-full sm:w-auto;
   @apply text-base font-bold text-white text-center;
   @apply bg-gradient-to-r from-primary via-primary to-yellow-600;
   @apply hover:from-primary/90 hover:via-primary/90 hover:to-yellow-600/90;
