@@ -64,19 +64,19 @@ export default function FinalReportPage() {
       {/* Page Tabs */}
       <nav className="page-tabs">
         <button className={`tab ${activePage === 1 ? 'active' : ''}`} onClick={() => setActivePage(1)}>
-          🦈 Deal Summary
+          Deal Summary
         </button>
         <button className={`tab ${activePage === 2 ? 'active' : ''}`} onClick={() => setActivePage(2)}>
-          📊 Competency Profile
+          Competency Profile
         </button>
         <button className={`tab ${activePage === 3 ? 'active' : ''}`} onClick={() => setActivePage(3)}>
-          🧠 AI Analysis
+          AI Analysis
         </button>
         <button className={`tab ${activePage === 4 ? 'active' : ''}`} onClick={() => setActivePage(4)}>
-          📝 Your Responses
+          Your Responses
         </button>
         <button className={`tab ${activePage === 5 ? 'active' : ''}`} onClick={() => setActivePage(5)}>
-          🔍 Deep Dive
+          Deep Dive
         </button>
       </nav>
 
@@ -210,7 +210,7 @@ function DealPage({ report }: { report: EvaluationReport }) {
               <div className="sc-scores">
                 <span>Primary: {sc.primaryScore || sc.primary_score}/5</span>
                 <span>Bias Trait: {sc.biasTraitScore || sc.bias_trait_score}/5</span>
-                {sc.redFlag && <span className="red-flag">🚩 Red Flag</span>}
+                {sc.redFlag && <span className="red-flag">Red Flag</span>}
               </div>
               {sc.investorReaction && (
                 <blockquote>&ldquo;{sc.investorReaction || sc.investor_reaction}&rdquo;</blockquote>
@@ -559,7 +559,7 @@ function AIAnalysisPage({ report }: { report: EvaluationReport }) {
   return (
     <div className="analysis-page">
       <div className="analysis-header">
-        <h2>🧠 Detailed AI Evaluation</h2>
+        <h2>Detailed AI Evaluation</h2>
         <p className="analysis-subtitle">
           Comprehensive analysis of your simulation journey — strengths, weaknesses, and actionable insights
         </p>
@@ -688,7 +688,7 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
   return (
     <div className="responses-page">
       <div className="responses-header">
-        <h2>📝 Your Responses</h2>
+        <h2>Your Responses</h2>
         <p className="responses-subtitle">
           All your answers throughout the simulation, grouped by stage
         </p>
@@ -719,7 +719,7 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
                 {getProficiencyBadge(entry.proficiency)}
                 {entry.aiFeedback && entry.aiFeedback.feedback && (
                   <span className="ai-feedback-text">
-                    💡 {typeof entry.aiFeedback.feedback === 'string' ? entry.aiFeedback.feedback : ''}
+                    Tip: {typeof entry.aiFeedback.feedback === 'string' ? entry.aiFeedback.feedback : ''}
                   </span>
                 )}
               </div>

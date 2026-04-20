@@ -56,11 +56,11 @@ export default function ReportsPage() {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'cohort':
-        return '👥 Cohort'
+        return 'Cohort'
       case 'individual':
-        return '👤 Individual'
+        return 'Individual'
       case 'comparative':
-        return '📊 Comparative'
+        return 'Comparative'
       default:
         return type
     }

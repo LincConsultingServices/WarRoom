@@ -481,7 +481,7 @@ export default function WarRoomSimulation() {
             {/* Top Bar */}
             <header className="warroom-header">
                 <div className="header-left">
-                    <h1 className="warroom-title">⚔️ War Room</h1>
+                    <h1 className="warroom-title">War Room</h1>
                     <span className="warroom-subtitle">Live Investor Pitch Simulation</span>
                 </div>
                 <div className="header-center">
@@ -509,7 +509,7 @@ export default function WarRoomSimulation() {
                             className="loading-icon"
                             animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
                             transition={{ repeat: Infinity, duration: 2 }}
-                        >⚔️</motion.div>
+                        >WR</motion.div>
                         <motion.h2
                             className="loading-text"
                             initial={{ opacity: 0, y: 10 }}
@@ -549,7 +549,7 @@ export default function WarRoomSimulation() {
 
                         {/* Pitch Template - Collapsible */}
                         <motion.details className="pitch-template" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                            <summary className="pitch-template-summary">📝 Pitch Template Guide (tap to expand)</summary>
+                            <summary className="pitch-template-summary">Pitch Template Guide (tap to expand)</summary>
                             <div className="template-text" style={{ marginTop: '0.8rem' }}>
                                 {preparedPitch ? (
                                     <>
@@ -624,7 +624,7 @@ export default function WarRoomSimulation() {
                         {/* Pitch Analysis Results */}
                         {pitchAnalysis && (
                             <motion.div className="analysis-panel" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                                <h3 className="analysis-title">📊 Pitch Analysis</h3>
+                                <h3 className="analysis-title">Pitch Analysis</h3>
                                 <div className="analysis-scores">
                                     <div className="score-item"><span className="score-label">Overall</span><span className="score-value">{pitchAnalysis.overallScore}/10</span></div>
                                     <div className="score-item"><span className="score-label">Clarity</span><span className="score-value">{pitchAnalysis.clarity}/5</span></div>
@@ -632,19 +632,19 @@ export default function WarRoomSimulation() {
                                     <div className="score-item"><span className="score-label">Persuasion</span><span className="score-value">{pitchAnalysis.persuasion}/5</span></div>
                                 </div>
                                 <div className="analysis-transcript">
-                                    <span className="analysis-label">📝 What you said:</span>
+                                    <span className="analysis-label">What you said:</span>
                                     <p>{pitchAnalysis.transcription}</p>
                                 </div>
                                 
                                 {pitchAnalysis.strengths?.length > 0 && (
                                     <div className="analysis-list strengths">
-                                        <span className="analysis-label">✅ Strengths:</span>
+                                        <span className="analysis-label">Strengths:</span>
                                         <ul>{pitchAnalysis.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
                                     </div>
                                 )}
                                 {pitchAnalysis.weaknesses?.length > 0 && (
                                     <div className="analysis-list weaknesses">
-                                        <span className="analysis-label">⚠️ Areas to Improve:</span>
+                                        <span className="analysis-label">Areas to Improve:</span>
                                         <ul>{pitchAnalysis.weaknesses.map((w, i) => <li key={i}>{w}</li>)}</ul>
                                     </div>
                                 )}
@@ -694,7 +694,7 @@ export default function WarRoomSimulation() {
 
                         {/* Question */}
                         <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                            <span className="question-label">🎯 {currentInvestor.name} asks:</span>
+                            <span className="question-label">{currentInvestor.name} asks:</span>
                             <p className="question-text">{currentInvestor.signature_question}</p>
                         </motion.div>
 
@@ -704,14 +704,14 @@ export default function WarRoomSimulation() {
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                                 {responseTranscription && (
                                     <div className="analysis-transcript" style={{ marginBottom: '1rem' }}>
-                                        <span className="analysis-label">📝 What you said:</span>
+                                        <span className="analysis-label">What you said:</span>
                                         <p>{responseTranscription}</p>
                                     </div>
                                 )}
                                 <div className="investor-reaction">
                                     <span className="reaction-label">
-                                        💬 {currentInvestor.name} responds:
-                                        {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', color: '#10b981', fontWeight: 'normal' }}>🔊 Playing...</span>}
+                                        {currentInvestor.name} responds:
+                                        {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', color: '#10b981', fontWeight: 'normal' }}>Playing...</span>}
                                     </span>
                                     <p>{currentInvestorReaction}</p>
                                 </div>
@@ -724,7 +724,7 @@ export default function WarRoomSimulation() {
 
                         {/* Walk-out warning */}
                         <motion.div className="walkout-warning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                            <span>🚨 Walk-out trigger:</span> {currentInvestor.walk_out_trigger}
+                            <span>Walk-out trigger:</span> {currentInvestor.walk_out_trigger}
                         </motion.div>
 
                         {/* Audio Recording for Response */}
@@ -833,13 +833,13 @@ export default function WarRoomSimulation() {
                                             <div>
                                                 <h3 className="sc-name">{offer.investorName}</h3>
                                                 <span className="sc-decision" style={{ color: '#10b981' }}>
-                                                    🔥 OFFER RECEIVED
+                                                    OFFER RECEIVED
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="sc-deal">
-                                            <span>💰 Offer: ${(offer.capital || 0).toLocaleString()}</span>
-                                            <span>📊 For {offer.equity}% equity</span>
+                                            <span>Offer: ${(offer.capital || 0).toLocaleString()}</span>
+                                            <span>For {offer.equity}% equity</span>
                                         </div>
                                         <div className="sc-investor-reaction">
                                             <p>"{offer.message}"</p>
@@ -910,11 +910,11 @@ export default function WarRoomSimulation() {
                                     }}>
                                         {negRound >= MAX_NEG_ROUNDS - 1 ? (
                                             <p style={{ fontSize: '0.85rem', color: '#f87171', fontWeight: 600, margin: 0 }}>
-                                                🔴 <strong>Final Round!</strong> Say <em>"I accept this deal"</em> to secure it, or <em>"I walk away"</em> to reject.
+                                                <strong>Final Round!</strong> Say <em>"I accept this deal"</em> to secure it, or <em>"I walk away"</em> to reject.
                                             </p>
                                         ) : (
                                             <p style={{ fontSize: '0.85rem', color: '#93c5fd', margin: 0 }}>
-                                                🎙️ Speak your counter-offer, or say <em>"I accept"</em> / <em>"I walk away"</em> to finalize.
+                                                Speak your counter-offer, or say <em>"I accept"</em> / <em>"I walk away"</em> to finalize.
                                             </p>
                                         )}
                                     </div>
@@ -951,7 +951,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         ) : negRound >= MAX_NEG_ROUNDS ? (
                                             <div className="recording-status">
-                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>⏱️ All rounds exhausted — offer expired</span>
+                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted — offer expired</span>
                                             </div>
                                         ) : (
                                             <div className="recording-status">
@@ -1007,7 +1007,7 @@ export default function WarRoomSimulation() {
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 style={{ textAlign: 'center', padding: '2rem', background: 'rgba(239,68,68,0.1)', borderRadius: '16px', border: '1px solid rgba(239,68,68,0.3)', marginBottom: '1.5rem' }}
                             >
-                                <h3 style={{ fontSize: '1.5rem', color: '#f87171', marginBottom: '0.5rem' }}>🚶 Walked Away</h3>
+                                <h3 style={{ fontSize: '1.5rem', color: '#f87171', marginBottom: '0.5rem' }}>Walked Away</h3>
                                 <p style={{ color: '#fca5a5', fontSize: '1rem' }}>You walked away from <strong>{walkedAwayInvestor}</strong>&apos;s offer.</p>
                                 <p style={{ color: '#a1a1aa', fontSize: '0.85rem', marginTop: '0.5rem' }}>Select another offer to continue negotiating, or walk away from all offers.</p>
                             </motion.div>
@@ -1019,7 +1019,7 @@ export default function WarRoomSimulation() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 style={{ textAlign: 'center', padding: '3rem', background: 'rgba(16,185,129,0.1)', borderRadius: '16px', border: '1px solid #10b981', position: 'relative', overflow: 'hidden' }}
                             >
-                                <h2 style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '1.5rem', fontWeight: 'bold' }}>Deal Secured! 🎉</h2>
+                                <h2 style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '1.5rem', fontWeight: 'bold' }}>Deal Secured!</h2>
                                 <div style={{ fontSize: '1.2rem', marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '12px' }}>
                                     <p style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Congratulations! You finalized a deal with <strong style={{ color: 'white' }}>{acceptedDealTerms?.investorName || selectedOffer?.investorName}</strong>.</p>
                                     <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem' }}>

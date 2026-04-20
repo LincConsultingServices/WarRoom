@@ -161,10 +161,10 @@ function getQuestionTypeColor(type: string): string {
 
 // Scenario step styling
 const SCENARIO_STEP_STYLES: Record<string, { icon: string; label: string; color: string; bgColor: string }> = {
-  environment: { icon: '🌍', label: 'ENVIRONMENT', color: '#3b82f6', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
-  problem: { icon: '⚠️', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
-  decision: { icon: '🎯', label: 'YOUR DECISION', color: '#8b5cf6', bgColor: 'bg-violet-50 dark:bg-violet-900/20' },
-  consequence: { icon: '📊', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
+  environment: { icon: 'ENV', label: 'ENVIRONMENT', color: '#3b82f6', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+  problem: { icon: 'PROB', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
+  decision: { icon: 'DEC', label: 'YOUR DECISION', color: '#8b5cf6', bgColor: 'bg-violet-50 dark:bg-violet-900/20' },
+  consequence: { icon: 'RESULT', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
 }
 
 // Ideation form section icons
@@ -1445,7 +1445,7 @@ export default function SimulationPage() {
             className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none"
           >
             <div className="bg-green-500 text-white font-black text-4xl sm:text-6xl px-12 py-8 rounded-full shadow-[0_0_100px_rgba(34,197,94,0.8)] border-4 border-white/20 transform -rotate-6 tracking-tight">
-              +$50,000 RAISED! 🎉
+              +$50,000 RAISED!
             </div>
           </motion.div>
         )}
@@ -1534,7 +1534,7 @@ export default function SimulationPage() {
                 className="h-12 w-12 rounded-full flex items-center justify-center text-xl shadow-lg font-black shrink-0"
                 style={{ backgroundColor: `${STAGE_THEMES[simulation.currentStage] || '#8b5cf6'}20`, color: STAGE_THEMES[simulation.currentStage] || '#8b5cf6' }}
               >
-                📅
+                M
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
@@ -1666,7 +1666,7 @@ export default function SimulationPage() {
                     ) : (
                       <div className="text-center py-8 text-muted-foreground space-y-3">
                         <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
-                          ⚠️ {dynamicScenarioError || 'Failed to generate scenario. Please try again.'}
+                          {dynamicScenarioError || 'Failed to generate scenario. Please try again.'}
                         </div>
                         {currentQ?.q_id && (
                           <Button
@@ -1678,7 +1678,7 @@ export default function SimulationPage() {
                               setDynamicScenarioBlocked(prev => ({ ...prev, [currentQ.q_id]: false }))
                             }}
                           >
-                            🔄 Retry scenario generation
+                            Retry scenario generation
                           </Button>
                         )}
                       </div>
@@ -1871,7 +1871,7 @@ export default function SimulationPage() {
                           {/* Scenario group badge */}
                           {currentQ.scenario_group && (
                             <div className="text-xs text-muted-foreground font-medium mb-2">
-                              📋 {currentQ.scenario_group.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                              {currentQ.scenario_group.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </div>
                           )}
 
@@ -1974,7 +1974,7 @@ export default function SimulationPage() {
                               ) : (
                                 <>
                                   <div className="text-xs font-bold text-violet-600 dark:text-violet-400 flex items-center gap-1">
-                                    🎯 How do you respond to this situation?
+                                    How do you respond to this situation?
                                   </div>
                                   <Textarea
                                     placeholder="Describe your decision and reasoning..."
@@ -2050,7 +2050,7 @@ export default function SimulationPage() {
                       className="p-5 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800"
                     >
                       <div className="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                        ℹ️ INFORMATION
+                        INFORMATION
                       </div>
                       {currentQ.context_text && (
                         <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">{currentQ.context_text}</p>

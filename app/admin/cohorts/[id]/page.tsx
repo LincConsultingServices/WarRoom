@@ -280,7 +280,7 @@ export default function BatchDetailPage() {
                        {leaderboard.map((lb) => (
                            <tr key={lb.id} className="border-b last:border-0 hover:bg-muted/50">
                                <td className="py-3 px-2 font-bold w-16">
-                                   {lb.rank === 1 ? '🥇' : lb.rank === 2 ? '🥈' : lb.rank === 3 ? '🥉' : `#${lb.rank}`}
+                               {lb.rank === 1 ? '1st' : lb.rank === 2 ? '2nd' : lb.rank === 3 ? '3rd' : `#${lb.rank}`}
                                </td>
                                <td className="py-3 px-2">{lb.name}</td>
                                <td className="py-3 px-2 text-muted-foreground">{lb.stageName || '-'}</td>

@@ -487,7 +487,7 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
                 className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-extrabold tracking-[0.15em] uppercase mb-6 border"
                 style={{ backgroundColor: `${accentColor}15`, borderColor: `${accentColor}30`, color: accentColor }}
               >
-                <span>📅</span> {data.month}
+                <span>MONTH</span> {data.month}
               </motion.div>
 
               {/* Title */}
@@ -620,7 +620,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
             {/* Header */}
             <div className="text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                <span>📊</span> Stage Complete
+                <span>STAGE</span> Stage Complete
               </div>
               <h3 className="text-xl font-bold">{stageName}</h3>
             </div>
@@ -644,7 +644,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
               </div>
               {previousRevenue !== undefined && previousRevenue > 0 && (
                 <div className={cn("flex items-center justify-center gap-1 mt-2 text-sm font-semibold", isPositive ? "text-emerald-500" : "text-red-500")}>
-                  <span>{isPositive ? '📈' : '📉'}</span>
+                  <span>{isPositive ? 'UP' : 'DOWN'}</span>
                   <span>{isPositive ? '+' : ''}{revChange.toFixed(1)}% from last stage</span>
                 </div>
               )}
@@ -659,7 +659,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
                 className="rounded-2xl border bg-card p-4"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">🏆 Leaderboard</p>
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Leaderboard</p>
                   <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
                   </span>
@@ -677,7 +677,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
                       )}
                     >
                       <span className="w-6 text-center font-bold text-xs" style={{ color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#d97706' : undefined }}>
-                        {i < 3 ? ['🥇', '🥈', '🥉'][i] : `#${i + 1}`}
+                        {i < 3 ? ['1st', '2nd', '3rd'][i] : `#${i + 1}`}
                       </span>
                       <span className="flex-1 truncate">
                         {entry.name}
@@ -727,7 +727,7 @@ interface MentorTipPopupProps {
   onAskMentor?: () => void
 }
 
-export function MentorTipPopup({ show, message, emoji = '💡', onDismiss, onAskMentor }: MentorTipPopupProps) {
+export function MentorTipPopup({ show, message, emoji = 'TIP', onDismiss, onAskMentor }: MentorTipPopupProps) {
   return (
     <AnimatePresence>
       {show && (
@@ -766,7 +766,7 @@ export function MentorTipPopup({ show, message, emoji = '💡', onDismiss, onAsk
                 onClick={() => { onDismiss(); onAskMentor(); }}
                 className="mt-3 w-full py-2 rounded-xl text-xs font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all"
               >
-                💬 Use a Mentor Lifeline
+                Use a Mentor Lifeline
               </button>
             )}
           </div>

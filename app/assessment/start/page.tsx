@@ -58,7 +58,7 @@ export default function SimulationStartPage() {
               className={`level-card ${level === 1 ? 'selected' : ''}`}
               onClick={() => setLevel(1)}
             >
-              <div className="level-icon">🎓</div>
+              <div className="level-icon">L1</div>
               <h3>Level 1: Student</h3>
               <p>For students & early-career professionals exploring entrepreneurship</p>
               <ul>
@@ -71,7 +71,7 @@ export default function SimulationStartPage() {
               className={`level-card ${level === 2 ? 'selected' : ''}`}
               onClick={() => setLevel(2)}
             >
-              <div className="level-icon">💼</div>
+              <div className="level-icon">L2</div>
               <h3>Level 2: Manager</h3>
               <p>For mid-level managers & experienced professionals</p>
               <ul>
@@ -110,22 +110,22 @@ export default function SimulationStartPage() {
         {/* Key Features */}
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🧠</div>
+            <div className="feature-icon">C8</div>
             <h3>8 Core Competencies</h3>
             <p>Problem Sensing, Learning Agility, Courage, Financial Discipline, Strategy, Influence, Team Management, Value Creation</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🎯</div>
+            <div className="feature-icon">M3</div>
             <h3>3 Mentor Lifelines</h3>
             <p>Consult Tony Robbins, Grant Cardone, Richard Branson, and 4 more world-class mentors when you need guidance</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🦈</div>
+            <div className="feature-icon">WR</div>
             <h3>Investor War Room</h3>
             <p>Pitch to 7 investors including Kevin O&apos;Leary, Mark Cuban, and Barbara Corcoran. Negotiate your deal.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon">E3</div>
             <h3>3-Page Evaluation</h3>
             <p>Get your entrepreneur archetype, competency spider chart, role fit map, and personalized action plan</p>
           </div>
