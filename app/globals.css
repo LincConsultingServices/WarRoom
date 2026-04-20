@@ -708,7 +708,7 @@
 
 .mic-button {
   @apply inline-flex items-center justify-center min-h-14 px-6 rounded-xl;
-  @apply text-sm font-bold text-white text-center leading-tight;
+  @apply text-sm font-bold text-black text-center leading-tight;
   @apply bg-primary hover:bg-primary/90 active:bg-primary/80;
   @apply border border-primary/40 shadow-lg transition-all duration-200;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
