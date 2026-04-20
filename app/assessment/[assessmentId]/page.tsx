@@ -474,6 +474,8 @@ export default function SimulationPage() {
       setDynamicScenario(null)
       setMcqFeedback(null)
       setDynamicScenarioError('')
+      // CRITICAL: reset the in-flight guard so back-navigation never permanently blocks fetching
+      loadingScenarioRef.current = false
     }
   }, [currentQ?.q_id])
 
@@ -485,13 +487,11 @@ export default function SimulationPage() {
       (currentQ as any)?.type === 'dynamic_scenario' &&
       simulation &&
       !loadingScenarioRef.current &&
-      // Check both currentQ.q_id AND dynamicScenario.questionId
-      ((dynamicScenario?.questionId || dynamicScenario?.question_id) !== currentQ.q_id || !dynamicScenario) &&
       !dynamicScenarioBlocked[currentQ.q_id]
     ) {
       const fetchScenario = async () => {
         if (!currentQ) return;
-        // Check cache first
+        // Check stage-level cache first (populated by bulk prefetch OR previous individual fetch)
         const cached = stageDynamicScenarios[currentQ.q_id]
         if (cached && cached.questionId === currentQ.q_id) {
           if (!ignore) {
@@ -529,7 +529,6 @@ export default function SimulationPage() {
             attempts++;
             if (attempts < maxAttempts && !ignore) {
               console.warn(`Dynamic scenario fetch failed (attempt ${attempts}/${maxAttempts}). Retrying in 2 seconds...`, err);
-              // Wait 2 seconds before retrying
               await new Promise(resolve => setTimeout(resolve, 2000));
             }
           }
@@ -539,24 +538,24 @@ export default function SimulationPage() {
           if (fetchError) throw fetchError;
           
           if (!ignore && ds && (ds.questionId === currentQ.q_id || ds.question_id === currentQ.q_id)) {
-            // Normalize for the rest of the component
+            // Normalize
             ds.questionId = ds.questionId || ds.question_id;
             setDynamicScenario(ds)
             setDynamicScenarioError('')
             setDynamicScenarioBlocked(prev => ({ ...prev, [currentQ.q_id]: false }))
+            // Store in stage cache so back-navigation finds it instantly
+            setStageDynamicScenarios(prev => ({ ...prev, [currentQ.q_id]: ds }))
             // If already answered, set feedback
             if (ds.selectedOptionId) {
               const options = typeof ds.options === 'string' ? JSON.parse(ds.options) : ds.options;
               const opt = options.find((o: any) => o.id === ds.selectedOptionId)
               if (opt) setMcqFeedback(opt.feedback)
-              // Pre-fill answer
               setAnswers(prev => ({
                 ...prev,
                 [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: ds.selectedOptionId } as any
               }))
             }
           } else if (!ignore && (!ds || (ds.questionId !== currentQ.q_id && ds.question_id !== currentQ.q_id))) {
-            // Wrong scenario returned or null
             console.error('Wrong scenario returned:', ds, 'expected:', currentQ.q_id);
             setDynamicScenarioError('Received incorrect scenario data.')
           }
@@ -576,7 +575,7 @@ export default function SimulationPage() {
     }
     return () => { ignore = true; }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQ?.q_id, assessmentId, simulation?.currentStage, stageDynamicScenarios, dynamicScenarioBlocked, dynamicScenario])
+  }, [currentQ?.q_id, assessmentId, simulation?.currentStage, stageDynamicScenarios, dynamicScenarioBlocked])
 
   if (loading) {
     return (
