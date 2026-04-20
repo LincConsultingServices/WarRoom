@@ -19,6 +19,51 @@ import type {
 
 type WarRoomPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
 
+type PreviousResponseEntry = {
+    q?: string
+    a?: string
+}
+
+function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[] {
+    if (!raw) return []
+
+    if (Array.isArray(raw)) {
+        return raw.filter((item): item is PreviousResponseEntry => typeof item === 'object' && item !== null)
+    }
+
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw)
+            return Array.isArray(parsed)
+                ? parsed.filter((item): item is PreviousResponseEntry => typeof item === 'object' && item !== null)
+                : []
+        } catch {
+            return []
+        }
+    }
+
+    return []
+}
+
+function getPreparedPitchFromState(state: AssessmentState | null): string {
+    const directPitch = state?.assessment?.warRoomPitch?.trim()
+    if (directPitch) return directPitch
+
+    const previousResponses = normalizePreviousResponses(state?.assessment?.previousResponses)
+    for (let i = previousResponses.length - 1; i >= 0; i--) {
+        const entry = previousResponses[i]
+        const question = (entry.q || '').toLowerCase()
+        const answer = (entry.a || '').trim()
+        if (!answer) continue
+
+        if (question.includes('pitch template') || question.includes('war room pitch')) {
+            return answer
+        }
+    }
+
+    return ''
+}
+
 export default function WarRoomSimulation() {
     const params = useParams()
     const router = useRouter()
@@ -426,6 +471,7 @@ export default function WarRoomSimulation() {
 
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
+    const preparedPitch = getPreparedPitchFromState(assessmentState)
 
     // ============================================
     // RENDER
@@ -503,14 +549,23 @@ export default function WarRoomSimulation() {
 
                         {/* Pitch Template - Collapsible */}
                         <motion.details className="pitch-template" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                            <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem', color: '#d1d5db' }}>📝 Pitch Template Guide (tap to expand)</summary>
+                            <summary className="pitch-template-summary">📝 Pitch Template Guide (tap to expand)</summary>
                             <div className="template-text" style={{ marginTop: '0.8rem' }}>
-                                <p>Hello Sharks, my name is <strong>[NAME]</strong> and I am the founder of <strong>[BUSINESS]</strong>.</p>
-                                <p><em>(The Problem)</em> Today, [TARGET CUSTOMER] struggles with [PROBLEM].</p>
-                                <p><em>(The Solution)</em> I created [PRODUCT], which [VALUE PROP].</p>
-                                <p><em>(Why Different)</em> Unlike [COMPETITORS], we [DIFFERENTIATION].</p>
-                                <p><em>(Proof)</em> We validated this by [VALIDATION]. So far, [TRACTION].</p>
-                                <p><em>(The Ask)</em> We are raising $[AMOUNT] for [EQUITY]% equity.</p>
+                                {preparedPitch ? (
+                                    <>
+                                        <p className="template-helper-label">Using your War Room Prep pitch:</p>
+                                        <pre className="template-user-pitch">{preparedPitch}</pre>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>Hello Sharks, my name is <strong>[NAME]</strong> and I am the founder of <strong>[BUSINESS]</strong>.</p>
+                                        <p><em>(The Problem)</em> Today, [TARGET CUSTOMER] struggles with [PROBLEM].</p>
+                                        <p><em>(The Solution)</em> I created [PRODUCT], which [VALUE PROP].</p>
+                                        <p><em>(Why Different)</em> Unlike [COMPETITORS], we [DIFFERENTIATION].</p>
+                                        <p><em>(Proof)</em> We validated this by [VALIDATION]. So far, [TRACTION].</p>
+                                        <p><em>(The Ask)</em> We are raising $[AMOUNT] for [EQUITY]% equity.</p>
+                                    </>
+                                )}
                             </div>
                         </motion.details>
 
