@@ -2,14 +2,16 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 import api from '@/src/lib/api'
 import type { AdminBatch, CreateBatchRequest } from '@/src/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Search, Users, Calendar, Hash, Copy, Check } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { Plus, Search, Users, Calendar, Hash, Copy, Check, Power, PowerOff, Loader2, AlertTriangle } from 'lucide-react'
 
 export default function CohortsPage() {
   const [batches, setBatches] = useState<AdminBatch[]>([])
@@ -19,6 +21,12 @@ export default function CohortsPage() {
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState('')
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+
+  // Per-batch toggle loading state
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+
+  // Confirm disable dialog
+  const [confirmDisable, setConfirmDisable] = useState<AdminBatch | null>(null)
 
   // Create form
   const [newCode, setNewCode] = useState('')
@@ -72,13 +80,39 @@ export default function CohortsPage() {
     setTimeout(() => setCopiedCode(null), 2000)
   }
 
-  const toggleActive = async (batch: AdminBatch) => {
+  // Called when the Switch is toggled
+  async function handleToggle(batch: AdminBatch, newActive: boolean) {
+    // Show confirmation when disabling
+    if (!newActive) {
+      setConfirmDisable(batch)
+      return
+    }
+    await doToggle(batch, true)
+  }
+
+  async function doToggle(batch: AdminBatch, active: boolean) {
+    setTogglingId(batch.id)
+    // Optimistic update
+    setBatches(prev =>
+      prev.map(b => b.id === batch.id ? { ...b, active } : b)
+    )
     try {
-      await api.admin.updateBatch(batch.id, { active: !batch.active })
-      fetchBatches()
+      await api.admin.updateBatch(batch.id, { active })
     } catch (err) {
       console.error('Failed to toggle batch:', err)
+      // Rollback on error
+      setBatches(prev =>
+        prev.map(b => b.id === batch.id ? { ...b, active: !active } : b)
+      )
+    } finally {
+      setTogglingId(null)
     }
+  }
+
+  async function confirmDoDisable() {
+    if (!confirmDisable) return
+    setConfirmDisable(null)
+    await doToggle(confirmDisable, false)
   }
 
   const filteredBatches = batches.filter(
@@ -90,6 +124,7 @@ export default function CohortsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
         <p className="text-muted-foreground">Loading batches...</p>
       </div>
     )
@@ -119,8 +154,8 @@ export default function CohortsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{batches.filter(b => b.active).length}</div>
-            <p className="text-xs text-muted-foreground">Active</p>
+            <div className="text-2xl font-bold text-green-600">{batches.filter(b => b.active).length}</div>
+            <p className="text-xs text-muted-foreground">Enabled</p>
           </CardContent>
         </Card>
         <Card>
@@ -131,8 +166,8 @@ export default function CohortsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{batches.filter(b => !b.active).length}</div>
-            <p className="text-xs text-muted-foreground">Inactive</p>
+            <div className="text-2xl font-bold text-red-500">{batches.filter(b => !b.active).length}</div>
+            <p className="text-xs text-muted-foreground">Disabled</p>
           </CardContent>
         </Card>
       </div>
@@ -151,58 +186,99 @@ export default function CohortsPage() {
       {/* Batches Grid */}
       {filteredBatches.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBatches.map((batch) => (
-            <Card key={batch.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <CardTitle className="text-lg truncate">{batch.name}</CardTitle>
-                    <div className="flex items-center gap-2 mt-1">
-                      <button
-                        onClick={() => handleCopyCode(batch.code)}
-                        className="flex items-center gap-1 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <Hash className="h-3 w-3" />
-                        {batch.code}
-                        {copiedCode === batch.code ? (
-                          <Check className="h-3 w-3 text-green-500" />
+          <AnimatePresence>
+            {filteredBatches.map((batch) => (
+              <motion.div
+                key={batch.id}
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card className={`transition-shadow ${batch.active ? 'hover:shadow-md' : 'opacity-70 border-dashed'}`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-lg truncate">{batch.name}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <button
+                            onClick={() => handleCopyCode(batch.code)}
+                            className="flex items-center gap-1 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Hash className="h-3 w-3" />
+                            {batch.code}
+                            {copiedCode === batch.code ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Status badge */}
+                      <div className="flex-shrink-0">
+                        {batch.active ? (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-semibold border border-green-500/20">
+                            <Power className="h-3 w-3" />
+                            Enabled
+                          </div>
                         ) : (
-                          <Copy className="h-3 w-3" />
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-semibold border border-red-500/20">
+                            <PowerOff className="h-3 w-3" />
+                            Disabled
+                          </div>
                         )}
-                      </button>
+                      </div>
                     </div>
-                  </div>
-                  <Badge
-                    variant={batch.active ? 'default' : 'secondary'}
-                    className="cursor-pointer"
-                    onClick={() => toggleActive(batch)}
-                  >
-                    {batch.active ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    <span>{batch.participantCount} participants</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{new Date(batch.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Level {batch.level} {batch.level === 1 ? '(Student)' : '(Manager)'}
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link href={`/admin/cohorts/${batch.id}`}>View Details</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  </CardHeader>
+
+                  <CardContent className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Users className="h-4 w-4" />
+                        <span>{batch.participantCount} participants</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(batch.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Level {batch.level} {batch.level === 1 ? '(Student)' : '(Manager)'}
+                    </div>
+
+                    {/* Toggle row */}
+                    <div className="flex items-center justify-between pt-1 border-t border-border/50">
+                      <div className="flex items-center gap-2">
+                        {togglingId === batch.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        ) : (
+                          <Switch
+                            id={`toggle-${batch.id}`}
+                            checked={batch.active}
+                            onCheckedChange={(checked) => handleToggle(batch, checked)}
+                            disabled={togglingId === batch.id}
+                            className="data-[state=checked]:bg-green-600"
+                          />
+                        )}
+                        <label
+                          htmlFor={`toggle-${batch.id}`}
+                          className="text-xs text-muted-foreground cursor-pointer select-none"
+                        >
+                          {batch.active ? 'Click to disable assessments' : 'Click to enable assessments'}
+                        </label>
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/cohorts/${batch.id}`}>Details</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       ) : (
         <Card className="text-center py-12">
@@ -217,7 +293,7 @@ export default function CohortsPage() {
         </Card>
       )}
 
-      {/* Create Dialog */}
+      {/* ── Create Dialog ── */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent>
           <DialogHeader>
@@ -277,7 +353,32 @@ export default function CohortsPage() {
               Cancel
             </Button>
             <Button onClick={handleCreate} disabled={creating}>
-              {creating ? 'Creating...' : 'Create Batch'}
+              {creating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating...</> : 'Create Batch'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Confirm Disable Dialog ── */}
+      <Dialog open={!!confirmDisable} onOpenChange={(v) => { if (!v) setConfirmDisable(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <AlertTriangle className="h-5 w-5" />
+              Disable Batch?
+            </DialogTitle>
+            <DialogDescription>
+              Disabling <strong>{confirmDisable?.name}</strong> ({confirmDisable?.code}) will prevent all participants
+              in this batch from starting new assessments. Existing in-progress simulations will not be affected.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setConfirmDisable(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDoDisable}>
+              <PowerOff className="h-4 w-4 mr-2" />
+              Disable Batch
             </Button>
           </DialogFooter>
         </DialogContent>

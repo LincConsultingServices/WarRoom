@@ -55,6 +55,18 @@ export function StartSimulationDialog({
       const user = JSON.parse(localStorage.getItem('user') || '{}')
       const batchCode = user?.batchCode || ''
 
+      // ── Pre-flight: verify the batch is still enabled ──
+      if (batchCode) {
+        const validation = await api.batches.validate(batchCode)
+        if (!validation.valid) {
+          setError(
+            'Your batch has been disabled by the admin. Please contact your instructor to re-enable it before starting a new simulation.'
+          )
+          setCreating(false)
+          return
+        }
+      }
+
       const simulation = await api.assessments.create({
         level,
         userIdea: idea.trim() || undefined,
