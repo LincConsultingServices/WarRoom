@@ -470,58 +470,42 @@ export default function SimulationPage() {
 
   // Reset dynamic scenario state when question changes
   useEffect(() => {
-    if ((currentQ as any)?.type === 'dynamic_scenario') {
+    if ((currentQ as any)?.type === 'dynamic_scenario' || currentQ?.type === 'scenario') {
       setDynamicScenario(null)
       setMcqFeedback(null)
       setDynamicScenarioError('')
-      // CRITICAL: reset the in-flight guard so back-navigation never permanently blocks fetching
       loadingScenarioRef.current = false
     }
   }, [currentQ?.q_id])
 
+  const [scenarioRetryTick, setScenarioRetryTick] = useState(0);
+
   // Fetch dynamic scenario if current question needs it
   useEffect(() => {
     let ignore = false;
+    const qType = currentQ?.type || (currentQ as any)?.type;
+    
     if (
       currentQ &&
-      (currentQ as any)?.type === 'dynamic_scenario' &&
+      qType === 'dynamic_scenario' &&
       simulation &&
-      !loadingScenarioRef.current &&
-      !dynamicScenarioBlocked[currentQ.q_id]
+      !loadingScenarioRef.current
     ) {
       const fetchScenario = async () => {
         if (!currentQ) return;
-        // Check stage-level cache first (populated by bulk prefetch OR previous individual fetch)
-        const cached = stageDynamicScenarios[currentQ.q_id]
-        if (cached && cached.questionId === currentQ.q_id) {
-          if (!ignore) {
-            setDynamicScenario(cached)
-            setDynamicScenarioError('')
-            // If already answered, set feedback
-            if (cached.selectedOptionId) {
-              const options = typeof cached.options === 'string' ? JSON.parse(cached.options) : cached.options;
-              const opt = options.find((o: any) => o.id === cached.selectedOptionId)
-              if (opt) setMcqFeedback(opt.feedback)
-              // Pre-fill answer
-              setAnswers(prev => ({
-                ...prev,
-                [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: cached.selectedOptionId } as any
-              }))
-            }
-          }
-          return
-        }
 
+        // Skip frontend stage-level cache checks as it caused payload inconsistencies
         loadingScenarioRef.current = true;
         setLoadingScenario(true)
         
         let ds: any = null;
         let fetchError: any = null;
         let attempts = 0;
-        const maxAttempts = 3; // Auto-retry up to 3 times before giving up
+        const maxAttempts = 3;
         
         while (attempts < maxAttempts && !ignore && !ds) {
           try {
+            // Always rely on the backend: checks if generated, if not creates it.
             ds = await api.assessments.getDynamicScenario(assessmentId, simulation.currentStage, currentQ.q_id)
             fetchError = null;
           } catch (err: any) {
@@ -537,34 +521,34 @@ export default function SimulationPage() {
         try {
           if (fetchError) throw fetchError;
           
-          if (!ignore && ds && (ds.questionId === currentQ.q_id || ds.question_id === currentQ.q_id)) {
-            // Normalize
-            ds.questionId = ds.questionId || ds.question_id;
+          if (!ignore && ds && (ds.questionId === currentQ.q_id || ds.question_id === currentQ.q_id || ds.q_id === currentQ.q_id)) {
+            // Normalize ID fields across different backend models
+            ds.questionId = ds.questionId || ds.question_id || ds.q_id || currentQ.q_id;
             setDynamicScenario(ds)
             setDynamicScenarioError('')
-            setDynamicScenarioBlocked(prev => ({ ...prev, [currentQ.q_id]: false }))
-            // Store in stage cache so back-navigation finds it instantly
-            setStageDynamicScenarios(prev => ({ ...prev, [currentQ.q_id]: ds }))
-            // If already answered, set feedback
-            if (ds.selectedOptionId) {
+            
+            // If already answered, set feedback restoring from answers logic
+            if (ds.selectedOptionId || (answers[currentQ.q_id] && (answers[currentQ.q_id] as any).selectedOptionId)) {
+              const selectedId = ds.selectedOptionId || (answers[currentQ.q_id] as any).selectedOptionId;
               const options = typeof ds.options === 'string' ? JSON.parse(ds.options) : ds.options;
-              const opt = options.find((o: any) => o.id === ds.selectedOptionId)
+              const opt = options.find((o: any) => o.id === selectedId)
               if (opt) setMcqFeedback(opt.feedback)
-              setAnswers(prev => ({
-                ...prev,
-                [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: ds.selectedOptionId } as any
-              }))
+              
+              if (!answers[currentQ.q_id]) {
+                setAnswers(prev => ({
+                  ...prev,
+                  [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: selectedId } as any
+                }))
+              }
             }
-          } else if (!ignore && (!ds || (ds.questionId !== currentQ.q_id && ds.question_id !== currentQ.q_id))) {
-            console.error('Wrong scenario returned:', ds, 'expected:', currentQ.q_id);
+          } else if (!ignore && !ds) {
             setDynamicScenarioError('Received incorrect scenario data.')
           }
         } catch (err: any) {
           if (!ignore) {
             const message = err?.message || 'Failed to generate scenario right now.'
             setDynamicScenarioError(message)
-            setDynamicScenarioBlocked(prev => ({ ...prev, [currentQ.q_id]: true }))
-            console.error('Failed to fetch dynamic scenario after retries:', err)
+            console.error('Failed to fetch dynamic scenario:', err)
           }
         } finally {
           loadingScenarioRef.current = false;
@@ -575,7 +559,7 @@ export default function SimulationPage() {
     }
     return () => { ignore = true; }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQ?.q_id, assessmentId, simulation?.currentStage, stageDynamicScenarios, dynamicScenarioBlocked])
+  }, [currentQ?.q_id, assessmentId, simulation?.currentStage, scenarioRetryTick])
 
   if (loading) {
     return (
@@ -1661,7 +1645,6 @@ export default function SimulationPage() {
                             )}
                           </FadeInUp>
                         )}
-
                       </FadeInUp>
                     ) : (
                       <div className="text-center py-8 text-muted-foreground space-y-3">
@@ -1675,7 +1658,7 @@ export default function SimulationPage() {
                             onClick={() => {
                               setDynamicScenarioError('')
                               setDynamicScenario(null)
-                              setDynamicScenarioBlocked(prev => ({ ...prev, [currentQ.q_id]: false }))
+                              setScenarioRetryTick(r => r + 1)
                             }}
                           >
                             Retry scenario generation
