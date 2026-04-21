@@ -50,11 +50,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             setRecordingTime(0)
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100,
-                }
+                audio: true
             })
             streamRef.current = stream
 
@@ -94,7 +90,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
                 }
             }
 
-            mediaRecorder.start(250) // Collect data every 250ms
+            mediaRecorder.start() // Do not pass timeSlice to avoid instant termination issues
             setIsRecording(true)
 
             // Start countdown timer
