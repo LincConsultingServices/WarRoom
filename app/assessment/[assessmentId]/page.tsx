@@ -266,6 +266,7 @@ export default function SimulationPage() {
   // Follow-up branching
   const [loadingFollowup, setLoadingFollowup] = useState<Record<string, boolean>>({})
   const [followupScenarios, setFollowupScenarios] = useState<Record<string, { question: string }>>({})
+  const [followupError, setFollowupError] = useState<Record<string, string>>({})
 
   const [buyoutCompany, setBuyoutCompany] = useState('')
   const [buyoutAmount, setBuyoutAmount] = useState('')
@@ -468,6 +469,13 @@ export default function SimulationPage() {
     }
   }, [simulation?.currentStage, assessmentId])
 
+  // Redirect to war-room if stage is STAGE_4_WARROOM
+  useEffect(() => {
+    if (simulation?.currentStage === 'STAGE_4_WARROOM' && !showingScenario) {
+      router.push(`/assessment/${assessmentId}/war-room`)
+    }
+  }, [simulation?.currentStage, assessmentId, router, showingScenario])
+
   // Reset dynamic scenario state when question changes
   useEffect(() => {
     if ((currentQ as any)?.type === 'dynamic_scenario' || currentQ?.type === 'scenario') {
@@ -475,6 +483,7 @@ export default function SimulationPage() {
       setMcqFeedback(null)
       setDynamicScenarioError('')
       loadingScenarioRef.current = false
+      setLoadingScenario(false)
     }
   }, [currentQ?.q_id])
 
@@ -506,7 +515,11 @@ export default function SimulationPage() {
         while (attempts < maxAttempts && !ignore && !ds) {
           try {
             // Always rely on the backend: checks if generated, if not creates it.
-            ds = await api.assessments.getDynamicScenario(assessmentId, simulation.currentStage, currentQ.q_id)
+            const rawDs = await api.assessments.getDynamicScenario(assessmentId, simulation.currentStage, currentQ.q_id)
+            if (rawDs && rawDs.error) {
+              throw new Error(rawDs.error);
+            }
+            ds = rawDs;
             fetchError = null;
           } catch (err: any) {
             fetchError = err;
@@ -521,25 +534,33 @@ export default function SimulationPage() {
         try {
           if (fetchError) throw fetchError;
           
-          if (!ignore && ds && (ds.questionId === currentQ.q_id || ds.question_id === currentQ.q_id || ds.q_id === currentQ.q_id)) {
-            // Normalize ID fields across different backend models
-            ds.questionId = ds.questionId || ds.question_id || ds.q_id || currentQ.q_id;
-            setDynamicScenario(ds)
-            setDynamicScenarioError('')
-            
-            // If already answered, set feedback restoring from answers logic
-            if (ds.selectedOptionId || (answers[currentQ.q_id] && (answers[currentQ.q_id] as any).selectedOptionId)) {
-              const selectedId = ds.selectedOptionId || (answers[currentQ.q_id] as any).selectedOptionId;
-              const options = typeof ds.options === 'string' ? JSON.parse(ds.options) : ds.options;
-              const opt = options.find((o: any) => o.id === selectedId)
-              if (opt) setMcqFeedback(opt.feedback)
+          if (!ignore && ds) {
+            if (ds.questionId === currentQ.q_id || ds.question_id === currentQ.q_id || ds.q_id === currentQ.q_id) {
+              // Normalize ID fields across different backend models
+              ds.questionId = ds.questionId || ds.question_id || ds.q_id || currentQ.q_id;
+              setDynamicScenario(ds)
+              setDynamicScenarioError('')
               
-              if (!answers[currentQ.q_id]) {
-                setAnswers(prev => ({
-                  ...prev,
-                  [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: selectedId } as any
-                }))
+              // If already answered, set feedback restoring from answers logic
+              if (ds.selectedOptionId || (answers[currentQ.q_id] && (answers[currentQ.q_id] as any).selectedOptionId)) {
+                const selectedId = ds.selectedOptionId || (answers[currentQ.q_id] as any).selectedOptionId;
+                const options = typeof ds.options === 'string' ? JSON.parse(ds.options) : ds.options;
+                const opt = options.find((o: any) => o.id === selectedId)
+                if (opt) setMcqFeedback(opt.feedback)
+                
+                if (!answers[currentQ.q_id]) {
+                  setAnswers(prev => ({
+                    ...prev,
+                    [currentQ.q_id]: { questionId: currentQ.q_id, type: 'dynamic_scenario', selectedOptionId: selectedId } as any
+                  }))
+                }
               }
+            } else {
+              console.warn(`Scenario ID mismatch! Expected: ${currentQ.q_id}, got: ${ds.questionId || ds.question_id || ds.q_id}`);
+              // Fallback to accepting it as the scenario to prevent UI hanging, but update its ID
+              ds.questionId = currentQ.q_id;
+              setDynamicScenario(ds)
+              setDynamicScenarioError('')
             }
           } else if (!ignore && !ds) {
             setDynamicScenarioError('Received incorrect scenario data.')
@@ -679,6 +700,7 @@ export default function SimulationPage() {
     // Secondary Branching logic for scenarios
     if (isScenario && !followupScenarios[qId]) {
       setLoadingFollowup(prev => ({ ...prev, [qId]: true }))
+      setFollowupError(prev => ({ ...prev, [qId]: '' }))
       try {
         const payloadTitle = simulation?.userIdea || 'The entrepreneur is building a business.'
         const payloadQuestion = (qType === 'dynamic_scenario' && dynamicScenario) 
@@ -698,6 +720,7 @@ export default function SimulationPage() {
         }
       } catch (err: any) {
         console.error('Failed to generate follow-up:', err)
+        setFollowupError(prev => ({ ...prev, [qId]: err.message || 'Failed to generate follow-up' }))
       } finally {
         setLoadingFollowup(prev => ({ ...prev, [qId]: false }))
       }
@@ -1611,7 +1634,7 @@ export default function SimulationPage() {
                         </div>
                         
                         {/* FOLLOWUP BRANCHING SECTION */}
-                        {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
+                        {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
                           <FadeInUp className="mt-6 pl-4 border-l-2 border-primary/40 space-y-4">
                             <div className="flex items-center gap-2">
                                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -1622,6 +1645,23 @@ export default function SimulationPage() {
                               <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-xl">
                                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                                 <span className="text-sm italic text-muted-foreground">AI is assessing the impact of your decision...</span>
+                              </div>
+                            ) : followupError[currentQ.q_id] ? (
+                              <div className="space-y-3">
+                                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm font-medium leading-relaxed whitespace-pre-line text-red-900 dark:text-red-100">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                    <span className="font-bold">Follow-up Scenario Failed</span>
+                                  </div>
+                                  {followupError[currentQ.q_id]}
+                                </div>
+                                <Button 
+                                  variant="outline" 
+                                  onClick={() => handleSelectOption(currentQ.options?.find(o => o.id === currentAnswer.selectedOptionId)!, currentQ.q_id)}
+                                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/40"
+                                >
+                                  Retry Generating Consequence
+                                </Button>
                               </div>
                             ) : followupScenarios[currentQ.q_id] && (
                               <div className="space-y-3">
@@ -1704,7 +1744,7 @@ export default function SimulationPage() {
                     )}
                     
                     {/* FOLLOWUP BRANCHING SECTION */}
-                    {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
+                    {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
                       <FadeInUp className="mt-6 pl-4 border-l-2 border-amber-500/40 space-y-4">
                         <div className="flex items-center gap-2">
                            <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
@@ -1715,6 +1755,28 @@ export default function SimulationPage() {
                           <div className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl">
                             <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
                             <span className="text-sm italic text-amber-700 dark:text-amber-400">AI is developing the scenario consequence...</span>
+                          </div>
+                        ) : followupError[currentQ.q_id] ? (
+                          <div className="space-y-3">
+                            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm font-medium leading-relaxed whitespace-pre-line text-red-900 dark:text-red-100">
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                <span className="font-bold">Follow-up Scenario Failed</span>
+                              </div>
+                              {followupError[currentQ.q_id]}
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => {
+                                const selectedOption = currentQ.options?.find((o:any) => o.id === currentAnswer.selectedOptionId);
+                                if (selectedOption) {
+                                  handleSelectOption(selectedOption, currentQ.q_id);
+                                }
+                              }}
+                              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/40"
+                            >
+                              Retry Generating Consequence
+                            </Button>
                           </div>
                         ) : followupScenarios[currentQ.q_id] && (
                           <div className="space-y-3">
