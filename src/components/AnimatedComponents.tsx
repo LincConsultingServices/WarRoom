@@ -457,7 +457,6 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[70] flex items-center justify-center cursor-pointer"
           style={{ background: 'radial-gradient(ellipse at center, hsl(var(--background) / 0.97), hsl(var(--background) / 0.99))' }}
-          onClick={onDismiss}
         >
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -470,7 +469,7 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
               boxShadow: `0 30px 70px -45px ${accentColor}`,
               backdropFilter: 'blur(18px)',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={onDismiss}
           >
             <div
               className="pointer-events-none absolute inset-0"
@@ -486,7 +485,7 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
                 className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-extrabold tracking-[0.15em] uppercase mb-6 border"
                 style={{ backgroundColor: `${accentColor}15`, borderColor: `${accentColor}30`, color: accentColor }}
               >
-                <span>MONTH</span> {data.month}
+                {data.month}
               </motion.div>
 
               {/* Title */}
@@ -495,10 +494,9 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ delay: 0.35, duration: 0.6 }}
                 className="text-3xl sm:text-5xl font-black tracking-tight mb-3"
+                style={{ color: accentColor }}
               >
-                <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(135deg, hsl(var(--foreground)), ${accentColor})` }}>
-                  {data.title}
-                </span>
+                {data.title}
               </motion.h2>
 
               {/* Description */}

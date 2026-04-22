@@ -281,12 +281,12 @@ export default function SimulationResultPage() {
                         </Badge>
                       </div>
                       <Progress
-                        value={Math.min(comp.weightedAverage || 0, 100)}
+                        value={Math.min(((comp.weightedAverage || 0) / 3) * 100, 100)}
                         className="h-2"
                       />
                     </div>
                     <span className="text-sm font-mono font-bold w-10 text-right">
-                      {Math.round(comp.weightedAverage || 0)}
+                      {(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)}
                     </span>
                   </div>
                 ))}
@@ -405,7 +405,7 @@ export default function SimulationResultPage() {
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Proficiency</span>
-                        <span className="font-mono">{(comp.weightedAverage || 0).toFixed(1)} / 3.0</span>
+                        <span className="font-mono">{(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)} / 10.0</span>
                       </div>
                       <Progress value={((comp.weightedAverage || 0) / 3) * 100} className="h-1.5" />
                     </div>

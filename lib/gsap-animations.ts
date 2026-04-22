@@ -127,7 +127,7 @@ export const glowPulse = (
       `0 0 5px ${color}`,
       `0 0 25px ${color}, 0 0 50px rgba(99, 102, 241, 0.2)`,
       `0 0 5px ${color}`,
-    ],
+    ] as any,
     duration,
     repeat: -1,
     ease: 'sine.inOut',
@@ -183,7 +183,7 @@ export const setupMagneticButton = (
 
 // SCROLL TRIGGER FADE IN UP
 export const scrollFadeInUp = (
-  element: gsap.TweenTarget,
+  element: any,
   duration = 0.6
 ) => {
   gsap.fromTo(
@@ -206,7 +206,7 @@ export const scrollFadeInUp = (
 
 // SCROLL TRIGGER SCALE UP
 export const scrollScaleUp = (
-  element: gsap.TweenTarget,
+  element: any,
   duration = 0.8
 ) => {
   gsap.fromTo(
@@ -330,7 +330,7 @@ export const animateGradient = (
   duration = 4
 ) => {
   return gsap.to(element, {
-    backgroundPosition: ['0% center', '100% center', '0% center'],
+    backgroundPosition: ['0% center', '100% center', '0% center'] as any,
     duration,
     repeat: -1,
     ease: 'none',

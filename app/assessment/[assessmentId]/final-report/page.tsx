@@ -168,11 +168,11 @@ function DealPage({ report }: { report: EvaluationReport }) {
 
   const sortedResults = deal?.investorResults ? [...deal.investorResults].sort((a, b) => {
     // Sort logic: Deal made comes first. Secondary sort by primary score descending.
-    const aDeal = (a.dealDecision || a.deal_decision) !== 'WALK_OUT' ? 1 : 0;
-    const bDeal = (b.dealDecision || b.deal_decision) !== 'WALK_OUT' ? 1 : 0;
+    const aDeal = (a.dealDecision || (a as any).deal_decision) !== 'WALK_OUT' ? 1 : 0;
+    const bDeal = (b.dealDecision || (b as any).deal_decision) !== 'WALK_OUT' ? 1 : 0;
     if (aDeal !== bDeal) return bDeal - aDeal;
-    const aScore = a.primaryScore ?? a.primary_score ?? 0;
-    const bScore = b.primaryScore ?? b.primary_score ?? 0;
+    const aScore = a.primaryScore ?? (a as any).primary_score ?? 0;
+    const bScore = b.primaryScore ?? (b as any).primary_score ?? 0;
     return bScore - aScore;
   }) : []
 
@@ -303,8 +303,8 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
   const ranking = report.competencyRanking || []
   const spiderData = report.spiderChartData || {}
 
-  // Simple bar chart representation since we can't use recharts in server component
-  const maxVal = 3
+  // Simple bar chart representation
+  const maxVal = 10
 
   return (
     <div className="comp-page">
@@ -326,7 +326,9 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
       {/* Spider Chart (bar representation) */}
       <div className="spider-chart">
         <h3>Competency Profile</h3>
-        {ranking.map((comp: RankedCompetency) => (
+        {ranking.map((comp: RankedCompetency) => {
+          const scaledScore = (comp.weightedAverage / 3) * 10;
+          return (
           <div key={comp.code} className="bar-row">
             <div className="bar-label">
               <span className="comp-code" style={{ color: COMP_COLORS[comp.code] || '#8b5cf6' }}>
@@ -338,17 +340,17 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
               <div
                 className="bar-fill"
                 style={{
-                  width: `${(comp.weightedAverage / maxVal) * 100}%`,
+                  width: `${(scaledScore / maxVal) * 100}%`,
                   background: COMP_COLORS[comp.code] || '#8b5cf6',
                 }}
               />
             </div>
-            <div className="bar-value">{comp.weightedAverage.toFixed(2)}</div>
+            <div className="bar-value">{scaledScore.toFixed(1)}</div>
             <span className={`cat-badge cat-${comp.category.toLowerCase().replace(/_/g, '-')}`}>
               {comp.category.replace(/_/g, ' ')}
             </span>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Role Fit */}

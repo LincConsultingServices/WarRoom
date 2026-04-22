@@ -108,10 +108,10 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-4">
               <Link href="/login">
-                <Button variant="outline" size="md">Sign In</Button>
+                <Button variant="outline" size="default">Sign In</Button>
               </Link>
               <Link href="/register">
-                <Button size="md" className="bg-gradient-to-r from-primary to-yellow-600 hover:from-primary/90 hover:to-yellow-600/90">Get Started</Button>
+                <Button size="default" className="bg-gradient-to-r from-primary to-yellow-600 hover:from-primary/90 hover:to-yellow-600/90">Get Started</Button>
               </Link>
             </div>
           </div>

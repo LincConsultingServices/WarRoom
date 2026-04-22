@@ -16,22 +16,17 @@ interface CompetencyRadarChartProps {
 }
 
 export function CompetencyRadarChart({ spiderData, competencyRanking }: CompetencyRadarChartProps) {
-  const scoreValues = competencyRanking
-    .map((comp) => Number(spiderData[comp.code] ?? 0))
-    .filter((value) => Number.isFinite(value))
-
-  const observedMax = scoreValues.length > 0 ? Math.max(...scoreValues) : 0
-  const isThreePointScale = observedMax <= 3.2
-  const domainMin = isThreePointScale ? 1 : 0
-  const domainMax = isThreePointScale ? 3 : 5
-  const ticks = isThreePointScale ? [1, 1.5, 2, 2.5, 3] : [1, 2, 3, 4, 5]
-
-  // Convert dict to array for recharts
-  const data = competencyRanking.map((comp) => ({
-    subject: comp.name,
-    score: Number(spiderData[comp.code] ?? domainMin),
-    fullMark: domainMax,
-  }))
+  // Convert dict to array for recharts, scaling from out-of-3 to out-of-10
+  const data = competencyRanking.map((comp) => {
+    const rawScore = Number(spiderData[comp.code] ?? 0);
+    const scaledScore = (rawScore / 3) * 10;
+    
+    return {
+      subject: comp.name,
+      score: Number(scaledScore.toFixed(1)),
+      fullMark: 10,
+    }
+  })
 
   return (
     <div className="w-full h-[400px]">
@@ -39,7 +34,7 @@ export function CompetencyRadarChart({ spiderData, competencyRanking }: Competen
         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
           <PolarGrid />
           <PolarAngleAxis dataKey="subject" tick={{ fill: 'currentColor', fontSize: 12 }} />
-          <PolarRadiusAxis angle={30} domain={[domainMin, domainMax]} ticks={ticks as any[]} />
+          <PolarRadiusAxis angle={30} domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10] as any[]} />
           <Radar name="Competency Score" dataKey="score" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
           <Tooltip 
             contentStyle={{ backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--card-foreground))', borderRadius: '8px' }}
