@@ -24,7 +24,7 @@ export default function FinalReportPage() {
   const [report, setReport] = useState<EvaluationReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [activePage, setActivePage] = useState<1 | 2 | 3 | 4 | 5>(1)
+  const [activePage, setActivePage] = useState<1 | 2 | 3 | 4>(1)
 
   useEffect(() => {
     api.assessments
@@ -38,7 +38,7 @@ export default function FinalReportPage() {
     return (
       <div className="report-loading">
         <div className="loader-text">Loading your saved evaluation report...</div>
-        <style jsx>{`.report-loading { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a1a; color: #c4b5fd; font-size: 1.2rem; }`}</style>
+        <style jsx>{`.report-loading { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: hsl(var(--background)); color: hsl(var(--primary)); font-size: 1.2rem; }`}</style>
       </div>
     )
   }
@@ -75,9 +75,6 @@ export default function FinalReportPage() {
         <button className={`tab ${activePage === 4 ? 'active' : ''}`} onClick={() => setActivePage(4)}>
           Your Responses
         </button>
-        <button className={`tab ${activePage === 5 ? 'active' : ''}`} onClick={() => setActivePage(5)}>
-          Deep Dive
-        </button>
       </nav>
 
       <main className="report-content">
@@ -93,7 +90,6 @@ export default function FinalReportPage() {
             {activePage === 2 && <CompetencyPage report={report} />}
             {activePage === 3 && <AIAnalysisPage report={report} />}
             {activePage === 4 && <UserResponsesPage report={report} />}
-            {activePage === 5 && <DeepDivePage report={report} />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -125,7 +121,7 @@ export default function FinalReportPage() {
           margin-bottom: 0.5rem;
         }
         .subtitle {
-          color: #a5b4fc;
+          color: hsl(var(--muted-foreground));
           font-size: 1rem;
           font-weight: 500;
         }
@@ -137,7 +133,7 @@ export default function FinalReportPage() {
           margin-bottom: 2rem;
         }
         .tab {
-          background: rgba(255,255,255,0.04);
+          background: hsl(var(--muted));
           border: 1px solid rgba(255,255,255,0.08);
           color: #9ca3af;
           padding: 0.7rem 1.5rem;
@@ -151,7 +147,7 @@ export default function FinalReportPage() {
         .tab.active {
           background: rgba(139,92,246,0.15);
           border-color: #8b5cf6;
-          color: #c4b5fd;
+          color: hsl(var(--primary));
         }
 
         .report-content {
@@ -169,6 +165,16 @@ export default function FinalReportPage() {
 
 function DealPage({ report }: { report: EvaluationReport }) {
   const deal = report.dealSummary
+
+  const sortedResults = deal?.investorResults ? [...deal.investorResults].sort((a, b) => {
+    // Sort logic: Deal made comes first. Secondary sort by primary score descending.
+    const aDeal = (a.dealDecision || a.deal_decision) !== 'WALK_OUT' ? 1 : 0;
+    const bDeal = (b.dealDecision || b.deal_decision) !== 'WALK_OUT' ? 1 : 0;
+    if (aDeal !== bDeal) return bDeal - aDeal;
+    const aScore = a.primaryScore ?? a.primary_score ?? 0;
+    const bScore = b.primaryScore ?? b.primary_score ?? 0;
+    return bScore - aScore;
+  }) : []
 
   return (
     <div className="deal-page">
@@ -231,7 +237,7 @@ function DealPage({ report }: { report: EvaluationReport }) {
           margin-bottom: 2rem;
         }
         .stat-card {
-          background: rgba(255,255,255,0.04);
+          background: hsl(var(--muted));
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 16px;
           padding: 2rem 3rem;
@@ -265,7 +271,7 @@ function DealPage({ report }: { report: EvaluationReport }) {
           border-radius: 6px;
         }
         .deal-badge.deal { background: rgba(16,185,129,0.15); color: #34d399; }
-        .deal-badge.walkout { background: rgba(239,68,68,0.15); color: #fca5a5; }
+        .deal-badge.walkout { background: rgba(239,68,68,0.15); color: hsl(var(--destructive)); }
         .sc-scores {
           display: flex;
           gap: 1rem;
@@ -275,7 +281,7 @@ function DealPage({ report }: { report: EvaluationReport }) {
         }
         .red-flag { color: #ef4444; font-weight: 600; }
         blockquote {
-          background: rgba(255,255,255,0.02);
+          background: hsl(var(--muted));
           border-left: 2px solid rgba(255,255,255,0.1);
           padding: 0.6rem 1rem;
           border-radius: 0 6px 6px 0;
@@ -400,7 +406,7 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
           font-size: 1rem;
           margin-bottom: 1rem;
         }
-        .archetype-role strong { color: #c4b5fd; }
+        .archetype-role strong { color: hsl(var(--primary)); }
         .archetype-narrative {
           color: #d1d5db;
           line-height: 1.6;
@@ -466,7 +472,7 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
         .cat-natural-dominant { background: rgba(16,185,129,0.12); color: #34d399; }
         .cat-strong { background: rgba(59,130,246,0.12); color: #60a5fa; }
         .cat-functional { background: rgba(245,158,11,0.12); color: #fbbf24; }
-        .cat-development-required { background: rgba(239,68,68,0.12); color: #fca5a5; }
+        .cat-development-required { background: rgba(239,68,68,0.12); color: hsl(var(--destructive)); }
         .cat-high-risk { background: rgba(239,68,68,0.2); color: #ef4444; }
 
         .role-fit { margin-bottom: 2rem; }
@@ -479,7 +485,7 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
         .role-name {
           font-size: 1.2rem;
           font-weight: 700;
-          color: #c4b5fd;
+          color: hsl(var(--primary));
           margin-bottom: 0.5rem;
         }
         .role-card p { color: #9ca3af; font-size: 0.9rem; margin-bottom: 0.8rem; }
@@ -490,7 +496,7 @@ function CompetencyPage({ report }: { report: EvaluationReport }) {
           border-radius: 6px;
           font-size: 0.75rem;
           font-weight: 600;
-          color: #a5b4fc;
+          color: hsl(var(--muted-foreground));
         }
 
         .action-plan { margin-bottom: 2rem; }
@@ -597,7 +603,7 @@ function AIAnalysisPage({ report }: { report: EvaluationReport }) {
         .analysis-heading {
           font-size: 1.15rem;
           font-weight: 700;
-          color: #c4b5fd;
+          color: hsl(var(--primary));
           margin: 1.5rem 0 0.6rem 0;
           padding-bottom: 0.4rem;
           border-bottom: 1px solid rgba(196, 181, 253, 0.15);
@@ -758,7 +764,7 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
         }
         .stage-badge {
           background: rgba(99,102,241,0.15);
-          color: #a5b4fc;
+          color: hsl(var(--muted-foreground));
           padding: 0.25rem 0.8rem;
           border-radius: 8px;
           font-size: 0.8rem;
@@ -793,7 +799,7 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
           margin: 0.2rem 0 0 0;
         }
         .response-answer {
-          background: rgba(255,255,255,0.02);
+          background: hsl(var(--muted));
           border-left: 2px solid rgba(99,102,241,0.3);
           padding: 0.5rem 0.8rem;
           border-radius: 0 6px 6px 0;
@@ -835,78 +841,3 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
 }
 
 // ============================================
-// PAGE 5: DEEP DIVE
-// ============================================
-
-function DeepDivePage({ report }: { report: EvaluationReport }) {
-  const narrations = report.stageNarrations || []
-
-  return (
-    <div className="deep-dive">
-      <h3>Stage-by-Stage Journey</h3>
-      {narrations.map((n, i) => (
-        <div key={i} className="stage-narration">
-          <div className="sn-header">
-            <span className="sn-badge">Stage {n.stageNumber}</span>
-            <span className="sn-name">{n.stage}</span>
-            <span className="sn-count">{n.questionsAnswered} questions</span>
-          </div>
-          {n.decisions && n.decisions.length > 0 && (
-            <div className="sn-decisions">
-              <strong>Key Decisions:</strong>
-              <ul>{n.decisions.map((d, j) => <li key={j}>{d}</li>)}</ul>
-            </div>
-          )}
-          {n.scoringRationale && (
-            <p className="scoring-rationale">{n.scoringRationale}</p>
-          )}
-        </div>
-      ))}
-
-      <style jsx>{`
-        .deep-dive { animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        h3 { color: white; margin-bottom: 1.5rem; }
-        .stage-narration {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 12px;
-          padding: 1.2rem;
-          margin-bottom: 0.8rem;
-        }
-        .sn-header {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          margin-bottom: 0.6rem;
-        }
-        .sn-badge {
-          background: rgba(99,102,241,0.15);
-          color: #a5b4fc;
-          padding: 0.15rem 0.6rem;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-        .sn-name { color: white; font-weight: 600; font-size: 0.95rem; }
-        .sn-count { color: #6b7280; font-size: 0.8rem; }
-        .sn-decisions {
-          font-size: 0.9rem;
-          color: #d1d5db;
-        }
-        .sn-decisions strong { color: #a5b4fc; font-size: 0.85rem; }
-        .sn-decisions ul {
-          margin: 0.3rem 0 0 1.2rem;
-          padding: 0;
-        }
-        .sn-decisions li { margin-bottom: 0.2rem; }
-        .scoring-rationale {
-          font-size: 0.85rem;
-          color: #9ca3af;
-          font-style: italic;
-          margin: 0.5rem 0 0 0;
-        }
-      `}</style>
-    </div>
-  )
-}
