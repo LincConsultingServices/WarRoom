@@ -929,15 +929,23 @@ export default function WarRoomSimulation() {
                                             }
                                         </p>
                                         
-                                        <div className="mic-button-wrapper" style={{ width: '100px', height: '100px' }}>
-                                            <button 
-                                                className={`mic-button ${negotiationRecorder.isRecording ? 'active' : ''}`}
-                                                style={{ width: '80px', height: '80px', fontSize: '2rem' }}
+                                        <div className={`mic-button-wrapper ${negotiationRecorder.isRecording ? 'recording' : ''}`}>
+                                            {negotiationRecorder.isRecording && (
+                                                <>
+                                                    <div className="pulse-ring ring-1" />
+                                                    <div className="pulse-ring ring-2" />
+                                                    <div className="pulse-ring ring-3" />
+                                                </>
+                                            )}
+                                            <motion.button 
+                                                className={`mic-button ${negotiationRecorder.isRecording ? 'active' : ''} ${negotiationRecorder.audioBlob ? 'done' : ''}`}
                                                 onClick={negotiationRecorder.isRecording ? negotiationRecorder.stopRecording : negotiationRecorder.startRecording}
                                                 disabled={isNegVoiceSubmitting || negRound >= MAX_NEG_ROUNDS}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                             >
-                                                {negotiationRecorder.isRecording ? 'Stop Recording' : 'Start Recording'}
-                                            </button>
+                                                {negotiationRecorder.isRecording ? 'Stop Recording' : negotiationRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                            </motion.button>
                                         </div>
 
                                         {negotiationRecorder.isRecording ? (
