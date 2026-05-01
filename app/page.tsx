@@ -107,6 +107,9 @@ export default function HomePage() {
               <span className="font-bold text-lg">War Room</span>
             </div>
             <div className="flex items-center gap-4">
+              <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Terms &amp; Conditions
+              </Link>
               <Link href="/login">
                 <Button variant="outline" size="default">Sign In</Button>
               </Link>
@@ -183,6 +186,13 @@ export default function HomePage() {
                 </Button>
               </motion.div>
             </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              By continuing, you agree to the{' '}
+              <Link href="/terms" className="text-primary hover:underline">
+                Terms &amp; Conditions
+              </Link>{' '}
+              before entering the War Room.
+            </p>
           </FadeInUp>
 
           {/* Featured Panelists Preview — Animated Orbital */}

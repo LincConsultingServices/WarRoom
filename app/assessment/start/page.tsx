@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/src/lib/api'
+import { Checkbox } from '@/components/ui/checkbox'
+import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 const STAGES = [
   { name: 'Ideation', number: -2, duration: '10 min', competencies: ['C1', 'C2'] },
@@ -20,14 +22,25 @@ const STAGES = [
 export default function SimulationStartPage() {
   const router = useRouter()
   const [level, setLevel] = useState<1 | 2>(1)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isStarting, setIsStarting] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    setAcceptedTerms(hasAcceptedTerms())
+  }, [])
+
   const handleStart = async () => {
+    if (!acceptedTerms) {
+      setError('Please accept the Terms & Conditions before attending the simulation')
+      return
+    }
+
     setIsStarting(true)
     setError('')
     try {
       const simulation = await api.assessments.create({ level })
+      acceptTerms()
       router.push(`/assessment/${simulation.id}`)
     } catch (err: any) {
       setError(err.message || 'Failed to start simulation')
@@ -39,6 +52,12 @@ export default function SimulationStartPage() {
     <div className="simulation-start-page">
       <div className="start-container">
         <Link href="/" className="back-link">← Back to Dashboard</Link>
+        <div className="terms-banner">
+          <div>
+            <strong>Before attending:</strong> please review and accept the{' '}
+            <Link href="/terms">Terms &amp; Conditions</Link>.
+          </div>
+        </div>
 
         <div className="hero-section">
           <div className="hero-badge">KK&apos;s War Room 2.0</div>
@@ -133,10 +152,21 @@ export default function SimulationStartPage() {
 
         {error && <div className="error-message">{error}</div>}
 
+        <div className="consent-box">
+          <Checkbox
+            id="simulation-terms"
+            checked={acceptedTerms}
+            onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+          />
+          <label htmlFor="simulation-terms">
+            I have read and agree to the <Link href="/terms">Terms &amp; Conditions</Link>.
+          </label>
+        </div>
+
         <button
           className="start-button"
           onClick={handleStart}
-          disabled={isStarting}
+          disabled={isStarting || !acceptedTerms}
         >
           {isStarting ? 'Initializing Simulation...' : 'Begin Simulation →'}
         </button>
@@ -162,6 +192,25 @@ export default function SimulationStartPage() {
           transition: color 0.2s;
         }
         .back-link:hover { color: #b0b0ff; }
+
+        .terms-banner {
+          max-width: 900px;
+          margin: 0 auto 1.5rem;
+          padding: 0.9rem 1rem;
+          border: 1px solid rgba(139, 92, 246, 0.22);
+          background: rgba(139, 92, 246, 0.08);
+          border-radius: 12px;
+          color: #d8d6ff;
+          font-size: 0.92rem;
+          line-height: 1.5;
+        }
+
+        .terms-banner a,
+        .consent-box a {
+          color: #c4b5fd;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
 
         .hero-section {
           text-align: center;
@@ -318,6 +367,24 @@ export default function SimulationStartPage() {
           padding: 1.5rem;
         }
         .feature-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
+
+        .consent-box {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+          padding: 0.9rem 1rem;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.03);
+          color: #d1d5db;
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+
+        .consent-box label {
+          cursor: pointer;
+        }
         .feature-card h3 { font-size: 1rem; color: white; margin-bottom: 0.4rem; }
         .feature-card p { font-size: 0.85rem; color: #9ca3af; line-height: 1.5; }
 

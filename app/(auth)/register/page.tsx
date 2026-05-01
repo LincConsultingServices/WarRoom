@@ -2,13 +2,15 @@
 
 import React from "react"
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/src/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -18,8 +20,13 @@ export default function RegisterPage() {
   const [batchCode, setBatchCode] = useState('')
   const [batchValid, setBatchValid] = useState<boolean | null>(null)
   const [batchName, setBatchName] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setAcceptedTerms(hasAcceptedTerms())
+  }, [])
 
   const handleBatchCodeBlur = async () => {
     if (!batchCode.trim()) return
@@ -48,6 +55,10 @@ export default function RegisterPage() {
       setError('Please enter a valid batch code')
       return
     }
+    if (!acceptedTerms) {
+      setError('Please accept the Terms & Conditions before creating an account')
+      return
+    }
     setLoading(true)
     setError('')
 
@@ -58,6 +69,7 @@ export default function RegisterPage() {
         password,
         batchCode: batchCode.trim().toUpperCase(),
       })
+      acceptTerms()
       router.push('/login?registered=true')
     } catch (err: any) {
       setError(err.message || 'Registration failed')
@@ -83,7 +95,11 @@ export default function RegisterPage() {
         <Card>
           <CardHeader>
             <CardTitle>Create Account</CardTitle>
-            <CardDescription>Enter your batch code and details to begin your simulation</CardDescription>
+            <CardDescription>
+              Enter your batch code and details to begin your simulation. Review the{' '}
+              <Link href="/terms" className="text-primary hover:underline">Terms &amp; Conditions</Link>{' '}
+              before continuing.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -142,7 +158,21 @@ export default function RegisterPage() {
                   className="mt-1"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
+                <Checkbox
+                  id="register-terms"
+                  checked={acceptedTerms}
+                  onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="register-terms" className="text-sm leading-6 text-muted-foreground">
+                  I have read and agree to the{' '}
+                  <Link href="/terms" className="font-medium text-primary hover:underline">
+                    Terms &amp; Conditions
+                  </Link>
+                </label>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
                 {loading ? 'Creating account...' : 'Create Account'}
               </Button>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
   Dialog,
   DialogContent,
@@ -11,10 +12,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
 import { CharacterPicker } from './CharacterPicker'
 import api from '@/src/lib/api'
 import type { Mentor, Leader, Investor } from '@/src/types'
+import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 interface StartSimulationDialogProps {
   open: boolean
@@ -32,9 +35,14 @@ export function StartSimulationDialog({
   const [step, setStep] = useState<Step>('idea')
   const [idea, setIdea] = useState('')
   const [level, setLevel] = useState<1 | 2>(1)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setAcceptedTerms(hasAcceptedTerms())
+  }, [])
 
   const reset = () => {
     setStep('idea')
@@ -49,6 +57,11 @@ export function StartSimulationDialog({
   }
 
   const handleCreateSimulation = async () => {
+    if (!acceptedTerms) {
+      setError('Please accept the Terms & Conditions before starting a simulation')
+      return
+    }
+
     setCreating(true)
     setError('')
     try {
@@ -77,6 +90,8 @@ export function StartSimulationDialog({
         selectedInvestors: [],
       })
 
+      acceptTerms()
+
       reset()
       onCreated(simulation.id)
     } catch (err: any) {
@@ -96,6 +111,14 @@ export function StartSimulationDialog({
             {step === 'level' && 'Choose your experience level'}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground">
+          Before continuing, review and accept the{' '}
+          <Link href="/terms" className="font-medium text-primary hover:underline">
+            Terms &amp; Conditions
+          </Link>
+          .
+        </div>
 
         {/* Step indicator */}
         <div className="flex items-center gap-2 py-2">
@@ -120,6 +143,22 @@ export function StartSimulationDialog({
             {error}
           </div>
         )}
+
+        <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
+          <Checkbox
+            id="dialog-terms"
+            checked={acceptedTerms}
+            onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+            className="mt-0.5"
+          />
+          <label htmlFor="dialog-terms" className="text-sm leading-6 text-muted-foreground">
+            I agree to the{' '}
+            <Link href="/terms" className="font-medium text-primary hover:underline">
+              Terms &amp; Conditions
+            </Link>
+            {' '}and want to attend the simulation.
+          </label>
+        </div>
 
         {/* Step: Idea */}
         {step === 'idea' && (
@@ -184,7 +223,7 @@ export function StartSimulationDialog({
               <Button variant="outline" onClick={() => setStep('idea')}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button onClick={handleCreateSimulation} disabled={creating}>
+              <Button onClick={handleCreateSimulation} disabled={creating || !acceptedTerms}>
                 {creating ? (
                   <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...</>
                 ) : (
