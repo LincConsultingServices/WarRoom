@@ -395,40 +395,6 @@ export default function SimulationPage() {
     load()
   }, [load])
 
-  // Check if we need to show panel selection
-  useEffect(() => {
-    if (state?.simulation?.currentStage === 'STAGE_NEG1_VISION') {
-      const raw = (state?.simulation as any)?.selectedMentors
-      let selectedMentors: string[] = []
-      
-      if (Array.isArray(raw)) {
-        selectedMentors = raw
-      } else if (typeof raw === 'string') {
-        const trimmed = raw.trim()
-        if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-          try { selectedMentors = JSON.parse(trimmed) } catch { selectedMentors = [] }
-        } else if (trimmed) {
-          // If it's a raw string like "id1,id2" or just "id1"
-          selectedMentors = trimmed.split(',').map(s => s.trim())
-        }
-      }
-      
-      if (selectedMentors.length === 0) {
-        setShowPanelSelection(true)
-      }
-    }
-}, [state?.simulation?.currentStage, state?.simulation?.selectedMentors])
-
-  // Narration overlay: show on stage change
-  useEffect(() => {
-    if (simulation?.currentStage && STAGE_NARRATIVES[simulation.currentStage]) {
-      if (prevStageRef.current !== simulation.currentStage) {
-        prevStageRef.current = simulation.currentStage
-        setShowStageNarration(true)
-      }
-    }
-  }, [simulation?.currentStage])
-
   // Mentor tip auto-popup: show after 15 seconds on each stage
   useEffect(() => {
     if (mentorTipTimerRef.current) clearTimeout(mentorTipTimerRef.current)
@@ -696,6 +662,14 @@ export default function SimulationPage() {
       setShowCapitalAnimation(true);
       setTimeout(() => setShowCapitalAnimation(false), 3000);
     }
+  }
+
+  async function handleConfirmScenarioDecision(opt: SimOption, questionId?: string) {
+    const qId = questionId || currentQ?.q_id
+    if (!qId) return
+
+    const qType = currentQ?.type || (currentQ as any)?.type || ''
+    const isScenario = qType === 'scenario' || qType === 'dynamic_scenario'
 
     // Secondary Branching logic for scenarios
     if (isScenario && !followupScenarios[qId]) {
@@ -1634,7 +1608,7 @@ export default function SimulationPage() {
                         </div>
                         
                         {/* FOLLOWUP BRANCHING SECTION */}
-                        {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
+                        {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId ? (
                           <FadeInUp className="mt-6 pl-4 border-l-2 border-primary/40 space-y-4">
                             <div className="flex items-center gap-2">
                                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -1657,7 +1631,7 @@ export default function SimulationPage() {
                                 </div>
                                 <Button 
                                   variant="outline" 
-                                  onClick={() => handleSelectOption(currentQ.options?.find(o => o.id === currentAnswer.selectedOptionId)!, currentQ.q_id)}
+                                  onClick={() => handleConfirmScenarioDecision((currentQ.options || (dynamicScenario.options ? (typeof dynamicScenario.options === 'string' ? JSON.parse(dynamicScenario.options) : dynamicScenario.options) : []))?.find((o: any) => o.id === currentAnswer.selectedOptionId)!, currentQ.q_id)}
                                   className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/40"
                                 >
                                   Retry Generating Consequence
@@ -1684,7 +1658,16 @@ export default function SimulationPage() {
                               </div>
                             )}
                           </FadeInUp>
-                        )}
+                        ) : currentAnswer?.selectedOptionId ? (
+                          <FadeInUp className="mt-4 flex justify-end">
+                            <Button 
+                              onClick={() => handleConfirmScenarioDecision((currentQ.options || (dynamicScenario.options ? (typeof dynamicScenario.options === 'string' ? JSON.parse(dynamicScenario.options) : dynamicScenario.options) : []))?.find((o: any) => o.id === currentAnswer.selectedOptionId)!, currentQ.q_id)}
+                              className="w-full sm:w-auto"
+                            >
+                              Confirm Decision <ChevronRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </FadeInUp>
+                        ) : null}
                       </FadeInUp>
                     ) : (
                       <div className="text-center py-8 text-muted-foreground space-y-3">
@@ -1744,7 +1727,7 @@ export default function SimulationPage() {
                     )}
                     
                     {/* FOLLOWUP BRANCHING SECTION */}
-                    {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId && (
+                    {(loadingFollowup[currentQ.q_id] || followupScenarios[currentQ.q_id] || followupError[currentQ.q_id]) && currentAnswer?.selectedOptionId ? (
                       <FadeInUp className="mt-6 pl-4 border-l-2 border-amber-500/40 space-y-4">
                         <div className="flex items-center gap-2">
                            <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
@@ -1770,7 +1753,7 @@ export default function SimulationPage() {
                               onClick={() => {
                                 const selectedOption = currentQ.options?.find((o:any) => o.id === currentAnswer.selectedOptionId);
                                 if (selectedOption) {
-                                  handleSelectOption(selectedOption, currentQ.q_id);
+                                  handleConfirmScenarioDecision(selectedOption, currentQ.q_id);
                                 }
                               }}
                               className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/40"
@@ -1799,7 +1782,16 @@ export default function SimulationPage() {
                           </div>
                         )}
                       </FadeInUp>
-                    )}
+                    ) : currentAnswer?.selectedOptionId ? (
+                      <FadeInUp className="mt-4 flex justify-end">
+                        <Button 
+                          onClick={() => handleConfirmScenarioDecision(currentQ.options?.find(o => o.id === currentAnswer.selectedOptionId)!, currentQ.q_id)}
+                          className="w-full sm:w-auto"
+                        >
+                          Confirm Decision <ChevronRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </FadeInUp>
+                    ) : null}
                   </div>
                 ) : currentQ.type === 'multiple_choice' && currentQ.options ? (
                   /* Standard MCQ */
