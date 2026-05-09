@@ -712,24 +712,64 @@ export default function WarRoomSimulation() {
                                         <ul>{pitchAnalysis.weaknesses.map((w, i) => <li key={i}>{w}</li>)}</ul>
                                     </div>
                                 )}
-                                <motion.button className="submit-pitch-btn" onClick={handleContinueFromPitch} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                    Continue to Investor Questions
-                                </motion.button>
+
+                                {/* INVESTOR REACTION TO PITCH */}
+                                <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                                    <h4 style={{ color: '#60a5fa', marginBottom: '0.5rem', fontSize: '0.95rem' }}>{investors[0]?.name || 'Lead Investor'} Reaction:</h4>
+                                    <p style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>"{pitchAnalysis.feedback}"</p>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    <motion.button 
+                                        className="submit-pitch-btn" 
+                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        onClick={() => {
+                                            setPitchAnalysis(null);
+                                            pitchRecorder.resetRecording();
+                                        }}
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        Retry Pitch
+                                    </motion.button>
+                                    <motion.button 
+                                        className="submit-pitch-btn" 
+                                        style={{ flex: 2 }}
+                                        onClick={handleContinueFromPitch} 
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        Continue to Investor Questions
+                                    </motion.button>
+                                </div>
                             </motion.div>
                         )}
 
                         {error && <div className="error-msg">{error}</div>}
 
                         {!pitchAnalysis && !isAnalyzing && pitchRecorder.audioBlob && (
-                            <motion.button
-                                className="submit-pitch-btn"
-                                onClick={handleSubmitPitchAudio}
-                                disabled={isSubmitting}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                            >
-                                {isSubmitting ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
-                            </motion.button>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <motion.button
+                                    className="submit-pitch-btn"
+                                    style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                    onClick={() => pitchRecorder.resetRecording()}
+                                    disabled={isSubmitting}
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
+                                >
+                                    Discard Recording
+                                </motion.button>
+                                <motion.button
+                                    className="submit-pitch-btn"
+                                    style={{ flex: 2 }}
+                                    onClick={handleSubmitPitchAudio}
+                                    disabled={isSubmitting}
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
+                                >
+                                    {isSubmitting ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
+                                </motion.button>
+                            </div>
                         )}
                     </motion.div>
                 )}
@@ -801,9 +841,30 @@ export default function WarRoomSimulation() {
                                     </span>
                                     <p>{currentInvestorReaction}</p>
                                 </div>
-                                <motion.button className="respond-btn" onClick={handleContinueToNextInvestor} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                    {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor` : `View Panel Decisions`}
-                                </motion.button>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    <motion.button 
+                                        className="respond-btn" 
+                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        onClick={() => {
+                                            setCurrentInvestorReaction('');
+                                            setResponseTranscription('');
+                                            responseRecorder.resetRecording();
+                                        }}
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        Retry Response
+                                    </motion.button>
+                                    <motion.button 
+                                        className="respond-btn" 
+                                        style={{ flex: 2 }}
+                                        onClick={handleContinueToNextInvestor} 
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor` : `View Panel Decisions`}
+                                    </motion.button>
+                                </div>
                             </motion.div>
                         )}
                         </AnimatePresence>
@@ -851,9 +912,28 @@ export default function WarRoomSimulation() {
                                 {error && <div className="error-msg">{error}</div>}
 
                                 {responseRecorder.audioBlob && (
-                                    <motion.button className="respond-btn" onClick={handleRespondToInvestorAudio} disabled={isSubmitting} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                        {isSubmitting ? 'Analyzing Response...' : 'Submit Response'}
-                                    </motion.button>
+                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                        <motion.button 
+                                            className="respond-btn" 
+                                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                            onClick={() => responseRecorder.resetRecording()} 
+                                            disabled={isSubmitting} 
+                                            whileHover={{ scale: 1.03 }} 
+                                            whileTap={{ scale: 0.97 }}
+                                        >
+                                            Discard Recording
+                                        </motion.button>
+                                        <motion.button 
+                                            className="respond-btn" 
+                                            style={{ flex: 2 }}
+                                            onClick={handleRespondToInvestorAudio} 
+                                            disabled={isSubmitting} 
+                                            whileHover={{ scale: 1.03 }} 
+                                            whileTap={{ scale: 0.97 }}
+                                        >
+                                            {isSubmitting ? 'Analyzing Response...' : 'Submit Response'}
+                                        </motion.button>
+                                    </div>
                                 )}
                             </motion.div>
                         )}
@@ -1060,16 +1140,32 @@ export default function WarRoomSimulation() {
                                         )}
 
                                         {negotiationRecorder.audioBlob && !negotiationRecorder.isRecording && negRound < MAX_NEG_ROUNDS && (
-                                            <motion.button 
-                                                className="respond-btn" 
-                                                style={{ marginTop: '1rem', background: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#3b82f6' }}
-                                                onClick={handleNegotiateAudio} 
-                                                disabled={isNegVoiceSubmitting}
-                                                initial={{ scale: 0.9, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                            >
-                                                {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Decision' : 'Submit Voice Counter'}
-                                            </motion.button>
+                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                                <motion.button 
+                                                    className="respond-btn" 
+                                                    style={{ flex: 1, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                                    onClick={() => negotiationRecorder.resetRecording()} 
+                                                    disabled={isNegVoiceSubmitting}
+                                                    initial={{ scale: 0.9, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    whileHover={{ scale: 1.02 }} 
+                                                    whileTap={{ scale: 0.98 }}
+                                                >
+                                                    Discard Recording
+                                                </motion.button>
+                                                <motion.button 
+                                                    className="respond-btn" 
+                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#3b82f6' }}
+                                                    onClick={handleNegotiateAudio} 
+                                                    disabled={isNegVoiceSubmitting}
+                                                    initial={{ scale: 0.9, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    whileHover={{ scale: 1.02 }} 
+                                                    whileTap={{ scale: 0.98 }}
+                                                >
+                                                    {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Decision' : 'Submit Voice Counter'}
+                                                </motion.button>
+                                            </div>
                                         )}
                                     </div>
 
