@@ -11,11 +11,70 @@ import type {
     Investor,
     InvestorScorecard,
 } from '@/src/types'
+import { Volume2, VolumeX } from 'lucide-react'
 
 // ============================================
 // WAR ROOM – Investor Pitch Simulation
 // SOP: 15 minutes, all C1-C8 integrated
 // ============================================
+
+function QuestionAudioPlayer({ qId, className = '' }: { qId: string, className?: string }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [hasAudio, setHasAudio] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const audioSrc = `/audio/questions/${qId}.mp3`;
+    fetch(audioSrc, { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          setHasAudio(true);
+        } else {
+          setHasAudio(false);
+        }
+      })
+      .catch(() => setHasAudio(false));
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [qId]);
+
+  if (!hasAudio) return null;
+
+  const toggleAudio = () => {
+    const audioSrc = `/audio/questions/${qId}.mp3`;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(audioSrc);
+      audioRef.current.onended = () => setIsPlaying(false);
+      audioRef.current.onerror = () => setIsPlaying(false);
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((e) => {
+        setIsPlaying(false);
+      });
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleAudio(); }}
+      className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors ${isPlaying ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted"} ${className}`}
+      title="Listen"
+    >
+      {isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+    </button>
+  );
+}
 
 type WarRoomPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
 
@@ -699,7 +758,10 @@ export default function WarRoomSimulation() {
 
                         {/* Question */}
                         <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                            <span className="question-label">{currentInvestor.name} asks:</span>
+                            <div className="flex items-center justify-between">
+                                <span className="question-label">{currentInvestor.name} asks:</span>
+                                <QuestionAudioPlayer qId={currentInvestor.name.toLowerCase().replace(/\s+/g, '_')} />
+                            </div>
                             <p className="question-text">{currentInvestor.signature_question}</p>
                         </motion.div>
 

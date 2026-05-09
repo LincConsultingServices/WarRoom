@@ -33,6 +33,8 @@ import {
   X,
   TrendingUp,
   ShieldAlert,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CharacterPicker } from '@/src/components/CharacterPicker'
@@ -239,6 +241,66 @@ interface PhaseAnswers {
 // ============================================
 // MAIN COMPONENT
 // ============================================
+
+function QuestionAudioPlayer({ qId, className }: { qId: string, className?: string }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [hasAudio, setHasAudio] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const audioSrc = `/audio/questions/${qId}.mp3`;
+    fetch(audioSrc, { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          setHasAudio(true);
+        } else {
+          setHasAudio(false);
+        }
+      })
+      .catch(() => setHasAudio(false));
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [qId]);
+
+  if (!hasAudio) return null;
+
+  const toggleAudio = () => {
+    const audioSrc = `/audio/questions/${qId}.mp3`;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(audioSrc);
+      audioRef.current.onended = () => setIsPlaying(false);
+      audioRef.current.onerror = () => setIsPlaying(false);
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((e) => {
+        setIsPlaying(false);
+      });
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleAudio(); }}
+      className={cn("flex-shrink-0 h-8 w-8 rounded-full", isPlaying ? "text-primary bg-primary/10" : "text-muted-foreground", className)}
+      title="Listen"
+    >
+      {isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+    </Button>
+  );
+}
 
 export default function SimulationPage() {
   const params = useParams()
@@ -1269,7 +1331,10 @@ export default function SimulationPage() {
                               </Badge>
                               {answer && <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />}
                             </div>
-                            <Label className="text-sm font-medium leading-snug block">{q.text}</Label>
+                            <div className="flex items-start justify-between gap-2">
+                              <Label className="text-sm font-medium leading-snug block mt-1">{q.text}</Label>
+                              <QuestionAudioPlayer qId={q.q_id} className="-mt-1" />
+                            </div>
                             {q.context_text && (
                               <p className="text-xs text-muted-foreground">{q.context_text}</p>
                             )}
@@ -1559,7 +1624,10 @@ export default function SimulationPage() {
                   )}
                   {currentAnswer && <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />}
                 </div>
-                <h2 className="text-lg font-semibold leading-snug">{currentQ.text}</h2>
+                <div className="flex items-start justify-between gap-4">
+                  <h2 className="text-lg font-semibold leading-snug">{currentQ.text}</h2>
+                  <QuestionAudioPlayer qId={currentQ.q_id} className="-mt-1" />
+                </div>
                 {currentQ.context_text && (
                   <p className="text-sm text-muted-foreground mt-2">{currentQ.context_text}</p>
                 )}
