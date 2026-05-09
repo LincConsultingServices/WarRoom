@@ -282,6 +282,32 @@ export const api = {
       }>
     },
 
+    generateInvestorFollowupAudio: async (id: string, investorId: string, audioBlob: Blob) => {
+        const formData = new FormData()
+        formData.append('audio', audioBlob, 'response.webm')
+        formData.append('investorId', investorId)
+        const res = await fetch(`${API_BASE_URL}/assessments/${id}/warroom/investor-followup-audio`, {
+            method: 'POST',
+            body: formData,
+        })
+        if (!res.ok) throw new Error('Failed to generate investor followup')
+        return res.json()
+    },
+
+    respondToInvestorFinalAudio: async (id: string, investorId: string, initialTranscription: string, followupQuestion: string, audioBlob: Blob) => {
+        const formData = new FormData()
+        formData.append('audio', audioBlob, 'final_response.webm')
+        formData.append('investorId', investorId)
+        formData.append('initialTranscription', initialTranscription)
+        formData.append('followupQuestion', followupQuestion)
+        const res = await fetch(`${API_BASE_URL}/assessments/${id}/warroom/respond-final-audio`, {
+            method: 'POST',
+            body: formData,
+        })
+        if (!res.ok) throw new Error('Failed to submit final response')
+        return res.json()
+    },
+
     respondToInvestorAudio: async (id: string, investorId: string, audioBlob: Blob) => {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
       const formData = new FormData()

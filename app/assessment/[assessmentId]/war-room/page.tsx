@@ -95,6 +95,11 @@ export default function WarRoomSimulation() {
     const [investorResponse, setInvestorResponse] = useState('')
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
+
+    const [followupPhase, setFollowupPhase] = useState<'initial' | 'followup_pending' | 'followup_answered'>('initial')
+    const [followupQuestion, setFollowupQuestion] = useState('')
+    const [initialTranscription, setInitialTranscription] = useState('')
+
     const [isPlayingAudio, setIsPlayingAudio] = useState(false)
 
     // Negotiation state
@@ -697,6 +702,25 @@ export default function WarRoomSimulation() {
                             <span className="question-label">{currentInvestor.name} asks:</span>
                             <p className="question-text">{currentInvestor.signature_question}</p>
                         </motion.div>
+
+                        {/* Follow-up Section */}
+                        <AnimatePresence>
+                        {followupPhase === 'followup_pending' && (
+                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}>
+                                <div className="analysis-transcript" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                                    <span className="analysis-label">Your initial response:</span>
+                                    <p>{initialTranscription}</p>
+                                </div>
+                                <div className="investor-question followup-question" style={{ borderColor: '#f59e0b', backgroundColor: '#fdfbeb11' }}>
+                                    <span className="question-label" style={{ color: '#f59e0b' }}>
+                                        Follow-up Question:
+                                        {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', fontWeight: 'normal' }}>Playing...</span>}
+                                    </span>
+                                    <p className="question-text">{followupQuestion}</p>
+                                </div>
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
 
                         {/* Investor Reaction (after response) */}
                         <AnimatePresence>
