@@ -640,7 +640,26 @@ export default function SimulationPage() {
   // Mentor lifeline derived data
   const lifelinesLeft = simulation.mentorLifelinesRemaining ?? 0
   // Show all mentors always - no gating by character selection
-  const availableMentors = mentors
+  const availableMentors = mentors.length > 0 ? mentors : [
+    {
+      id: 'p1',
+      name: 'Sarah Wisdom',
+      specialization: 'Founder Psychology',
+      avatar: '👩‍🏫',
+      bio: 'Sarah has coached over 500 founders through the highs and lows of startup life.',
+      guidance_style: 'Coaching',
+      tone: 'warm',
+    },
+    {
+      id: 'p4',
+      name: 'David Design',
+      specialization: 'User Experience',
+      avatar: '👨‍🎨',
+      bio: 'David believes design is the competitive advantage of the 21st century.',
+      guidance_style: 'Teaching',
+      tone: 'optimistic',
+    },
+  ]
 
   // Mentor lifeline panel UI (overlay)
 
@@ -1052,6 +1071,11 @@ export default function SimulationPage() {
           </div>
         ) : (
           <div className="space-y-4">
+            {loadingConfig && mentors.length === 0 ? (
+              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                Loading mentors...
+              </div>
+            ) : null}
             <div>
               <Label className="text-sm font-medium mb-2 block">Choose your mentor</Label>
               <div className="space-y-2">

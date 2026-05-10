@@ -22,13 +22,9 @@ const STAGES = [
 export default function SimulationStartPage() {
   const router = useRouter()
   const [level, setLevel] = useState<1 | 2>(1)
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(() => hasAcceptedTerms())
   const [isStarting, setIsStarting] = useState(false)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    setAcceptedTerms(hasAcceptedTerms())
-  }, [])
 
   const handleStart = async () => {
     if (!acceptedTerms) {
@@ -42,8 +38,8 @@ export default function SimulationStartPage() {
       const simulation = await api.assessments.create({ level })
       acceptTerms()
       router.push(`/assessment/${simulation.id}`)
-    } catch (err: any) {
-      setError(err.message || 'Failed to start simulation')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to start simulation')
       setIsStarting(false)
     }
   }
@@ -175,8 +171,10 @@ export default function SimulationStartPage() {
       <style jsx>{`
         .simulation-start-page {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d0d2b 100%);
-          color: #e0e0e0;
+          background:
+            radial-gradient(circle at top, rgba(0,0,0,0.08), transparent 35%),
+            linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+          color: #111111;
           padding: 2rem;
         }
         .start-container {
@@ -184,30 +182,30 @@ export default function SimulationStartPage() {
           margin: 0 auto;
         }
         .back-link {
-          color: #8b8bcc;
+          color: #111111;
           text-decoration: none;
           font-size: 0.9rem;
           display: inline-block;
           margin-bottom: 2rem;
           transition: color 0.2s;
         }
-        .back-link:hover { color: #b0b0ff; }
+        .back-link:hover { color: #000000; }
 
         .terms-banner {
           max-width: 900px;
           margin: 0 auto 1.5rem;
           padding: 0.9rem 1rem;
-          border: 1px solid rgba(139, 92, 246, 0.22);
-          background: rgba(139, 92, 246, 0.08);
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          background: rgba(255, 255, 255, 0.9);
           border-radius: 12px;
-          color: #d8d6ff;
+          color: #111111;
           font-size: 0.92rem;
           line-height: 1.5;
         }
 
         .terms-banner a,
         .consent-box a {
-          color: #c4b5fd;
+          color: #000000;
           text-decoration: underline;
           text-underline-offset: 2px;
         }
@@ -218,7 +216,7 @@ export default function SimulationStartPage() {
         }
         .hero-badge {
           display: inline-block;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: #000000;
           color: white;
           padding: 0.4rem 1.2rem;
           border-radius: 20px;
@@ -230,13 +228,13 @@ export default function SimulationStartPage() {
         h1 {
           font-size: 2.5rem;
           font-weight: 800;
-          background: linear-gradient(135deg, #fff, #c4b5fd);
+          background: linear-gradient(135deg, #111111, #555555);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           margin-bottom: 1rem;
         }
         .hero-subtitle {
-          color: #9ca3af;
+          color: #444444;
           font-size: 1.05rem;
           line-height: 1.6;
           max-width: 700px;
@@ -247,7 +245,7 @@ export default function SimulationStartPage() {
         h2 {
           font-size: 1.4rem;
           font-weight: 700;
-          color: #c4b5fd;
+          color: #111111;
           margin-bottom: 1.5rem;
           text-align: center;
         }
@@ -258,32 +256,33 @@ export default function SimulationStartPage() {
           gap: 1.5rem;
         }
         .level-card {
-          background: rgba(255,255,255,0.04);
-          border: 2px solid rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.96);
+          border: 2px solid rgba(0,0,0,0.08);
           border-radius: 16px;
           padding: 2rem;
           text-align: left;
           cursor: pointer;
           transition: all 0.3s;
-          color: #e0e0e0;
+          color: #111111;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
         .level-card:hover {
-          border-color: rgba(139, 92, 246, 0.3);
-          background: rgba(139, 92, 246, 0.05);
+          border-color: rgba(0, 0, 0, 0.18);
+          background: #ffffff;
         }
         .level-card.selected {
-          border-color: #8b5cf6;
-          background: rgba(139, 92, 246, 0.1);
-          box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+          border-color: #000000;
+          background: rgba(0, 0, 0, 0.04);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
         }
         .level-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-        .level-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: white; }
-        .level-card p { font-size: 0.9rem; color: #9ca3af; margin-bottom: 1rem; }
+        .level-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #111111; }
+        .level-card p { font-size: 0.9rem; color: #444444; margin-bottom: 1rem; }
         .level-card ul {
           list-style: none;
           padding: 0;
           font-size: 0.85rem;
-          color: #a5b4fc;
+          color: #111111;
         }
         .level-card ul li {
           padding: 0.2rem 0;
@@ -304,7 +303,7 @@ export default function SimulationStartPage() {
           top: 0;
           bottom: 0;
           width: 2px;
-          background: linear-gradient(to bottom, #6366f1, #8b5cf6, #a78bfa);
+          background: linear-gradient(to bottom, #111111, #444444, #111111);
         }
         .timeline-item {
           position: relative;
@@ -318,8 +317,8 @@ export default function SimulationStartPage() {
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background: #8b5cf6;
-          border: 2px solid #0a0a1a;
+          background: #111111;
+          border: 2px solid #ffffff;
         }
         .timeline-header {
           display: flex;
@@ -328,26 +327,26 @@ export default function SimulationStartPage() {
           margin-bottom: 0.3rem;
         }
         .stage-badge {
-          background: rgba(99, 102, 241, 0.2);
-          color: #a5b4fc;
+          background: rgba(0, 0, 0, 0.08);
+          color: #111111;
           padding: 0.15rem 0.6rem;
           border-radius: 8px;
           font-size: 0.75rem;
           font-weight: 600;
         }
         .duration-badge {
-          color: #6b7280;
+          color: #555555;
           font-size: 0.75rem;
         }
         .timeline-content h4 {
-          color: white;
+          color: #111111;
           font-size: 1rem;
           margin-bottom: 0.4rem;
         }
         .competency-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
         .comp-tag {
-          background: rgba(52, 211, 153, 0.12);
-          color: #34d399;
+          background: rgba(0, 0, 0, 0.05);
+          color: #111111;
           padding: 0.1rem 0.5rem;
           border-radius: 6px;
           font-size: 0.7rem;
@@ -361,10 +360,11 @@ export default function SimulationStartPage() {
           margin-bottom: 2.5rem;
         }
         .feature-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.96);
+          border: 1px solid rgba(0,0,0,0.08);
           border-radius: 12px;
           padding: 1.5rem;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
         }
         .feature-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
 
@@ -375,9 +375,9 @@ export default function SimulationStartPage() {
           margin-bottom: 1rem;
           padding: 0.9rem 1rem;
           border-radius: 12px;
-          border: 1px solid rgba(255,255,255,0.08);
-          background: rgba(255,255,255,0.03);
-          color: #d1d5db;
+          border: 1px solid rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.96);
+          color: #111111;
           font-size: 0.95rem;
           line-height: 1.5;
         }
@@ -385,13 +385,13 @@ export default function SimulationStartPage() {
         .consent-box label {
           cursor: pointer;
         }
-        .feature-card h3 { font-size: 1rem; color: white; margin-bottom: 0.4rem; }
-        .feature-card p { font-size: 0.85rem; color: #9ca3af; line-height: 1.5; }
+        .feature-card h3 { font-size: 1rem; color: #111111; margin-bottom: 0.4rem; }
+        .feature-card p { font-size: 0.85rem; color: #444444; line-height: 1.5; }
 
         .error-message {
-          background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          color: #fca5a5;
+          background: rgba(239, 68, 68, 0.06);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          color: #991b1b;
           padding: 0.8rem 1.2rem;
           border-radius: 8px;
           margin-bottom: 1.5rem;
@@ -402,7 +402,7 @@ export default function SimulationStartPage() {
           display: block;
           width: 100%;
           padding: 1.2rem;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #111111, #333333);
           color: white;
           border: none;
           border-radius: 12px;
@@ -414,7 +414,7 @@ export default function SimulationStartPage() {
         }
         .start-button:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
         }
         .start-button:disabled {
           opacity: 0.6;
