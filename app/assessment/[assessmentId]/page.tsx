@@ -639,20 +639,8 @@ export default function SimulationPage() {
 
   // Mentor lifeline derived data
   const lifelinesLeft = simulation.mentorLifelinesRemaining ?? 0
-  const selectedMentorIds: string[] = (() => {
-    const raw = (simulation as any).selectedMentors
-    if (Array.isArray(raw)) return raw
-    if (typeof raw === 'string') {
-      const trimmed = raw.trim()
-      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-        try { return JSON.parse(trimmed) } catch { return [] }
-      } else if (trimmed) {
-        return trimmed.split(',').map(s => s.trim())
-      }
-    }
-    return []
-  })()
-  const availableMentors = mentors.filter(m => selectedMentorIds.includes(m.id))
+  // Show all mentors always - no gating by character selection
+  const availableMentors = mentors
 
   // Mentor lifeline panel UI (overlay)
 
@@ -922,8 +910,23 @@ export default function SimulationPage() {
     setSubmitting(true)
     try {
       await api.assessments.restartAssessment(assessmentId)
+      // Clear localStorage timers for all stages so month 0 starts fresh
+      STAGE_ORDER.forEach(stage => {
+        localStorage.removeItem(getStageTimerKey(assessmentId, stage))
+        localStorage.removeItem(`timer_${stage}`)
+      })
+      // Reset all in-memory phase state so UI is fully clean
+      setAnswers({})
+      setQIndex(0)
+      setMcqFeedback(null)
+      setSubmitError('')
+      setFollowupScenarios({})
+      setFollowupError({})
+      setDynamicScenario(null)
+      setDynamicScenarioError('')
       setShowingScenario(false)
       setPhaseScenario(null)
+      setShowRestartCheckpoint(false)
       await load()
     } catch (err: any) {
       setSubmitError(err.message || 'Failed to restart')
@@ -1051,25 +1054,21 @@ export default function SimulationPage() {
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-2 block">Choose your mentor</Label>
-              {availableMentors.length > 0 ? (
-                <div className="space-y-2">
-                  {availableMentors.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => setSelectedMentorId(m.id)}
-                      className={cn(
-                        'w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all text-sm',
-                        selectedMentorId === m.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
-                      )}
-                    >
-                      <div className="font-medium">{m.name}</div>
-                      <div className="text-xs text-muted-foreground">{m.specialization}</div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No mentors selected. Please complete character selection first.</p>
-              )}
+              <div className="space-y-2">
+                {availableMentors.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelectedMentorId(m.id)}
+                    className={cn(
+                      'w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all text-sm',
+                      selectedMentorId === m.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
+                    )}
+                  >
+                    <div className="font-medium">{m.name}</div>
+                    <div className="text-xs text-muted-foreground">{m.specialization}</div>
+                  </button>
+                ))}
+              </div>
             </div>
             <div>
               <Label className="text-sm font-medium mb-2 block">Your question (optional)</Label>

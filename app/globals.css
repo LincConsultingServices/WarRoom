@@ -256,6 +256,37 @@
     box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
   }
 
+  /* =============================================
+   * CRISIS / WAR-ROOM INTENSITY ANIMATIONS
+   * ============================================= */
+
+  /* Pulsing red glow overlay behind the card */
+  .crisis-card {
+    animation: crisisGlow 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Red animated border on the actual question card */
+  .crisis-shake {
+    animation: crisisBorder 2.2s ease-in-out infinite !important;
+  }
+
+  /* Corner wave: pseudo-elements sweeping red light across corners */
+  .crisis-shake::before,
+  .crisis-shake::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    z-index: -1;
+    pointer-events: none;
+    animation: crisisCornerSweep 3s linear infinite;
+  }
+  .crisis-shake::after {
+    animation-delay: -1.5s;
+    opacity: 0.5;
+  }
+
   /* Animated gradient text */
   .gradient-text-animate {
     background: linear-gradient(90deg, #6366f1, #f59e0b, #ef4444, #6366f1);
@@ -1052,3 +1083,90 @@
     @apply grid-cols-1;
   }
 }
+
+/* =============================================
+ * CRISIS ANIMATION KEYFRAMES
+ * ============================================= */
+
+/* Outer glow overlay that pulsates red */
+@keyframes crisisGlow {
+  0%, 100% {
+    opacity: 0;
+    box-shadow:
+      0 0 0px 0px rgba(220, 38, 38, 0),
+      inset 0 0 0px 0px rgba(220, 38, 38, 0);
+    background: rgba(220, 38, 38, 0);
+  }
+  25% {
+    opacity: 1;
+    box-shadow:
+      0 0 40px 12px rgba(220, 38, 38, 0.4),
+      inset 0 0 30px 4px rgba(220, 38, 38, 0.15);
+    background: rgba(220, 38, 38, 0.05);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow:
+      0 0 80px 25px rgba(220, 38, 38, 0.2),
+      inset 0 0 15px 2px rgba(220, 38, 38, 0.08);
+    background: rgba(220, 38, 38, 0.03);
+  }
+  75% {
+    opacity: 1;
+    box-shadow:
+      0 0 50px 15px rgba(220, 38, 38, 0.35),
+      inset 0 0 25px 3px rgba(220, 38, 38, 0.12);
+    background: rgba(220, 38, 38, 0.04);
+  }
+}
+
+/* Border pulse on the card itself */
+@keyframes crisisBorder {
+  0%, 100% {
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow:
+      0 0 0px 0px rgba(220, 38, 38, 0),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  30% {
+    border-color: rgba(239, 68, 68, 0.9);
+    box-shadow:
+      0 0 20px 4px rgba(220, 38, 38, 0.45),
+      0 0 0 2px rgba(220, 38, 38, 0.2),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  60% {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow:
+      0 0 35px 8px rgba(220, 38, 38, 0.2),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Corner sweep — conic gradient rotating around the border */
+@keyframes crisisCornerSweep {
+  0% {
+    background: conic-gradient(
+      from 0deg,
+      rgba(220, 38, 38, 0.8) 0deg,
+      rgba(220, 38, 38, 0) 60deg,
+      rgba(220, 38, 38, 0) 300deg,
+      rgba(220, 38, 38, 0.8) 360deg
+    );
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    background: conic-gradient(
+      from 360deg,
+      rgba(220, 38, 38, 0.8) 0deg,
+      rgba(220, 38, 38, 0) 60deg,
+      rgba(220, 38, 38, 0) 300deg,
+      rgba(220, 38, 38, 0.8) 360deg
+    );
+    opacity: 0.7;
+  }
+}
+

@@ -344,7 +344,15 @@ export default function WarRoomSimulation() {
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const audioRef = useRef<HTMLAudioElement | null>(null)
 
-    // Load assessment state and investors
+    // Fix 1: Force dark theme for the entire War Room phase
+    useEffect(() => {
+        document.documentElement.classList.add('dark')
+        return () => {
+            document.documentElement.classList.remove('dark')
+        }
+    }, [])
+
+    // Load assessment state and investors — filter to only selected investor IDs
     useEffect(() => {
         const load = async () => {
             try {
@@ -353,7 +361,28 @@ export default function WarRoomSimulation() {
                     api.config.getInvestors(),
                 ])
                 setAssessmentState(state)
-                setInvestors(investorList)
+
+                // Fix 3: Only show the investors selected for this assessment
+                const selectedIds: string[] = (() => {
+                    try {
+                        const raw = (state as any)?.assessment?.selectedInvestors
+                        if (Array.isArray(raw)) return raw
+                        if (typeof raw === 'string') return JSON.parse(raw)
+                        return []
+                    } catch { return [] }
+                })()
+
+                // Fix 2: If buyout was chosen, skip War Room entirely
+                const buyoutChosen = (state as any)?.assessment?.buyoutChosen
+                if (buyoutChosen) {
+                    router.push(`/assessment/${assessmentId}/final-report`)
+                    return
+                }
+
+                const filtered = selectedIds.length > 0
+                    ? investorList.filter(inv => selectedIds.includes(inv.id))
+                    : investorList
+                setInvestors(filtered)
                 setPhase('PITCH')
             } catch (err: any) {
                 setError(err.message || 'Failed to load War Room data')
@@ -361,7 +390,7 @@ export default function WarRoomSimulation() {
             }
         }
         load()
-    }, [assessmentId])
+    }, [assessmentId, router])
 
     // 15-minute countdown timer
     useEffect(() => {
@@ -753,7 +782,7 @@ export default function WarRoomSimulation() {
                                     className="submit-pitch-btn"
                                     style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
                                     onClick={() => pitchRecorder.resetRecording()}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || isAnalyzing}
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
                                 >
@@ -763,11 +792,11 @@ export default function WarRoomSimulation() {
                                     className="submit-pitch-btn"
                                     style={{ flex: 2 }}
                                     onClick={handleSubmitPitchAudio}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || isAnalyzing}
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
                                 >
-                                    {isSubmitting ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
+                                    {isSubmitting || isAnalyzing ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
                                 </motion.button>
                             </div>
                         )}
@@ -800,7 +829,8 @@ export default function WarRoomSimulation() {
                         <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
                             <div className="flex items-center justify-between">
                                 <span className="question-label">{currentInvestor.name} asks:</span>
-                                <QuestionAudioPlayer qId={currentInvestor.name.toLowerCase().replace(/\s+/g, '_')} />
+                                {/* Fix: use name slug which matches the audio filenames in /public/audio/questions/ */}
+                                <QuestionAudioPlayer qId={`${currentInvestor.name.toLowerCase().replace(/\s+/g, '_')}`} />
                             </div>
                             <p className="question-text">{currentInvestor.signature_question}</p>
                         </motion.div>
@@ -917,7 +947,7 @@ export default function WarRoomSimulation() {
                                             className="respond-btn" 
                                             style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
                                             onClick={() => responseRecorder.resetRecording()} 
-                                            disabled={isSubmitting} 
+                                            disabled={isSubmitting || isAnalyzing} 
                                             whileHover={{ scale: 1.03 }} 
                                             whileTap={{ scale: 0.97 }}
                                         >
@@ -927,11 +957,11 @@ export default function WarRoomSimulation() {
                                             className="respond-btn" 
                                             style={{ flex: 2 }}
                                             onClick={handleRespondToInvestorAudio} 
-                                            disabled={isSubmitting} 
+                                            disabled={isSubmitting || isAnalyzing} 
                                             whileHover={{ scale: 1.03 }} 
                                             whileTap={{ scale: 0.97 }}
                                         >
-                                            {isSubmitting ? 'Analyzing Response...' : 'Submit Response'}
+                                            {isSubmitting || isAnalyzing ? 'Analyzing Response...' : 'Submit Response'}
                                         </motion.button>
                                     </div>
                                 )}
