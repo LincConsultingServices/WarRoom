@@ -76,6 +76,9 @@ export interface SimQuestion {
   text: string;
   context_text?: string;
   pressure_text?: string;
+  context?: string;
+  budget_categories?: any[];
+  total_budget?: number;
   assess: CompetencyCode[];
   section?: string;
   tag?: string;
@@ -497,6 +500,9 @@ export interface PhaseResponse {
   text?: string;
   selectedOptionId?: string;
   allocations?: Record<string, number>;
+  aiConceptIdea?: string;
+  aiFeatures?: string[];
+  aiMarket?: string;
 }
 
 export interface PhaseSubmitRequest {
