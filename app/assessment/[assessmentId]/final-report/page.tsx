@@ -666,16 +666,17 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
   const sortedStages = Object.keys(grouped);
 
   const getResponseText = (entry: any): string => {
-      if (entry.selectedOptionText) return entry.selectedOptionText;
-    if (!entry.response) return '(no response)'
-    if (entry.response.text) return entry.response.text
-    if (entry.response.selectedOptionId) return `Selected: ${entry.response.selectedOptionId}`
-    if (entry.response.allocations) {
-      return Object.entries(entry.response.allocations)
+    if (typeof entry.selectedOptionText === 'string' && entry.selectedOptionText.trim()) return entry.selectedOptionText
+    const response = entry.response || {}
+    if (typeof response.selectedOptionText === 'string' && response.selectedOptionText.trim()) return response.selectedOptionText
+    if (typeof response.text === 'string' && response.text.trim()) return response.text
+    if (typeof response.selectedOptionId === 'string' && response.selectedOptionId.trim()) return `Selected: ${response.selectedOptionId}`
+    if (response.allocations && typeof response.allocations === 'object') {
+      return Object.entries(response.allocations)
         .map(([k, v]) => `${k}: ${v}%`)
         .join(', ')
     }
-    return JSON.stringify(entry.response)
+    return JSON.stringify(response)
   }
 
   const getProficiencyBadge = (p: number | null) => {
@@ -716,8 +717,8 @@ function UserResponsesPage({ report }: { report: EvaluationReport }) {
           {grouped[stageName].map((entry, i) => (
             <div key={i} className="response-card">
               <div className="response-question">
-                <span className="q-type">{entry.questionType.replace(/_/g, ' ')}</span>
-                <p>{entry.questionText}</p>
+                <span className="q-type">{(entry.questionType || 'unknown').replace(/_/g, ' ')}</span>
+                <p>{entry.questionText || entry.questionId || 'Question'}</p>
               </div>
               <div className="response-answer">
                 <span className="answer-label">Your Answer:</span>

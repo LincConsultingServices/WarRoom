@@ -385,6 +385,7 @@ export interface UserResponseEntry {
   response: Record<string, any>;
   proficiency: number | null;
   aiFeedback: Record<string, any> | null;
+  selectedOptionText?: string;
 }
 
 export interface RankedCompetency {

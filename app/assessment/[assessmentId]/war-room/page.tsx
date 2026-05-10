@@ -18,36 +18,61 @@ import { Volume2, VolumeX } from 'lucide-react'
 // SOP: 15 minutes, all C1-C8 integrated
 // ============================================
 
-function QuestionAudioPlayer({ qId, className = '' }: { qId: string, className?: string }) {
+function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[], className?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [hasAudio, setHasAudio] = useState<boolean | null>(null);
+    const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
+    const [isCheckingAudio, setIsCheckingAudio] = useState(true);
 
   useEffect(() => {
-    const audioSrc = `/audio/questions/${qId}.mp3`;
-    fetch(audioSrc, { method: 'HEAD' })
-      .then(res => {
-        if (res.ok) {
-          setHasAudio(true);
-        } else {
-          setHasAudio(false);
-        }
-      })
-      .catch(() => setHasAudio(false));
+        let cancelled = false;
+        setIsCheckingAudio(true);
+        setResolvedSrc(null);
+
+        const probe = async () => {
+            for (const key of audioKeys) {
+                if (!key) continue;
+                const audioSrc = `/audio/questions/${key}.mp3`;
+                try {
+                    const res = await fetch(audioSrc, { method: 'HEAD' });
+                    if (res.ok) {
+                        if (!cancelled) {
+                            setResolvedSrc(audioSrc);
+                        }
+                        return;
+                    }
+                } catch {
+                    // keep trying other candidates
+                }
+            }
+            if (!cancelled) {
+                setResolvedSrc(null);
+            }
+            if (!cancelled) {
+                setIsCheckingAudio(false);
+            }
+        };
+
+        void probe().finally(() => {
+            if (!cancelled) {
+                setIsCheckingAudio(false);
+            }
+        });
 
     return () => {
+            cancelled = true;
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
-  }, [qId]);
+    }, [audioKeys.join('|')]);
 
-  if (!hasAudio) return null;
+    if (!isCheckingAudio && !resolvedSrc) return null;
 
   const toggleAudio = () => {
-    const audioSrc = `/audio/questions/${qId}.mp3`;
-    if (!audioRef.current) {
-      audioRef.current = new Audio(audioSrc);
+        if (!resolvedSrc) return;
+        if (!audioRef.current) {
+            audioRef.current = new Audio(resolvedSrc);
       audioRef.current.onended = () => setIsPlaying(false);
       audioRef.current.onerror = () => setIsPlaying(false);
     }
@@ -68,10 +93,11 @@ function QuestionAudioPlayer({ qId, className = '' }: { qId: string, className?:
     <button
       type="button"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleAudio(); }}
-      className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors ${isPlaying ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted"} ${className}`}
-      title="Listen"
+            className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors ${isPlaying ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'} ${className}`}
+            title={isCheckingAudio ? 'Loading voice' : 'Listen'}
+            disabled={isCheckingAudio}
     >
-      {isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            {isCheckingAudio ? <span className="h-2 w-2 rounded-full bg-current animate-pulse" /> : isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
     </button>
   );
 }
@@ -139,7 +165,7 @@ export default function WarRoomSimulation() {
 
     // Audio Recording
     const pitchRecorder = useAudioRecorder(60)  // 60s for pitch
-    const responseRecorder = useAudioRecorder(30) // 30s for responses
+    const responseRecorder = useAudioRecorder(15) // 15s for responses
     const negotiationRecorder = useAudioRecorder(15) // 15s for negotiation
 
     // Analysis results
@@ -154,6 +180,7 @@ export default function WarRoomSimulation() {
     const [investorResponse, setInvestorResponse] = useState('')
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
+    const [responseSubmitted, setResponseSubmitted] = useState(false)
 
     const [followupPhase, setFollowupPhase] = useState<'initial' | 'followup_pending' | 'followup_answered'>('initial')
     const [followupQuestion, setFollowupQuestion] = useState('')
@@ -500,6 +527,7 @@ export default function WarRoomSimulation() {
             setCurrentInvestorReaction(
                 result.scorecard.investorReaction || `${investor.name} has considered your response.`
             )
+            setResponseSubmitted(true)
             responseRecorder.resetRecording()
 
             if (result.ttsError) {
@@ -538,6 +566,8 @@ export default function WarRoomSimulation() {
         setCurrentInvestorReaction('')
         if (currentInvestorIndex < investors.length - 1) {
             setCurrentInvestorIndex(prev => prev + 1)
+            setResponseSubmitted(false)
+            setResponseTranscription('')
         } else {
             try {
                 const fetchedOffers = await api.assessments.getWarRoomOffers(assessmentId)
@@ -565,12 +595,17 @@ export default function WarRoomSimulation() {
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
+        const currentInvestorAudioKeys = [
+                currentInvestor?.id || '',
+                currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_') || '',
+                currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || '',
+            ].filter(Boolean)
 
     // ============================================
     // RENDER
     // ============================================
     return (
-        <div className="warroom-page">
+        <div className="warroom-page warroom-shell">
             {/* Top Bar */}
             <header className="warroom-header">
                 <div className="header-left">
@@ -829,8 +864,7 @@ export default function WarRoomSimulation() {
                         <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
                             <div className="flex items-center justify-between">
                                 <span className="question-label">{currentInvestor.name} asks:</span>
-                                {/* Fix: use name slug which matches the audio filenames in /public/audio/questions/ */}
-                                <QuestionAudioPlayer qId={`${currentInvestor.name.toLowerCase().replace(/\s+/g, '_')}`} />
+                                <QuestionAudioPlayer audioKeys={currentInvestorAudioKeys} />
                             </div>
                             <p className="question-text">{currentInvestor.signature_question}</p>
                         </motion.div>
@@ -899,11 +933,6 @@ export default function WarRoomSimulation() {
                         )}
                         </AnimatePresence>
 
-                        {/* Walk-out warning */}
-                        <motion.div className="walkout-warning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                            <span>Walk-out trigger:</span> {currentInvestor.walk_out_trigger}
-                        </motion.div>
-
                         {/* Audio Recording for Response */}
                         {!currentInvestorReaction && !isAnalyzing && (
                             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
@@ -919,35 +948,38 @@ export default function WarRoomSimulation() {
                                         <motion.button
                                             className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
                                             onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
+                                            disabled={responseSubmitted}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                         >
-                                            {responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                            {responseSubmitted ? 'Response Submitted' : responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
                                         </motion.button>
                                     </div>
                                     <div className="recording-status">
-                                        {responseRecorder.isRecording ? (
+                                        {responseSubmitted ? (
+                                            <span className="rec-done">Response submitted. You cannot submit another response for this investor.</span>
+                                        ) : responseRecorder.isRecording ? (
                                             <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 30 - responseRecorder.recordingTime)}s left</span></>
                                         ) : responseRecorder.audioBlob ? (
                                             <span className="rec-done">Response recorded ({responseRecorder.recordingTime}s)</span>
                                         ) : (
-                                            <span className="rec-hint">Select Start Recording to record your response (30s max)</span>
+                                            <span className="rec-hint">Select Start Recording to record your response (15s max)</span>
                                         )}
                                     </div>
                                     {responseRecorder.isRecording && (
-                                        <div className="countdown-bar"><div className="countdown-fill" style={{ width: `${Math.max(0, ((30 - responseRecorder.recordingTime) / 30) * 100)}%` }} /></div>
+                                        <div className="countdown-bar"><div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - responseRecorder.recordingTime) / 15) * 100)}%` }} /></div>
                                     )}
                                 </div>
 
                                 {error && <div className="error-msg">{error}</div>}
 
-                                {responseRecorder.audioBlob && (
+                                {responseRecorder.audioBlob && !responseSubmitted && (
                                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                         <motion.button 
                                             className="respond-btn" 
                                             style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
                                             onClick={() => responseRecorder.resetRecording()} 
-                                            disabled={isSubmitting || isAnalyzing} 
+                                            disabled={isSubmitting || isAnalyzing || responseSubmitted} 
                                             whileHover={{ scale: 1.03 }} 
                                             whileTap={{ scale: 0.97 }}
                                         >
@@ -957,11 +989,11 @@ export default function WarRoomSimulation() {
                                             className="respond-btn" 
                                             style={{ flex: 2 }}
                                             onClick={handleRespondToInvestorAudio} 
-                                            disabled={isSubmitting || isAnalyzing} 
+                                            disabled={isSubmitting || isAnalyzing || responseSubmitted} 
                                             whileHover={{ scale: 1.03 }} 
                                             whileTap={{ scale: 0.97 }}
                                         >
-                                            {isSubmitting || isAnalyzing ? 'Analyzing Response...' : 'Submit Response'}
+                                            {responseSubmitted ? 'Response Submitted' : isSubmitting || isAnalyzing ? 'Analyzing Response...' : 'Submit Response'}
                                         </motion.button>
                                     </div>
                                 )}
@@ -1277,6 +1309,71 @@ export default function WarRoomSimulation() {
                     </motion.div>
                 )}
             </main>
+
+            <style jsx>{`
+                .warroom-shell {
+                    position: relative;
+                    min-height: 100vh;
+                    background:
+                        radial-gradient(circle at top, rgba(239,68,68,0.12), transparent 40%),
+                        linear-gradient(180deg, #000 0%, #050505 55%, #101010 100%);
+                    color: #f5f5f5;
+                    overflow: hidden;
+                }
+
+                .warroom-shell::before {
+                    content: '';
+                    position: fixed;
+                    inset: 0;
+                    pointer-events: none;
+                    border: 2px solid rgba(239, 68, 68, 0.24);
+                    border-radius: 28px;
+                    margin: 14px;
+                    box-shadow:
+                        0 0 0 1px rgba(239,68,68,0.08) inset,
+                        0 0 24px rgba(239,68,68,0.16),
+                        0 0 50px rgba(239,68,68,0.08) inset;
+                    animation: warroomPulse 2.8s ease-in-out infinite;
+                    z-index: 0;
+                }
+
+                .warroom-shell::after {
+                    content: '';
+                    position: fixed;
+                    inset: 8px;
+                    pointer-events: none;
+                    border-radius: 30px;
+                    background:
+                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top left / 100% 2px no-repeat,
+                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top right / 2px 100% no-repeat,
+                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom right / 100% 2px no-repeat,
+                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom left / 2px 100% no-repeat;
+                    mask:
+                        radial-gradient(circle at top left, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at top right, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at bottom right, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at bottom left, transparent 0 24px, #000 24px);
+                    animation: cornerWave 2.2s linear infinite;
+                    mix-blend-mode: screen;
+                    z-index: 0;
+                }
+
+                .warroom-shell > * {
+                    position: relative;
+                    z-index: 1;
+                }
+
+                @keyframes warroomPulse {
+                    0%, 100% { opacity: 0.55; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.002); }
+                }
+
+                @keyframes cornerWave {
+                    0% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+                    50% { filter: drop-shadow(0 0 10px rgba(239,68,68,0.4)); }
+                    100% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+                }
+            `}</style>
 
 
         </div>
