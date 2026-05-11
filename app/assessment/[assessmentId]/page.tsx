@@ -242,34 +242,95 @@ interface PhaseAnswers {
 // MAIN COMPONENT
 // ============================================
 
-function QuestionAudioPlayer({ qId, className }: { qId: string, className?: string }) {
+const INVESTOR_VOICE_ALIASES: Record<string, string> = {
+  'Kevin O\'Leary': 'kevin_oleary',
+  'Daymond John': 'daymond_john',
+  'Barbara Corcoran': 'barbara_corcoran',
+  'Mark Cuban': 'mark_cuban',
+  'Lori Greiner': 'lori_greiner',
+  'Robert Herjavec': 'robert_herjavec',
+  'Steven Bartlett': 'steven_bartlett',
+}
+
+function normalizeVoiceSlug(value: string): string {
+  const trimmed = value.trim()
+  return INVESTOR_VOICE_ALIASES[trimmed] || trimmed
+    .toLowerCase()
+    .replace(/[\u2019']/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+}
+
+function getVoiceKeysForName(value: string): string[] {
+  const normalized = normalizeVoiceSlug(value)
+  return normalized ? [normalized] : []
+}
+
+function parseInvestorPanelQuestions(contextText: string): Array<{ investorName: string; question: string; voiceKeys: string[] }> {
+  return contextText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const match = line.match(/^(.+?):\s*['\"](.+?)['\"]$/)
+      if (!match) return null
+
+      const investorName = match[1].trim()
+      const question = match[2].trim()
+
+      return {
+        investorName,
+        question,
+        voiceKeys: getVoiceKeysForName(investorName),
+      }
+    })
+    .filter((item): item is { investorName: string; question: string; voiceKeys: string[] } => item !== null)
+}
+
+function QuestionAudioPlayer({ audioKey, audioKeys, className }: { audioKey?: string; audioKeys?: string[]; className?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [hasAudio, setHasAudio] = useState<boolean | null>(null);
+  const candidateKeys = audioKeys?.length ? audioKeys : audioKey ? [audioKey] : []
 
   useEffect(() => {
-    const audioSrc = `/audio/questions/${qId}.mp3`;
-    fetch(audioSrc, { method: 'HEAD' })
-      .then(res => {
-        if (res.ok) {
-          setHasAudio(true);
-        } else {
-          setHasAudio(false);
+    let cancelled = false
+
+    const probe = async () => {
+      for (const key of candidateKeys) {
+        const audioSrc = `/audio/questions/${key}.mp3`
+        try {
+          const res = await fetch(audioSrc, { method: 'HEAD' })
+          if (res.ok) {
+            if (!cancelled) {
+              setHasAudio(true)
+            }
+            return
+          }
+        } catch {
+          // keep trying fallback keys
         }
-      })
-      .catch(() => setHasAudio(false));
+      }
+
+      if (!cancelled) {
+        setHasAudio(false)
+      }
+    }
+
+    void probe()
 
     return () => {
+      cancelled = true
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
-  }, [qId]);
+  }, [candidateKeys.join('|')]);
 
   if (!hasAudio) return null;
 
   const toggleAudio = () => {
-    const audioSrc = `/audio/questions/${qId}.mp3`;
+    const audioSrc = `/audio/questions/${candidateKeys[0]}.mp3`;
     if (!audioRef.current) {
       audioRef.current = new Audio(audioSrc);
       audioRef.current.onended = () => setIsPlaying(false);
@@ -1381,7 +1442,7 @@ export default function SimulationPage() {
                             </div>
                             <div className="flex items-start justify-between gap-2">
                               <Label className="text-sm font-medium leading-snug block mt-1">{q.text}</Label>
-                              <QuestionAudioPlayer qId={q.q_id} className="-mt-1" />
+                              <QuestionAudioPlayer audioKey={q.q_id} className="-mt-1" />
                             </div>
                             {q.context_text && (
                               <p className="text-xs text-muted-foreground">{q.context_text}</p>
@@ -1674,7 +1735,7 @@ export default function SimulationPage() {
                 </div>
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="text-lg font-semibold leading-snug">{currentQ.text}</h2>
-                  <QuestionAudioPlayer qId={currentQ.q_id} className="-mt-1" />
+                  {currentQ.scenario_group === 'investor_panel' ? null : <QuestionAudioPlayer audioKey={currentQ.q_id} className="-mt-1" />}
                 </div>
                 {currentQ.context_text && (
                   <p className="text-sm text-muted-foreground mt-2">{currentQ.context_text}</p>
@@ -2045,6 +2106,31 @@ export default function SimulationPage() {
                               </div>
                               <p className="text-foreground/80 whitespace-pre-line">{currentQ.context_text}</p>
                             </motion.div>
+                          )}
+
+                          {currentQ.scenario_group === 'investor_panel' && currentQ.context_text && (
+                            <div className="space-y-3">
+                              {parseInvestorPanelQuestions(currentQ.context_text).map((entry, idx) => (
+                                <motion.div
+                                  key={`${entry.investorName}-${idx}`}
+                                  initial={{ opacity: 0, y: 8 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.12 + idx * 0.04 }}
+                                  className="rounded-xl border bg-card/70 p-4"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                        Question {idx + 1}
+                                      </div>
+                                      <div className="font-semibold text-sm">{entry.investorName}</div>
+                                    </div>
+                                    <QuestionAudioPlayer audioKeys={entry.voiceKeys} className="-mt-1" />
+                                  </div>
+                                  <p className="mt-2 text-sm leading-relaxed text-foreground/90">{entry.question}</p>
+                                </motion.div>
+                              ))}
+                            </div>
                           )}
 
                           {/* Decision step: open text for user response OR specific Buyout UI */}
