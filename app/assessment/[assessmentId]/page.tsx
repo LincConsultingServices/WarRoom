@@ -161,20 +161,20 @@ function getQuestionTypeColor(type: string): string {
   }
 }
 
-// Scenario step styling
+// Scenario step styling (emoji-enhanced)
 const SCENARIO_STEP_STYLES: Record<string, { icon: string; label: string; color: string; bgColor: string }> = {
-  environment: { icon: 'ENV', label: 'ENVIRONMENT', color: '#3b82f6', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
-  problem: { icon: 'PROB', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
-  decision: { icon: 'DEC', label: 'YOUR DECISION', color: '#8b5cf6', bgColor: 'bg-violet-50 dark:bg-violet-900/20' },
-  consequence: { icon: 'RESULT', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
+  environment: { icon: '🌍', label: 'ENVIRONMENT', color: '#3b82f6', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+  problem: { icon: '⚠️', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
+  decision: { icon: '🎯', label: 'YOUR DECISION', color: '#8b5cf6', bgColor: 'bg-violet-50 dark:bg-violet-900/20' },
+  consequence: { icon: '📊', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
 }
 
-// Ideation form section icons
+// Ideation form section icons (emoji-friendly)
 const SECTION_ICONS: Record<string, React.ReactNode> = {
-  'The Idea': <Lightbulb className="h-5 w-5" />,
-  'Market Reality': <Target className="h-5 w-5" />,
-  'Money & Model': <DollarSign className="h-5 w-5" />,
-  'Founder Fit': <FileText className="h-5 w-5" />,
+  'The Idea': <span className="text-lg">💡</span>,
+  'Market Reality': <span className="text-lg">🎯</span>,
+  'Money & Model': <span className="text-lg">💵</span>,
+  'Founder Fit': <span className="text-lg">🧑‍💼</span>,
 }
 
 // ---- Stage Countdown Timer ----
@@ -1453,7 +1453,7 @@ export default function SimulationPage() {
                 {submitting ? (
                   <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Evaluating Ideation...</>
                 ) : (
-                  <><Send className="h-5 w-5 mr-2" />Submit Ideation & Enter Simulation</>
+                  <><Send className="h-5 w-5 mr-2" />Submit Ideation & Enter Simulation 🎯</>
                 )}
               </Button>
               </motion.div>
@@ -1539,7 +1539,7 @@ export default function SimulationPage() {
             className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none"
           >
             <div className="bg-green-500 text-white font-black text-4xl sm:text-6xl px-12 py-8 rounded-full shadow-[0_0_100px_rgba(34,197,94,0.8)] border-4 border-white/20 transform -rotate-6 tracking-tight">
-              +$50,000 RAISED!
+              +$50,000 RAISED! 🎉
             </div>
           </motion.div>
         )}
