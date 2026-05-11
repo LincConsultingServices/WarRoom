@@ -598,10 +598,18 @@ export default function WarRoomSimulation() {
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
+
+    // Build prioritized audio keys so question-specific audio is tried first,
+    // then fall back to investor id/name/signature_question.
+    const questionKey = `q_${currentInvestor?.id}_${currentInvestorIndex}`
+    const fallbackQuestionKey = `q_${currentInvestor?.id}`
+
     const currentInvestorAudioKeys = [
-        currentInvestor?.id || '',
-        currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_') || '',
-        currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || '',
+        questionKey,
+        fallbackQuestionKey,
+        currentInvestor?.id,
+        currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_'),
+        currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
     ].filter(Boolean)
 
     // Auto-play investor question
