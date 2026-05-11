@@ -21,58 +21,69 @@ import { Volume2, VolumeX } from 'lucide-react'
 function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[], className?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-    const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
-    const [isCheckingAudio, setIsCheckingAudio] = useState(true);
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
+  const [isCheckingAudio, setIsCheckingAudio] = useState(true);
 
   useEffect(() => {
-        let cancelled = false;
-        setIsCheckingAudio(true);
+    let cancelled = false;
+    setIsCheckingAudio(true);
+    setResolvedSrc(null);
+
+    const probe = async () => {
+      for (const key of audioKeys) {
+        if (!key) continue;
+        const audioSrc = `/audio/questions/${key}.mp3`;
+        try {
+          const res = await fetch(audioSrc, { method: 'HEAD' });
+          if (res.ok) {
+            if (!cancelled) {
+              setResolvedSrc(audioSrc);
+            }
+            return;
+          }
+        } catch {
+          // keep trying other candidates
+        }
+      }
+      if (!cancelled) {
         setResolvedSrc(null);
+      }
+      if (!cancelled) {
+        setIsCheckingAudio(false);
+      }
+    };
 
-        const probe = async () => {
-            for (const key of audioKeys) {
-                if (!key) continue;
-                const audioSrc = `/audio/questions/${key}.mp3`;
-                try {
-                    const res = await fetch(audioSrc, { method: 'HEAD' });
-                    if (res.ok) {
-                        if (!cancelled) {
-                            setResolvedSrc(audioSrc);
-                        }
-                        return;
-                    }
-                } catch {
-                    // keep trying other candidates
-                }
-            }
-            if (!cancelled) {
-                setResolvedSrc(null);
-            }
-            if (!cancelled) {
-                setIsCheckingAudio(false);
-            }
-        };
-
-        void probe().finally(() => {
-            if (!cancelled) {
-                setIsCheckingAudio(false);
-            }
-        });
+    void probe().finally(() => {
+      if (!cancelled) {
+        setIsCheckingAudio(false);
+      }
+    });
 
     return () => {
-            cancelled = true;
+      cancelled = true;
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
-    }, [audioKeys.join('|')]);
+  }, [audioKeys.join('|')]);
 
-    if (!isCheckingAudio && !resolvedSrc) return null;
+  useEffect(() => {
+    if (!resolvedSrc) return;
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    audioRef.current = new Audio(resolvedSrc);
+    audioRef.current.onended = () => setIsPlaying(false);
+    audioRef.current.onerror = () => setIsPlaying(false);
+    setIsPlaying(false);
+  }, [resolvedSrc]);
+
+  if (!isCheckingAudio && !resolvedSrc) return null;
 
   const toggleAudio = () => {
-        if (!resolvedSrc) return;
-        if (!audioRef.current) {
-            audioRef.current = new Audio(resolvedSrc);
+    if (!resolvedSrc) return;
+    if (!audioRef.current || audioRef.current.src !== new URL(resolvedSrc, window.location.origin).href) {
+      audioRef.current = new Audio(resolvedSrc);
       audioRef.current.onended = () => setIsPlaying(false);
       audioRef.current.onerror = () => setIsPlaying(false);
     }
@@ -83,7 +94,7 @@ function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[
     } else {
       audioRef.current.play().then(() => {
         setIsPlaying(true);
-      }).catch((e) => {
+      }).catch(() => {
         setIsPlaying(false);
       });
     }
@@ -128,6 +139,15 @@ function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[] {
     }
 
     return []
+}
+
+function normalizeVoiceSlug(value: string): string {
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/[\u2019']/g, '')
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
 }
 
 function getPreparedPitchFromState(state: AssessmentState | null): string {
@@ -599,23 +619,18 @@ export default function WarRoomSimulation() {
     const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
 
-    // Build prioritized audio keys so question-specific audio is tried first,
-    // then fall back to investor id/name/signature_question.
-    const questionKey = `q_${currentInvestor?.id}_${currentInvestorIndex}`
-    const fallbackQuestionKey = `q_${currentInvestor?.id}`
-
+    // Use the investor's voice filename directly so each question resolves to the
+    // correct speaker clip instead of a question-index placeholder.
+    const currentInvestorVoiceKey = normalizeVoiceSlug(currentInvestor?.name || '')
     const currentInvestorAudioKeys = [
-        questionKey,
-        fallbackQuestionKey,
+        currentInvestorVoiceKey,
         currentInvestor?.id,
-        currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_'),
-        currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
     ].filter(Boolean)
 
     // Auto-play investor question
     useEffect(() => {
         if (phase === 'INVESTOR_QA' && currentInvestor && !currentInvestorReaction && !isAnalyzing && !responseRecorder.isRecording) {
-            const questionKey = `q_${currentInvestor.id}_${currentInvestorIndex}`
+            const questionKey = currentInvestorVoiceKey || currentInvestor.id
             if (!hasAutoPlayed[questionKey]) {
                 const timeout = setTimeout(() => {
                     const audioButton = document.querySelector('.investor-question button[title="Listen"]') as HTMLButtonElement
@@ -627,7 +642,7 @@ export default function WarRoomSimulation() {
                 return () => clearTimeout(timeout)
             }
         }
-    }, [phase, currentInvestor, currentInvestorIndex, currentInvestorReaction, isAnalyzing, responseRecorder.isRecording, hasAutoPlayed])
+    }, [phase, currentInvestor, currentInvestorVoiceKey, currentInvestorReaction, isAnalyzing, responseRecorder.isRecording, hasAutoPlayed])
 
     // ============================================
     // RENDER

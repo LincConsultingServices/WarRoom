@@ -8,6 +8,7 @@ interface UseAudioRecorderReturn {
     recordingTime: number
     maxDuration: number
     isSupported: boolean
+    error: string | null
     startRecording: () => Promise<void>
     stopRecording: () => void
     resetRecording: () => void
@@ -18,6 +19,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const [isSupported, setIsSupported] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
     const chunksRef = useRef<Blob[]>([])
@@ -48,6 +50,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             chunksRef.current = []
             setAudioBlob(null)
             setRecordingTime(0)
+            setError(null)
 
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: true
@@ -69,6 +72,24 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             mediaRecorder.ondataavailable = (e) => {
                 if (e.data.size > 0) {
                     chunksRef.current.push(e.data)
+                }
+            }
+
+            mediaRecorder.onerror = (event) => {
+                console.error('MediaRecorder error:', event.error)
+                setIsRecording(false)
+                setError(event.error || 'Recording failed')
+                
+                // Stop all tracks
+                if (streamRef.current) {
+                    streamRef.current.getTracks().forEach(track => track.stop())
+                    streamRef.current = null
+                }
+
+                // Clear timer
+                if (timerRef.current) {
+                    clearInterval(timerRef.current)
+                    timerRef.current = null
                 }
             }
 
@@ -107,7 +128,9 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
                 }
             }, 100)
         } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to start recording'
             console.error('Failed to start recording:', err)
+            setError(errorMessage)
             setIsRecording(false)
         }
     }, [maxDurationSec])
@@ -121,6 +144,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
     const resetRecording = useCallback(() => {
         setAudioBlob(null)
         setRecordingTime(0)
+        setError(null)
         chunksRef.current = []
     }, [])
 
@@ -130,6 +154,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
         recordingTime,
         maxDuration: maxDurationSec,
         isSupported,
+        error,
         startRecording,
         stopRecording,
         resetRecording,
