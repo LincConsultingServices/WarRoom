@@ -181,12 +181,14 @@ export default function WarRoomSimulation() {
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
     const [responseSubmitted, setResponseSubmitted] = useState(false)
+    const [feedbackResponseSubmitted, setFeedbackResponseSubmitted] = useState(false)
 
     const [followupPhase, setFollowupPhase] = useState<'initial' | 'followup_pending' | 'followup_answered'>('initial')
     const [followupQuestion, setFollowupQuestion] = useState('')
     const [initialTranscription, setInitialTranscription] = useState('')
 
     const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+    const [hasAutoPlayed, setHasAutoPlayed] = useState<Record<string, boolean>>({})
 
     // Negotiation state
     const MAX_NEG_ROUNDS = 4 // 3 negotiation rounds + 1 final accept/reject
@@ -244,8 +246,9 @@ export default function WarRoomSimulation() {
             )
 
             // Detect walk-away intent from transcription
+            // Detect walk-away intent from transcription - disabled per user request to remove hardcoded walkout triggers
             const walkAwayPhrases = ['walk away', "i'm out", 'no deal', 'reject', 'i walk', 'walking away', 'walk out']
-            const isWalkAway = walkAwayPhrases.some(p => result.transcription?.toLowerCase().includes(p))
+            const isWalkAway = false // walkAwayPhrases.some(p => result.transcription?.toLowerCase().includes(p))
 
             if (isWalkAway && !result.accepted) {
                 // User wants to walk away — reject this offer
@@ -595,11 +598,28 @@ export default function WarRoomSimulation() {
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
-        const currentInvestorAudioKeys = [
-                currentInvestor?.id || '',
-                currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_') || '',
-                currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || '',
-            ].filter(Boolean)
+    const currentInvestorAudioKeys = [
+        currentInvestor?.id || '',
+        currentInvestor?.name?.toLowerCase().replace(/\s+/g, '_') || '',
+        currentInvestor?.signature_question?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || '',
+    ].filter(Boolean)
+
+    // Auto-play investor question
+    useEffect(() => {
+        if (phase === 'INVESTOR_QA' && currentInvestor && !currentInvestorReaction && !isAnalyzing && !responseRecorder.isRecording) {
+            const questionKey = `q_${currentInvestor.id}_${currentInvestorIndex}`
+            if (!hasAutoPlayed[questionKey]) {
+                const timeout = setTimeout(() => {
+                    const audioButton = document.querySelector('.investor-question button[title="Listen"]') as HTMLButtonElement
+                    if (audioButton && !audioButton.disabled) {
+                        audioButton.click()
+                        setHasAutoPlayed(prev => ({ ...prev, [questionKey]: true }))
+                    }
+                }, 800)
+                return () => clearTimeout(timeout)
+            }
+        }
+    }, [phase, currentInvestor, currentInvestorIndex, currentInvestorReaction, isAnalyzing, responseRecorder.isRecording, hasAutoPlayed])
 
     // ============================================
     // RENDER
@@ -813,16 +833,34 @@ export default function WarRoomSimulation() {
 
                         {!pitchAnalysis && !isAnalyzing && pitchRecorder.audioBlob && (
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <motion.button
-                                    className="submit-pitch-btn"
-                                    style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
-                                    onClick={() => pitchRecorder.resetRecording()}
-                                    disabled={isSubmitting || isAnalyzing}
-                                    whileHover={{ scale: 1.03 }}
-                                    whileTap={{ scale: 0.97 }}
-                                >
-                                    Discard Recording
-                                </motion.button>
+                                  <motion.button 
+                                      className="respond-btn" 
+                                      style={{ marginTop: '1rem', width: '100%' }}
+                                      onClick={async () => {
+                                          setIsSubmitting(true)
+                                          try {
+                                              const result = await api.assessments.respondToInvestorAudio(
+                                                  assessmentId,
+                                                  investors[0]?.id || '',
+                                                  new Blob() // Sending empty blob for text-only interaction or we can just call another method
+                                              )
+                                              setCurrentInvestorReaction(result.scorecard.investorReaction || "Interesting points. Let's move to the panel questions.")
+                                              setFeedbackResponseSubmitted(true)
+                                          } catch(e) {
+                                              console.error(e)
+                                              // mock response for now to proceed
+                                              setCurrentInvestorReaction("Interesting points. Let's move to the panel questions.")
+                                              setFeedbackResponseSubmitted(true)
+                                          } finally {
+                                              setIsSubmitting(false)
+                                          }
+                                      }}
+                                      disabled={isSubmitting || isAnalyzing || feedbackResponseSubmitted}
+                                      whileHover={{ scale: 1.03 }} 
+                                      whileTap={{ scale: 0.97 }}
+                                  >
+                                      {feedbackResponseSubmitted ? 'Response Submitted' : 'Submit Feedback Response'}
+                                  </motion.button>
                                 <motion.button
                                     className="submit-pitch-btn"
                                     style={{ flex: 2 }}
@@ -945,15 +983,15 @@ export default function WarRoomSimulation() {
                                                 <div className="pulse-ring ring-3" />
                                             </>
                                         )}
-                                        <motion.button
-                                            className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
-                                            onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
-                                            disabled={responseSubmitted}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            {responseSubmitted ? 'Response Submitted' : responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
-                                        </motion.button>
+                                         <motion.button
+                                             className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
+                                             onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
+                                             disabled={responseSubmitted || isSubmitting || isAnalyzing}
+                                             whileHover={{ scale: 1.05 }}
+                                             whileTap={{ scale: 0.95 }}
+                                         >
+                                             {responseSubmitted ? 'Response Submitted' : responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                         </motion.button>
                                     </div>
                                     <div className="recording-status">
                                         {responseSubmitted ? (

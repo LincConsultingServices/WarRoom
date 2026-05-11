@@ -651,6 +651,24 @@ export default function SimulationPage() {
       tone: 'warm',
     },
     {
+      id: 'p2',
+      name: 'Marcus Market',
+      specialization: 'GTM Strategy',
+      avatar: '📈',
+      bio: 'Marcus is an expert in scaling SaaS companies from $0 to $10M ARR.',
+      guidance_style: 'Direct',
+      tone: 'analytical',
+    },
+    {
+      id: 'p3',
+      name: 'Elena Equity',
+      specialization: 'Venture Capital',
+      avatar: '💰',
+      bio: 'Elena has seen thousands of pitches and knows exactly what VCs are looking for.',
+      guidance_style: 'Challenging',
+      tone: 'professional',
+    },
+    {
       id: 'p4',
       name: 'David Design',
       specialization: 'User Experience',
@@ -936,6 +954,9 @@ export default function SimulationPage() {
       })
       // Reset all in-memory phase state so UI is fully clean
       setAnswers({})
+      setBudgetAllocations({})
+      setRevenue(0)
+      setPrevRevenue(undefined)
       setQIndex(0)
       setMcqFeedback(null)
       setSubmitError('')
@@ -1002,6 +1023,7 @@ export default function SimulationPage() {
     setSubmitting(true)
     try {
       await api.assessments.chooseBuyout(assessmentId as string, buyoutCompany, numericAmount)
+      // Redirect directly to final report, skipping War Room
       router.push(`/assessment/${assessmentId}/final-report`)
     } catch (err: any) {
       console.error('Buyout error:', err)
@@ -1261,15 +1283,18 @@ export default function SimulationPage() {
           stageName={stageLabel(simulation.currentStage)}
           onContinue={() => snapshotContinueRef.current?.()}
         />
-        {/* Mentor Tip Popup */}
-        {STAGE_MENTOR_TIPS[simulation.currentStage] && (
-          <MentorTipPopup
-            show={showMentorTip}
-            message={STAGE_MENTOR_TIPS[simulation.currentStage]}
-            onDismiss={() => setShowMentorTip(false)}
-            onAskMentor={() => { setMentorResult(null); setShowMentorPanel(true) }}
-          />
-        )}
+      {/* Red Waving Pattern Animation for Dynamic Scenarios */}
+      {isCrisisQuestion && <div className="crisis-corner-wave" />}
+
+      {/* Mentor Tip Popup */}
+      {STAGE_MENTOR_TIPS[simulation.currentStage] && (
+        <MentorTipPopup
+          show={showMentorTip}
+          message={STAGE_MENTOR_TIPS[simulation.currentStage]}
+          onDismiss={() => setShowMentorTip(false)}
+          onAskMentor={() => { setMentorResult(null); setShowMentorPanel(true) }}
+        />
+      )}
         <div className="min-h-screen bg-background flex flex-col">
         <CinemaOverlay
           show={submitting}

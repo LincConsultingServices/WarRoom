@@ -424,16 +424,38 @@
   box-shadow: 0 0 30px rgba(239, 68, 68, 0.08), inset 0 0 30px rgba(239, 68, 68, 0.02) !important;
 }
 
-.danger-pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
-  display: inline-block;
-  animation: danger-pulse-dot 1.5s ease-in-out infinite;
-}
+  .danger-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    display: inline-block;
+    animation: danger-pulse-dot 1.5s ease-in-out infinite;
+  }
 
-/* ============================================ */
+  /* Red waving pattern animation around corners */
+  .crisis-corner-wave {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    border: 8px solid transparent;
+    animation: redWaveBorder 2s ease-in-out infinite;
+  }
+
+  @keyframes redWaveBorder {
+    0%, 100% {
+      border-color: rgba(239, 68, 68, 0.3);
+      box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.2), 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+    50% {
+      border-color: rgba(239, 68, 68, 0.8);
+      box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.5);
+      border-width: 12px;
+    }
+  }
+
+  /* ============================================ */
 /* PREMIUM ANIMATION EFFECTS                    */
 /* ============================================ */
 
