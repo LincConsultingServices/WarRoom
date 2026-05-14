@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -14,7 +14,7 @@ import type {
 import { Volume2, VolumeX } from 'lucide-react'
 
 // ============================================
-// WAR ROOM – Investor Pitch Simulation
+// WAR ROOM ΓÇô Investor Pitch Simulation
 // SOP: 15 minutes, all C1-C8 integrated
 // ============================================
 
@@ -269,7 +269,7 @@ export default function WarRoomSimulation() {
             const isWalkAway = false // walkAwayPhrases.some(p => result.transcription?.toLowerCase().includes(p))
 
             if (isWalkAway && !result.accepted) {
-                // User wants to walk away — reject this offer
+                // User wants to walk away ΓÇö reject this offer
                 setWalkedAwayInvestor(selectedOffer.investorName)
                 try {
                     await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
@@ -340,7 +340,7 @@ export default function WarRoomSimulation() {
                 setNegInputEq(result.equity.toString())
 
                 if (nextRound >= MAX_NEG_ROUNDS) {
-                    // Max rounds exhausted without acceptance — auto-reject this offer
+                    // Max rounds exhausted without acceptance ΓÇö auto-reject this offer
                     try {
                         await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
                         setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
@@ -400,7 +400,7 @@ export default function WarRoomSimulation() {
         }
     }, [])
 
-    // Load assessment state and investors — filter to only selected investor IDs
+    // Load assessment state and investors ΓÇö filter to only selected investor IDs
     useEffect(() => {
         const load = async () => {
             try {
@@ -809,7 +809,7 @@ export default function WarRoomSimulation() {
                 )}
 
                 {/* ============================================ */}
-                {/* PITCH PHASE — AUDIO RECORDING */}
+                {/* PITCH PHASE ΓÇö AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'PITCH' && (
                     <motion.div
@@ -818,7 +818,7 @@ export default function WarRoomSimulation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 — YOUR PITCH</motion.div>
+                        <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 ΓÇö YOUR PITCH</motion.div>
                         <motion.h2 className="phase-title" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                             Record Your 1-Minute War Room Pitch
                         </motion.h2>
@@ -877,7 +877,7 @@ export default function WarRoomSimulation() {
                                             <span className="rec-text">Recording... {Math.max(0, 60 - pitchRecorder.recordingTime)}s left</span>
                                         </>
                                     ) : pitchRecorder.audioBlob ? (
-                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) — Select Record Again to re-record</span>
+                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) ΓÇö Select Record Again to re-record</span>
                                     ) : (
                                         <span className="rec-hint">Select Start Recording to begin your pitch</span>
                                     )}
@@ -1060,11 +1060,11 @@ export default function WarRoomSimulation() {
                 )}
 
                 {/* ============================================ */}
-                {/* INVESTOR Q&A PHASE — AUDIO RECORDING */}
+                {/* INVESTOR Q&A PHASE ΓÇö AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'INVESTOR_QA' && currentInvestor && (
                     <motion.div className="investor-qa-phase" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                        <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 — INVESTOR QUESTIONS</motion.div>
+                        <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 ΓÇö INVESTOR QUESTIONS</motion.div>
                         <div className="investor-counter">Investor {currentInvestorIndex + 1} of {investors.length}</div>
 
                         {/* Investor Card */}
@@ -1247,7 +1247,7 @@ export default function WarRoomSimulation() {
                             initial={{ scale: 0.8 }}
                             animate={{ scale: 1 }}
                             transition={{ type: 'spring' }}
-                        >PHASE 3 — INVESTOR OFFERS</motion.div>
+                        >PHASE 3 ΓÇö INVESTOR OFFERS</motion.div>
                         <motion.h2
                             className="phase-title"
                             initial={{ y: 10, opacity: 0 }}
@@ -1294,7 +1294,7 @@ export default function WarRoomSimulation() {
                                             <p>"{offer.message}"</p>
                                         </div>
                                         <div style={{ marginTop: '1rem', textAlign: 'center', color: '#10b981', fontWeight: 'bold' }}>
-                                            Click to Negotiate →
+                                            Click to Negotiate ΓåÆ
                                         </div>
                                     </motion.div>
                                 ))}
@@ -1373,7 +1373,7 @@ export default function WarRoomSimulation() {
                                     <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
                                         <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
                                             {negRound >= MAX_NEG_ROUNDS - 1
-                                                ? 'This is your final round — say "I accept this deal" or "I walk away"'
+                                                ? 'This is your final round ΓÇö say "I accept this deal" or "I walk away"'
                                                 : 'Speak your counter offer (e.g., "I\'d like $1.2M for 25% equity because...")'
                                             }
                                         </p>
@@ -1408,7 +1408,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         ) : negRound >= MAX_NEG_ROUNDS ? (
                                             <div className="recording-status">
-                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted — offer expired</span>
+                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted ΓÇö offer expired</span>
                                             </div>
                                         ) : (
                                             <div className="recording-status">
