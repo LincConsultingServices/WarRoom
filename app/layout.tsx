@@ -1,24 +1,30 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Cinzel } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  variable: '--font-got',
+  weight: ['400', '600', '700', '900'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: "KK's War Room - Entrepreneurial Assessment",
-  description: 'Assess your entrepreneurial competencies and get personalized development roadmaps.',
-  keywords: ['entrepreneurship', 'assessment', 'competencies', 'business'],
-    generator: 'v0.app'
+  title: "KK's War Room — Forge Your Legacy",
+  description: 'Enter the War Room. Face legendary investors, defend your vision, and forge your entrepreneurial legacy in the ultimate pressure simulation.',
+  keywords: ['entrepreneurship', 'simulation', 'pitch', 'investors', 'war room', 'gamified'],
+  generator: 'v0.app'
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#2563EB'
+  themeColor: '#0d0b09'
 }
 
 export default function RootLayout({
@@ -27,12 +33,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

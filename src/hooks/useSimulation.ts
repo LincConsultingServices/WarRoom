@@ -354,11 +354,20 @@ export function useSimulation(assessmentId: string) {
     // Handlers
     load, goBack, goNext, handleSelectOption, handleConfirmScenarioDecision,
     handleTextChange, handleBudgetAllocation, doPhaseSubmit, handleCharacterConfirm,
-    handleRestart: (onClear?: () => void) => transition.handleRestart(onClear || (() => {
-      setAnswers({}); setBudgetAllocations({}); setRevenue(0); setPrevRevenue(undefined)
-      setQIndex(0); setMcqFeedback(null); setFollowupScenarios({}); setFollowupError({})
-      setDynamicScenario(null); setDynamicScenarioError('')
-    })),
+    handleRestart: (
+      onClear?: () => void,
+      opts?: { mode?: 'month_zero' | 'continue'; targetStage?: string }
+    ) => transition.handleRestart(onClear || (() => {
+      // For a hard restart, scrub the local in-progress UI state so the user
+      // doesn't see stale answers/budgets from the prior run. For continue mode,
+      // leave the local state alone — the load() that follows will refresh from
+      // the server-side preserved answers.
+      if (!opts || opts.mode !== 'continue') {
+        setAnswers({}); setBudgetAllocations({}); setRevenue(0); setPrevRevenue(undefined)
+        setQIndex(0); setMcqFeedback(null); setFollowupScenarios({}); setFollowupError({})
+        setDynamicScenario(null); setDynamicScenarioError('')
+      }
+    }), opts),
     handleContinue: transition.handleContinue,
     handleUseMentor,
     closeMentorPanel: mentor.closeMentorPanel,

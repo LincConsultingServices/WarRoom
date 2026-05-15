@@ -44,21 +44,26 @@ interface GlowCardProps {
   hoverScale?: number
 }
 
-export function GlowCard({ children, className, glowColor = 'rgba(99, 102, 241, 0.15)', hoverScale = 1.02 }: GlowCardProps) {
+export function GlowCard({ children, className, glowColor = 'rgba(201, 162, 39, 0.12)', hoverScale = 1.02 }: GlowCardProps) {
   return (
     <motion.div
       whileHover={{
         scale: hoverScale,
-        boxShadow: `0 0 30px ${glowColor}, 0 0 60px ${glowColor}`,
+        boxShadow: `0 0 30px ${glowColor}, 0 0 60px ${glowColor}, inset 0 1px 0 rgba(201,162,39,0.15)`,
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
-        'relative rounded-2xl border border-white/10 bg-card/80 backdrop-blur-xl overflow-hidden',
-        'before:absolute before:inset-0 before:rounded-2xl before:border before:border-white/5',
-        'shadow-lg shadow-black/5',
+        'relative overflow-hidden',
+        'shadow-lg shadow-black/20',
         className
       )}
+      style={{
+        background: 'linear-gradient(135deg, rgba(17,14,10,0.9), rgba(10,8,6,0.8))',
+        border: '1px solid rgba(201,162,39,0.12)',
+        borderRadius: '4px',
+      }}
     >
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.25), transparent)' }} />
       {children}
     </motion.div>
   )
@@ -338,29 +343,44 @@ export function CinemaOverlay({ show, icon, title, subtitle }: CinemaOverlayProp
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-50 bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center gap-4"
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 z-50 backdrop-blur-xl flex flex-col items-center justify-center gap-5"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(10,8,6,0.97), rgba(5,4,3,0.99))' }}
         >
+          {/* Ambient embers */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[0,1,2,3,4].map(i => (
+              <motion.div key={i} className="absolute w-1 h-1 rounded-full"
+                style={{ left: `${20 + i * 15}%`, bottom: '10%', background: '#ff6b00', boxShadow: '0 0 6px #ff6b00' }}
+                animate={{ y: [0, -150], opacity: [0.8, 0], scale: [1, 0] }}
+                transition={{ duration: 2 + i * 0.4, delay: i * 0.3, repeat: Infinity, ease: 'easeOut' }}
+              />
+            ))}
+          </div>
           {icon && (
-            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="text-5xl">
+            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}>
               {icon}
             </motion.div>
           )}
           {title && (
-            <motion.h2 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="text-2xl font-bold bg-gradient-to-r from-primary via-yellow-500 to-orange-500 bg-clip-text text-transparent">
+            <motion.h2
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+              style={{ fontFamily: "'Cinzel', Georgia, serif", fontSize: '1.5rem', fontWeight: 700, letterSpacing: '0.06em', color: '#c9a227', textShadow: '0 0 30px rgba(201,162,39,0.5)' }}
+            >
               {title}
             </motion.h2>
           )}
           {subtitle && (
-            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-sm text-muted-foreground">
+            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}
+              style={{ fontSize: '0.8rem', color: '#8c8075', letterSpacing: '0.06em' }}
+            >
               {subtitle}
             </motion.p>
           )}
           <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
+            initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
             transition={{ delay: 0.3, duration: 1.5, ease: 'easeInOut' }}
-            className="w-48 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent origin-center"
+            style={{ width: 200, height: 1, background: 'linear-gradient(90deg, transparent, #c9a227, transparent)', transformOrigin: 'center' }}
           />
         </motion.div>
       )}
@@ -388,7 +408,7 @@ interface StageNarrationOverlayProps {
   onDismiss: () => void
 }
 
-export function StageNarrationOverlay({ show, data, stageIndex, totalStages, stageLabels, accentColor = '#6366f1', onDismiss }: StageNarrationOverlayProps) {
+export function StageNarrationOverlay({ show, data, stageIndex, totalStages, stageLabels, accentColor = '#c9a227', onDismiss }: StageNarrationOverlayProps) {
   useEffect(() => {
     if (!show) return
     const timer = setTimeout(onDismiss, 6000)
@@ -404,7 +424,7 @@ export function StageNarrationOverlay({ show, data, stageIndex, totalStages, sta
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[70] flex items-center justify-center cursor-pointer"
-          style={{ background: 'radial-gradient(ellipse at center, hsl(var(--background) / 0.97), hsl(var(--background) / 0.99))' }}
+          style={{ background: 'radial-gradient(ellipse at center, rgba(10,8,6,0.97) 0%, rgba(5,4,3,0.99) 100%)' }}
         >
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -528,8 +548,9 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
             className="w-full max-w-lg space-y-5"
           >
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                Stage Complete
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-3"
+              style={{ background: 'rgba(201,162,39,0.08)', border: '1px solid rgba(201,162,39,0.3)', color: '#c9a227', borderRadius: '2px', fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.15em' }}>
+              ⚔ Stage Complete ⚔
               </div>
               <h3 className="text-xl font-bold">{stageName}</h3>
             </div>
@@ -586,7 +607,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={onContinue}
-                className="px-8 py-3 rounded-xl text-sm font-bold bg-primary text-primary-foreground shadow-lg transition-all hover:shadow-xl"
+                style={{ background: 'linear-gradient(135deg, #b8891e, #c9a227)', color: '#0a0806', border: '1px solid rgba(201,162,39,0.5)', borderRadius: '3px', padding: '10px 28px', fontFamily: "'Cinzel', Georgia, serif", fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', boxShadow: '0 4px 20px rgba(201,162,39,0.3)', cursor: 'pointer' }}
               >
                 Continue →
               </motion.button>
@@ -621,23 +642,23 @@ export function MentorTipPopup({ show, message, emoji = 'TIP', onDismiss, onAskM
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="fixed bottom-24 right-6 z-[55] max-w-xs"
         >
-          <div className="relative bg-card border-2 border-primary/20 rounded-2xl p-4 shadow-xl">
+          <div className="relative p-4 shadow-xl" style={{ background: 'rgba(17,14,10,0.95)', border: '1px solid rgba(201,162,39,0.2)', borderRadius: '4px', backdropFilter: 'blur(16px)' }}>
             <button onClick={onDismiss} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-xs text-muted-foreground hover:text-foreground transition-all">✕</button>
             <div className="flex items-start gap-3 pr-4">
               <motion.div
                 animate={{ y: [0, -3, 0] }}
                 transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-lg flex-shrink-0"
+                className="h-10 w-10 flex items-center justify-center text-lg flex-shrink-0" style={{ background: 'rgba(201,162,39,0.1)', border: '1px solid rgba(201,162,39,0.25)', borderRadius: '50%' }}
               >
                 {emoji}
               </motion.div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Mentor Tip</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#c9a227', fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.15em' }}>📜 Mentor Scroll</p>
                 <p className="text-sm text-foreground/80 leading-relaxed">{message}</p>
               </div>
             </div>
             {onAskMentor && (
-              <button onClick={() => { onDismiss(); onAskMentor() }} className="mt-3 w-full py-2 rounded-xl text-xs font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all">
+              <button onClick={() => { onDismiss(); onAskMentor() }} className="mt-3 w-full py-2 text-xs font-bold transition-all" style={{ background: 'rgba(201,162,39,0.08)', border: '1px solid rgba(201,162,39,0.25)', color: '#c9a227', borderRadius: '2px', fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.08em' }}>
                 Use a Mentor Lifeline
               </button>
             )}

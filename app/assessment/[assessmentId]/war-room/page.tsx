@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -430,7 +430,9 @@ export default function WarRoomSimulation() {
                 const filtered = selectedIds.length > 0
                     ? investorList.filter(inv => selectedIds.includes(inv.id))
                     : investorList
-                setInvestors(filtered)
+
+                // Fallback: if ID matching yielded nothing, use the full list
+                setInvestors(filtered.length > 0 ? filtered : investorList)
                 setPhase('PITCH')
             } catch (err: any) {
                 setError(err.message || 'Failed to load War Room data')
@@ -1020,6 +1022,7 @@ export default function WarRoomSimulation() {
                                             setPitchAnalysis(null);
                                             resetPitchFollowupState();
                                             pitchRecorder.resetRecording();
+                                            setError('');
                                         }}
                                         whileHover={{ scale: 1.03 }} 
                                         whileTap={{ scale: 0.97 }}
@@ -1028,13 +1031,17 @@ export default function WarRoomSimulation() {
                                     </motion.button>
                                     <motion.button 
                                         className="submit-pitch-btn" 
-                                        style={{ flex: 2 }}
+                                        style={{ flex: 2, ...(!feedbackResponseSubmitted && !error ? { opacity: 0.5 } : {}) }}
                                         onClick={handleContinueFromPitch} 
-                                        disabled={!feedbackResponseSubmitted}
+                                        disabled={!feedbackResponseSubmitted && !error}
                                         whileHover={{ scale: 1.03 }} 
                                         whileTap={{ scale: 0.97 }}
                                     >
-                                        {feedbackResponseSubmitted ? 'Continue to Investor Questions' : 'Answer the follow-up first'}
+                                        {feedbackResponseSubmitted
+                                            ? 'Continue to Investor Questions'
+                                            : error
+                                                ? 'Skip to Investor Q&A →'
+                                                : 'Answer the follow-up first'}
                                     </motion.button>
                                 </div>
                             </motion.div>

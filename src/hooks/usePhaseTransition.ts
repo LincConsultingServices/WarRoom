@@ -51,13 +51,22 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
     await load()
   }
 
+  // handleRestart restarts the assessment. opts.mode defaults to "month_zero"
+  // (full wipe — the legacy behaviour). Pass mode="continue" with an optional
+  // targetStage to soft-restart while preserving prior answers (used when the
+  // user picks "continue with current plan" from a checkpoint).
   async function handleRestart(
-    onClear: () => void
+    onClear: () => void,
+    opts?: { mode?: 'month_zero' | 'continue'; targetStage?: string }
   ) {
     setSubmitting(true)
     try {
-      await api.assessments.restartAssessment(assessmentId)
-      STAGE_ORDER.forEach((s) => clearStageTimerKey(assessmentId, s))
+      await api.assessments.restartAssessment(assessmentId, opts)
+      // Only clear all timers on a hard restart — a continue-mode restart should
+      // keep timer progress for stages the user has already entered.
+      if (!opts || opts.mode !== 'continue') {
+        STAGE_ORDER.forEach((s) => clearStageTimerKey(assessmentId, s))
+      }
       setShowingScenario(false)
       setPhaseScenario(null)
       setShowRestartCheckpoint(false)

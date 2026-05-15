@@ -59,7 +59,8 @@ export function useWarRoomCore(assessmentId: string) {
           ? investorList.filter((inv) => selectedIds.includes(inv.id))
           : investorList
 
-        setInvestors(filtered)
+        // Fallback: if ID matching yielded nothing, use the full list
+        setInvestors(filtered.length > 0 ? filtered : investorList)
         setPhase('PITCH')
       } catch (err: any) {
         setError(err.message || 'Failed to load War Room')

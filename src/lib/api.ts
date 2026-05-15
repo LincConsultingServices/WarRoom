@@ -372,10 +372,20 @@ export const api = {
     // Report
     getReport: (id: string) => request<EvaluationReport>(`/assessments/${id}/report`),
 
+    // Regenerate the report from scratch — drops any cached row and rebuilds from
+    // the current assessment state. Use after late answer changes (e.g. user
+    // answered more questions after a buyout-triggered draft report was created).
+    regenerateReport: (id: string) =>
+      request<EvaluationReport>(`/assessments/${id}/report?regenerate=true`),
+
     // Flow Branching
-    restartAssessment: (id: string) =>
+    // mode="continue" preserves prior responses and just jumps the cursor to the
+    // given target stage (defaults to current stage). mode="month_zero" or omitted
+    // performs a full wipe and returns the user to Ideation.
+    restartAssessment: (id: string, opts?: { mode?: 'month_zero' | 'continue'; targetStage?: string }) =>
       request<Assessment>(`/assessments/${id}/restart`, {
         method: 'POST',
+        body: opts ? JSON.stringify(opts) : undefined,
       }),
 
     chooseBuyout: (id: string, company: string, amount: number) =>

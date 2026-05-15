@@ -52,8 +52,18 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             setRecordingTime(0)
             setError(null)
 
+            // Stop any existing stream before requesting a new one
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop())
+                streamRef.current = null
+            }
+
             const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100,
+                }
             })
             streamRef.current = stream
 
@@ -128,7 +138,18 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
                 }
             }, 100)
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Failed to start recording'
+            let errorMessage = 'Failed to start recording'
+            if (err instanceof Error) {
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings and try again.'
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    errorMessage = 'No microphone found. Please connect a microphone and try again.'
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage = 'Microphone is in use by another application. Please close other apps using the mic and try again.'
+                } else {
+                    errorMessage = err.message
+                }
+            }
             console.error('Failed to start recording:', err)
             setError(errorMessage)
             setIsRecording(false)

@@ -4,10 +4,47 @@ import { motion } from 'framer-motion'
 import type { EvaluationReport } from '@/src/types'
 
 export function DealSummaryTab({ report }: { report: EvaluationReport }) {
-  const deal = report.dealSummary
+  const deal = report.dealSummary as any
+  const exitedVia: string | undefined = deal?.exitedVia
+  const exitStage: string | undefined = deal?.exitStage
+  const capitalSource: string | undefined = deal?.capitalSource
+
+  // Map the backend's exit reason to a human-friendly banner. Keeps the page
+  // coherent for users who never entered the war room (buyout, early exit).
+  const exitBanner = (() => {
+    if (!exitedVia) return null
+    if (exitedVia === 'BUYOUT') {
+      return {
+        title: 'Exited via Buyout',
+        subtitle: capitalSource || `You accepted a buyout offer${exitStage ? ` at ${exitStage}` : ''}.`,
+        tone: 'positive' as const,
+      }
+    }
+    if (exitedVia === 'WALKOUT') {
+      return {
+        title: 'Walked Out of the War Room',
+        subtitle: 'You declined every investor offer and exited without a deal.',
+        tone: 'negative' as const,
+      }
+    }
+    if (exitedVia === 'EARLY_EXIT') {
+      return {
+        title: 'Early Exit',
+        subtitle: `Simulation ended at ${exitStage || 'your current phase'} before reaching the War Room.`,
+        tone: 'neutral' as const,
+      }
+    }
+    return null
+  })()
 
   return (
     <div className="deal-page">
+      {exitBanner && (
+        <div className={`exit-banner exit-${exitBanner.tone}`}>
+          <div className="exit-title">{exitBanner.title}</div>
+          <div className="exit-subtitle">{exitBanner.subtitle}</div>
+        </div>
+      )}
       <div className="deal-stats">
         {[
           { value: deal?.totalInvestors || 0, label: 'Investors Faced', highlight: false },
@@ -59,6 +96,12 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
       <style jsx>{`
         .deal-page { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .exit-banner { border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); }
+        .exit-banner .exit-title { font-weight: 700; color: white; margin-bottom: 0.2rem; font-size: 1.05rem; }
+        .exit-banner .exit-subtitle { color: #9ca3af; font-size: 0.85rem; }
+        .exit-positive { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); }
+        .exit-negative { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
+        .exit-neutral { background: rgba(99,102,241,0.07); border-color: rgba(99,102,241,0.25); }
         .deal-stats { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 2rem; }
         .stat-card { background: hsl(var(--muted)); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem 3rem; text-align: center; }
         .stat-card.highlight { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }

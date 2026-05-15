@@ -47,8 +47,21 @@ export default function SimulationPage() {
   } = sim
 
   // ---- Loading / Error ----
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-  if (error) return <div className="min-h-screen flex flex-col items-center justify-center gap-4"><p className="text-destructive">{error}</p><Button onClick={() => router.push('/dashboard')}>Back to Dashboard</Button></div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0806' }}>
+      <div className="text-center space-y-4">
+        <div className="text-4xl animate-torch-glow">🐉</div>
+        <div className="w-8 h-8 mx-auto" style={{ border: '2px solid rgba(201,162,39,0.2)', borderTopColor: '#c9a227', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <p className="text-xs" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#c9a227', letterSpacing: '0.15em' }}>SUMMONING THE COUNCIL...</p>
+      </div>
+    </div>
+  )
+  if (error) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#0a0806' }}>
+      <p style={{ color: '#c23b3b', fontFamily: "'Cinzel', Georgia, serif" }}>{error}</p>
+      <button onClick={() => router.push('/dashboard')} style={{ background: 'rgba(201,162,39,0.1)', border: '1px solid rgba(201,162,39,0.3)', color: '#c9a227', padding: '8px 20px', borderRadius: '3px', fontFamily: "'Cinzel', Georgia, serif", fontSize: '0.75rem', letterSpacing: '0.1em', cursor: 'pointer' }}>Return to the Keep</button>
+    </div>
+  )
   if (!state || !simulation) return null
 
   const accent = STAGE_THEMES[simulation.currentStage] || '#6366f1'
@@ -59,11 +72,14 @@ export default function SimulationPage() {
   // ---- Panel Selection ----
   if (showPanelSelection) {
     return (
-      <div className="min-h-screen bg-background p-6 flex items-center justify-center">
+      <div className="min-h-screen p-6 flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #0a0806, #110e0a)' }}>
+        <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.3), transparent)' }} />
         <div className="w-full max-w-4xl space-y-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold">Assemble Your Board</h1>
-            <p className="text-muted-foreground">Select the mentors, leaders, and investors who will guide your journey.</p>
+          <div className="text-center space-y-3">
+            <div className="text-3xl">👑</div>
+            <h1 className="text-3xl font-bold" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.06em' }}>Assemble the War Council</h1>
+            <div className="h-px max-w-sm mx-auto" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.4), transparent)' }} />
+            <p style={{ color: '#8c8075', fontSize: '0.85rem', letterSpacing: '0.04em' }}>Choose wisely, Lord Commander. Their counsel will shape your fate.</p>
           </div>
           <CharacterPicker mentors={mentors} leaders={[]} investors={[]} onConfirm={handleCharacterConfirm} loading={settingCharacters} />
         </div>
@@ -153,21 +169,28 @@ export default function SimulationPage() {
       <AnimatePresence>
         {showCapitalAnimation && (
           <motion.div initial={{ opacity: 0, scale: 0.5, y: 50 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.5, y: -50 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
-            <div className="bg-green-500 text-white font-black text-4xl sm:text-6xl px-12 py-8 rounded-full shadow-[0_0_100px_rgba(34,197,94,0.8)] border-4 border-white/20 transform -rotate-6">+$50,000 RAISED! 🎉</div>
+            <div className="text-center" style={{ background: 'rgba(10,8,6,0.9)', border: '2px solid rgba(201,162,39,0.6)', borderRadius: '4px', padding: '2rem 3rem', boxShadow: '0 0 60px rgba(201,162,39,0.4), 0 0 120px rgba(201,162,39,0.15)' }}>
+              <div className="text-3xl mb-2">🐉</div>
+              <div style={{ fontFamily: "'Cinzel', Georgia, serif", fontSize: '1.8rem', fontWeight: 900, color: '#c9a227', letterSpacing: '0.08em', textShadow: '0 0 30px rgba(201,162,39,0.8)' }}>+$50,000 PLEDGED!</div>
+              <div style={{ fontSize: '0.7rem', color: '#8c8075', letterSpacing: '0.15em', marginTop: '4px' }}>THE COUNCIL INVESTS IN YOUR REALM</div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
       {/* Mentor button */}
       <div className="fixed bottom-6 right-6 z-40 group">
         <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowMentorPanel(true)}
-          className="flex items-center gap-3 bg-card border-2 shadow-xl rounded-full p-3 pr-5 text-sm font-semibold"
-          style={{ borderColor: accent, color: accent }}
+          className="flex items-center gap-2"
+          style={{ background: 'rgba(17,14,10,0.9)', border: `1px solid ${accent}40`, borderRadius: '24px', padding: '8px 16px 8px 8px', boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 20px ${accent}20`, backdropFilter: 'blur(8px)' }}
         >
-          <div className="h-10 w-10 rounded-full flex items-center justify-center bg-background border relative">
-            <span className="absolute -top-1 -right-1 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" /><span className="relative inline-flex rounded-full h-3 w-3 bg-primary" /></span>
-            <Users className="h-5 w-5" />
+          <div className="h-9 w-9 rounded-full flex items-center justify-center relative" style={{ background: 'rgba(201,162,39,0.1)', border: `1px solid ${accent}40` }}>
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: accent }} />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: accent }} />
+            </span>
+            <Users className="h-4 w-4" style={{ color: accent }} />
           </div>
-          <span>Need Help?</span>
+          <span className="text-xs font-bold" style={{ fontFamily: "'Cinzel', Georgia, serif", color: accent, letterSpacing: '0.06em' }}>Counsel</span>
         </motion.button>
       </div>
     </>
@@ -197,8 +220,9 @@ export default function SimulationPage() {
     return (
       <>
         {sharedOverlays}
-        <div className="min-h-screen bg-background flex flex-col">
-          <CinemaOverlay show={submitting} icon={<Loader2 className="h-10 w-10 animate-spin text-primary" />} title="Evaluating your ideation..." subtitle="AI is reviewing your business concept" />
+        <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #0a0806 0%, #110e0a 100%)' }}>
+          <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.2), transparent)', zIndex: 40 }} />
+          <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council weighs your idea..." subtitle="Forging your founder assessment" />
           <SimulationHeader
             stageName="Stage -2: IDEATION"
             progressLabel={`${answeredCount}/${questions.length} answered`}
@@ -233,8 +257,9 @@ export default function SimulationPage() {
   return (
     <>
       {sharedOverlays}
-      <div className="min-h-screen bg-background flex flex-col">
-        <CinemaOverlay show={submitting} icon={<Loader2 className="h-10 w-10 animate-spin text-primary" />} title="Evaluating phase responses..." subtitle="AI is reviewing your answers" />
+      <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #0a0806 0%, #110e0a 100%)' }}>
+        <div className="fixed inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.15), transparent)', zIndex: 31 }} />
+        <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council deliberates..." subtitle="Your answers are being judged" />
         {isCrisisQuestion && <div className="crisis-vignette" />}
         <SimulationHeader
           stageName={stageLabel(simulation.currentStage)}

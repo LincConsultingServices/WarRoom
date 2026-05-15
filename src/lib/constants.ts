@@ -6,17 +6,17 @@ import type React from 'react'
 import type { StageName } from '@/src/types'
 
 
-// Stage accent colours
+// Stage accent colours — GOT themed
 export const STAGE_THEMES: Record<string, string> = {
-  STAGE_NEG2_IDEATION: '#6366f1',
-  STAGE_NEG1_VISION: '#8b5cf6',
-  STAGE_0_COMMITMENT: '#f59e0b',
-  STAGE_1_VALIDATION: '#10b981',
-  STAGE_2A_GROWTH: '#3b82f6',
-  STAGE_2B_EXPANSION: '#06b6d4',
-  STAGE_3_SCALE: '#a855f7',
-  STAGE_WARROOM_PREP: '#ef4444',
-  STAGE_4_WARROOM: '#dc2626',
+  STAGE_NEG2_IDEATION: '#6b5a8e',     // Dragonglass purple
+  STAGE_NEG1_VISION: '#7c5a9e',       // Raven's wing purple
+  STAGE_0_COMMITMENT: '#c9a227',      // Lannister Gold
+  STAGE_1_VALIDATION: '#4a7c59',      // Stark green (Godswood)
+  STAGE_2A_GROWTH: '#3d6b8e',         // Castle Black steel blue
+  STAGE_2B_EXPANSION: '#2e7d82',      // Braavosi teal
+  STAGE_3_SCALE: '#c9a227',           // Molten Gold
+  STAGE_WARROOM_PREP: '#8b3a1a',      // Dragonstone burnt orange-red
+  STAGE_4_WARROOM: '#8b1a1a',         // Dragon fire blood red
 }
 
 // Cinematic narration metadata per stage
