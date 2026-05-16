@@ -24,6 +24,12 @@ import type {
 //   useLeaderboard     → live batch leaderboard via WS
 // ============================================
 
+// Special MCQ options that break the linear stage progression. When the user
+// selects one of these and clicks Submit Phase, we bypass the normal
+// submitPhase endpoint and dispatch directly to restart / buyout flows.
+const RESTART_OPTION_ID = 'Q_0_DECISION_RESTART'
+const BUYOUT_OPTION_ID = 'Q_3_DECISION_BUYOUT'
+
 export interface PhaseAnswers { [questionId: string]: PhaseResponse }
 
 export function useSimulation(assessmentId: string) {
@@ -50,6 +56,9 @@ export function useSimulation(assessmentId: string) {
   // ---- Buyout form state ----
   const [buyoutCompany, setBuyoutCompany] = useState('')
   const [buyoutAmount, setBuyoutAmount] = useState('')
+
+  // ---- Restart confirmation modal (fired from Q_0 checkpoint) ----
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false)
 
   // ---- Revenue / user ----
   const [revenue, setRevenue] = useState(0)
@@ -258,6 +267,39 @@ export function useSimulation(assessmentId: string) {
   function goNext() { if (qIndex < questions.length - 1) { setQIndex((i) => i + 1); setMcqFeedback(null) } }
 
   async function doPhaseSubmit() {
+    // Edge-case 1: user picked "Restart from Month 0" on the commitment
+    // checkpoint. Open the confirm modal — the actual restart fires from
+    // confirmRestart() once the user accepts.
+    const chosePickRestart = Object.values(answers).some(
+      (a: any) => a?.selectedOptionId === RESTART_OPTION_ID
+    )
+    if (chosePickRestart) {
+      setShowRestartConfirm(true)
+      return
+    }
+
+    // Edge-case 2: user picked "AGREE TO BUY OUT DEAL" on the scale
+    // crossroads. Skip submitPhase entirely so the backend keeps
+    // CurrentStage = STAGE_3_SCALE (the report shows the exit point). Call
+    // chooseBuyout with placeholder deal details, then jump to the report.
+    const choseBuyout = Object.values(answers).some(
+      (a: any) => a?.selectedOptionId === BUYOUT_OPTION_ID
+    )
+    if (choseBuyout) {
+      transition.setSubmitting(true)
+      transition.setSubmitError('')
+      try {
+        const amount = Math.max(revenue || 0, 1_000_000)
+        await api.assessments.chooseBuyout(assessmentId, 'Strategic Buyer', amount)
+        router.push(`/assessment/${assessmentId}/final-report`)
+      } catch (err: any) {
+        transition.setSubmitError(err.message || 'Failed to finalise buyout')
+      } finally {
+        transition.setSubmitting(false)
+      }
+      return
+    }
+
     transition.setSubmitting(true); transition.setSubmitError('')
     try {
       const responses: PhaseResponse[] = questions.map((q: SimQuestion) => answers[q.q_id] || { questionId: q.q_id, type: q.type as PhaseResponse['type'], text: '' })
@@ -278,6 +320,18 @@ export function useSimulation(assessmentId: string) {
       setShowSnapshot(true)
     } catch (err: any) { transition.setSubmitError(err.message || 'Failed to submit phase') }
     finally { transition.setSubmitting(false) }
+  }
+
+  // Called by the RestartConfirmDialog after the user accepts the wipe.
+  // Closes the modal and triggers the existing month_zero restart flow,
+  // which also scrubs local state via the onClear callback below.
+  function confirmRestart() {
+    setShowRestartConfirm(false)
+    transition.handleRestart(() => {
+      setAnswers({}); setBudgetAllocations({}); setRevenue(0); setPrevRevenue(undefined)
+      setQIndex(0); setMcqFeedback(null); setFollowupScenarios({}); setFollowupError({})
+      setDynamicScenario(null); setDynamicScenarioError('')
+    }, { mode: 'month_zero' })
   }
 
   async function handleCharacterConfirm(selected: { mentors: string[]; leaders: string[]; investors: string[] }) {
@@ -320,6 +374,7 @@ export function useSimulation(assessmentId: string) {
     showStageNarration, showSnapshot, showMentorTip,
     stageTimer, shouldRunTimer, isCrisisQuestion,
     entries, connected, updatedAt, snapshotContinueRef,
+    showRestartConfirm, setShowRestartConfirm, confirmRestart,
 
     // From sub-hooks (flattened for backwards compat)
     submitting: transition.submitting,
