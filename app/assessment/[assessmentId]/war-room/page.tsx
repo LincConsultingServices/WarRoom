@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
+import { useMicPermission } from '@/src/hooks/useMicPermission'
+import { MicPermissionDialog } from '@/components/MicPermissionDialog'
 import type {
     AssessmentState,
     Investor,
@@ -171,6 +173,9 @@ export default function WarRoomSimulation() {
     const params = useParams()
     const router = useRouter()
     const assessmentId = params?.assessmentId as string
+
+    // Microphone permission gate
+    const mic = useMicPermission()
 
     // State
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
@@ -508,40 +513,7 @@ export default function WarRoomSimulation() {
             const result = await api.assessments.submitPitchAudio(assessmentId, pitchRecorder.audioBlob)
             setPitchAnalysis(result.analysis)
             setPitchText(result.analysis.transcription)
-
             resetPitchFollowupState()
-
-            const leadInvestor = investors[0]
-            if (!leadInvestor) {
-                setInitialTranscription(result.analysis.transcription)
-                setError('No investor available to generate the follow-up question.')
-                return
-            }
-
-            const followup = await api.assessments.generateInvestorFollowupAudio(
-                assessmentId,
-                leadInvestor.id,
-                pitchRecorder.audioBlob
-            )
-
-            setInitialTranscription(followup.transcription || result.analysis.transcription)
-            setFollowupQuestion(followup.followup_question || followup.followupQuestion || 'Can you explain more about the strongest part of your pitch?')
-            setFollowupPhase('followup_pending')
-
-            if (followup.audioBase64) {
-                if (audioRef.current) {
-                    audioRef.current.pause()
-                }
-                const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
-                audioRef.current = audio
-                audio.onplay = () => setIsPlayingAudio(true)
-                audio.onended = () => setIsPlayingAudio(false)
-                audio.onerror = () => setIsPlayingAudio(false)
-                audio.play().catch(e => {
-                    console.error('Auto-play failed:', e)
-                    setIsPlayingAudio(false)
-                })
-            }
         } catch (err: any) {
             setError(err.message || 'Failed to analyze pitch')
         } finally {
@@ -550,63 +522,90 @@ export default function WarRoomSimulation() {
         }
     }
 
-    const handleSubmitPitchFollowupAudio = async () => {
-        if (!responseRecorder.audioBlob) {
-            setError('Please record your response to the investor follow-up')
-            return
-        }
+    // Follow-up flow now lives inside the Investor Q&A phase (see handleSubmitInvestorFollowupAudio).
 
-        const leadInvestor = investors[0]
-        if (!leadInvestor) {
-            setError('No investor available to respond to the follow-up')
-            return
-        }
+    // ============================================
+    // TEXT FALLBACK HANDLERS (when mic permission was denied / declined)
+    // ============================================
+    const [textPitchInput, setTextPitchInput] = useState('')
+    const [textResponseInput, setTextResponseInput] = useState('')
+    const [textNegCapital, setTextNegCapital] = useState('')
+    const [textNegEquity, setTextNegEquity] = useState('')
 
-        if (!initialTranscription || !followupQuestion) {
-            setError('The follow-up context is not ready yet')
-            return
-        }
-
-        setIsAnalyzing(true)
-        setIsSubmitting(true)
-        setError('')
-
+    const handleSubmitPitchText = async () => {
+        const trimmed = textPitchInput.trim()
+        if (!trimmed) { setError('Please type your pitch before submitting'); return }
+        setIsAnalyzing(true); setIsSubmitting(true); setError('')
         try {
-            const result = await api.assessments.respondToInvestorFinalAudio(
-                assessmentId,
-                leadInvestor.id,
-                initialTranscription,
-                followupQuestion,
-                responseRecorder.audioBlob
-            )
-
-            setCurrentInvestorReaction(
-                result.scorecard.investorReaction || `${leadInvestor.name} has considered your answer.`
-            )
-            setResponseTranscription(result.transcription)
-            setFeedbackResponseSubmitted(true)
-            setFollowupPhase('followup_answered')
-            responseRecorder.resetRecording()
-
-            if (result.audioBase64) {
-                if (audioRef.current) {
-                    audioRef.current.pause()
-                }
-                const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
-                audioRef.current = audio
-                audio.onplay = () => setIsPlayingAudio(true)
-                audio.onended = () => setIsPlayingAudio(false)
-                audio.onerror = () => setIsPlayingAudio(false)
-                audio.play().catch(e => {
-                    console.error('Auto-play failed:', e)
-                    setIsPlayingAudio(false)
-                })
-            }
+            await api.assessments.submitPitch(assessmentId, trimmed)
+            setPitchAnalysis({
+                transcription: trimmed,
+                feedback: 'Text pitch received. The investors will read it before the next round.',
+                strengths: [], weaknesses: [],
+                overallScore: 0, clarity: 0, confidence: 0, persuasion: 0,
+            })
+            setPitchText(trimmed)
+            setTextPitchInput('')
         } catch (err: any) {
-            setError(err.message || 'Failed to submit investor follow-up response')
+            setError(err.message || 'Failed to submit pitch')
         } finally {
-            setIsAnalyzing(false)
-            setIsSubmitting(false)
+            setIsAnalyzing(false); setIsSubmitting(false)
+        }
+    }
+
+    const handleRespondToInvestorText = async () => {
+        const investor = investors[currentInvestorIndex]
+        const trimmed = textResponseInput.trim()
+        if (!investor) return
+        if (!trimmed) { setError('Please type your response'); return }
+        setIsAnalyzing(true); setIsSubmitting(true); setError('')
+        try {
+            const scorecard = await api.assessments.respondToInvestor(assessmentId, investor.id, trimmed)
+            setScorecards(prev => [...prev, scorecard])
+            setResponseTranscription(trimmed)
+            setCurrentInvestorReaction(scorecard.investorReaction || `${investor.name} has considered your response.`)
+            setResponseSubmitted(true)
+            setTextResponseInput('')
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit response')
+        } finally {
+            setIsAnalyzing(false); setIsSubmitting(false)
+        }
+    }
+
+    const handleNegotiateText = async () => {
+        if (!selectedOffer) return
+        const capital = parseFloat(textNegCapital)
+        const equity = parseFloat(textNegEquity)
+        if (!Number.isFinite(capital) || capital <= 0 || !Number.isFinite(equity) || equity <= 0) {
+            setError('Enter valid capital and equity values'); return
+        }
+        const nextRound = negRound + 1
+        if (nextRound > MAX_NEG_ROUNDS) { setError('Maximum rounds reached.'); return }
+        setIsNegVoiceSubmitting(true); setError('')
+        try {
+            const result = await api.assessments.counterNegotiate(assessmentId, selectedOffer.investorId, capital, equity)
+            const newHistory = [
+                ...negHistory,
+                { sender: 'You', msg: `Counter: $${capital} for ${equity}% equity`, type: 'user' as const },
+                { sender: selectedOffer.investorName, msg: result.message || 'Response received', type: 'investor' as const },
+            ]
+            setNegHistory(newHistory)
+            setNegRound(nextRound)
+            if (result.accepted) {
+                const finalCapital = result.capital || capital
+                const finalEquity = result.equity || equity
+                setAcceptedDealTerms({ capital: finalCapital, equity: finalEquity, investorName: selectedOffer.investorName })
+                try { await api.assessments.acceptDeal(assessmentId, selectedOffer.investorId, finalCapital, finalEquity) } catch { }
+                setDealFinalized(true)
+            } else {
+                setSelectedOffer({ ...selectedOffer, capital: result.capital ?? capital, equity: result.equity ?? equity })
+            }
+            setTextNegCapital(''); setTextNegEquity('')
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit counter-offer')
+        } finally {
+            setIsNegVoiceSubmitting(false)
         }
     }
 
@@ -618,7 +617,7 @@ export default function WarRoomSimulation() {
     }
 
     // ============================================
-    // INVESTOR RESPONSE (AUDIO)
+    // INVESTOR RESPONSE (AUDIO) — with one follow-up per investor
     // ============================================
     const handleRespondToInvestorAudio = async () => {
         if (!responseRecorder.audioBlob) {
@@ -633,41 +632,111 @@ export default function WarRoomSimulation() {
         setIsSubmitting(true)
         setError('')
 
+        const responseBlob = responseRecorder.audioBlob
+
         try {
             const result = await api.assessments.respondToInvestorAudio(
                 assessmentId,
                 investor.id,
-                responseRecorder.audioBlob
+                responseBlob
             )
             setScorecards(prev => [...prev, result.scorecard])
             setResponseTranscription(result.transcription)
-            setCurrentInvestorReaction(
-                result.scorecard.investorReaction || `${investor.name} has considered your response.`
-            )
+            setInitialTranscription(result.transcription)
             setResponseSubmitted(true)
             responseRecorder.resetRecording()
 
             if (result.ttsError) {
                 console.warn("TTS Generation Warning:", result.ttsError)
-                setError(`Note: Audio generation failed (${result.ttsError}). Please read the text response instead.`)
             }
 
-            if (result.audioBase64) {
-                if (audioRef.current) {
-                    audioRef.current.pause()
+            try {
+                const followup = await api.assessments.generateInvestorFollowupAudio(
+                    assessmentId,
+                    investor.id,
+                    responseBlob
+                )
+                const question = followup.followup_question || followup.followupQuestion
+                if (question) {
+                    setFollowupQuestion(question)
+                    setFollowupPhase('followup_pending')
+                    if (followup.audioBase64) {
+                        if (audioRef.current) audioRef.current.pause()
+                        const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
+                        audioRef.current = audio
+                        audio.onplay = () => setIsPlayingAudio(true)
+                        audio.onended = () => setIsPlayingAudio(false)
+                        audio.onerror = () => setIsPlayingAudio(false)
+                        audio.play().catch(() => setIsPlayingAudio(false))
+                    }
+                    return
                 }
+            } catch (followupErr) {
+                console.warn('[war-room] follow-up generation failed, skipping', followupErr)
+            }
+
+            // No follow-up — show immediate reaction
+            setCurrentInvestorReaction(
+                result.scorecard.investorReaction || `${investor.name} has considered your response.`
+            )
+            if (result.audioBase64) {
+                if (audioRef.current) audioRef.current.pause()
                 const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
                 audioRef.current = audio
                 audio.onplay = () => setIsPlayingAudio(true)
                 audio.onended = () => setIsPlayingAudio(false)
                 audio.onerror = () => setIsPlayingAudio(false)
-                audio.play().catch(e => {
-                    console.error("Auto-play failed:", e)
-                    setIsPlayingAudio(false)
-                })
+                audio.play().catch(() => setIsPlayingAudio(false))
             }
         } catch (err: any) {
             setError(err.message || 'Failed to analyze response')
+        } finally {
+            setIsAnalyzing(false)
+            setIsSubmitting(false)
+        }
+    }
+
+    // Submit response to the investor's follow-up question
+    const handleSubmitInvestorFollowupAudio = async () => {
+        if (!responseRecorder.audioBlob) {
+            setError('Please record your follow-up response')
+            return
+        }
+        const investor = investors[currentInvestorIndex]
+        if (!investor || !initialTranscription || !followupQuestion) {
+            setError('Follow-up context not ready')
+            return
+        }
+
+        setIsAnalyzing(true)
+        setIsSubmitting(true)
+        setError('')
+
+        try {
+            const result = await api.assessments.respondToInvestorFinalAudio(
+                assessmentId,
+                investor.id,
+                initialTranscription,
+                followupQuestion,
+                responseRecorder.audioBlob
+            )
+            setCurrentInvestorReaction(
+                result.scorecard.investorReaction || `${investor.name} has considered your follow-up.`
+            )
+            setResponseTranscription(result.transcription)
+            setFollowupPhase('followup_answered')
+            responseRecorder.resetRecording()
+            if (result.audioBase64) {
+                if (audioRef.current) audioRef.current.pause()
+                const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audioRef.current = audio
+                audio.onplay = () => setIsPlayingAudio(true)
+                audio.onended = () => setIsPlayingAudio(false)
+                audio.onerror = () => setIsPlayingAudio(false)
+                audio.play().catch(() => setIsPlayingAudio(false))
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit follow-up response')
         } finally {
             setIsAnalyzing(false)
             setIsSubmitting(false)
@@ -681,6 +750,9 @@ export default function WarRoomSimulation() {
             setIsPlayingAudio(false)
         }
         setCurrentInvestorReaction('')
+        setFollowupPhase('initial')
+        setFollowupQuestion('')
+        setInitialTranscription('')
         if (currentInvestorIndex < investors.length - 1) {
             setCurrentInvestorIndex(prev => prev + 1)
             setResponseSubmitted(false)
@@ -760,6 +832,11 @@ export default function WarRoomSimulation() {
     // ============================================
     return (
         <div className="warroom-page warroom-shell">
+            <MicPermissionDialog
+                open={mic.needsPrompt && phase !== 'LOADING'}
+                onAllow={() => mic.grant()}
+                onUseText={() => mic.useText()}
+            />
             {/* Top Bar */}
             <header className="warroom-header">
                 <div className="header-left">
@@ -851,8 +928,26 @@ export default function WarRoomSimulation() {
                             </div>
                         </motion.details>
 
+                        {/* Text fallback when mic permission was declined */}
+                        {!pitchAnalysis && !isAnalyzing && mic.isText && (
+                            <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                                <textarea
+                                    value={textPitchInput}
+                                    onChange={(e) => setTextPitchInput(e.target.value)}
+                                    placeholder="Type your 60-second pitch here..."
+                                    rows={6}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
+                                />
+                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                                    <button onClick={handleSubmitPitchText} disabled={isSubmitting} className="respond-btn" style={{ flex: 1 }}>
+                                        {isSubmitting ? 'Submitting...' : 'Submit Pitch (Text)'}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Recording UI */}
-                        {!pitchAnalysis && !isAnalyzing && (
+                        {!pitchAnalysis && !isAnalyzing && !mic.isText && (
                             <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                                 <div className={`mic-button-wrapper ${pitchRecorder.isRecording ? 'recording' : ''}`}>
                                     {pitchRecorder.isRecording && (
@@ -937,82 +1032,7 @@ export default function WarRoomSimulation() {
                                     <p style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>"{pitchAnalysis.feedback}"</p>
                                 </div>
 
-                                {followupPhase === 'followup_pending' && (
-                                    <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.22)' }}>
-                                        <h4 style={{ color: '#f59e0b', marginBottom: '0.75rem', fontSize: '0.95rem' }}>Lead Investor Follow-up</h4>
-                                        {initialTranscription && (
-                                            <div className="analysis-transcript" style={{ marginBottom: '1rem' }}>
-                                                <span className="analysis-label">What the investor heard:</span>
-                                                <p>{initialTranscription}</p>
-                                            </div>
-                                        )}
-                                        <div className="investor-question followup-question" style={{ borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)' }}>
-                                            <span className="question-label" style={{ color: '#f59e0b' }}>
-                                                Follow-up Question:
-                                                {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', fontWeight: 'normal' }}>Playing...</span>}
-                                            </span>
-                                            <p className="question-text">{followupQuestion || 'Generating your investor follow-up question...'}</p>
-                                        </div>
-
-                                        <div className="recording-zone" style={{ marginTop: '1rem' }}>
-                                            <div className={`mic-button-wrapper ${responseRecorder.isRecording ? 'recording' : ''}`}>
-                                                {responseRecorder.isRecording && (
-                                                    <>
-                                                        <div className="pulse-ring ring-1" />
-                                                        <div className="pulse-ring ring-2" />
-                                                        <div className="pulse-ring ring-3" />
-                                                    </>
-                                                )}
-                                                <motion.button
-                                                    className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
-                                                    onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
-                                                    disabled={isSubmitting || isAnalyzing}
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                >
-                                                    {responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
-                                                </motion.button>
-                                            </div>
-                                            <div className="recording-status">
-                                                {responseRecorder.isRecording ? (
-                                                    <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 15 - responseRecorder.recordingTime)}s left</span></>
-                                                ) : responseRecorder.audioBlob ? (
-                                                    <span className="rec-done">Follow-up response recorded ({responseRecorder.recordingTime}s)</span>
-                                                ) : (
-                                                    <span className="rec-hint">Answer the investor's follow-up question before continuing</span>
-                                                )}
-                                            </div>
-                                            {responseRecorder.isRecording && (
-                                                <div className="countdown-bar"><div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - responseRecorder.recordingTime) / 15) * 100)}%` }} /></div>
-                                            )}
-                                        </div>
-
-                                        {responseRecorder.audioBlob && !feedbackResponseSubmitted && (
-                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                                <motion.button
-                                                    className="respond-btn"
-                                                    style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
-                                                    onClick={() => responseRecorder.resetRecording()}
-                                                    disabled={isSubmitting || isAnalyzing}
-                                                    whileHover={{ scale: 1.03 }}
-                                                    whileTap={{ scale: 0.97 }}
-                                                >
-                                                    Discard Recording
-                                                </motion.button>
-                                                <motion.button
-                                                    className="respond-btn"
-                                                    style={{ flex: 2 }}
-                                                    onClick={handleSubmitPitchFollowupAudio}
-                                                    disabled={isSubmitting || isAnalyzing}
-                                                    whileHover={{ scale: 1.03 }}
-                                                    whileTap={{ scale: 0.97 }}
-                                                >
-                                                    {isSubmitting || isAnalyzing ? 'Analyzing Response...' : 'Submit Follow-up Response'}
-                                                </motion.button>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                {/* Pitch follow-up block removed — follow-ups now live in the Investor Q&A phase. */}
 
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                     <motion.button 
@@ -1161,8 +1181,31 @@ export default function WarRoomSimulation() {
                         )}
                         </AnimatePresence>
 
+                        {/* Text fallback for Q&A response */}
+                        {!currentInvestorReaction && !isAnalyzing && mic.isText && followupPhase !== 'followup_pending' && (
+                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+                                <div className="recording-zone" style={{ marginBottom: '1rem' }}>
+                                    <textarea
+                                        value={textResponseInput}
+                                        onChange={(e) => setTextResponseInput(e.target.value)}
+                                        placeholder={`Type your answer to ${currentInvestor.name}...`}
+                                        rows={5}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
+                                    />
+                                    <button
+                                        onClick={handleRespondToInvestorText}
+                                        disabled={isSubmitting || isAnalyzing || responseSubmitted}
+                                        className="respond-btn"
+                                        style={{ marginTop: '0.75rem', width: '100%' }}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Response (Text)'}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Audio Recording for Response */}
-                        {!currentInvestorReaction && !isAnalyzing && (
+                        {!currentInvestorReaction && !isAnalyzing && !mic.isText && (
                             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
                                 <div className="recording-zone" style={{ marginBottom: '1rem' }}>
                                     <div className={`mic-button-wrapper ${responseRecorder.isRecording ? 'recording' : ''}`}>
@@ -1176,15 +1219,23 @@ export default function WarRoomSimulation() {
                                          <motion.button
                                              className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
                                              onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
-                                             disabled={responseSubmitted || isSubmitting || isAnalyzing}
+                                             disabled={(responseSubmitted && followupPhase !== 'followup_pending') || isSubmitting || isAnalyzing}
                                              whileHover={{ scale: 1.05 }}
                                              whileTap={{ scale: 0.95 }}
                                          >
-                                             {responseSubmitted ? 'Response Submitted' : responseRecorder.isRecording ? 'Stop Recording' : responseRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                             {responseSubmitted && followupPhase !== 'followup_pending'
+                                                 ? 'Response Submitted'
+                                                 : responseRecorder.isRecording
+                                                     ? 'Stop Recording'
+                                                     : responseRecorder.audioBlob
+                                                         ? 'Record Again'
+                                                         : followupPhase === 'followup_pending'
+                                                             ? 'Record Follow-up'
+                                                             : 'Start Recording'}
                                          </motion.button>
                                     </div>
                                     <div className="recording-status">
-                                        {responseSubmitted ? (
+                                        {responseSubmitted && followupPhase !== 'followup_pending' ? (
                                             <span className="rec-done">Response submitted. You cannot submit another response for this investor.</span>
                                         ) : responseRecorder.isRecording ? (
                                             <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 30 - responseRecorder.recordingTime)}s left</span></>
@@ -1201,27 +1252,31 @@ export default function WarRoomSimulation() {
 
                                 {error && <div className="error-msg">{error}</div>}
 
-                                {responseRecorder.audioBlob && !responseSubmitted && (
+                                {responseRecorder.audioBlob && (followupPhase === 'followup_pending' || !responseSubmitted) && (
                                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                        <motion.button 
-                                            className="respond-btn" 
+                                        <motion.button
+                                            className="respond-btn"
                                             style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
-                                            onClick={() => responseRecorder.resetRecording()} 
-                                            disabled={isSubmitting || isAnalyzing || responseSubmitted} 
-                                            whileHover={{ scale: 1.03 }} 
+                                            onClick={() => responseRecorder.resetRecording()}
+                                            disabled={isSubmitting || isAnalyzing}
+                                            whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.97 }}
                                         >
                                             Discard Recording
                                         </motion.button>
-                                        <motion.button 
-                                            className="respond-btn" 
+                                        <motion.button
+                                            className="respond-btn"
                                             style={{ flex: 2 }}
-                                            onClick={handleRespondToInvestorAudio} 
-                                            disabled={isSubmitting || isAnalyzing || responseSubmitted} 
-                                            whileHover={{ scale: 1.03 }} 
+                                            onClick={followupPhase === 'followup_pending' ? handleSubmitInvestorFollowupAudio : handleRespondToInvestorAudio}
+                                            disabled={isSubmitting || isAnalyzing}
+                                            whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.97 }}
                                         >
-                                            {responseSubmitted ? 'Response Submitted' : isSubmitting || isAnalyzing ? 'Analyzing Response...' : 'Submit Response'}
+                                            {isSubmitting || isAnalyzing
+                                                ? 'Analyzing Response...'
+                                                : followupPhase === 'followup_pending'
+                                                    ? 'Submit Follow-up'
+                                                    : 'Submit Response'}
                                         </motion.button>
                                     </div>
                                 )}
@@ -1377,6 +1432,38 @@ export default function WarRoomSimulation() {
                                 )}
 
                                 <div className="neg-controls" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem', width: '100%' }}>
+                                    {mic.isText && negRound < MAX_NEG_ROUNDS && (
+                                        <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', marginBottom: '1rem' }}>
+                                            <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '0.75rem' }}>
+                                                Enter your counter offer (capital in $ and equity %).
+                                            </p>
+                                            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                                <input
+                                                    type="number"
+                                                    placeholder="Capital ($)"
+                                                    value={textNegCapital}
+                                                    onChange={(e) => setTextNegCapital(e.target.value)}
+                                                    style={{ flex: 2, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    placeholder="Equity (%)"
+                                                    value={textNegEquity}
+                                                    onChange={(e) => setTextNegEquity(e.target.value)}
+                                                    style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleNegotiateText}
+                                                disabled={isNegVoiceSubmitting}
+                                                className="respond-btn"
+                                                style={{ width: '100%' }}
+                                            >
+                                                {isNegVoiceSubmitting ? 'Submitting...' : 'Submit Counter (Text)'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!mic.isText && (
                                     <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
                                         <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
                                             {negRound >= MAX_NEG_ROUNDS - 1
@@ -1384,7 +1471,7 @@ export default function WarRoomSimulation() {
                                                 : 'Speak your counter offer (e.g., "I\'d like $1.2M for 25% equity because...")'
                                             }
                                         </p>
-                                        
+
                                         <div className={`mic-button-wrapper ${negotiationRecorder.isRecording ? 'recording' : ''}`}>
                                             {negotiationRecorder.isRecording && (
                                                 <>
@@ -1458,6 +1545,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         )}
                                     </div>
+                                    )}
 
                                     {/* Walk Away Button */}
                                     <motion.button

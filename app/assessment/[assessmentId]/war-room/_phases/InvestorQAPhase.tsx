@@ -18,14 +18,18 @@ interface InvestorQAPhaseProps {
   isSubmitting: boolean
   error: string
   recorder: ReturnType<typeof import('@/src/hooks/useAudioRecorder').useAudioRecorder>
+  followupActive: boolean
+  followupQuestion: string
   onSubmitResponse: () => void
+  onSubmitFollowupResponse: () => void
   onContinue: () => void
 }
 
 export function InvestorQAPhase({
   investor, investorIndex, totalInvestors, responseSubmitted, currentInvestorReaction,
   responseTranscription, isPlayingAudio, isAnalyzing, isSubmitting, error,
-  recorder, onSubmitResponse, onContinue,
+  recorder, followupActive, followupQuestion,
+  onSubmitResponse, onSubmitFollowupResponse, onContinue,
 }: InvestorQAPhaseProps) {
   if (!investor) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -146,8 +150,61 @@ export function InvestorQAPhase({
         </div>
       )}
 
+      {/* Follow-up question + recording */}
+      {responseSubmitted && followupActive && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4"
+        >
+          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3">
+            <div className="flex items-center gap-2">
+              {isPlayingAudio && <Volume2 className="h-4 w-4 text-amber-400 animate-pulse" />}
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">{investor.name} follows up:</span>
+            </div>
+            <p className="text-white font-medium">{followupQuestion}</p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4 text-center">
+            <div className="text-sm text-gray-400">Record your follow-up response (up to 15s)</div>
+            {recorder.isRecording ? (
+              <div className="flex flex-col items-center gap-3">
+                <button onClick={recorder.stopRecording} className="relative h-16 w-16 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center">
+                  <MicOff className="h-7 w-7 text-white" />
+                </button>
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                  {recorder.recordingTime}s / {recorder.maxDuration}s
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={recorder.startRecording}
+                disabled={!!recorder.audioBlob}
+                className={cn('h-16 w-16 rounded-full flex items-center justify-center mx-auto', recorder.audioBlob ? 'bg-green-600/20 border-2 border-green-500' : 'bg-red-600 hover:bg-red-700')}
+              >
+                {recorder.audioBlob ? <CheckCircle2 className="h-7 w-7 text-green-400" /> : <Mic className="h-7 w-7 text-white" />}
+              </button>
+            )}
+            {recorder.audioBlob && !recorder.isRecording && (
+              <div className="space-y-3">
+                <Button variant="ghost" size="sm" onClick={recorder.resetRecording} className="text-xs text-gray-500 gap-1">
+                  <RefreshCw className="h-3 w-3" />Re-record
+                </Button>
+                <Button
+                  onClick={onSubmitFollowupResponse}
+                  disabled={isAnalyzing || isSubmitting}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                >
+                  {isAnalyzing ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Analyzing...</> : 'Submit Follow-up'}
+                </Button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       {/* Reaction + Next button */}
-      {responseSubmitted && (
+      {responseSubmitted && !followupActive && (
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

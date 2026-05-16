@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { toast } from '@/hooks/use-toast'
 
 interface UseAudioRecorderReturn {
     isRecording: boolean
@@ -139,13 +140,17 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             }, 100)
         } catch (err) {
             let errorMessage = 'Failed to start recording'
+            let toastTitle = 'Microphone unavailable'
             if (err instanceof Error) {
                 if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                     errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings and try again.'
+                    toastTitle = 'Microphone access denied'
                 } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
                     errorMessage = 'No microphone found. Please connect a microphone and try again.'
+                    toastTitle = 'No microphone found'
                 } else if (err.name === 'NotReadableError') {
                     errorMessage = 'Microphone is in use by another application. Please close other apps using the mic and try again.'
+                    toastTitle = 'Microphone in use'
                 } else {
                     errorMessage = err.message
                 }
@@ -153,6 +158,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             console.error('Failed to start recording:', err)
             setError(errorMessage)
             setIsRecording(false)
+            toast({ variant: 'destructive', title: toastTitle, description: errorMessage })
         }
     }, [maxDurationSec])
 

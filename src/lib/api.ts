@@ -229,24 +229,40 @@ export const api = {
       formData.append('investorId', investorId)
       const headers: Record<string, string> = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
-      const res = await fetch(`${API_BASE}/assessments/${id}/warroom/counter-audio`, {
-        method: 'POST',
-        headers,
-        body: formData,
-      })
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.error || `API error: ${res.status}`)
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 35000)
+      try {
+        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/counter-audio`, {
+          method: 'POST',
+          headers,
+          body: formData,
+          signal: controller.signal,
+        })
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(errData.error || `API error: ${res.status}`)
+        }
+        const data = (await res.json()) as {
+          transcription: string
+          message: string
+          accepted: boolean
+          isFinal: boolean
+          capital: number
+          equity: number
+          audioBase64?: string
+        }
+        if (!data.message) {
+          throw new Error('Negotiator returned an empty response')
+        }
+        return data
+      } catch (err: any) {
+        if (err?.name === 'AbortError') {
+          throw new Error('Negotiator timed out — please try again')
+        }
+        throw err
+      } finally {
+        clearTimeout(timeout)
       }
-      return res.json() as Promise<{
-        transcription: string
-        message: string
-        accepted: boolean
-        isFinal: boolean
-        capital: number
-        equity: number
-        audioBase64?: string
-      }>
     },
 
     // War Room Audio
