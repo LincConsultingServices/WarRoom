@@ -33,9 +33,8 @@ export function useWarRoom(assessmentId: string) {
 
   // ---- Cross-phase wiring ----
 
-  /** Called after pitch is analysed and followup answered — moves to Q&A */
+  /** Called after pitch is analysed — moves to Q&A (no follow-up loop) */
   function handleContinueFromPitch() {
-    pitch.resetPitchFollowupState()
     pitch.setPitchAnalysis(null)
     qa.setCurrentInvestorIndex(0)
     qa.setResponseSubmitted(false)
@@ -77,23 +76,22 @@ export function useWarRoom(assessmentId: string) {
     pitchText: pitch.pitchText,
     setPitchText: pitch.setPitchText,
     pitchAnalysis: pitch.pitchAnalysis,
-    followupPhase: pitch.followupPhase,
-    followupQuestion: pitch.followupQuestion,
-    feedbackResponseSubmitted: pitch.feedbackResponseSubmitted,
     preparedPitch: core.preparedPitch,
 
     // Q&A-specific
     currentInvestorIndex: qa.currentInvestorIndex,
     currentInvestor,
     responseSubmitted: qa.responseSubmitted,
+    followupActive: qa.followupActive,
+    followupQuestion: qa.followupQuestion,
 
-    // Phase-aware shared props (switches between pitch-followup and Q&A)
-    responseRecorder: inQA ? qa.responseRecorder : pitch.responseRecorder,
-    responseTranscription: inQA ? qa.responseTranscription : pitch.responseTranscription,
-    currentInvestorReaction: inQA ? qa.currentInvestorReaction : pitch.currentInvestorReaction,
+    // Phase-aware shared props
+    responseRecorder: qa.responseRecorder,
+    responseTranscription: qa.responseTranscription,
+    currentInvestorReaction: qa.currentInvestorReaction,
     isSubmitting: inQA ? qa.isSubmitting : pitch.isSubmitting,
     isAnalyzing: inQA ? qa.isAnalyzing : pitch.isAnalyzing,
-    isPlayingAudio: inQA ? qa.isPlayingAudio : pitch.isPlayingAudio,
+    isPlayingAudio: qa.isPlayingAudio,
 
     // Negotiation
     offers: neg.offers,
@@ -109,9 +107,9 @@ export function useWarRoom(assessmentId: string) {
 
     // Handlers
     handleSubmitPitchAudio: () => pitch.handleSubmitPitchAudio(core.investors[0]),
-    handleSubmitPitchFollowupAudio: () => pitch.handleSubmitPitchFollowupAudio(core.investors[0]),
     handleContinueFromPitch,
     handleRespondToInvestorAudio: () => qa.handleRespondToInvestorAudio(currentInvestor),
+    handleSubmitFollowupResponse: () => qa.handleSubmitFollowupResponse(currentInvestor),
     handleContinueToNextInvestor,
     handleSelectOffer: neg.handleSelectOffer,
     handleNegotiateAudio: neg.handleNegotiateAudio,

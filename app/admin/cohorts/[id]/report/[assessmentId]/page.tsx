@@ -161,6 +161,50 @@ export default function AdminUserReportPage() {
         </Card>
       )}
 
+      {report.phaseEngagement && Object.keys(report.phaseEngagement).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Focus & Engagement</CardTitle>
+            <CardDescription>
+              Rapid-click telemetry per phase. A high percentage means options were chosen too fast or in suspicious bursts; revenue is penalized when ≥ 40%.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-2 font-medium">Phase</th>
+                  <th className="text-right py-2 px-2 font-medium">Spam %</th>
+                  <th className="text-right py-2 px-2 font-medium">Burst</th>
+                  <th className="text-right py-2 px-2 font-medium">Floor</th>
+                  <th className="text-right py-2 px-2 font-medium">Selections</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(report.phaseEngagement).map(([stage, e]: any) => {
+                  const pct = Math.round(e?.spamPercent || 0)
+                  const color = pct >= 40 ? 'text-red-500' : pct >= 20 ? 'text-amber-500' : 'text-green-500'
+                  return (
+                    <tr key={stage} className="border-b last:border-0">
+                      <td className="py-2 px-2 font-mono text-xs">{stage.replace('STAGE_', '').replace(/_/g, ' ')}</td>
+                      <td className={`py-2 px-2 text-right font-mono ${color}`}>{pct}%</td>
+                      <td className="py-2 px-2 text-right font-mono">{e?.burstEvents ?? 0}</td>
+                      <td className="py-2 px-2 text-right font-mono">{e?.floorEvents ?? 0}</td>
+                      <td className="py-2 px-2 text-right font-mono">{e?.totalSelections ?? 0}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            {Object.values(report.phaseEngagement).some((e: any) => (e?.spamPercent || 0) >= 40) && (
+              <p className="mt-4 text-sm text-amber-500">
+                ⚠ One or more phases exceeded the engagement threshold. A revenue penalty was applied automatically.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
     </div>
   )
 }

@@ -14,6 +14,7 @@ import { IdeationView } from './_views/IdeationView'
 import { StageView } from './_views/StageView'
 import { PhaseTransitionView } from './_views/PhaseTransitionView'
 import { RestartConfirmDialog } from './_views/RestartConfirmDialog'
+import { InvolvementWarningDialog } from './_views/InvolvementWarningDialog'
 import { useSimulation } from '@/src/hooks/useSimulation'
 import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATION_STAGE_LABELS } from '@/src/lib/constants'
 import { stageLabel } from '@/src/lib/helpers'
@@ -37,6 +38,7 @@ export default function SimulationPage() {
     stageTimer, shouldRunTimer, isCrisisQuestion,
     entries, connected, updatedAt, snapshotContinueRef,
     showRestartConfirm, setShowRestartConfirm, confirmRestart,
+    showInvolvementWarning, dismissInvolvementWarning, spamPercent,
     isIdeationStage, isLastQuestion, isFirstQuestion, currentAnswer, answeredCount, lifelinesLeft,
     // Setters
     setShowMentorPanel, setSelectedMentorId, setMentorQuestion, setMentorResult,
@@ -131,6 +133,11 @@ export default function SimulationPage() {
         submitting={submitting}
         onCancel={() => setShowRestartConfirm(false)}
         onConfirm={confirmRestart}
+      />
+      <InvolvementWarningDialog
+        open={showInvolvementWarning}
+        spamPercent={spamPercent}
+        onAcknowledge={dismissInvolvementWarning}
       />
       <MentorOverlay
         show={showMentorPanel}

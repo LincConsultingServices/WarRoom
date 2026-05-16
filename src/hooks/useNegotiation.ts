@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import confetti from 'canvas-confetti'
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
+import { useToast } from '@/hooks/use-toast'
 
 // ============================================
 // useNegotiation — manages offer selection, counter-offer
@@ -15,6 +16,7 @@ export const MAX_NEG_ROUNDS = 4
 
 export function useNegotiation(assessmentId: string) {
   const negotiationRecorder = useAudioRecorder(15)
+  const { toast } = useToast()
 
   const [offers, setOffers] = useState<any[]>([])
   const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
@@ -71,7 +73,14 @@ export function useNegotiation(assessmentId: string) {
         if (audioRef.current) audioRef.current.pause()
         const a = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
         audioRef.current = a
-        a.play().catch(() => {})
+        a.play().catch((playErr) => {
+          console.warn('[useNegotiation] audio playback failed', playErr)
+          toast({
+            variant: 'destructive',
+            title: 'Audio playback blocked',
+            description: 'The investor response is shown above. Check your browser audio permissions.',
+          })
+        })
       }
 
       if (result.accepted) {
@@ -92,7 +101,13 @@ export function useNegotiation(assessmentId: string) {
       }
       negotiationRecorder.resetRecording()
     } catch (err: any) {
-      setError(err.message || 'Failed to negotiate')
+      const msg = err?.message || 'Failed to negotiate'
+      setError(msg)
+      toast({
+        variant: 'destructive',
+        title: 'Negotiator unavailable',
+        description: msg,
+      })
     } finally {
       setIsNegVoiceSubmitting(false)
     }

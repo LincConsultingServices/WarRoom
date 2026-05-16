@@ -499,9 +499,16 @@ export interface PhaseResponse {
   allocations?: Record<string, number>;
 }
 
+export interface PhaseEngagement {
+  burstEvents: number;
+  floorEvents: number;
+  totalSelections: number;
+}
+
 export interface PhaseSubmitRequest {
   stageId: string;
   responses: PhaseResponse[];
+  engagement?: PhaseEngagement;
 }
 
 export interface PhaseScenarioOut {
@@ -586,6 +593,13 @@ export interface AdminBatchDetail {
   updatedAt: string;
 }
 
+export interface PhaseEngagementRecord {
+  spamPercent: number;
+  burstEvents: number;
+  floorEvents: number;
+  totalSelections: number;
+}
+
 export interface BatchParticipant {
   userId: string;
   userName: string;
@@ -597,6 +611,7 @@ export interface BatchParticipant {
   revenueProjection: number | null;
   startedAt: string | null;
   completedAt: string | null;
+  phaseEngagement?: Record<string, PhaseEngagementRecord> | null;
 }
 
 export interface BatchStats {

@@ -314,37 +314,54 @@ export default function BatchDetailPage() {
                     <th className="text-left py-3 px-2 font-medium">Status</th>
                     <th className="text-left py-3 px-2 font-medium">Stage</th>
                     <th className="text-right py-3 px-2 font-medium">Revenue</th>
+                    <th className="text-right py-3 px-2 font-medium">Engagement</th>
                     <th className="text-right py-3 px-2 font-medium">Report</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {participants.map((p) => (
-                    <tr key={p.userId} className="border-b last:border-0 hover:bg-muted/50">
-                      <td className="py-3 px-2 font-medium">{p.userName}</td>
-                      <td className="py-3 px-2 text-muted-foreground">{p.email}</td>
-                      <td className="py-3 px-2 text-muted-foreground">
-                        {new Date(p.joinedAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-2">{getStatusBadge(p.status)}</td>
-                      <td className="py-3 px-2 text-muted-foreground font-mono text-xs">
-                        {p.currentStage?.replace('STAGE_', '').replace(/_/g, ' ') || '-'}
-                      </td>
-                      <td className="py-3 px-2 text-right font-mono">
-                        {p.revenueProjection != null ? `$${p.revenueProjection.toLocaleString()}` : '-'}
-                      </td>
-                      <td className="py-3 px-2 text-right">
-                        {p.assessmentId ? (
-                           <Link href={`/admin/cohorts/${batchId}/report/${p.assessmentId}`}>
-                             <Button variant="ghost" size="sm" title="View Competency Report">
+                  {participants.map((p) => {
+                    const engagementEntries = p.phaseEngagement ? Object.values(p.phaseEngagement) : []
+                    const meanSpam = engagementEntries.length
+                      ? engagementEntries.reduce((acc, e) => acc + (e?.spamPercent || 0), 0) / engagementEntries.length
+                      : null
+                    const engagementColor = meanSpam == null
+                      ? 'text-muted-foreground'
+                      : meanSpam >= 40
+                        ? 'text-red-500'
+                        : meanSpam >= 20
+                          ? 'text-amber-500'
+                          : 'text-green-500'
+                    return (
+                      <tr key={p.userId} className="border-b last:border-0 hover:bg-muted/50">
+                        <td className="py-3 px-2 font-medium">{p.userName}</td>
+                        <td className="py-3 px-2 text-muted-foreground">{p.email}</td>
+                        <td className="py-3 px-2 text-muted-foreground">
+                          {new Date(p.joinedAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-2">{getStatusBadge(p.status)}</td>
+                        <td className="py-3 px-2 text-muted-foreground font-mono text-xs">
+                          {p.currentStage?.replace('STAGE_', '').replace(/_/g, ' ') || '-'}
+                        </td>
+                        <td className="py-3 px-2 text-right font-mono">
+                          {p.revenueProjection != null ? `$${p.revenueProjection.toLocaleString()}` : '-'}
+                        </td>
+                        <td className={`py-3 px-2 text-right font-mono ${engagementColor}`}>
+                          {meanSpam == null ? '-' : `${Math.round(meanSpam)}%`}
+                        </td>
+                        <td className="py-3 px-2 text-right">
+                          {p.assessmentId ? (
+                            <Link href={`/admin/cohorts/${batchId}/report/${p.assessmentId}`}>
+                              <Button variant="ghost" size="sm" title="View Competency Report">
                                 <Eye className="h-4 w-4 text-blue-500" />
-                             </Button>
-                           </Link>
-                        ) : (
-                           <span className="text-muted-foreground text-xs">No data</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                              </Button>
+                            </Link>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">No data</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

@@ -1,11 +1,9 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MicOff, Loader2, RefreshCw, Volume2, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Mic, MicOff, Loader2, RefreshCw, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import type { Investor } from '@/src/types'
 
 interface PitchPhaseProps {
@@ -13,24 +11,16 @@ interface PitchPhaseProps {
   preparedPitch: string
   pitchText: string
   pitchAnalysis: any | null
-  followupPhase: 'initial' | 'followup_pending' | 'followup_answered'
-  followupQuestion: string
-  responseTranscription: string
-  currentInvestorReaction: string
-  feedbackResponseSubmitted: boolean
   isAnalyzing: boolean
   isSubmitting: boolean
-  isPlayingAudio: boolean
   error: string
   pitchRecorder: ReturnType<typeof import('@/src/hooks/useAudioRecorder').useAudioRecorder>
-  responseRecorder: ReturnType<typeof import('@/src/hooks/useAudioRecorder').useAudioRecorder>
   onPitchTextChange: (v: string) => void
   onSubmitPitch: () => void
-  onSubmitFollowup: () => void
   onContinue: () => void
 }
 
-function RecordingButton({ recorder, maxLabel }: { recorder: any; maxLabel: string }) {
+function RecordingButton({ recorder }: { recorder: any }) {
   return (
     <div className="flex flex-col items-center gap-4">
       {recorder.isRecording ? (
@@ -65,15 +55,13 @@ function RecordingButton({ recorder, maxLabel }: { recorder: any; maxLabel: stri
 }
 
 export function PitchPhase({
-  leadInvestor, preparedPitch, pitchText, pitchAnalysis, followupPhase, followupQuestion,
-  responseTranscription, currentInvestorReaction, feedbackResponseSubmitted,
-  isAnalyzing, isSubmitting, isPlayingAudio, error,
-  pitchRecorder, responseRecorder,
-  onPitchTextChange, onSubmitPitch, onSubmitFollowup, onContinue,
+  leadInvestor, preparedPitch, pitchAnalysis,
+  isAnalyzing, isSubmitting, error,
+  pitchRecorder,
+  onSubmitPitch, onContinue,
 }: PitchPhaseProps) {
   return (
     <div className="max-w-2xl mx-auto w-full px-4 py-8 space-y-6">
-      {/* Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest">
           {leadInvestor ? `${leadInvestor.name} is listening` : 'Pitch Phase'}
@@ -82,7 +70,6 @@ export function PitchPhase({
         {leadInvestor && <p className="text-gray-400 text-sm">Recorded as audio — speak clearly and confidently</p>}
       </div>
 
-      {/* Prepared pitch reference */}
       {preparedPitch && !pitchAnalysis && (
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300 space-y-2">
           <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">Your Prepared Pitch</div>
@@ -92,10 +79,9 @@ export function PitchPhase({
 
       {error && <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>}
 
-      {/* Phase: Initial — record pitch */}
-      {followupPhase === 'initial' && !pitchAnalysis && (
+      {!pitchAnalysis && (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6 text-center">
-          <RecordingButton recorder={pitchRecorder} maxLabel="60s" />
+          <RecordingButton recorder={pitchRecorder} />
           {pitchRecorder.audioBlob && (
             <Button onClick={onSubmitPitch} disabled={isAnalyzing || isSubmitting} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold">
               {isAnalyzing ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Analyzing pitch...</> : 'Submit Pitch'}
@@ -104,8 +90,7 @@ export function PitchPhase({
         </div>
       )}
 
-      {/* Pitch analysis */}
-      {pitchAnalysis && followupPhase === 'initial' && (
+      {pitchAnalysis && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
             {[['Clarity', pitchAnalysis.clarity], ['Confidence', pitchAnalysis.confidence], ['Persuasion', pitchAnalysis.persuasion]].map(([label, score]) => (
@@ -116,58 +101,13 @@ export function PitchPhase({
             ))}
           </div>
           <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300">
-            <div className="text-xs font-bold text-gray-500 uppercase mb-2">Feedback</div>
+            <div className="text-xs font-bold text-gray-500 uppercase mb-2">{leadInvestor?.name ? `${leadInvestor.name}'s reaction` : 'Investor reaction'}</div>
             <p>{pitchAnalysis.feedback}</p>
           </div>
-          {/* No followup was generated (no investor / API failure) — allow continuing */}
           <Button onClick={onContinue} className="w-full bg-primary hover:bg-primary/90 text-white font-bold">
             Continue to Investor Q&A <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         </motion.div>
-      )}
-
-
-      {/* Follow-up question */}
-      {followupPhase === 'followup_pending' && (
-        <div className="space-y-4">
-          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3">
-            <div className="flex items-center gap-2">
-              {isPlayingAudio && <Volume2 className="h-4 w-4 text-amber-400 animate-pulse" />}
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">{leadInvestor?.name || 'Lead Investor'} asks:</span>
-            </div>
-            <p className="text-white font-medium">{followupQuestion}</p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4 text-center">
-            <div className="text-sm text-gray-400">Record your response (max 15s)</div>
-            <RecordingButton recorder={responseRecorder} maxLabel="15s" />
-            {responseRecorder.audioBlob && (
-              <Button onClick={onSubmitFollowup} disabled={isAnalyzing || isSubmitting} className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold">
-                {isAnalyzing ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Analyzing...</> : 'Submit Response'}
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Follow-up answered */}
-      {followupPhase === 'followup_answered' && (
-        <div className="space-y-4">
-          {responseTranscription && (
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300">
-              <div className="text-xs font-bold text-gray-500 uppercase mb-2">Your response</div>
-              <p>{responseTranscription}</p>
-            </div>
-          )}
-          {currentInvestorReaction && (
-            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-sm text-green-300">
-              <div className="text-xs font-bold text-green-500 uppercase mb-2">{leadInvestor?.name || 'Investor'} reaction</div>
-              <p>{currentInvestorReaction}</p>
-            </div>
-          )}
-          <Button onClick={onContinue} className="w-full bg-primary hover:bg-primary/90 text-white font-bold">
-            Continue to Investor Q&A <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
-        </div>
       )}
     </div>
   )

@@ -8,6 +8,7 @@ import { useStageTimer } from '@/src/hooks/useStageTimer'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
 import { useMentorLifeline } from '@/src/hooks/useMentorLifeline'
 import { usePhaseTransition } from '@/src/hooks/usePhaseTransition'
+import { useClickSpamGuard } from '@/src/hooks/useClickSpamGuard'
 import type {
   SimQuestion, SimOption, PhaseResponse,
   StageName, Mentor, Leader, Investor,
@@ -92,6 +93,10 @@ export function useSimulation(assessmentId: string) {
   const mentor = useMentorLifeline(assessmentId)
   const transition = usePhaseTransition(assessmentId, () => loadRef.current())
   const { entries, connected, updatedAt } = useLeaderboard(batchCode)
+  const spamGuard = useClickSpamGuard()
+
+  // ---- Engagement / spam-guard UI ----
+  const [showInvolvementWarning, setShowInvolvementWarning] = useState(false)
 
   // ---- Derived ----
   const simulation = state?.simulation
@@ -211,6 +216,7 @@ export function useSimulation(assessmentId: string) {
     const qId = questionId || currentQ?.q_id; if (!qId) return
     const qType = (currentQ as any)?.type || ''
     const isScenario = qType === 'scenario' || qType === 'dynamic_scenario'
+    spamGuard.recordSelection(qId)
     setAnswers((prev) => ({ ...prev, [qId]: { ...prev[qId], questionId: qId, type: (isScenario ? qType : 'multiple_choice') as any, selectedOptionId: opt.id } }))
     if (!questionId) setMcqFeedback(opt.feedback || null)
     if (qId === 'Q_0_1' || qId === 'Q_0_CAPITAL') {
@@ -305,9 +311,16 @@ export function useSimulation(assessmentId: string) {
       const responses: PhaseResponse[] = questions.map((q: SimQuestion) => answers[q.q_id] || { questionId: q.q_id, type: q.type as PhaseResponse['type'], text: '' })
       const aiKey = `AI_${simulation.currentStage}`
       if (answers[aiKey]) responses.push(answers[aiKey])
-      const result = await api.assessments.submitPhase(assessmentId, { stageId: simulation.currentStage, responses })
+      const engagement = {
+        burstEvents: spamGuard.metrics.burstEvents,
+        floorEvents: spamGuard.metrics.floorEvents,
+        totalSelections: spamGuard.metrics.totalSelections,
+      }
+      const result = await api.assessments.submitPhase(assessmentId, { stageId: simulation.currentStage, responses, engagement })
       if (result.revenueProjection) { setPrevRevenue(revenue); setRevenue(result.revenueProjection) }
       if ((result as any).simCompleted) { router.push(`/assessment/${assessmentId}/final-report`); return }
+      const sawHighSpam = spamGuard.shouldShowWarning
+      spamGuard.reset()
       const proceed = async () => {
         if ((result as any).phaseScenario) { transition.setPhaseScenario((result as any).phaseScenario); transition.setShowingScenario(true) }
         else if (result.nextStage) {
@@ -317,9 +330,18 @@ export function useSimulation(assessmentId: string) {
         } else { router.push(`/assessment/${assessmentId}/war-room`) }
       }
       snapshotContinueRef.current = () => { setShowSnapshot(false); proceed() }
-      setShowSnapshot(true)
+      if (sawHighSpam) {
+        setShowInvolvementWarning(true)
+      } else {
+        setShowSnapshot(true)
+      }
     } catch (err: any) { transition.setSubmitError(err.message || 'Failed to submit phase') }
     finally { transition.setSubmitting(false) }
+  }
+
+  function dismissInvolvementWarning() {
+    setShowInvolvementWarning(false)
+    setShowSnapshot(true)
   }
 
   // Called by the RestartConfirmDialog after the user accepts the wipe.
@@ -375,6 +397,9 @@ export function useSimulation(assessmentId: string) {
     stageTimer, shouldRunTimer, isCrisisQuestion,
     entries, connected, updatedAt, snapshotContinueRef,
     showRestartConfirm, setShowRestartConfirm, confirmRestart,
+    showInvolvementWarning, dismissInvolvementWarning,
+    spamPercent: spamGuard.spamPercent,
+    spamMetrics: spamGuard.metrics,
 
     // From sub-hooks (flattened for backwards compat)
     submitting: transition.submitting,
