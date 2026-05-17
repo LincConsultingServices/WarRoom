@@ -15,6 +15,7 @@ import { StageView } from './_views/StageView'
 import { PhaseTransitionView } from './_views/PhaseTransitionView'
 import { RestartConfirmDialog } from './_views/RestartConfirmDialog'
 import { InvolvementWarningDialog } from './_views/InvolvementWarningDialog'
+import { BuyoutLockoutDialog } from './_views/BuyoutLockoutDialog'
 import { useSimulation } from '@/src/hooks/useSimulation'
 import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATION_STAGE_LABELS } from '@/src/lib/constants'
 import { stageLabel } from '@/src/lib/helpers'
@@ -39,6 +40,7 @@ export default function SimulationPage() {
     entries, connected, updatedAt, snapshotContinueRef,
     showRestartConfirm, setShowRestartConfirm, confirmRestart,
     showInvolvementWarning, dismissInvolvementWarning, spamPercent,
+    showBuyoutLockout, buyoutContext, dismissBuyoutLockout,
     isIdeationStage, isLastQuestion, isFirstQuestion, currentAnswer, answeredCount, lifelinesLeft,
     // Setters
     setShowMentorPanel, setSelectedMentorId, setMentorQuestion, setMentorResult,
@@ -138,6 +140,12 @@ export default function SimulationPage() {
         open={showInvolvementWarning}
         spamPercent={spamPercent}
         onAcknowledge={dismissInvolvementWarning}
+      />
+      <BuyoutLockoutDialog
+        open={showBuyoutLockout}
+        company={buyoutContext?.company || ''}
+        amount={buyoutContext?.amount || 0}
+        onContinue={dismissBuyoutLockout}
       />
       <MentorOverlay
         show={showMentorPanel}

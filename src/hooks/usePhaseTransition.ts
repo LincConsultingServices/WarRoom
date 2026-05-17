@@ -22,6 +22,8 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
   const [showRestartCheckpoint, setShowRestartCheckpoint] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [showBuyoutLockout, setShowBuyoutLockout] = useState(false)
+  const [buyoutContext, setBuyoutContext] = useState<{ company: string; amount: number } | null>(null)
 
   async function handleScenarioSubmit(response: string) {
     if (!phaseScenario) return
@@ -89,12 +91,23 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
     setSubmitting(true)
     try {
       await api.assessments.chooseBuyout(assessmentId, buyoutCompany, n)
-      router.push(`/assessment/${assessmentId}/final-report`)
+      setBuyoutContext({ company: buyoutCompany.trim(), amount: n })
+      setShowBuyoutLockout(true)
     } catch (err: any) {
       setSubmitError(err.message || 'Failed')
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function dismissBuyoutLockout() {
+    setShowBuyoutLockout(false)
+    router.push(`/assessment/${assessmentId}/final-report`)
+  }
+
+  function triggerBuyoutLockout(company: string, amount: number) {
+    setBuyoutContext({ company: (company || '').trim(), amount })
+    setShowBuyoutLockout(true)
   }
 
   return {
@@ -103,9 +116,12 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
     showRestartCheckpoint, setShowRestartCheckpoint,
     submitting, setSubmitting,
     submitError, setSubmitError,
+    showBuyoutLockout, buyoutContext,
     handleScenarioSubmit,
     handleContinue,
     handleRestart,
     handleBuyoutSubmit,
+    dismissBuyoutLockout,
+    triggerBuyoutLockout,
   }
 }

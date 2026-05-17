@@ -386,6 +386,8 @@ export interface UserResponseEntry {
   proficiency: number | null;
   aiFeedback: Record<string, any> | null;
   selectedOptionText?: string;
+  idealOptionText?: string | null;
+  idealRationale?: string | null;
 }
 
 export interface RankedCompetency {

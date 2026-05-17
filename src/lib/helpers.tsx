@@ -3,7 +3,7 @@
 // ============================================
 
 import { FileText, AlertTriangle, Target, DollarSign, Lightbulb } from 'lucide-react'
-import { INVESTOR_VOICE_ALIASES } from './constants'
+import { INVESTOR_VOICE_BY_ID, INVESTOR_TITLE_TO_ID } from './constants'
 import type { AssessmentState } from '@/src/types'
 
 // ---- Stage / Question labels ----
@@ -56,7 +56,10 @@ export function getQuestionTypeColor(type: string): string {
 
 export function normalizeVoiceSlug(value: string): string {
   const trimmed = value.trim()
-  return INVESTOR_VOICE_ALIASES[trimmed] || trimmed
+  const idFromTitle = INVESTOR_TITLE_TO_ID[trimmed]
+  if (idFromTitle && INVESTOR_VOICE_BY_ID[idFromTitle]) return INVESTOR_VOICE_BY_ID[idFromTitle]
+  if (INVESTOR_VOICE_BY_ID[trimmed]) return INVESTOR_VOICE_BY_ID[trimmed]
+  return trimmed
     .toLowerCase()
     .replace(/[\u2019']/g, '')
     .replace(/[^a-z0-9]+/g, '_')

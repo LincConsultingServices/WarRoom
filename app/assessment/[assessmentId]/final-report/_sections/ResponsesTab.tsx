@@ -1,5 +1,6 @@
 'use client'
 
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { stageLabel } from '@/src/lib/helpers'
 import type { EvaluationReport, UserResponseEntry } from '@/src/types'
 
@@ -33,7 +34,6 @@ function ProficiencyBadge({ p }: { p: number | null }) {
 export function ResponsesTab({ report }: { report: EvaluationReport }) {
   const responses = report.userResponses || []
 
-  // Group by stage
   const grouped: Record<string, UserResponseEntry[]> = {}
   for (const r of responses) {
     const stage = r.stageName || 'Unknown'
@@ -46,7 +46,7 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
     <div className="responses-page">
       <div className="responses-header">
         <h2>Your Responses</h2>
-        <p className="responses-subtitle">All your answers throughout the simulation, grouped by stage</p>
+        <p className="responses-subtitle">Expand any question to compare your choice with the ideal path</p>
       </div>
 
       {sortedStages.length === 0 && <div className="no-data">No responses recorded.</div>}
@@ -58,26 +58,53 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
             <span className="response-count">{grouped[stageName].length} responses</span>
           </div>
 
-          {grouped[stageName].map((entry, i) => (
-            <div key={i} className="response-card">
-              <div className="response-question">
-                <span className="q-type">{(entry.questionType || 'unknown').replace(/_/g, ' ')}</span>
-                <p>{entry.questionText || entry.questionId || 'Question'}</p>
-              </div>
-              <div className="response-answer">
-                <span className="answer-label">Your Answer:</span>
-                <p>{getResponseText(entry)}</p>
-              </div>
-              <div className="response-footer">
-                <ProficiencyBadge p={entry.proficiency} />
-                {entry.aiFeedback && (entry.aiFeedback as any).feedback && (
-                  <span className="ai-feedback-text">
-                    Tip: {typeof (entry.aiFeedback as any).feedback === 'string' ? (entry.aiFeedback as any).feedback : ''}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+          <Accordion type="multiple" className="response-accordion">
+            {grouped[stageName].map((entry, i) => {
+              const userAnswer = getResponseText(entry)
+              const idealText = (entry.idealOptionText || '').trim()
+              const hasIdeal = idealText.length > 0
+              const userMatchesIdeal = hasIdeal && userAnswer.trim() === idealText
+              const tip = entry.aiFeedback && typeof (entry.aiFeedback as any).feedback === 'string' ? (entry.aiFeedback as any).feedback : ''
+
+              return (
+                <AccordionItem key={i} value={`${stageName}-${i}`} className="response-item">
+                  <AccordionTrigger className="response-trigger">
+                    <div className="trigger-content">
+                      <span className="q-type">{(entry.questionType || 'unknown').replace(/_/g, ' ')}</span>
+                      <p className="trigger-question">{entry.questionText || entry.questionId || 'Question'}</p>
+                      <div className="trigger-meta">
+                        <ProficiencyBadge p={entry.proficiency} />
+                        {userMatchesIdeal && <span className="match-badge">✓ Matches ideal</span>}
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="response-content">
+                    {hasIdeal ? (
+                      <div className="answer-grid">
+                        <div className={`answer-card user-card${userMatchesIdeal ? ' is-match' : ''}`}>
+                          <span className="answer-label">Your Answer</span>
+                          <p>{userAnswer}</p>
+                          {tip && <p className="ai-tip">Tip: {tip}</p>}
+                        </div>
+                        <div className="answer-card ideal-card">
+                          <span className="answer-label ideal-label">Ideal Path</span>
+                          <p>{idealText}</p>
+                          {entry.idealRationale && <p className="ai-tip">{entry.idealRationale}</p>}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="answer-card single-card">
+                        <span className="answer-label">Your Answer</span>
+                        <p>{userAnswer}</p>
+                        {tip && <p className="ai-tip">Tip: {tip}</p>}
+                        <p className="no-ideal-note">No ideal reference for free-form responses — your answer is evaluated by AI.</p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              )
+            })}
+          </Accordion>
         </div>
       ))}
 
@@ -91,15 +118,41 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         .stage-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
         .stage-badge { background: rgba(99,102,241,0.15); color: hsl(var(--muted-foreground)); padding: 0.25rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
         .response-count { font-size: 0.8rem; color: #6b7280; }
-        .response-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; }
-        .response-question { margin-bottom: 0.6rem; }
+
+        .response-accordion :global(.response-item) {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 12px;
+          margin-bottom: 0.6rem;
+          padding: 0 1.1rem;
+        }
+        .response-accordion :global(.response-trigger) {
+          padding: 0.9rem 0;
+        }
+        .response-accordion :global(.response-content) {
+          padding-top: 0.4rem;
+          padding-bottom: 1rem;
+        }
+
+        .trigger-content { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
         .q-type { font-size: 0.7rem; font-weight: 600; color: #8b5cf6; text-transform: uppercase; letter-spacing: 0.5px; }
-        .response-question p { font-size: 0.9rem; color: #e0e0e0; margin: 0.2rem 0 0 0; }
-        .response-answer { background: rgba(255,255,255,0.02); border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; }
-        .answer-label { font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; }
-        .response-answer p { color: #d1d5db; font-size: 0.9rem; margin: 0.2rem 0 0 0; }
-        .response-footer { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-        .ai-feedback-text { font-size: 0.78rem; color: #9ca3af; font-style: italic; }
+        .trigger-question { font-size: 0.9rem; color: #e0e0e0; margin: 0; line-height: 1.4; }
+        .trigger-meta { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .match-badge { font-size: 0.7rem; font-weight: 600; color: #34d399; background: rgba(16,185,129,0.1); padding: 0.15rem 0.5rem; border-radius: 6px; }
+
+        .answer-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
+        @media (min-width: 640px) { .answer-grid { grid-template-columns: 1fr 1fr; } }
+
+        .answer-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.8rem 1rem; }
+        .answer-card.single-card { background: rgba(255,255,255,0.02); }
+        .answer-card.is-match { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.04); }
+        .answer-card.ideal-card { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
+
+        .answer-label { font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ideal-label { color: #34d399; }
+        .answer-card p { color: #d1d5db; font-size: 0.88rem; margin: 0.3rem 0 0 0; line-height: 1.5; }
+        .ai-tip { font-size: 0.78rem; color: #9ca3af; font-style: italic; margin-top: 0.5rem !important; }
+        .no-ideal-note { font-size: 0.74rem; color: #6b7280; font-style: italic; margin-top: 0.6rem !important; }
         .no-data { color: #6b7280; text-align: center; padding: 3rem; }
       `}</style>
     </div>
