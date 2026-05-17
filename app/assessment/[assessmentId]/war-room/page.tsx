@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import api from '@/src/lib/api'
@@ -15,6 +15,10 @@ import type {
     InvestorScorecard,
 } from '@/src/types'
 import { Volume2, VolumeX } from 'lucide-react'
+import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
+import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
+import { MuteToggle } from '@/src/components/warroom/MuteToggle'
+import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 
 // ============================================
 // WAR ROOM ΓÇô Investor Pitch Simulation
@@ -175,6 +179,8 @@ export default function WarRoomSimulation() {
 
     // State
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
+    // Cinematic entrance overlay — shown until the door video / fallback completes.
+    const [showEntrance, setShowEntrance] = useState(true)
     const [assessmentState, setAssessmentState] = useState<AssessmentState | null>(null)
     const [investors, setInvestors] = useState<Investor[]>([])
     const [pitchText, setPitchText] = useState('')
@@ -826,10 +832,30 @@ export default function WarRoomSimulation() {
     // ============================================
     // RENDER
     // ============================================
+    // Map War Room phase → ambient audio scene. Empty (null) while the entrance
+    // is still playing so we don't fight the door-video atmospherics.
+    const ambientScene = useMemo<AmbientScene>(() => {
+        if (showEntrance) return null
+        if (phase === 'LOADING') return 'warroom-lobby'
+        if (phase === 'INVESTOR_QA') return isAnalyzing ? 'warroom-deliberation' : 'warroom-active'
+        if (phase === 'PITCH') return 'warroom-active'
+        if (phase === 'DEAL_RESULTS') return 'warroom-deliberation'
+        return null
+    }, [showEntrance, phase, isAnalyzing])
+
     return (
         <div className="warroom-page warroom-shell">
+            <AnimatePresence>
+                {showEntrance && (
+                    <WarRoomEntrance
+                        key="entrance"
+                        onComplete={() => setShowEntrance(false)}
+                    />
+                )}
+            </AnimatePresence>
+            <AmbientAudioManager scene={ambientScene} />
             <MicPermissionDialog
-                open={mic.needsPrompt && phase !== 'LOADING'}
+                open={mic.needsPrompt && phase !== 'LOADING' && !showEntrance}
                 onAllow={() => mic.grant()}
                 onUseText={() => mic.useText()}
             />
@@ -843,6 +869,7 @@ export default function WarRoomSimulation() {
                     {/* timer removed */}
                 </div>
                 <div className="header-right">
+                    <MuteToggle />
                     <button className="end-btn" onClick={handleEndSimulation}>
                         End Simulation
                     </button>

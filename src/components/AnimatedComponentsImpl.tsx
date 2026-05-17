@@ -42,9 +42,10 @@ interface GlowCardProps {
   className?: string
   glowColor?: string
   hoverScale?: number
+  style?: React.CSSProperties
 }
 
-export function GlowCard({ children, className, glowColor = 'rgba(201, 162, 39, 0.12)', hoverScale = 1.02 }: GlowCardProps) {
+export function GlowCard({ children, className, glowColor = 'rgba(201, 162, 39, 0.12)', hoverScale = 1.02, style }: GlowCardProps) {
   return (
     <motion.div
       whileHover={{
@@ -61,6 +62,7 @@ export function GlowCard({ children, className, glowColor = 'rgba(201, 162, 39, 
         background: 'linear-gradient(135deg, rgba(17,14,10,0.9), rgba(10,8,6,0.8))',
         border: '1px solid rgba(201,162,39,0.12)',
         borderRadius: '4px',
+        ...style,
       }}
     >
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.25), transparent)' }} />
