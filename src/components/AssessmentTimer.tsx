@@ -100,7 +100,7 @@ export default function AssessmentTimer({
     return (
         <div className="assessment-timer">
             <div className="global-timer" title="Total Running Time">
-                ⏱ {globalElapsedStr}
+                Time {globalElapsedStr}
             </div>
             <div
                 className={`stage-timer ${isWarning ? 'warning' : ''}`}
@@ -138,7 +138,7 @@ export default function AssessmentTimer({
           letter-spacing: 1px;
         }
         .stage-timer::before {
-          content: '⌛';
+                    content: 'T';
           font-size: 1rem;
           filter: grayscale(100%) brightness(200%);
         }

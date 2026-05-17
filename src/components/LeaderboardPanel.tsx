@@ -25,7 +25,7 @@ const RANK_COLORS = [
   'text-amber-600',
 ]
 
-const RANK_ICONS = ['🥇', '🥈', '🥉']
+const RANK_ICONS = ['1st', '2nd', '3rd']
 
 export function LeaderboardPanel({
   entries,

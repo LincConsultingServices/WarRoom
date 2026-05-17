@@ -2,77 +2,114 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* ============================================================
+ * GAME OF THRONES — WAR ROOM
+ * Design System: Iron Throne Palette
+ * ============================================================ */
+
 @custom-variant dark (&:is(.dark *));
 
+/* === GOT CSS Variables === */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* GOT Light (rare — parchment / torchlit hall) */
+  --background: oklch(0.96 0.012 75);        /* aged parchment */
+  --foreground: oklch(0.15 0.02 50);         /* dark ink */
+  --card: oklch(0.92 0.015 70);              /* stone slab */
+  --card-foreground: oklch(0.18 0.02 50);
+  --popover: oklch(0.94 0.012 70);
+  --popover-foreground: oklch(0.15 0.02 50);
+  --primary: oklch(0.72 0.14 75);            /* GOT Gold */
+  --primary-foreground: oklch(0.12 0.02 50);
+  --secondary: oklch(0.85 0.02 60);
+  --secondary-foreground: oklch(0.2 0.02 50);
+  --muted: oklch(0.88 0.015 70);
+  --muted-foreground: oklch(0.45 0.03 60);
+  --accent: oklch(0.65 0.18 30);             /* Blood Red */
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.52 0.22 25);        /* Deep Blood Red */
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.78 0.04 65);
+  --input: oklch(0.88 0.012 65);
+  --ring: oklch(0.72 0.14 75);
+  --chart-1: oklch(0.72 0.14 75);            /* Gold */
+  --chart-2: oklch(0.52 0.22 25);            /* Blood Red */
+  --chart-3: oklch(0.45 0.1 220);            /* Dragonglass */
+  --chart-4: oklch(0.62 0.12 150);           /* Stark Green */
+  --chart-5: oklch(0.55 0.15 290);           /* Lannister Purple */
+  --radius: 0.375rem;
+  --sidebar: oklch(0.9 0.018 70);
+  --sidebar-foreground: oklch(0.15 0.02 50);
+  --sidebar-primary: oklch(0.72 0.14 75);
+  --sidebar-primary-foreground: oklch(0.12 0.02 50);
+  --sidebar-accent: oklch(0.84 0.02 65);
+  --sidebar-accent-foreground: oklch(0.2 0.02 50);
+  --sidebar-border: oklch(0.75 0.04 65);
+  --sidebar-ring: oklch(0.72 0.14 75);
+  --success: oklch(0.55 0.15 145);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.72 0.14 75);
+  --warning-foreground: oklch(0.12 0.02 50);
+  --info: oklch(0.48 0.12 220);
+  --info-foreground: oklch(0.98 0 0);
+
+  /* GOT Semantic Colors */
+  --got-gold: #c9a227;
+  --got-gold-light: #e8c84a;
+  --got-gold-dark: #8b6914;
+  --got-blood: #8b1a1a;
+  --got-blood-bright: #c23b3b;
+  --got-stone: #2a2520;
+  --got-stone-mid: #3d3530;
+  --got-stone-light: #5a5048;
+  --got-dragon: #1a0a00;
+  --got-dragonglass: #0f1a2e;
+  --got-fire: #ff6b00;
+  --got-fire-bright: #ff9933;
+  --got-ash: #8c8075;
+  --got-parchment: #f5e6c8;
+  --got-ink: #1a1208;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* GOT Dark Mode — Iron Throne aesthetic: obsidian black, molten gold, blood */
+  --background: oklch(0.08 0.01 50);         /* near-black obsidian */
+  --foreground: oklch(0.88 0.04 75);         /* warm aged parchment */
+  --card: oklch(0.11 0.015 50);              /* dark stone */
+  --card-foreground: oklch(0.85 0.035 75);
+  --popover: oklch(0.1 0.012 50);
+  --popover-foreground: oklch(0.85 0.035 75);
+  --primary: oklch(0.72 0.16 75);            /* Molten Gold */
+  --primary-foreground: oklch(0.08 0.01 50);
+  --secondary: oklch(0.16 0.015 50);
+  --secondary-foreground: oklch(0.82 0.03 75);
+  --muted: oklch(0.15 0.012 50);
+  --muted-foreground: oklch(0.58 0.04 70);
+  --accent: oklch(0.55 0.2 28);              /* Blood Red Accent */
+  --accent-foreground: oklch(0.95 0.02 75);
+  --destructive: oklch(0.46 0.22 24);        /* Deep Crimson */
+  --destructive-foreground: oklch(0.9 0.04 70);
+  --border: oklch(0.22 0.025 55);            /* dark stone border */
+  --input: oklch(0.14 0.012 50);
+  --ring: oklch(0.62 0.14 75);
+  --chart-1: oklch(0.72 0.16 75);            /* Gold */
+  --chart-2: oklch(0.52 0.22 25);            /* Blood */
+  --chart-3: oklch(0.48 0.12 220);           /* Dragonglass */
+  --chart-4: oklch(0.58 0.14 145);           /* Stark */
+  --chart-5: oklch(0.52 0.18 290);           /* Lannister */
+  --sidebar: oklch(0.1 0.014 50);
+  --sidebar-foreground: oklch(0.85 0.035 75);
+  --sidebar-primary: oklch(0.72 0.16 75);
+  --sidebar-primary-foreground: oklch(0.08 0.01 50);
+  --sidebar-accent: oklch(0.16 0.015 50);
+  --sidebar-accent-foreground: oklch(0.82 0.03 75);
+  --sidebar-border: oklch(0.2 0.022 55);
+  --sidebar-ring: oklch(0.62 0.14 75);
+  --success: oklch(0.48 0.15 145);
+  --success-foreground: oklch(0.95 0.02 75);
+  --warning: oklch(0.68 0.16 75);
+  --warning-foreground: oklch(0.08 0.01 50);
+  --info: oklch(0.44 0.14 220);
+  --info-foreground: oklch(0.95 0.02 75);
 }
 
 @theme inline {
@@ -135,48 +172,122 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    /* Subtle stone texture overlay */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='none'/%3E%3Crect x='0' y='0' width='1' height='1' fill='rgba(0,0,0,0.03)'/%3E%3C/svg%3E");
+  }
+
+  /* GOT Display font class */
+  .font-got {
+    font-family: 'Cinzel', 'Georgia', serif;
+    letter-spacing: 0.04em;
   }
 
   h1 {
-    @apply text-3xl font-bold tracking-tight;
+    @apply text-4xl font-bold tracking-tight;
+    font-family: 'Cinzel', 'Georgia', serif;
   }
 
   h2 {
-    @apply text-2xl font-bold;
+    @apply text-3xl font-bold tracking-tight;
   }
 
   h3 {
+    @apply text-2xl font-semibold;
+  }
+
+  h4 {
     @apply text-xl font-semibold;
+  }
+
+  h5 {
+    @apply text-lg font-semibold;
+  }
+
+  h6 {
+    @apply text-base font-semibold;
   }
 
   p {
     @apply text-base leading-relaxed;
   }
+
+  small {
+    @apply text-sm text-muted-foreground;
+  }
+
+  strong {
+    @apply font-semibold;
+  }
+
+  code {
+    @apply px-2 py-1 rounded bg-muted text-muted-foreground font-mono text-sm;
+  }
 }
 
 @layer components {
+  /* GOT Stone Card */
   .card-base {
-    @apply rounded-lg bg-card text-card-foreground shadow-sm border border-border;
+    @apply rounded-sm bg-card text-card-foreground shadow-sm border border-border transition-all duration-300;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(201,162,39,0.08);
   }
 
+  .card-base:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(201,162,39,0.06), inset 0 1px 0 rgba(201,162,39,0.12);
+    @apply border-border/80;
+  }
+
+  /* GOT Stone Card — thematic card */
+  .got-stone-card {
+    background: linear-gradient(135deg, var(--card) 0%, color-mix(in oklch, var(--card), #c9a22710 100%) 100%);
+    border: 1px solid color-mix(in oklch, var(--border), #c9a227 15%);
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,162,39,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .got-stone-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,162,39,0.4), transparent);
+  }
+
+  /* Badge Styling */
   .badge-primary {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary;
+    @apply inline-flex items-center px-3 py-1 rounded-sm text-xs font-semibold whitespace-nowrap;
+    background: rgba(201,162,39,0.12);
+    color: #c9a227;
+    border: 1px solid rgba(201,162,39,0.3);
+    letter-spacing: 0.05em;
   }
 
   .badge-success {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-600;
+    @apply inline-flex items-center px-3 py-1 rounded-sm text-xs font-semibold bg-success/15 text-success border border-success/20 whitespace-nowrap;
   }
 
   .badge-warning {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-500/10 text-amber-600;
+    @apply inline-flex items-center px-3 py-1 rounded-sm text-xs font-semibold whitespace-nowrap;
+    background: rgba(201,162,39,0.15);
+    color: #c9a227;
+    border: 1px solid rgba(201,162,39,0.25);
   }
 
   .badge-error {

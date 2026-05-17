@@ -2,24 +2,176 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import api from '@/src/lib/api'
+import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
+import { useMicPermission } from '@/src/hooks/useMicPermission'
+import { MicPermissionDialog } from '@/components/MicPermissionDialog'
+import { normalizeVoiceSlug as sharedNormalizeVoiceSlug } from '@/src/lib/helpers'
 import type {
     AssessmentState,
     Investor,
     InvestorScorecard,
 } from '@/src/types'
+import { Volume2, VolumeX } from 'lucide-react'
 
 // ============================================
-// WAR ROOM – Investor Pitch Simulation
+// WAR ROOM ΓÇô Investor Pitch Simulation
 // SOP: 15 minutes, all C1-C8 integrated
 // ============================================
 
+function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[], className?: string }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
+  const [isCheckingAudio, setIsCheckingAudio] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsCheckingAudio(true);
+    setResolvedSrc(null);
+
+    const probe = async () => {
+      for (const key of audioKeys) {
+        if (!key) continue;
+        const audioSrc = `/audio/questions/${key}.mp3`;
+        try {
+          const res = await fetch(audioSrc, { method: 'HEAD' });
+          if (res.ok) {
+            if (!cancelled) {
+              setResolvedSrc(audioSrc);
+            }
+            return;
+          }
+        } catch {
+          // keep trying other candidates
+        }
+      }
+      if (!cancelled) {
+        setResolvedSrc(null);
+      }
+      if (!cancelled) {
+        setIsCheckingAudio(false);
+      }
+    };
+
+    void probe().finally(() => {
+      if (!cancelled) {
+        setIsCheckingAudio(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [audioKeys.join('|')]);
+
+  useEffect(() => {
+    if (!resolvedSrc) return;
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    audioRef.current = new Audio(resolvedSrc);
+    audioRef.current.onended = () => setIsPlaying(false);
+    audioRef.current.onerror = () => setIsPlaying(false);
+    setIsPlaying(false);
+  }, [resolvedSrc]);
+
+  if (!isCheckingAudio && !resolvedSrc) return null;
+
+  const toggleAudio = () => {
+    if (!resolvedSrc) return;
+    if (!audioRef.current || audioRef.current.src !== new URL(resolvedSrc, window.location.origin).href) {
+      audioRef.current = new Audio(resolvedSrc);
+      audioRef.current.onended = () => setIsPlaying(false);
+      audioRef.current.onerror = () => setIsPlaying(false);
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(() => {
+        setIsPlaying(false);
+      });
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleAudio(); }}
+            className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors ${isPlaying ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'} ${className}`}
+            title={isCheckingAudio ? 'Loading voice' : 'Listen'}
+            disabled={isCheckingAudio}
+    >
+            {isCheckingAudio ? <span className="h-2 w-2 rounded-full bg-current animate-pulse" /> : isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+    </button>
+  );
+}
+
 type WarRoomPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
+
+type PreviousResponseEntry = Record<string, any>
+
+function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[] {
+    if (!raw) return []
+
+    if (Array.isArray(raw)) {
+        return raw.filter((item): item is PreviousResponseEntry => typeof item === 'object' && item !== null)
+    }
+
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw)
+            return Array.isArray(parsed)
+                ? parsed.filter((item): item is PreviousResponseEntry => typeof item === 'object' && item !== null)
+                : []
+        } catch {
+            return []
+        }
+    }
+
+    return []
+}
+
+// Re-exported via shared helper so investor title \u2192 id \u2192 voice-slug resolution
+// stays in one place (see src/lib/helpers.tsx).
+const normalizeVoiceSlug = sharedNormalizeVoiceSlug
+
+function getPreparedPitchFromState(state: AssessmentState | null): string {
+    const directPitch = state?.assessment?.warRoomPitch?.trim()
+    if (directPitch) return directPitch
+
+    const previousResponses = normalizePreviousResponses(state?.assessment?.previousResponses)
+    for (let i = previousResponses.length - 1; i >= 0; i--) {
+        const entry = previousResponses[i] as Record<string, any>
+        const questionId = String(entry.questionId || entry.qId || entry.question_id || entry.q_id || '').toUpperCase()
+        const question = String(entry.q || entry.question || entry.questionText || entry.text || '').toLowerCase()
+        const answer = String(entry.a || entry.answer || entry.response || entry.selectedOptionText || entry.text || '').trim()
+        if (!answer) continue
+
+        if (questionId === 'Q_WP_1' || question.includes('pitch template') || question.includes('war room pitch') || question.includes('prepared pitch')) {
+            return answer
+        }
+    }
+
+    return ''
+}
 
 export default function WarRoomSimulation() {
     const params = useParams()
     const router = useRouter()
     const assessmentId = params?.assessmentId as string
+
+    // Microphone permission gate
+    const mic = useMicPermission()
 
     // State
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
@@ -28,18 +180,228 @@ export default function WarRoomSimulation() {
     const [pitchText, setPitchText] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState('')
+    const [isAnalyzing, setIsAnalyzing] = useState(false)
+
+    // Audio Recording
+    const pitchRecorder = useAudioRecorder(60)  // 60s for pitch
+    const responseRecorder = useAudioRecorder(15) // 15s for responses
+    const negotiationRecorder = useAudioRecorder(15) // 15s for negotiation
+
+    // Analysis results
+    const [pitchAnalysis, setPitchAnalysis] = useState<{
+        transcription: string; feedback: string; strengths: string[]; weaknesses: string[];
+        overallScore: number; clarity: number; confidence: number; persuasion: number;
+    } | null>(null)
+    const [responseTranscription, setResponseTranscription] = useState('')
 
     // Investor Q&A
     const [currentInvestorIndex, setCurrentInvestorIndex] = useState(0)
     const [investorResponse, setInvestorResponse] = useState('')
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
+    const [responseSubmitted, setResponseSubmitted] = useState(false)
+    const [feedbackResponseSubmitted, setFeedbackResponseSubmitted] = useState(false)
+
+    const [followupPhase, setFollowupPhase] = useState<'initial' | 'followup_pending' | 'followup_answered'>('initial')
+    const [followupQuestion, setFollowupQuestion] = useState('')
+    const [initialTranscription, setInitialTranscription] = useState('')
+
+    const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+    const [hasAutoPlayed, setHasAutoPlayed] = useState<Record<string, boolean>>({})
+
+    // Negotiation state
+    const MAX_NEG_ROUNDS = 4 // 3 negotiation rounds + 1 final accept/reject
+    const [offers, setOffers] = useState<any[]>([])
+    const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
+    const [negRound, setNegRound] = useState(0)
+    const [negHistory, setNegHistory] = useState<{sender: string, msg: string, type: 'investor'|'user'}[]>([])
+    const [negInputCap, setNegInputCap] = useState<string>('')
+    const [negInputEq, setNegInputEq] = useState<string>('')
+    const [dealFinalized, setDealFinalized] = useState(false)
+    const [isNegVoiceSubmitting, setIsNegVoiceSubmitting] = useState(false)
+    const [acceptedDealTerms, setAcceptedDealTerms] = useState<{capital: number, equity: number, investorName: string} | null>(null)
+    const [walkedAwayInvestor, setWalkedAwayInvestor] = useState<string | null>(null)
+
+    // Auto-reset negotiation recorder when offer changes
+    useEffect(() => {
+        if (selectedOffer) {
+            negotiationRecorder.resetRecording()
+        }
+    }, [selectedOffer])
 
     // Timer (15 min war room)
-    const [timeRemaining, setTimeRemaining] = useState(15 * 60) // 15 minutes in seconds
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const [timeRemaining, setTimeRemaining] = useState(15 * 60); /* Disabled countdown logic */ // 15 minutes in seconds
 
-    // Load assessment state and investors
+    // -- Negotiation Logic --
+    const handleSelectOffer = (offer: any) => {
+        setSelectedOffer(offer)
+        setNegRound(0) // Round increments on each voice submission
+        setNegHistory([
+            { sender: offer.investorName, msg: offer.message, type: 'investor' }
+        ])
+        setNegInputCap(offer.capital.toString())
+        setNegInputEq(offer.equity.toString())
+    }
+
+    const handleNegotiateAudio = async () => {
+        if (!negotiationRecorder.audioBlob || !selectedOffer) return
+
+        const nextRound = negRound + 1
+
+        // Don't allow more than MAX_NEG_ROUNDS
+        if (nextRound > MAX_NEG_ROUNDS) {
+            setError('Maximum rounds reached. This offer has expired.')
+            return
+        }
+
+        setIsNegVoiceSubmitting(true)
+        setError('')
+
+        try {
+            const result = await api.assessments.counterNegotiateAudio(
+                assessmentId,
+                selectedOffer.investorId,
+                negotiationRecorder.audioBlob
+            )
+
+            // Detect walk-away intent from transcription
+            // Detect walk-away intent from transcription - disabled per user request to remove hardcoded walkout triggers
+            const walkAwayPhrases = ['walk away', "i'm out", 'no deal', 'reject', 'i walk', 'walking away', 'walk out']
+            const isWalkAway = false // walkAwayPhrases.some(p => result.transcription?.toLowerCase().includes(p))
+
+            if (isWalkAway && !result.accepted) {
+                // User wants to walk away ΓÇö reject this offer
+                setWalkedAwayInvestor(selectedOffer.investorName)
+                try {
+                    await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
+                    setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
+                } catch (e) {
+                    console.error('Walk-away reject failed:', e)
+                }
+                setSelectedOffer(null)
+                setNegRound(0)
+                negotiationRecorder.resetRecording()
+                // Clear walk-away message after 3 seconds
+                setTimeout(() => setWalkedAwayInvestor(null), 3000)
+                return
+            }
+
+            const newHistory = [...negHistory, {
+                sender: 'You',
+                msg: result.transcription,
+                type: 'user' as const
+            }]
+
+            newHistory.push({
+                sender: selectedOffer.investorName,
+                msg: result.message,
+                type: 'investor'
+            })
+
+            setNegHistory(newHistory)
+            setNegRound(nextRound)
+
+            // Play investor audio response
+            if (result.audioBase64) {
+                if (audioRef.current) audioRef.current.pause()
+                const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audioRef.current = audio
+                audio.play().catch(e => console.error("Auto-play failed:", e))
+            }
+
+            if (result.accepted) {
+                // Use the current selectedOffer amounts (or AI-returned if they're reasonable)
+                // Prefer the AI response amounts since they represent the negotiated terms
+                const finalCapital = result.capital || selectedOffer.capital
+                const finalEquity = result.equity || selectedOffer.equity
+                
+                setAcceptedDealTerms({
+                    capital: finalCapital,
+                    equity: finalEquity,
+                    investorName: selectedOffer.investorName
+                })
+                
+                // Call backend to persist accepted deal and update revenue/leaderboard
+                try {
+                    await api.assessments.acceptDeal(assessmentId, selectedOffer.investorId, finalCapital, finalEquity)
+                } catch (e) {
+                    console.error('Accept deal backend call failed:', e)
+                }
+                
+                setDealFinalized(true)
+            } else {
+                // Update offer with counter-proposed terms
+                const updatedOffer = { 
+                    ...selectedOffer, 
+                    capital: result.capital, 
+                    equity: result.equity 
+                }
+                setSelectedOffer(updatedOffer)
+                setNegInputCap(result.capital.toString())
+                setNegInputEq(result.equity.toString())
+
+                if (nextRound >= MAX_NEG_ROUNDS) {
+                    // Max rounds exhausted without acceptance ΓÇö auto-reject this offer
+                    try {
+                        await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
+                        setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
+                        setSelectedOffer(null)
+                        setNegRound(0)
+                    } catch (e) {
+                        console.error('Auto-reject failed:', e)
+                    }
+                }
+            }
+
+            negotiationRecorder.resetRecording()
+        } catch (err: any) {
+            setError(err.message || 'Failed to negotiate via voice')
+        } finally {
+            setIsNegVoiceSubmitting(false)
+        }
+    }
+
+    const handleAcceptDeal = async (offer: any) => {
+        try {
+            setAcceptedDealTerms({
+                capital: offer.capital,
+                equity: offer.equity,
+                investorName: offer.investorName
+            })
+            await api.assessments.acceptDeal(assessmentId, offer.investorId, offer.capital, offer.equity)
+            setDealFinalized(true)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const handleRejectDeal = async () => {
+        if (!selectedOffer) return;
+        const investorName = selectedOffer.investorName;
+        try {
+            await api.assessments.rejectOffer(assessmentId as string, selectedOffer.offerId || selectedOffer.type)
+            setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
+            setSelectedOffer(null)
+            setNegRound(0)
+            setWalkedAwayInvestor(investorName)
+            setTimeout(() => setWalkedAwayInvestor(null), 3000)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+
+    // Fix 1: Force dark theme for the entire War Room phase
+    useEffect(() => {
+        document.documentElement.classList.add('dark')
+        return () => {
+            document.documentElement.classList.remove('dark')
+        }
+    }, [])
+
+    // Load assessment state and investors ΓÇö filter to only selected investor IDs
     useEffect(() => {
         const load = async () => {
             try {
@@ -48,7 +410,30 @@ export default function WarRoomSimulation() {
                     api.config.getInvestors(),
                 ])
                 setAssessmentState(state)
-                setInvestors(investorList)
+
+                // Fix 3: Only show the investors selected for this assessment
+                const selectedIds: string[] = (() => {
+                    try {
+                        const raw = (state as any)?.assessment?.selectedInvestors
+                        if (Array.isArray(raw)) return raw
+                        if (typeof raw === 'string') return JSON.parse(raw)
+                        return []
+                    } catch { return [] }
+                })()
+
+                // Fix 2: If buyout was chosen, skip War Room entirely
+                const buyoutChosen = (state as any)?.assessment?.buyoutChosen
+                if (buyoutChosen) {
+                    router.push(`/assessment/${assessmentId}/final-report`)
+                    return
+                }
+
+                const filtered = selectedIds.length > 0
+                    ? investorList.filter(inv => selectedIds.includes(inv.id))
+                    : investorList
+
+                // Fallback: if ID matching yielded nothing, use the full list
+                setInvestors(filtered.length > 0 ? filtered : investorList)
                 setPhase('PITCH')
             } catch (err: any) {
                 setError(err.message || 'Failed to load War Room data')
@@ -56,28 +441,51 @@ export default function WarRoomSimulation() {
             }
         }
         load()
-    }, [assessmentId])
+    }, [assessmentId, router])
 
     // 15-minute countdown timer
     useEffect(() => {
         if (phase === 'LOADING' || phase === 'COMPLETE') return
 
-        timerRef.current = setInterval(() => {
-            setTimeRemaining(prev => {
-                if (prev <= 1) {
-                    if (timerRef.current) clearInterval(timerRef.current)
-                    // Time's up — end simulation
-                    router.push(`/assessment/${assessmentId}/final-report`)
-                    return 0
-                }
-                return prev - 1
-            })
-        }, 1000)
+        // timer disabled per user request
 
         return () => {
             if (timerRef.current) clearInterval(timerRef.current)
         }
     }, [phase, assessmentId, router])
+
+    // Fire confetti when deal is finalized
+    useEffect(() => {
+        if (dealFinalized) {
+            const duration = 3 * 1000
+            const animationEnd = Date.now() + duration
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 }
+
+            const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
+
+            const interval: any = setInterval(function() {
+                const timeLeft = animationEnd - Date.now()
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval)
+                }
+
+                const particleCount = 50 * (timeLeft / duration)
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                })
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                })
+            }, 250)
+
+            return () => clearInterval(interval)
+        }
+    }, [dealFinalized])
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60)
@@ -86,67 +494,272 @@ export default function WarRoomSimulation() {
     }
 
     // ============================================
-    // PITCH SUBMISSION
+    // PITCH SUBMISSION (AUDIO)
     // ============================================
-    const handleSubmitPitch = async () => {
-        if (!pitchText.trim()) {
-            setError('Please write your pitch before submitting')
+    const handleSubmitPitchAudio = async () => {
+        if (!pitchRecorder.audioBlob) {
+            setError('Please record your pitch before submitting')
             return
         }
+        setIsAnalyzing(true)
         setIsSubmitting(true)
         setError('')
 
         try {
-            await api.assessments.submitPitch(assessmentId, pitchText)
-            setPhase('INVESTOR_QA')
-            setCurrentInvestorIndex(0)
-            setCurrentInvestorReaction('')
+            const result = await api.assessments.submitPitchAudio(assessmentId, pitchRecorder.audioBlob)
+            setPitchAnalysis(result.analysis)
+            setPitchText(result.analysis.transcription)
+            resetPitchFollowupState()
         } catch (err: any) {
-            setError(err.message || 'Failed to submit pitch')
+            setError(err.message || 'Failed to analyze pitch')
         } finally {
+            setIsAnalyzing(false)
             setIsSubmitting(false)
         }
     }
 
+    // Follow-up flow now lives inside the Investor Q&A phase (see handleSubmitInvestorFollowupAudio).
+
     // ============================================
-    // INVESTOR RESPONSE
+    // TEXT FALLBACK HANDLERS (when mic permission was denied / declined)
     // ============================================
-    const handleRespondToInvestor = async () => {
-        if (!investorResponse.trim()) {
-            setError('Please write your response')
+    const [textPitchInput, setTextPitchInput] = useState('')
+    const [textResponseInput, setTextResponseInput] = useState('')
+    const [textNegCapital, setTextNegCapital] = useState('')
+    const [textNegEquity, setTextNegEquity] = useState('')
+
+    const handleSubmitPitchText = async () => {
+        const trimmed = textPitchInput.trim()
+        if (!trimmed) { setError('Please type your pitch before submitting'); return }
+        setIsAnalyzing(true); setIsSubmitting(true); setError('')
+        try {
+            await api.assessments.submitPitch(assessmentId, trimmed)
+            setPitchAnalysis({
+                transcription: trimmed,
+                feedback: 'Text pitch received. The investors will read it before the next round.',
+                strengths: [], weaknesses: [],
+                overallScore: 0, clarity: 0, confidence: 0, persuasion: 0,
+            })
+            setPitchText(trimmed)
+            setTextPitchInput('')
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit pitch')
+        } finally {
+            setIsAnalyzing(false); setIsSubmitting(false)
+        }
+    }
+
+    const handleRespondToInvestorText = async () => {
+        const investor = investors[currentInvestorIndex]
+        const trimmed = textResponseInput.trim()
+        if (!investor) return
+        if (!trimmed) { setError('Please type your response'); return }
+        setIsAnalyzing(true); setIsSubmitting(true); setError('')
+        try {
+            const scorecard = await api.assessments.respondToInvestor(assessmentId, investor.id, trimmed)
+            setScorecards(prev => [...prev, scorecard])
+            setResponseTranscription(trimmed)
+            setCurrentInvestorReaction(scorecard.investorReaction || `${investor.name} has considered your response.`)
+            setResponseSubmitted(true)
+            setTextResponseInput('')
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit response')
+        } finally {
+            setIsAnalyzing(false); setIsSubmitting(false)
+        }
+    }
+
+    const handleNegotiateText = async () => {
+        if (!selectedOffer) return
+        const capital = parseFloat(textNegCapital)
+        const equity = parseFloat(textNegEquity)
+        if (!Number.isFinite(capital) || capital <= 0 || !Number.isFinite(equity) || equity <= 0) {
+            setError('Enter valid capital and equity values'); return
+        }
+        const nextRound = negRound + 1
+        if (nextRound > MAX_NEG_ROUNDS) { setError('Maximum rounds reached.'); return }
+        setIsNegVoiceSubmitting(true); setError('')
+        try {
+            const result = await api.assessments.counterNegotiate(assessmentId, selectedOffer.investorId, capital, equity)
+            const newHistory = [
+                ...negHistory,
+                { sender: 'You', msg: `Counter: $${capital} for ${equity}% equity`, type: 'user' as const },
+                { sender: selectedOffer.investorName, msg: result.message || 'Response received', type: 'investor' as const },
+            ]
+            setNegHistory(newHistory)
+            setNegRound(nextRound)
+            if (result.accepted) {
+                const finalCapital = result.capital || capital
+                const finalEquity = result.equity || equity
+                setAcceptedDealTerms({ capital: finalCapital, equity: finalEquity, investorName: selectedOffer.investorName })
+                try { await api.assessments.acceptDeal(assessmentId, selectedOffer.investorId, finalCapital, finalEquity) } catch { }
+                setDealFinalized(true)
+            } else {
+                setSelectedOffer({ ...selectedOffer, capital: result.capital ?? capital, equity: result.equity ?? equity })
+            }
+            setTextNegCapital(''); setTextNegEquity('')
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit counter-offer')
+        } finally {
+            setIsNegVoiceSubmitting(false)
+        }
+    }
+
+    const handleContinueFromPitch = () => {
+        resetPitchFollowupState()
+        setPhase('INVESTOR_QA')
+        setCurrentInvestorIndex(0)
+        setPitchAnalysis(null)
+    }
+
+    // ============================================
+    // INVESTOR RESPONSE (AUDIO) — with one follow-up per investor
+    // ============================================
+    const handleRespondToInvestorAudio = async () => {
+        if (!responseRecorder.audioBlob) {
+            setError('Please record your response')
             return
         }
 
         const investor = investors[currentInvestorIndex]
         if (!investor) return
 
+        setIsAnalyzing(true)
+        setIsSubmitting(true)
+        setError('')
+
+        const responseBlob = responseRecorder.audioBlob
+
+        try {
+            const result = await api.assessments.respondToInvestorAudio(
+                assessmentId,
+                investor.id,
+                responseBlob
+            )
+            setScorecards(prev => [...prev, result.scorecard])
+            setResponseTranscription(result.transcription)
+            setInitialTranscription(result.transcription)
+            setResponseSubmitted(true)
+            responseRecorder.resetRecording()
+
+            if (result.ttsError) {
+                console.warn("TTS Generation Warning:", result.ttsError)
+            }
+
+            try {
+                const followup = await api.assessments.generateInvestorFollowupAudio(
+                    assessmentId,
+                    investor.id,
+                    responseBlob
+                )
+                const question = followup.followup_question || followup.followupQuestion
+                if (question) {
+                    setFollowupQuestion(question)
+                    setFollowupPhase('followup_pending')
+                    if (followup.audioBase64) {
+                        if (audioRef.current) audioRef.current.pause()
+                        const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
+                        audioRef.current = audio
+                        audio.onplay = () => setIsPlayingAudio(true)
+                        audio.onended = () => setIsPlayingAudio(false)
+                        audio.onerror = () => setIsPlayingAudio(false)
+                        audio.play().catch(() => setIsPlayingAudio(false))
+                    }
+                    return
+                }
+            } catch (followupErr) {
+                console.warn('[war-room] follow-up generation failed, skipping', followupErr)
+            }
+
+            // No follow-up — show immediate reaction
+            setCurrentInvestorReaction(
+                result.scorecard.investorReaction || `${investor.name} has considered your response.`
+            )
+            if (result.audioBase64) {
+                if (audioRef.current) audioRef.current.pause()
+                const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audioRef.current = audio
+                audio.onplay = () => setIsPlayingAudio(true)
+                audio.onended = () => setIsPlayingAudio(false)
+                audio.onerror = () => setIsPlayingAudio(false)
+                audio.play().catch(() => setIsPlayingAudio(false))
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to analyze response')
+        } finally {
+            setIsAnalyzing(false)
+            setIsSubmitting(false)
+        }
+    }
+
+    // Submit response to the investor's follow-up question
+    const handleSubmitInvestorFollowupAudio = async () => {
+        if (!responseRecorder.audioBlob) {
+            setError('Please record your follow-up response')
+            return
+        }
+        const investor = investors[currentInvestorIndex]
+        if (!investor || !initialTranscription || !followupQuestion) {
+            setError('Follow-up context not ready')
+            return
+        }
+
+        setIsAnalyzing(true)
         setIsSubmitting(true)
         setError('')
 
         try {
-            const scorecard = await api.assessments.respondToInvestor(
+            const result = await api.assessments.respondToInvestorFinalAudio(
                 assessmentId,
                 investor.id,
-                investorResponse
+                initialTranscription,
+                followupQuestion,
+                responseRecorder.audioBlob
             )
-            setScorecards(prev => [...prev, scorecard])
             setCurrentInvestorReaction(
-                scorecard.investorReaction || `${investor.name} has considered your response.`
+                result.scorecard.investorReaction || `${investor.name} has considered your follow-up.`
             )
-            setInvestorResponse('')
+            setResponseTranscription(result.transcription)
+            setFollowupPhase('followup_answered')
+            responseRecorder.resetRecording()
+            if (result.audioBase64) {
+                if (audioRef.current) audioRef.current.pause()
+                const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audioRef.current = audio
+                audio.onplay = () => setIsPlayingAudio(true)
+                audio.onended = () => setIsPlayingAudio(false)
+                audio.onerror = () => setIsPlayingAudio(false)
+                audio.play().catch(() => setIsPlayingAudio(false))
+            }
         } catch (err: any) {
-            setError(err.message || 'Failed to submit response')
+            setError(err.message || 'Failed to submit follow-up response')
         } finally {
+            setIsAnalyzing(false)
             setIsSubmitting(false)
         }
     }
 
     // Move to next investor after viewing reaction
-    const handleContinueToNextInvestor = () => {
+    const handleContinueToNextInvestor = async () => {
+        if (audioRef.current) {
+            audioRef.current.pause()
+            setIsPlayingAudio(false)
+        }
         setCurrentInvestorReaction('')
+        setFollowupPhase('initial')
+        setFollowupQuestion('')
+        setInitialTranscription('')
         if (currentInvestorIndex < investors.length - 1) {
             setCurrentInvestorIndex(prev => prev + 1)
+            setResponseSubmitted(false)
+            setResponseTranscription('')
         } else {
+            try {
+                const fetchedOffers = await api.assessments.getWarRoomOffers(assessmentId)
+                setOffers(fetchedOffers)
+            } catch (err) {
+                console.error("Failed to fetch offers", err)
+            }
             setPhase('DEAL_RESULTS')
         }
     }
@@ -154,36 +767,84 @@ export default function WarRoomSimulation() {
     // ============================================
     // END SIMULATION
     // ============================================
-    const handleEndSimulation = () => {
+    const handleEndSimulation = async () => {
         if (timerRef.current) clearInterval(timerRef.current)
+        try {
+            await api.assessments.walkout(assessmentId as string)
+        } catch (e) {
+            console.error("Error completing simulation:", e)
+        }
         router.push(`/assessment/${assessmentId}/final-report`)
     }
 
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
+    const preparedPitch = getPreparedPitchFromState(assessmentState)
+
+    // Use the investor's voice filename directly so each question resolves to the
+    // correct speaker clip instead of a question-index placeholder.
+    const currentInvestorVoiceKey = normalizeVoiceSlug(currentInvestor?.name || '')
+    const currentInvestorAudioKeys = [
+        currentInvestorVoiceKey,
+        currentInvestor?.id,
+    ].filter(Boolean)
+
+    useEffect(() => {
+        if (preparedPitch && !pitchText) {
+            setPitchText(preparedPitch)
+        }
+    }, [preparedPitch, pitchText])
+
+    const resetPitchFollowupState = useCallback(() => {
+        setFollowupPhase('initial')
+        setFollowupQuestion('')
+        setInitialTranscription('')
+        setCurrentInvestorReaction('')
+        setResponseTranscription('')
+        setFeedbackResponseSubmitted(false)
+        setResponseSubmitted(false)
+        responseRecorder.resetRecording()
+    }, [responseRecorder])
+
+    // Auto-play investor question
+    useEffect(() => {
+        if (phase === 'INVESTOR_QA' && currentInvestor && !currentInvestorReaction && !isAnalyzing && !responseRecorder.isRecording) {
+            const questionKey = currentInvestorVoiceKey || currentInvestor.id
+            if (!hasAutoPlayed[questionKey]) {
+                const timeout = setTimeout(() => {
+                    const audioButton = document.querySelector('.investor-question button[title="Listen"]') as HTMLButtonElement
+                    if (audioButton && !audioButton.disabled) {
+                        audioButton.click()
+                        setHasAutoPlayed(prev => ({ ...prev, [questionKey]: true }))
+                    }
+                }, 800)
+                return () => clearTimeout(timeout)
+            }
+        }
+    }, [phase, currentInvestor, currentInvestorVoiceKey, currentInvestorReaction, isAnalyzing, responseRecorder.isRecording, hasAutoPlayed])
 
     // ============================================
     // RENDER
     // ============================================
     return (
-        <div className="warroom-page">
+        <div className="warroom-page warroom-shell">
+            <MicPermissionDialog
+                open={mic.needsPrompt && phase !== 'LOADING'}
+                onAllow={() => mic.grant()}
+                onUseText={() => mic.useText()}
+            />
             {/* Top Bar */}
             <header className="warroom-header">
                 <div className="header-left">
-                    <h1 className="warroom-title">⚔️ KK'S WAR ROOM</h1>
+                    <h1 className="warroom-title">War Room</h1>
                     <span className="warroom-subtitle">Live Investor Pitch Simulation</span>
                 </div>
                 <div className="header-center">
-                    {phase !== 'LOADING' && (
-                        <div className={`war-timer ${isTimeLow ? 'danger' : ''}`}>
-                            <span className="timer-label">WAR ROOM</span>
-                            <span className="timer-value">{formatTime(timeRemaining)}</span>
-                        </div>
-                    )}
+                    {/* timer removed */}
                 </div>
                 <div className="header-right">
                     <button className="end-btn" onClick={handleEndSimulation}>
-                        End Simulation →
+                        End Simulation
                     </button>
                 </div>
             </header>
@@ -193,741 +854,840 @@ export default function WarRoomSimulation() {
                 {/* LOADING */}
                 {/* ============================================ */}
                 {phase === 'LOADING' && (
-                    <div className="loading-container">
-                        <div className="loading-icon">⚔️</div>
-                        <h2 className="loading-text">ENTERING WAR ROOM</h2>
-                        <p className="loading-sub">Assembling Investor Panel...</p>
+                    <motion.div
+                        className="loading-container"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <motion.div
+                            className="loading-icon"
+                            animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                        >WR</motion.div>
+                        <motion.h2
+                            className="loading-text"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                        >ENTERING WAR ROOM</motion.h2>
+                        <motion.p
+                            className="loading-sub"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                        >Assembling Investor Panel...</motion.p>
                         <div className="loading-bar">
                             <div className="loading-bar-fill" />
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* ============================================ */}
-                {/* PITCH PHASE */}
+                {/* PITCH PHASE ΓÇö AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'PITCH' && (
-                    <div className="pitch-phase">
-                        <div className="phase-badge">PHASE 1 — YOUR PITCH</div>
-                        <h2 className="phase-title">Deliver Your 1-Minute War Room Pitch</h2>
-                        <p className="phase-desc">
-                            You are standing before the investor panel. Use the template below to craft a compelling pitch
-                            that demonstrates your journey, validation, and growth potential.
-                        </p>
+                    <motion.div
+                        className="pitch-phase"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 ΓÇö YOUR PITCH</motion.div>
+                        <motion.h2 className="phase-title" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                            Record Your 1-Minute War Room Pitch
+                        </motion.h2>
+                        <motion.p className="phase-desc" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+                            You are standing before the investor panel. Tap the microphone and deliver your pitch out loud.
+                            You have <strong>60 seconds</strong> to make your case.
+                        </motion.p>
 
-                        <div className="pitch-template">
-                            <h3>📝 Pitch Template</h3>
-                            <div className="template-text">
-                                <p>Hello Sharks, my name is <strong>[NAME]</strong> and I am the founder of <strong>[BUSINESS]</strong>.</p>
-                                <p><em>(The Problem)</em> Today, [TARGET CUSTOMER] struggles with [PROBLEM]. This problem causes them [IMPACT].</p>
-                                <p><em>(The Solution)</em> I created [PRODUCT], which [VALUE PROP]. It works by [HOW].</p>
-                                <p><em>(Why We're Different)</em> Unlike [COMPETITORS], we [DIFFERENTIATION].</p>
-                                <p><em>(Proof)</em> We validated this by [VALIDATION]. So far, we have [TRACTION].</p>
-                                <p><em>(Founder Fit)</em> I am building this because [WHY ME]. The key lesson I've learned is [LESSON].</p>
-                                <p><em>(The Ask)</em> We are raising $[AMOUNT] for [EQUITY]% equity. We will use this capital to [PLAN].</p>
+                        {/* Pitch Template - Collapsible */}
+                        <motion.details className="pitch-template" open={!!preparedPitch} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                            <summary className="pitch-template-summary">{preparedPitch ? 'Your prepared War Room pitch' : 'Pitch Template Guide (tap to expand)'}</summary>
+                            <div className="template-text" style={{ marginTop: '0.8rem' }}>
+                                {preparedPitch ? (
+                                    <>
+                                        <p className="template-helper-label">Using your saved War Room prep pitch:</p>
+                                        <pre className="template-user-pitch" style={{ whiteSpace: 'pre-wrap' }}>{preparedPitch}</pre>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>Hello Sharks, my name is <strong>[NAME]</strong> and I am the founder of <strong>[BUSINESS]</strong>.</p>
+                                        <p><em>(The Problem)</em> Today, [TARGET CUSTOMER] struggles with [PROBLEM].</p>
+                                        <p><em>(The Solution)</em> I created [PRODUCT], which [VALUE PROP].</p>
+                                        <p><em>(Why Different)</em> Unlike [COMPETITORS], we [DIFFERENTIATION].</p>
+                                        <p><em>(Proof)</em> We validated this by [VALIDATION]. So far, [TRACTION].</p>
+                                        <p><em>(The Ask)</em> We are raising $[AMOUNT] for [EQUITY]% equity.</p>
+                                    </>
+                                )}
                             </div>
-                        </div>
+                        </motion.details>
 
-                        <textarea
-                            className="pitch-input"
-                            value={pitchText}
-                            onChange={(e) => setPitchText(e.target.value)}
-                            placeholder="Hello Sharks, my name is..."
-                            rows={12}
-                        />
+                        {/* Text fallback when mic permission was declined */}
+                        {!pitchAnalysis && !isAnalyzing && mic.isText && (
+                            <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                                <textarea
+                                    value={textPitchInput}
+                                    onChange={(e) => setTextPitchInput(e.target.value)}
+                                    placeholder="Type your 60-second pitch here..."
+                                    rows={6}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
+                                />
+                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                                    <button onClick={handleSubmitPitchText} disabled={isSubmitting} className="respond-btn" style={{ flex: 1 }}>
+                                        {isSubmitting ? 'Submitting...' : 'Submit Pitch (Text)'}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Recording UI */}
+                        {!pitchAnalysis && !isAnalyzing && !mic.isText && (
+                            <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                                <div className={`mic-button-wrapper ${pitchRecorder.isRecording ? 'recording' : ''}`}>
+                                    {pitchRecorder.isRecording && (
+                                        <>
+                                            <div className="pulse-ring ring-1" />
+                                            <div className="pulse-ring ring-2" />
+                                            <div className="pulse-ring ring-3" />
+                                        </>
+                                    )}
+                                    <motion.button
+                                        className={`mic-button ${pitchRecorder.isRecording ? 'active' : ''} ${pitchRecorder.audioBlob ? 'done' : ''}`}
+                                        onClick={pitchRecorder.isRecording ? pitchRecorder.stopRecording : pitchRecorder.startRecording}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        {pitchRecorder.isRecording ? 'Stop Recording' : pitchRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                    </motion.button>
+                                </div>
+
+                                <div className="recording-status">
+                                    {pitchRecorder.isRecording ? (
+                                        <>
+                                            <span className="rec-dot" />
+                                            <span className="rec-text">Recording... {Math.max(0, 60 - pitchRecorder.recordingTime)}s left</span>
+                                        </>
+                                    ) : pitchRecorder.audioBlob ? (
+                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) ΓÇö Select Record Again to re-record</span>
+                                    ) : (
+                                        <span className="rec-hint">Select Start Recording to begin your pitch</span>
+                                    )}
+                                </div>
+
+                                {/* Countdown bar */}
+                                {pitchRecorder.isRecording && (
+                                    <div className="countdown-bar">
+                                        <div className="countdown-fill" style={{ width: `${Math.max(0, ((60 - pitchRecorder.recordingTime) / 60) * 100)}%` }} />
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* Analyzing state */}
+                        {isAnalyzing && (
+                            <motion.div className="analyzing-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="analyzing-spinner" />
+                                <h3>Analyzing Your Pitch...</h3>
+                                <p>Our AI panel is reviewing your delivery, content, and persuasiveness.</p>
+                            </motion.div>
+                        )}
+
+                        {/* Pitch Analysis Results */}
+                        {pitchAnalysis && (
+                            <motion.div className="analysis-panel" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                                <h3 className="analysis-title">Pitch Analysis</h3>
+                                <div className="analysis-scores">
+                                    <div className="score-item"><span className="score-label">Overall</span><span className="score-value">{pitchAnalysis.overallScore}/10</span></div>
+                                    <div className="score-item"><span className="score-label">Clarity</span><span className="score-value">{pitchAnalysis.clarity}/5</span></div>
+                                    <div className="score-item"><span className="score-label">Confidence</span><span className="score-value">{pitchAnalysis.confidence}/5</span></div>
+                                    <div className="score-item"><span className="score-label">Persuasion</span><span className="score-value">{pitchAnalysis.persuasion}/5</span></div>
+                                </div>
+                                <div className="analysis-transcript">
+                                    <span className="analysis-label">What you said:</span>
+                                    <p>{pitchAnalysis.transcription}</p>
+                                </div>
+                                
+                                {pitchAnalysis.strengths?.length > 0 && (
+                                    <div className="analysis-list strengths">
+                                        <span className="analysis-label">Strengths:</span>
+                                        <ul>{pitchAnalysis.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
+                                    </div>
+                                )}
+                                {pitchAnalysis.weaknesses?.length > 0 && (
+                                    <div className="analysis-list weaknesses">
+                                        <span className="analysis-label">Areas to Improve:</span>
+                                        <ul>{pitchAnalysis.weaknesses.map((w, i) => <li key={i}>{w}</li>)}</ul>
+                                    </div>
+                                )}
+
+                                {/* INVESTOR REACTION TO PITCH */}
+                                <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                                    <h4 style={{ color: '#60a5fa', marginBottom: '0.5rem', fontSize: '0.95rem' }}>{investors[0]?.name || 'Lead Investor'} Reaction:</h4>
+                                    <p style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>"{pitchAnalysis.feedback}"</p>
+                                </div>
+
+                                {/* Pitch follow-up block removed — follow-ups now live in the Investor Q&A phase. */}
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    <motion.button 
+                                        className="submit-pitch-btn" 
+                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        onClick={() => {
+                                            setPitchAnalysis(null);
+                                            resetPitchFollowupState();
+                                            pitchRecorder.resetRecording();
+                                            setError('');
+                                        }}
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        Retry Pitch
+                                    </motion.button>
+                                    <motion.button 
+                                        className="submit-pitch-btn" 
+                                        style={{ flex: 2, ...(!feedbackResponseSubmitted && !error ? { opacity: 0.5 } : {}) }}
+                                        onClick={handleContinueFromPitch} 
+                                        disabled={!feedbackResponseSubmitted && !error}
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        {feedbackResponseSubmitted
+                                            ? 'Continue to Investor Questions'
+                                            : error
+                                                ? 'Skip to Investor Q&A →'
+                                                : 'Answer the follow-up first'}
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        )}
 
                         {error && <div className="error-msg">{error}</div>}
 
-                        <button
-                            className="submit-pitch-btn"
-                            onClick={handleSubmitPitch}
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? 'Submitting Pitch...' : '🎤 Deliver Pitch to Panel →'}
-                        </button>
-                    </div>
+                        {!pitchAnalysis && !isAnalyzing && pitchRecorder.audioBlob && (
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <motion.button
+                                    className="submit-pitch-btn"
+                                    style={{ flex: 1 }}
+                                    onClick={handleSubmitPitchAudio}
+                                    disabled={isSubmitting || isAnalyzing}
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
+                                >
+                                    {isSubmitting || isAnalyzing ? 'Analyzing Pitch...' : 'Submit Pitch for Analysis'}
+                                </motion.button>
+                            </div>
+                        )}
+                    </motion.div>
                 )}
 
                 {/* ============================================ */}
-                {/* INVESTOR Q&A PHASE */}
+                {/* INVESTOR Q&A PHASE ΓÇö AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'INVESTOR_QA' && currentInvestor && (
-                    <div className="investor-qa-phase">
-                        <div className="phase-badge">PHASE 2 — INVESTOR QUESTIONS</div>
-                        <div className="investor-counter">
-                            Investor {currentInvestorIndex + 1} of {investors.length}
-                        </div>
+                    <motion.div className="investor-qa-phase" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                        <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 ΓÇö INVESTOR QUESTIONS</motion.div>
+                        <div className="investor-counter">Investor {currentInvestorIndex + 1} of {investors.length}</div>
 
                         {/* Investor Card */}
-                        <div className="investor-card">
-                            <div className="investor-avatar">
-                                {currentInvestor.name.charAt(0)}
-                            </div>
-                            <div className="investor-info">
-                                <h2 className="investor-name">{currentInvestor.name}</h2>
-                                <span className="investor-lens">{currentInvestor.primary_lens}</span>
-                                <p className="investor-bio">{currentInvestor.bio}</p>
-                            </div>
-                        </div>
+                        <AnimatePresence mode="wait">
+                            <motion.div key={currentInvestor.id || currentInvestorIndex} className="investor-card" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }} transition={{ duration: 0.4 }}>
+                                <motion.div className="investor-avatar" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}>
+                                    {currentInvestor.name.charAt(0)}
+                                </motion.div>
+                                <div className="investor-info">
+                                    <h2 className="investor-name">{currentInvestor.name}</h2>
+                                    <span className="investor-lens">{currentInvestor.primary_lens}</span>
+                                    <p className="investor-bio">{currentInvestor.bio}</p>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
 
-                        {/* Investor's signature question */}
-                        <div className="investor-question">
-                            <span className="question-label">🎯 {currentInvestor.name} asks:</span>
+                        {/* Question */}
+                        <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+                            <div className="flex items-center justify-between">
+                                <span className="question-label">{currentInvestor.name} asks:</span>
+                                <QuestionAudioPlayer audioKeys={currentInvestorAudioKeys} />
+                            </div>
                             <p className="question-text">{currentInvestor.signature_question}</p>
-                        </div>
+                        </motion.div>
+
+                        {/* Follow-up Section */}
+                        <AnimatePresence>
+                        {followupPhase === 'followup_pending' && (
+                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}>
+                                <div className="analysis-transcript" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                                    <span className="analysis-label">Your initial response:</span>
+                                    <p>{initialTranscription}</p>
+                                </div>
+                                <div className="investor-question followup-question" style={{ borderColor: '#f59e0b', backgroundColor: '#fdfbeb11' }}>
+                                    <span className="question-label" style={{ color: '#f59e0b' }}>
+                                        Follow-up Question:
+                                        {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', fontWeight: 'normal' }}>Playing...</span>}
+                                    </span>
+                                    <p className="question-text">{followupQuestion}</p>
+                                </div>
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
 
                         {/* Investor Reaction (after response) */}
+                        <AnimatePresence>
                         {currentInvestorReaction && (
-                            <>
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                                {responseTranscription && (
+                                    <div className="analysis-transcript" style={{ marginBottom: '1rem' }}>
+                                        <span className="analysis-label">What you said:</span>
+                                        <p>{responseTranscription}</p>
+                                    </div>
+                                )}
                                 <div className="investor-reaction">
-                                    <span className="reaction-label">💬 {currentInvestor.name} responds:</span>
+                                    <span className="reaction-label">
+                                        {currentInvestor.name} responds:
+                                        {isPlayingAudio && <span style={{ marginLeft: '10px', fontSize: '0.85em', color: '#10b981', fontWeight: 'normal' }}>Playing...</span>}
+                                    </span>
                                     <p>{currentInvestorReaction}</p>
                                 </div>
-                                <button
-                                    className="respond-btn"
-                                    onClick={handleContinueToNextInvestor}
-                                >
-                                    {currentInvestorIndex < investors.length - 1
-                                        ? `Continue to Next Investor →`
-                                        : `View Panel Decisions →`}
-                                </button>
-                            </>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    <motion.button 
+                                        className="respond-btn" 
+                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        onClick={() => {
+                                            setCurrentInvestorReaction('');
+                                            setResponseTranscription('');
+                                            responseRecorder.resetRecording();
+                                        }}
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        Retry Response
+                                    </motion.button>
+                                    <motion.button 
+                                        className="respond-btn" 
+                                        style={{ flex: 2 }}
+                                        onClick={handleContinueToNextInvestor} 
+                                        whileHover={{ scale: 1.03 }} 
+                                        whileTap={{ scale: 0.97 }}
+                                    >
+                                        {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor` : `View Panel Decisions`}
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
+
+                        {/* Text fallback for Q&A response */}
+                        {!currentInvestorReaction && !isAnalyzing && mic.isText && followupPhase !== 'followup_pending' && (
+                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+                                <div className="recording-zone" style={{ marginBottom: '1rem' }}>
+                                    <textarea
+                                        value={textResponseInput}
+                                        onChange={(e) => setTextResponseInput(e.target.value)}
+                                        placeholder={`Type your answer to ${currentInvestor.name}...`}
+                                        rows={5}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
+                                    />
+                                    <button
+                                        onClick={handleRespondToInvestorText}
+                                        disabled={isSubmitting || isAnalyzing || responseSubmitted}
+                                        className="respond-btn"
+                                        style={{ marginTop: '0.75rem', width: '100%' }}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Response (Text)'}
+                                    </button>
+                                </div>
+                            </motion.div>
                         )}
 
-                        {/* Walk-out warning */}
-                        <div className="walkout-warning">
-                            <span>🚨 Walk-out trigger:</span> {currentInvestor.walk_out_trigger}
-                        </div>
-
-                        {/* User response */}
-                        {!currentInvestorReaction && (
-                            <>
-                                <textarea
-                                    className="response-input"
-                                    value={investorResponse}
-                                    onChange={(e) => setInvestorResponse(e.target.value)}
-                                    placeholder="Respond to the investor's question..."
-                                    rows={5}
-                                />
+                        {/* Audio Recording for Response */}
+                        {!currentInvestorReaction && !isAnalyzing && !mic.isText && (
+                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+                                <div className="recording-zone" style={{ marginBottom: '1rem' }}>
+                                    <div className={`mic-button-wrapper ${responseRecorder.isRecording ? 'recording' : ''}`}>
+                                        {responseRecorder.isRecording && (
+                                            <>
+                                                <div className="pulse-ring ring-1" />
+                                                <div className="pulse-ring ring-2" />
+                                                <div className="pulse-ring ring-3" />
+                                            </>
+                                        )}
+                                         <motion.button
+                                             className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
+                                             onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
+                                             disabled={(responseSubmitted && followupPhase !== 'followup_pending') || isSubmitting || isAnalyzing}
+                                             whileHover={{ scale: 1.05 }}
+                                             whileTap={{ scale: 0.95 }}
+                                         >
+                                             {responseSubmitted && followupPhase !== 'followup_pending'
+                                                 ? 'Response Submitted'
+                                                 : responseRecorder.isRecording
+                                                     ? 'Stop Recording'
+                                                     : responseRecorder.audioBlob
+                                                         ? 'Record Again'
+                                                         : followupPhase === 'followup_pending'
+                                                             ? 'Record Follow-up'
+                                                             : 'Start Recording'}
+                                         </motion.button>
+                                    </div>
+                                    <div className="recording-status">
+                                        {responseSubmitted && followupPhase !== 'followup_pending' ? (
+                                            <span className="rec-done">Response submitted. You cannot submit another response for this investor.</span>
+                                        ) : responseRecorder.isRecording ? (
+                                            <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 30 - responseRecorder.recordingTime)}s left</span></>
+                                        ) : responseRecorder.audioBlob ? (
+                                            <span className="rec-done">Response recorded ({responseRecorder.recordingTime}s)</span>
+                                        ) : (
+                                            <span className="rec-hint">Select Start Recording to record your response (15s max)</span>
+                                        )}
+                                    </div>
+                                    {responseRecorder.isRecording && (
+                                        <div className="countdown-bar"><div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - responseRecorder.recordingTime) / 15) * 100)}%` }} /></div>
+                                    )}
+                                </div>
 
                                 {error && <div className="error-msg">{error}</div>}
 
-                                <button
-                                    className="respond-btn"
-                                    onClick={handleRespondToInvestor}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Evaluating Response...' : 'Submit Response →'}
-                                </button>
-                            </>
+                                {responseRecorder.audioBlob && (followupPhase === 'followup_pending' || !responseSubmitted) && (
+                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                        <motion.button
+                                            className="respond-btn"
+                                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                            onClick={() => responseRecorder.resetRecording()}
+                                            disabled={isSubmitting || isAnalyzing}
+                                            whileHover={{ scale: 1.03 }}
+                                            whileTap={{ scale: 0.97 }}
+                                        >
+                                            Discard Recording
+                                        </motion.button>
+                                        <motion.button
+                                            className="respond-btn"
+                                            style={{ flex: 2 }}
+                                            onClick={followupPhase === 'followup_pending' ? handleSubmitInvestorFollowupAudio : handleRespondToInvestorAudio}
+                                            disabled={isSubmitting || isAnalyzing}
+                                            whileHover={{ scale: 1.03 }}
+                                            whileTap={{ scale: 0.97 }}
+                                        >
+                                            {isSubmitting || isAnalyzing
+                                                ? 'Analyzing Response...'
+                                                : followupPhase === 'followup_pending'
+                                                    ? 'Submit Follow-up'
+                                                    : 'Submit Response'}
+                                        </motion.button>
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
-                    </div>
+
+                        {/* Analyzing state */}
+                        {isAnalyzing && (
+                            <motion.div className="analyzing-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="analyzing-spinner" />
+                                <h3>Analyzing Your Response...</h3>
+                                <p>{currentInvestor.name} is evaluating your answer.</p>
+                            </motion.div>
+                        )}
+                    </motion.div>
                 )}
 
                 {/* ============================================ */}
-                {/* DEAL RESULTS */}
+                {/* DEAL RESULTS / NEGOTIATION */}
                 {/* ============================================ */}
                 {phase === 'DEAL_RESULTS' && (
-                    <div className="deal-results-phase">
-                        <div className="phase-badge">PHASE 3 — PANEL DECISIONS</div>
-                        <h2 className="phase-title">Investor Panel Results</h2>
+                    <motion.div
+                        className="deal-results-phase"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <motion.div
+                            className="phase-badge"
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring' }}
+                        >PHASE 3 ΓÇö INVESTOR OFFERS</motion.div>
+                        <motion.h2
+                            className="phase-title"
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            {dealFinalized ? "Deal Finalized!" : selectedOffer ? "Negotiation Room" : "Investor Panel Results"}
+                        </motion.h2>
 
-                        <div className="scorecards-grid">
-                            {scorecards.map((sc, i) => {
-                                const decisionColor = sc.dealDecision === 'PRIORITY_1'
-                                    ? '#10b981'
-                                    : sc.dealDecision === 'PRIORITY_2'
-                                        ? '#f59e0b'
-                                        : '#ef4444'
-                                const decisionLabel = sc.dealDecision === 'PRIORITY_1'
-                                    ? '🔥 PRIORITY 1 — DEAL'
-                                    : sc.dealDecision === 'PRIORITY_2'
-                                        ? '⚖️ PRIORITY 2 — DEAL'
-                                        : '❌ WALK OUT'
-
-                                return (
-                                    <div key={i} className="scorecard" style={{ borderColor: `${decisionColor}44` }}>
+                        {!selectedOffer && !dealFinalized && (
+                            <div className="scorecards-grid">
+                                {offers.map((offer, i) => (
+                                    <motion.div
+                                        key={i}
+                                        className="scorecard"
+                                        style={{ borderColor: '#10b98144', cursor: 'pointer' }}
+                                        initial={{ opacity: 0, y: 30, rotateX: -10 }}
+                                        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                        transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+                                        onClick={() => handleSelectOffer(offer)}
+                                    >
                                         <div className="sc-header">
-                                            <div className="sc-avatar" style={{ borderColor: decisionColor }}>
-                                                {sc.investorName.charAt(0)}
-                                            </div>
+                                            <motion.div
+                                                className="sc-avatar"
+                                                style={{ borderColor: '#10b981' }}
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{ delay: 0.5 + i * 0.15, type: 'spring', stiffness: 300 }}
+                                            >
+                                                {offer.investorName.charAt(0)}
+                                            </motion.div>
                                             <div>
-                                                <h3 className="sc-name">{sc.investorName}</h3>
-                                                <span className="sc-decision" style={{ color: decisionColor }}>
-                                                    {decisionLabel}
+                                                <h3 className="sc-name">{offer.investorName}</h3>
+                                                <span className="sc-decision" style={{ color: '#10b981' }}>
+                                                    OFFER RECEIVED
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="sc-scores">
-                                            <div className="sc-score">
-                                                <span>Primary Score</span>
-                                                <strong>{sc.primaryScore}/5</strong>
-                                            </div>
-                                            <div className="sc-score">
-                                                <span>{sc.biasTraitName}</span>
-                                                <strong>{sc.biasTraitScore}/5</strong>
-                                            </div>
+                                        <div className="sc-deal">
+                                            <span>Offer: ${(offer.capital || 0).toLocaleString()}</span>
+                                            <span>For {offer.equity}% equity</span>
                                         </div>
-                                        {sc.redFlag && (
-                                            <div className="sc-redflag">
-                                                🚩 Red Flag: {sc.redFlagReasons?.join(', ')}
-                                            </div>
-                                        )}
-                                        {sc.dealProposed && sc.dealDecision !== 'WALK_OUT' && (
-                                            <div className="sc-deal">
-                                                <span>💰 Offer: ${sc.dealProposed.capitalOffer?.toLocaleString()}</span>
-                                                <span>📊 For {sc.dealProposed.equityAsk}% equity</span>
-                                            </div>
-                                        )}
-                                        {sc.participantResponse && (
-                                            <div className="sc-user-response">
-                                                <span className="sc-label">Your Response:</span>
-                                                <p>{sc.participantResponse}</p>
-                                            </div>
-                                        )}
-                                        {sc.investorReaction && (
-                                            <div className="sc-investor-reaction">
-                                                <span className="sc-label">💬 Investor Reaction:</span>
-                                                <p>{sc.investorReaction}</p>
-                                            </div>
-                                        )}
+                                        <div className="sc-investor-reaction">
+                                            <p>"{offer.message}"</p>
+                                        </div>
+                                        <div style={{ marginTop: '1rem', textAlign: 'center', color: '#10b981', fontWeight: 'bold' }}>
+                                            Click to Negotiate ΓåÆ
+                                        </div>
+                                    </motion.div>
+                                ))}
+                                {offers.length === 0 && (
+                                    <div className="no-scorecards">
+                                        <p>No investor offers available.</p>
                                     </div>
-                                )
-                            })}
-                        </div>
-
-                        {scorecards.length === 0 && (
-                            <div className="no-scorecards">
-                                <p>No investor decisions available yet.</p>
+                                )}
                             </div>
                         )}
 
-                        <button className="final-report-btn" onClick={handleEndSimulation}>
-                            View Full Evaluation Report →
-                        </button>
-                    </div>
+                        {selectedOffer && !dealFinalized && (
+                            <motion.div
+                                className="negotiation-room"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <div className="neg-header" style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <h3>Negotiating with {selectedOffer.investorName}</h3>
+                                        <div style={{
+                                            padding: '0.3rem 0.8rem',
+                                            borderRadius: '20px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 700,
+                                            letterSpacing: '1px',
+                                            background: negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                                            color: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#60a5fa',
+                                            border: `1px solid ${negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`,
+                                        }}>
+                                            ROUND {Math.min(negRound + 1, MAX_NEG_ROUNDS)} / {MAX_NEG_ROUNDS}
+                                        </div>
+                                    </div>
+                                    <p>Current Offer: ${selectedOffer.capital.toLocaleString()} for {selectedOffer.equity}%</p>
+                                </div>
+
+                                <div className="neg-history" style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {negHistory.map((item, idx) => (
+                                        <div key={idx} style={{ 
+                                            padding: '1rem', 
+                                            borderRadius: '12px', 
+                                            background: item.type === 'user' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                            alignSelf: item.type === 'user' ? 'flex-end' : 'flex-start',
+                                            maxWidth: '80%'
+                                        }}>
+                                            <strong style={{ display: 'block', marginBottom: '0.3rem', color: item.type === 'user' ? '#60a5fa' : '#34d399' }}>{item.sender}</strong>
+                                            {item.msg}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Voice instruction banner */}
+                                {negRound < MAX_NEG_ROUNDS && (
+                                    <div style={{
+                                        padding: '0.8rem 1.2rem',
+                                        borderRadius: '12px',
+                                        marginBottom: '1rem',
+                                        background: negRound >= MAX_NEG_ROUNDS - 1
+                                            ? 'rgba(239, 68, 68, 0.08)'
+                                            : 'rgba(59, 130, 246, 0.08)',
+                                        border: `1px solid ${negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}`,
+                                    }}>
+                                        {negRound >= MAX_NEG_ROUNDS - 1 ? (
+                                            <p style={{ fontSize: '0.85rem', color: '#f87171', fontWeight: 600, margin: 0 }}>
+                                                <strong>Final Round!</strong> Say <em>"I accept this deal"</em> to secure it, or <em>"I walk away"</em> to reject.
+                                            </p>
+                                        ) : (
+                                            <p style={{ fontSize: '0.85rem', color: '#93c5fd', margin: 0 }}>
+                                                Speak your counter-offer, or say <em>"I accept"</em> / <em>"I walk away"</em> to finalize.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="neg-controls" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem', width: '100%' }}>
+                                    {mic.isText && negRound < MAX_NEG_ROUNDS && (
+                                        <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', marginBottom: '1rem' }}>
+                                            <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '0.75rem' }}>
+                                                Enter your counter offer (capital in $ and equity %).
+                                            </p>
+                                            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                                <input
+                                                    type="number"
+                                                    placeholder="Capital ($)"
+                                                    value={textNegCapital}
+                                                    onChange={(e) => setTextNegCapital(e.target.value)}
+                                                    style={{ flex: 2, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    placeholder="Equity (%)"
+                                                    value={textNegEquity}
+                                                    onChange={(e) => setTextNegEquity(e.target.value)}
+                                                    style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleNegotiateText}
+                                                disabled={isNegVoiceSubmitting}
+                                                className="respond-btn"
+                                                style={{ width: '100%' }}
+                                            >
+                                                {isNegVoiceSubmitting ? 'Submitting...' : 'Submit Counter (Text)'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!mic.isText && (
+                                    <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                                        <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
+                                            {negRound >= MAX_NEG_ROUNDS - 1
+                                                ? 'This is your final round ΓÇö say "I accept this deal" or "I walk away"'
+                                                : 'Speak your counter offer (e.g., "I\'d like $1.2M for 25% equity because...")'
+                                            }
+                                        </p>
+
+                                        <div className={`mic-button-wrapper ${negotiationRecorder.isRecording ? 'recording' : ''}`}>
+                                            {negotiationRecorder.isRecording && (
+                                                <>
+                                                    <div className="pulse-ring ring-1" />
+                                                    <div className="pulse-ring ring-2" />
+                                                    <div className="pulse-ring ring-3" />
+                                                </>
+                                            )}
+                                            <motion.button 
+                                                className={`mic-button ${negotiationRecorder.isRecording ? 'active' : ''} ${negotiationRecorder.audioBlob ? 'done' : ''}`}
+                                                onClick={negotiationRecorder.isRecording ? negotiationRecorder.stopRecording : negotiationRecorder.startRecording}
+                                                disabled={isNegVoiceSubmitting || negRound >= MAX_NEG_ROUNDS}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                {negotiationRecorder.isRecording ? 'Stop Recording' : negotiationRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                            </motion.button>
+                                        </div>
+
+                                        {negotiationRecorder.isRecording ? (
+                                            <div className="recording-status">
+                                                <div className="rec-dot" />
+                                                <span className="rec-text">RECORDING... {Math.max(0, 15 - negotiationRecorder.recordingTime)}s</span>
+                                            </div>
+                                        ) : negotiationRecorder.audioBlob ? (
+                                            <div className="recording-status">
+                                                <span className="rec-done">Response recorded ({negotiationRecorder.recordingTime}s)</span>
+                                            </div>
+                                        ) : negRound >= MAX_NEG_ROUNDS ? (
+                                            <div className="recording-status">
+                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted ΓÇö offer expired</span>
+                                            </div>
+                                        ) : (
+                                            <div className="recording-status">
+                                                <span className="rec-hint">Select Start Recording to record your response (15s max)</span>
+                                            </div>
+                                        )}
+
+                                        {negotiationRecorder.isRecording && (
+                                            <div className="countdown-bar">
+                                                <div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - negotiationRecorder.recordingTime) / 15) * 100)}%` }} />
+                                            </div>
+                                        )}
+
+                                        {negotiationRecorder.audioBlob && !negotiationRecorder.isRecording && negRound < MAX_NEG_ROUNDS && (
+                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                                <motion.button 
+                                                    className="respond-btn" 
+                                                    style={{ flex: 1, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                                    onClick={() => negotiationRecorder.resetRecording()} 
+                                                    disabled={isNegVoiceSubmitting}
+                                                    initial={{ scale: 0.9, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    whileHover={{ scale: 1.02 }} 
+                                                    whileTap={{ scale: 0.98 }}
+                                                >
+                                                    Discard Recording
+                                                </motion.button>
+                                                <motion.button 
+                                                    className="respond-btn" 
+                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#3b82f6' }}
+                                                    onClick={handleNegotiateAudio} 
+                                                    disabled={isNegVoiceSubmitting}
+                                                    initial={{ scale: 0.9, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    whileHover={{ scale: 1.02 }} 
+                                                    whileTap={{ scale: 0.98 }}
+                                                >
+                                                    {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Decision' : 'Submit Voice Counter'}
+                                                </motion.button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    )}
+
+                                    {/* Walk Away Button */}
+                                    <motion.button
+                                        className="respond-btn"
+                                        style={{ 
+                                            background: 'transparent', 
+                                            border: '1px solid rgba(239,68,68,0.4)', 
+                                            color: '#f87171',
+                                            fontSize: '0.85rem',
+                                            padding: '0.6rem 1.2rem',
+                                        }}
+                                        onClick={handleRejectDeal}
+                                        disabled={isNegVoiceSubmitting}
+                                        whileHover={{ scale: 1.02, borderColor: 'rgba(239,68,68,0.8)' }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        Walk Away from This Offer
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {walkedAwayInvestor && !dealFinalized && !selectedOffer && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                style={{ textAlign: 'center', padding: '2rem', background: 'rgba(239,68,68,0.1)', borderRadius: '16px', border: '1px solid rgba(239,68,68,0.3)', marginBottom: '1.5rem' }}
+                            >
+                                <h3 style={{ fontSize: '1.5rem', color: '#f87171', marginBottom: '0.5rem' }}>Walked Away</h3>
+                                <p style={{ color: '#fca5a5', fontSize: '1rem' }}>You walked away from <strong>{walkedAwayInvestor}</strong>&apos;s offer.</p>
+                                <p style={{ color: '#a1a1aa', fontSize: '0.85rem', marginTop: '0.5rem' }}>Select another offer to continue negotiating, or walk away from all offers.</p>
+                            </motion.div>
+                        )}
+
+                        {dealFinalized && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                style={{ textAlign: 'center', padding: '3rem', background: 'rgba(16,185,129,0.1)', borderRadius: '16px', border: '1px solid #10b981', position: 'relative', overflow: 'hidden' }}
+                            >
+                                <h2 style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '1.5rem', fontWeight: 'bold' }}>Deal Secured!</h2>
+                                <div style={{ fontSize: '1.2rem', marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '12px' }}>
+                                    <p style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Congratulations! You finalized a deal with <strong style={{ color: 'white' }}>{acceptedDealTerms?.investorName || selectedOffer?.investorName}</strong>.</p>
+                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem' }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.9rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '1px' }}>Investment</div>
+                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#34d399' }}>${(acceptedDealTerms?.capital || selectedOffer?.capital || 0).toLocaleString()}</div>
+                                        </div>
+                                        <div style={{ width: '1px', background: 'rgba(255,255,255,0.2)' }}></div>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.9rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '1px' }}>Equity</div>
+                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#60a5fa' }}>{acceptedDealTerms?.equity || selectedOffer?.equity}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button className="final-report-btn" onClick={handleEndSimulation} style={{ position: 'relative', zIndex: 10 }}>
+                                    Complete Simulation and View Report
+                                </button>
+                            </motion.div>
+                        )}
+
+                        {!selectedOffer && !dealFinalized && (
+                            <motion.button
+                                className="final-report-btn"
+                                onClick={handleEndSimulation}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 + offers.length * 0.15 }}
+                                style={{ marginTop: '2rem' }}
+                            >
+                                Walk Away from All Offers
+                            </motion.button>
+                        )}
+                    </motion.div>
                 )}
             </main>
 
             <style jsx>{`
-        .warroom-page {
-          min-height: 100vh;
-          background: #0a0a0a;
-          color: #e0e0e0;
-          font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-        }
+                .warroom-shell {
+                    position: relative;
+                    min-height: 100vh;
+                    background:
+                        radial-gradient(circle at top, rgba(239,68,68,0.12), transparent 40%),
+                        linear-gradient(180deg, #000 0%, #050505 55%, #101010 100%);
+                    color: #f5f5f5;
+                    overflow: hidden;
+                }
 
-        /* HEADER */
-        .warroom-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem 2rem;
-          border-bottom: 1px solid rgba(220, 38, 38, 0.2);
-          background: rgba(10, 10, 10, 0.95);
-          backdrop-filter: blur(12px);
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-        .header-left { display: flex; align-items: center; gap: 1rem; }
-        .warroom-title {
-          font-size: 1.3rem;
-          font-weight: 900;
-          color: #dc2626;
-          letter-spacing: 1px;
-          margin: 0;
-        }
-        .warroom-subtitle {
-          font-size: 0.8rem;
-          color: #6b7280;
-        }
-        .war-timer {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.1rem;
-          background: rgba(220, 38, 38, 0.08);
-          border: 1px solid rgba(220, 38, 38, 0.2);
-          padding: 0.4rem 1.4rem;
-          border-radius: 10px;
-        }
-        .war-timer.danger {
-          animation: pulse-danger 1.5s infinite;
-          border-color: #ef4444;
-        }
-        @keyframes pulse-danger {
-          0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
-          50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
-          100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
-        }
-        .timer-label {
-          font-size: 0.6rem;
-          font-weight: 700;
-          letter-spacing: 2px;
-          color: #9ca3af;
-          text-transform: uppercase;
-        }
-        .timer-value {
-          font-size: 1.4rem;
-          font-weight: 900;
-          font-family: monospace;
-          color: #ef4444;
-          letter-spacing: 2px;
-        }
-        .end-btn {
-          padding: 0.5rem 1.2rem;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #9ca3af;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 0.85rem;
-          transition: all 0.2s;
-        }
-        .end-btn:hover {
-          border-color: #dc2626;
-          color: white;
-        }
+                .warroom-shell::before {
+                    content: '';
+                    position: fixed;
+                    inset: 0;
+                    pointer-events: none;
+                    border: 2px solid rgba(239, 68, 68, 0.24);
+                    border-radius: 28px;
+                    margin: 14px;
+                    box-shadow:
+                        0 0 0 1px rgba(239,68,68,0.08) inset,
+                        0 0 24px rgba(239,68,68,0.16),
+                        0 0 50px rgba(239,68,68,0.08) inset;
+                    animation: warroomPulse 2.8s ease-in-out infinite;
+                    z-index: 0;
+                }
 
-        /* MAIN */
-        .warroom-main {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 2rem;
-          min-height: calc(100vh - 80px);
-        }
+                .warroom-shell::after {
+                    content: '';
+                    position: fixed;
+                    inset: 8px;
+                    pointer-events: none;
+                    border-radius: 30px;
+                    background:
+                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top left / 100% 2px no-repeat,
+                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top right / 2px 100% no-repeat,
+                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom right / 100% 2px no-repeat,
+                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom left / 2px 100% no-repeat;
+                    mask:
+                        radial-gradient(circle at top left, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at top right, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at bottom right, transparent 0 24px, #000 24px),
+                        radial-gradient(circle at bottom left, transparent 0 24px, #000 24px);
+                    animation: cornerWave 2.2s linear infinite;
+                    mix-blend-mode: screen;
+                    z-index: 0;
+                }
 
-        /* LOADING */
-        .loading-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 60vh;
-          text-align: center;
-        }
-        .loading-icon {
-          font-size: 4rem;
-          animation: pulse-danger 2s infinite;
-          margin-bottom: 1.5rem;
-        }
-        .loading-text {
-          font-size: 1.8rem;
-          font-weight: 900;
-          color: #dc2626;
-          letter-spacing: 3px;
-          margin-bottom: 0.5rem;
-        }
-        .loading-sub { color: #6b7280; margin-bottom: 2rem; }
-        .loading-bar {
-          width: 200px;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 2px;
-          overflow: hidden;
-        }
-        .loading-bar-fill {
-          width: 100%;
-          height: 100%;
-          background: #dc2626;
-          animation: loading-slide 1.5s ease-in-out infinite;
-        }
-        @keyframes loading-slide {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
+                .warroom-shell > * {
+                    position: relative;
+                    z-index: 1;
+                }
 
-        /* PHASE BADGE */
-        .phase-badge {
-          display: inline-block;
-          font-size: 0.7rem;
-          font-weight: 800;
-          letter-spacing: 2px;
-          color: #dc2626;
-          background: rgba(220, 38, 38, 0.1);
-          border: 1px solid rgba(220, 38, 38, 0.25);
-          padding: 0.3rem 1rem;
-          border-radius: 20px;
-          margin-bottom: 1.5rem;
-          text-transform: uppercase;
-        }
-        .phase-title {
-          font-size: 1.6rem;
-          font-weight: 800;
-          color: white;
-          margin-bottom: 0.6rem;
-        }
-        .phase-desc {
-          font-size: 0.95rem;
-          color: #9ca3af;
-          line-height: 1.6;
-          margin-bottom: 2rem;
-        }
+                @keyframes warroomPulse {
+                    0%, 100% { opacity: 0.55; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.002); }
+                }
 
-        /* PITCH TEMPLATE */
-        .pitch-template {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-        }
-        .pitch-template h3 {
-          font-size: 0.9rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          color: #d1d5db;
-        }
-        .template-text {
-          font-size: 0.85rem;
-          line-height: 1.8;
-          color: #9ca3af;
-        }
-        .template-text p {
-          margin-bottom: 0.3rem;
-        }
-        .template-text strong {
-          color: #ef4444;
-        }
-        .template-text em {
-          color: #6b7280;
-          font-style: normal;
-          font-weight: 600;
-        }
+                @keyframes cornerWave {
+                    0% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+                    50% { filter: drop-shadow(0 0 10px rgba(239,68,68,0.4)); }
+                    100% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+                }
+            `}</style>
 
-        /* PITCH INPUT */
-        .pitch-input {
-          width: 100%;
-          padding: 1.2rem;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1.5px solid rgba(220, 38, 38, 0.2);
-          border-radius: 14px;
-          color: #e0e0e0;
-          font-size: 0.95rem;
-          font-family: inherit;
-          line-height: 1.6;
-          resize: vertical;
-          transition: border-color 0.2s;
-          margin-bottom: 1rem;
-        }
-        .pitch-input:focus {
-          outline: none;
-          border-color: #dc2626;
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .pitch-input::placeholder { color: #4b5563; }
 
-        /* SUBMIT PITCH */
-        .submit-pitch-btn {
-          width: 100%;
-          padding: 1rem;
-          background: linear-gradient(135deg, #dc2626, #991b1b);
-          border: none;
-          border-radius: 14px;
-          color: white;
-          font-size: 1.1rem;
-          font-weight: 800;
-          cursor: pointer;
-          transition: all 0.3s;
-          box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
-        }
-        .submit-pitch-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(220, 38, 38, 0.4);
-        }
-        .submit-pitch-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        /* ERROR */
-        .error-msg {
-          color: #fca5a5;
-          font-size: 0.85rem;
-          margin-bottom: 1rem;
-          padding: 0.5rem 0.8rem;
-          background: rgba(239, 68, 68, 0.08);
-          border-radius: 8px;
-        }
-
-        /* INVESTOR Q&A */
-        .investor-qa-phase { animation: fadeIn 0.5s ease; }
-        .investor-counter {
-          font-size: 0.85rem;
-          color: #6b7280;
-          margin-bottom: 1.5rem;
-          font-weight: 600;
-        }
-        .investor-card {
-          display: flex;
-          gap: 1.2rem;
-          align-items: flex-start;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          padding: 1.5rem;
-          margin-bottom: 1.5rem;
-        }
-        .investor-avatar {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #dc2626, #991b1b);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.4rem;
-          font-weight: 900;
-          color: white;
-          flex-shrink: 0;
-        }
-        .investor-name {
-          font-size: 1.2rem;
-          font-weight: 800;
-          color: white;
-          margin-bottom: 0.2rem;
-        }
-        .investor-lens {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #dc2626;
-          letter-spacing: 0.5px;
-        }
-        .investor-bio {
-          font-size: 0.85rem;
-          color: #9ca3af;
-          line-height: 1.4;
-          margin-top: 0.5rem;
-        }
-        .investor-question {
-          background: rgba(220, 38, 38, 0.06);
-          border: 1px solid rgba(220, 38, 38, 0.15);
-          border-radius: 14px;
-          padding: 1.2rem;
-          margin-bottom: 1rem;
-        }
-        .question-label {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #ef4444;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-        .question-text {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: white;
-          line-height: 1.5;
-        }
-        .investor-reaction {
-          background: rgba(16, 185, 129, 0.06);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          border-radius: 14px;
-          padding: 1.2rem;
-          margin-bottom: 1rem;
-          animation: fadeIn 0.5s ease;
-        }
-        .reaction-label {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #10b981;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-        .investor-reaction p {
-          color: #d1d5db;
-          line-height: 1.5;
-        }
-        .walkout-warning {
-          font-size: 0.8rem;
-          color: #fbbf24;
-          background: rgba(251, 191, 36, 0.06);
-          border: 1px solid rgba(251, 191, 36, 0.15);
-          border-radius: 10px;
-          padding: 0.6rem 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .walkout-warning span { font-weight: 700; }
-        .response-input {
-          width: 100%;
-          padding: 1rem;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1.5px solid rgba(255, 255, 255, 0.1);
-          border-radius: 14px;
-          color: #e0e0e0;
-          font-size: 0.95rem;
-          font-family: inherit;
-          line-height: 1.5;
-          resize: vertical;
-          margin-bottom: 1rem;
-        }
-        .response-input:focus {
-          outline: none;
-          border-color: #dc2626;
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .response-input::placeholder { color: #4b5563; }
-        .respond-btn {
-          width: 100%;
-          padding: 0.9rem;
-          background: linear-gradient(135deg, #dc2626, #991b1b);
-          border: none;
-          border-radius: 12px;
-          color: white;
-          font-size: 1rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-        .respond-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
-        }
-        .respond-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        /* DEAL RESULTS */
-        .deal-results-phase { animation: fadeIn 0.5s ease; }
-        .scorecards-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-        .scorecard {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid;
-          border-radius: 16px;
-          padding: 1.2rem;
-          transition: transform 0.2s;
-        }
-        .scorecard:hover { transform: translateY(-2px); }
-        .sc-header {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          margin-bottom: 1rem;
-        }
-        .sc-avatar {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.06);
-          border: 2px solid;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 800;
-          font-size: 1.1rem;
-        }
-        .sc-name {
-          font-size: 1rem;
-          font-weight: 700;
-          color: white;
-          margin-bottom: 0.1rem;
-        }
-        .sc-decision {
-          font-size: 0.75rem;
-          font-weight: 800;
-          letter-spacing: 0.5px;
-        }
-        .sc-scores {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 0.8rem;
-        }
-        .sc-score {
-          flex: 1;
-          background: rgba(255, 255, 255, 0.04);
-          padding: 0.5rem 0.8rem;
-          border-radius: 8px;
-          font-size: 0.8rem;
-          color: #9ca3af;
-        }
-        .sc-score strong {
-          display: block;
-          color: white;
-          font-size: 1rem;
-          margin-top: 0.2rem;
-        }
-        .sc-redflag {
-          font-size: 0.8rem;
-          color: #fca5a5;
-          background: rgba(239, 68, 68, 0.08);
-          padding: 0.5rem 0.8rem;
-          border-radius: 8px;
-          margin-bottom: 0.5rem;
-        }
-        .sc-deal {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.85rem;
-          color: #10b981;
-          background: rgba(16, 185, 129, 0.06);
-          padding: 0.5rem 0.8rem;
-          border-radius: 8px;
-        }
-        .sc-user-response, .sc-investor-reaction {
-          margin-top: 0.6rem;
-          padding: 0.5rem 0.8rem;
-          border-radius: 8px;
-          font-size: 0.85rem;
-        }
-        .sc-user-response {
-          background: rgba(99, 102, 241, 0.06);
-          border-left: 2px solid rgba(99, 102, 241, 0.3);
-        }
-        .sc-investor-reaction {
-          background: rgba(16, 185, 129, 0.06);
-          border-left: 2px solid rgba(16, 185, 129, 0.3);
-        }
-        .sc-label {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #9ca3af;
-          display: block;
-          margin-bottom: 0.3rem;
-        }
-        .sc-user-response p, .sc-investor-reaction p {
-          color: #d1d5db;
-          line-height: 1.5;
-          margin: 0;
-        }
-        .no-scorecards {
-          text-align: center;
-          color: #6b7280;
-          padding: 3rem;
-        }
-        .final-report-btn {
-          width: 100%;
-          padding: 1.1rem;
-          background: linear-gradient(135deg, #dc2626, #991b1b);
-          border: none;
-          border-radius: 14px;
-          color: white;
-          font-size: 1.1rem;
-          font-weight: 800;
-          cursor: pointer;
-          transition: all 0.3s;
-          box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
-        }
-        .final-report-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(220, 38, 38, 0.4);
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-          .warroom-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.8rem 1rem; }
-          .warroom-main { padding: 1.5rem; }
-          .scorecards-grid { grid-template-columns: 1fr; }
-          .phase-title { font-size: 1.3rem; }
-        }
-      `}</style>
         </div>
     )
 }

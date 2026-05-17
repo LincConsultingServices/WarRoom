@@ -58,6 +58,14 @@ async function request<T>(
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('batch');
+      }
+      throw new Error('Unauthorized');
+    }
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error || `API error: ${res.status}`);
   }
@@ -153,6 +161,7 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+      
 
     submitResponse: (id: string, data: { questionId: string; responseData: ResponseData }) =>
       request<SubmitResponseResult>(`/assessments/${id}/responses`, {
@@ -192,6 +201,183 @@ export const api = {
     getScorecard: (id: string) =>
       request<InvestorScorecard[]>(`/assessments/${id}/warroom/scorecard`),
 
+    getWarRoomOffers: (id: string) =>
+      request<any[]>(`/assessments/${id}/warroom/offers`),
+
+    counterNegotiate: (id: string, investorId: string, capital: number, equity: number) =>
+      request<any>(`/assessments/${id}/warroom/counter`, {
+        method: 'POST',
+        body: JSON.stringify({ investorId, capital, equity }),
+      }),
+
+    acceptDeal: (id: string, investorId: string, capital: number, equity: number) =>
+      request<any>(`/assessments/${id}/warroom/accept-deal`, {
+        method: 'POST',
+        body: JSON.stringify({ investorId, capital, equity }),
+      }),
+
+    rejectOffer: (id: string, offerId: string) =>
+      request<any>(`/assessments/${id}/warroom/reject-offer`, {
+        method: 'POST',
+        body: JSON.stringify({ offerId }),
+      }),
+
+    counterNegotiateAudio: async (id: string, investorId: string, audioBlob: Blob) => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'counter.webm')
+      formData.append('investorId', investorId)
+      const headers: Record<string, string> = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 35000)
+      try {
+        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/counter-audio`, {
+          method: 'POST',
+          headers,
+          body: formData,
+          signal: controller.signal,
+        })
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(errData.error || `API error: ${res.status}`)
+        }
+        const data = (await res.json()) as {
+          transcription: string
+          message: string
+          accepted: boolean
+          isFinal: boolean
+          capital: number
+          equity: number
+          audioBase64?: string
+        }
+        if (!data.message) {
+          throw new Error('Negotiator returned an empty response')
+        }
+        return data
+      } catch (err: any) {
+        if (err?.name === 'AbortError') {
+          throw new Error('Negotiator timed out — please try again')
+        }
+        throw err
+      } finally {
+        clearTimeout(timeout)
+      }
+    },
+
+    // War Room Audio
+    submitPitchAudio: async (id: string, audioBlob: Blob) => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'pitch.webm')
+      const headers: Record<string, string> = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch(`${API_BASE}/assessments/${id}/warroom/pitch-audio`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || `API error: ${res.status}`)
+      }
+      return res.json() as Promise<{
+        pitchReceived: boolean
+        investors: any[]
+        message: string
+        analysis: {
+          transcription: string
+          feedback: string
+          strengths: string[]
+          weaknesses: string[]
+          overallScore: number
+          clarity: number
+          confidence: number
+          persuasion: number
+        }
+      }>
+    },
+
+    generateInvestorFollowupAudio: async (id: string, investorId: string, audioBlob: Blob) => {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+        const formData = new FormData()
+        formData.append('audio', audioBlob, 'response.webm')
+        formData.append('investorId', investorId)
+        const headers: Record<string, string> = {}
+        if (token) headers['Authorization'] = `Bearer ${token}`
+        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/investor-followup-audio`, {
+            method: 'POST',
+            headers,
+            body: formData,
+        })
+        if (!res.ok) throw new Error('Failed to generate investor followup')
+        return res.json()
+    },
+
+    respondToInvestorFinalAudio: async (id: string, investorId: string, initialTranscription: string, followupQuestion: string, audioBlob: Blob) => {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+        const formData = new FormData()
+        formData.append('audio', audioBlob, 'final_response.webm')
+        formData.append('investorId', investorId)
+        formData.append('initialTranscription', initialTranscription)
+        formData.append('followupQuestion', followupQuestion)
+        const headers: Record<string, string> = {}
+        if (token) headers['Authorization'] = `Bearer ${token}`
+        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/respond-final-audio`, {
+            method: 'POST',
+            headers,
+            body: formData,
+        })
+        if (!res.ok) throw new Error('Failed to submit final response')
+        return res.json()
+    },
+
+    respondToInvestorAudio: async (id: string, investorId: string, audioBlob: Blob) => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'response.webm')
+      formData.append('investorId', investorId)
+      const headers: Record<string, string> = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch(`${API_BASE}/assessments/${id}/warroom/respond-audio`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || `API error: ${res.status}`)
+      }
+      return res.json() as Promise<{
+        scorecard: InvestorScorecard
+        transcription: string
+        ttsError?: string
+        audioBase64?: string
+      }>
+    },
+
+    // Dynamic Scenario
+    getDynamicScenario: (id: string, stageId: string, questionId: string) =>
+      request<any>(`/assessments/${id}/dynamic-scenario?stageId=${stageId}&questionId=${questionId}`),
+
+    getStageDynamicScenarios: (id: string, stageId: string) =>
+      request<any[]>(`/assessments/${id}/stage/${stageId}/dynamic-scenarios`),
+
+    submitDynamicScenario: (id: string, scenarioId: string, selectedOptionId: string) =>
+      request<SubmitResponseResult>(`/assessments/${id}/dynamic-scenario/submit`, {
+        method: 'POST',
+        body: JSON.stringify({ scenarioId, selectedOptionId }),
+      }),
+
+    // Flow Branching Follow-up (using public Demo API for convenience)
+    generateFollowup: (data: { introduction: string; originalQuestion: string; selectedOptionText: string; selectedOptionFeedback: string; roundNumber: number }) =>
+      request<{ question: string }>('/demo/generate-followup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+
+
     // AI-generated end-of-phase question
     generateAiQuestion: (id: string, data: { stageId: string; responses: Array<{ questionId: string; summary: string }>; userIdea: string }) =>
       request<{ question: string; leaderName: string }>(`/assessments/${id}/generate-ai-question`, {
@@ -201,6 +387,34 @@ export const api = {
 
     // Report
     getReport: (id: string) => request<EvaluationReport>(`/assessments/${id}/report`),
+
+    // Regenerate the report from scratch — drops any cached row and rebuilds from
+    // the current assessment state. Use after late answer changes (e.g. user
+    // answered more questions after a buyout-triggered draft report was created).
+    regenerateReport: (id: string) =>
+      request<EvaluationReport>(`/assessments/${id}/report?regenerate=true`),
+
+    // Flow Branching
+    // mode="continue" preserves prior responses and just jumps the cursor to the
+    // given target stage (defaults to current stage). mode="month_zero" or omitted
+    // performs a full wipe and returns the user to Ideation.
+    restartAssessment: (id: string, opts?: { mode?: 'month_zero' | 'continue'; targetStage?: string }) =>
+      request<Assessment>(`/assessments/${id}/restart`, {
+        method: 'POST',
+        body: opts ? JSON.stringify(opts) : undefined,
+      }),
+
+    chooseBuyout: (id: string, company: string, amount: number) =>
+      request<Assessment>(`/assessments/${id}/buyout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company, amount }),
+      }),
+
+    walkout: (id: string) =>
+      request<Assessment>(`/assessments/${id}/walkout`, {
+        method: 'POST',
+      }),
   },
 
   // ============================================

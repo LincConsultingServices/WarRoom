@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/src/lib/api'
+import { Checkbox } from '@/components/ui/checkbox'
+import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 const STAGES = [
   { name: 'Ideation', number: -2, duration: '10 min', competencies: ['C1', 'C2'] },
@@ -17,32 +19,45 @@ const STAGES = [
   { name: 'War Room', number: 4, duration: '15 min', competencies: ['C1-C8'] },
 ]
 
-export default function AssessmentStartPage() {
+export default function SimulationStartPage() {
   const router = useRouter()
   const [level, setLevel] = useState<1 | 2>(1)
+  const [acceptedTerms, setAcceptedTerms] = useState(() => hasAcceptedTerms())
   const [isStarting, setIsStarting] = useState(false)
   const [error, setError] = useState('')
 
   const handleStart = async () => {
+    if (!acceptedTerms) {
+      setError('Please accept the Terms & Conditions before attending the simulation')
+      return
+    }
+
     setIsStarting(true)
     setError('')
     try {
-      const assessment = await api.assessments.create({ level })
-      router.push(`/assessment/${assessment.id}`)
-    } catch (err: any) {
-      setError(err.message || 'Failed to start assessment')
+      const simulation = await api.assessments.create({ level })
+      acceptTerms()
+      router.push(`/assessment/${simulation.id}`)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to start simulation')
       setIsStarting(false)
     }
   }
 
   return (
-    <div className="assessment-start-page">
+    <div className="simulation-start-page">
       <div className="start-container">
         <Link href="/" className="back-link">← Back to Dashboard</Link>
+        <div className="terms-banner">
+          <div>
+            <strong>Before attending:</strong> please review and accept the{' '}
+            <Link href="/terms">Terms &amp; Conditions</Link>.
+          </div>
+        </div>
 
         <div className="hero-section">
           <div className="hero-badge">KK&apos;s War Room 2.0</div>
-          <h1>Business Simulation Assessment</h1>
+          <h1>Business Simulation Simulation</h1>
           <p className="hero-subtitle">
             Navigate a 12-month startup journey across 7 stages. Make decisions under pressure,
             consult mentors, and pitch to investors. Your 8 core competencies will be evaluated
@@ -58,7 +73,7 @@ export default function AssessmentStartPage() {
               className={`level-card ${level === 1 ? 'selected' : ''}`}
               onClick={() => setLevel(1)}
             >
-              <div className="level-icon">🎓</div>
+              <div className="level-icon">L1</div>
               <h3>Level 1: Student</h3>
               <p>For students & early-career professionals exploring entrepreneurship</p>
               <ul>
@@ -71,7 +86,7 @@ export default function AssessmentStartPage() {
               className={`level-card ${level === 2 ? 'selected' : ''}`}
               onClick={() => setLevel(2)}
             >
-              <div className="level-icon">💼</div>
+              <div className="level-icon">L2</div>
               <h3>Level 2: Manager</h3>
               <p>For mid-level managers & experienced professionals</p>
               <ul>
@@ -110,22 +125,22 @@ export default function AssessmentStartPage() {
         {/* Key Features */}
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🧠</div>
+            <div className="feature-icon">C8</div>
             <h3>8 Core Competencies</h3>
             <p>Problem Sensing, Learning Agility, Courage, Financial Discipline, Strategy, Influence, Team Management, Value Creation</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🎯</div>
+            <div className="feature-icon">M3</div>
             <h3>3 Mentor Lifelines</h3>
-            <p>Consult Tony Robbins, Grant Cardone, Richard Branson, and 4 more world-class mentors when you need guidance</p>
+            <p>Consult the Mindset Architect, the Sales Commander, the Brand Pioneer, and four more world-class mentors when you need guidance</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🦈</div>
+            <div className="feature-icon">WR</div>
             <h3>Investor War Room</h3>
-            <p>Pitch to 7 investors including Kevin O&apos;Leary, Mark Cuban, and Barbara Corcoran. Negotiate your deal.</p>
+            <p>Pitch to seven investors including the Master of Coin, the Hand of Execution, and the Mother of Instinct. Negotiate your deal.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon">E3</div>
             <h3>3-Page Evaluation</h3>
             <p>Get your entrepreneur archetype, competency spider chart, role fit map, and personalized action plan</p>
           </div>
@@ -133,20 +148,33 @@ export default function AssessmentStartPage() {
 
         {error && <div className="error-message">{error}</div>}
 
+        <div className="consent-box">
+          <Checkbox
+            id="simulation-terms"
+            checked={acceptedTerms}
+            onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+          />
+          <label htmlFor="simulation-terms">
+            I have read and agree to the <Link href="/terms">Terms &amp; Conditions</Link>.
+          </label>
+        </div>
+
         <button
           className="start-button"
           onClick={handleStart}
-          disabled={isStarting}
+          disabled={isStarting || !acceptedTerms}
         >
           {isStarting ? 'Initializing Simulation...' : 'Begin Simulation →'}
         </button>
       </div>
 
       <style jsx>{`
-        .assessment-start-page {
+        .simulation-start-page {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d0d2b 100%);
-          color: #e0e0e0;
+          background:
+            radial-gradient(circle at top, rgba(0,0,0,0.08), transparent 35%),
+            linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+          color: #111111;
           padding: 2rem;
         }
         .start-container {
@@ -154,14 +182,33 @@ export default function AssessmentStartPage() {
           margin: 0 auto;
         }
         .back-link {
-          color: #8b8bcc;
+          color: #111111;
           text-decoration: none;
           font-size: 0.9rem;
           display: inline-block;
           margin-bottom: 2rem;
           transition: color 0.2s;
         }
-        .back-link:hover { color: #b0b0ff; }
+        .back-link:hover { color: #000000; }
+
+        .terms-banner {
+          max-width: 900px;
+          margin: 0 auto 1.5rem;
+          padding: 0.9rem 1rem;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 12px;
+          color: #111111;
+          font-size: 0.92rem;
+          line-height: 1.5;
+        }
+
+        .terms-banner a,
+        .consent-box a {
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
 
         .hero-section {
           text-align: center;
@@ -169,7 +216,7 @@ export default function AssessmentStartPage() {
         }
         .hero-badge {
           display: inline-block;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: #000000;
           color: white;
           padding: 0.4rem 1.2rem;
           border-radius: 20px;
@@ -181,13 +228,13 @@ export default function AssessmentStartPage() {
         h1 {
           font-size: 2.5rem;
           font-weight: 800;
-          background: linear-gradient(135deg, #fff, #c4b5fd);
+          background: linear-gradient(135deg, #111111, #555555);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           margin-bottom: 1rem;
         }
         .hero-subtitle {
-          color: #9ca3af;
+          color: #444444;
           font-size: 1.05rem;
           line-height: 1.6;
           max-width: 700px;
@@ -198,7 +245,7 @@ export default function AssessmentStartPage() {
         h2 {
           font-size: 1.4rem;
           font-weight: 700;
-          color: #c4b5fd;
+          color: #111111;
           margin-bottom: 1.5rem;
           text-align: center;
         }
@@ -209,32 +256,33 @@ export default function AssessmentStartPage() {
           gap: 1.5rem;
         }
         .level-card {
-          background: rgba(255,255,255,0.04);
-          border: 2px solid rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.96);
+          border: 2px solid rgba(0,0,0,0.08);
           border-radius: 16px;
           padding: 2rem;
           text-align: left;
           cursor: pointer;
           transition: all 0.3s;
-          color: #e0e0e0;
+          color: #111111;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
         .level-card:hover {
-          border-color: rgba(139, 92, 246, 0.3);
-          background: rgba(139, 92, 246, 0.05);
+          border-color: rgba(0, 0, 0, 0.18);
+          background: #ffffff;
         }
         .level-card.selected {
-          border-color: #8b5cf6;
-          background: rgba(139, 92, 246, 0.1);
-          box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+          border-color: #000000;
+          background: rgba(0, 0, 0, 0.04);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
         }
         .level-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-        .level-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: white; }
-        .level-card p { font-size: 0.9rem; color: #9ca3af; margin-bottom: 1rem; }
+        .level-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #111111; }
+        .level-card p { font-size: 0.9rem; color: #444444; margin-bottom: 1rem; }
         .level-card ul {
           list-style: none;
           padding: 0;
           font-size: 0.85rem;
-          color: #a5b4fc;
+          color: #111111;
         }
         .level-card ul li {
           padding: 0.2rem 0;
@@ -255,7 +303,7 @@ export default function AssessmentStartPage() {
           top: 0;
           bottom: 0;
           width: 2px;
-          background: linear-gradient(to bottom, #6366f1, #8b5cf6, #a78bfa);
+          background: linear-gradient(to bottom, #111111, #444444, #111111);
         }
         .timeline-item {
           position: relative;
@@ -269,8 +317,8 @@ export default function AssessmentStartPage() {
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background: #8b5cf6;
-          border: 2px solid #0a0a1a;
+          background: #111111;
+          border: 2px solid #ffffff;
         }
         .timeline-header {
           display: flex;
@@ -279,26 +327,26 @@ export default function AssessmentStartPage() {
           margin-bottom: 0.3rem;
         }
         .stage-badge {
-          background: rgba(99, 102, 241, 0.2);
-          color: #a5b4fc;
+          background: rgba(0, 0, 0, 0.08);
+          color: #111111;
           padding: 0.15rem 0.6rem;
           border-radius: 8px;
           font-size: 0.75rem;
           font-weight: 600;
         }
         .duration-badge {
-          color: #6b7280;
+          color: #555555;
           font-size: 0.75rem;
         }
         .timeline-content h4 {
-          color: white;
+          color: #111111;
           font-size: 1rem;
           margin-bottom: 0.4rem;
         }
         .competency-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
         .comp-tag {
-          background: rgba(52, 211, 153, 0.12);
-          color: #34d399;
+          background: rgba(0, 0, 0, 0.05);
+          color: #111111;
           padding: 0.1rem 0.5rem;
           border-radius: 6px;
           font-size: 0.7rem;
@@ -312,19 +360,38 @@ export default function AssessmentStartPage() {
           margin-bottom: 2.5rem;
         }
         .feature-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.96);
+          border: 1px solid rgba(0,0,0,0.08);
           border-radius: 12px;
           padding: 1.5rem;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
         }
         .feature-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
-        .feature-card h3 { font-size: 1rem; color: white; margin-bottom: 0.4rem; }
-        .feature-card p { font-size: 0.85rem; color: #9ca3af; line-height: 1.5; }
+
+        .consent-box {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+          padding: 0.9rem 1rem;
+          border-radius: 12px;
+          border: 1px solid rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.96);
+          color: #111111;
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+
+        .consent-box label {
+          cursor: pointer;
+        }
+        .feature-card h3 { font-size: 1rem; color: #111111; margin-bottom: 0.4rem; }
+        .feature-card p { font-size: 0.85rem; color: #444444; line-height: 1.5; }
 
         .error-message {
-          background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          color: #fca5a5;
+          background: rgba(239, 68, 68, 0.06);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          color: #991b1b;
           padding: 0.8rem 1.2rem;
           border-radius: 8px;
           margin-bottom: 1.5rem;
@@ -335,7 +402,7 @@ export default function AssessmentStartPage() {
           display: block;
           width: 100%;
           padding: 1.2rem;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #111111, #333333);
           color: white;
           border: none;
           border-radius: 12px;
@@ -347,7 +414,7 @@ export default function AssessmentStartPage() {
         }
         .start-button:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
         }
         .start-button:disabled {
           opacity: 0.6;
@@ -362,3 +429,4 @@ export default function AssessmentStartPage() {
     </div>
   )
 }
+

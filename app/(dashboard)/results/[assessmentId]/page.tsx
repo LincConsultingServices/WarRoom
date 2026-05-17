@@ -56,7 +56,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 // MAIN COMPONENT
 // ============================================
 
-export default function AssessmentResultPage() {
+export default function SimulationResultPage() {
   const params = useParams()
   const router = useRouter()
   const assessmentId = params?.assessmentId as string
@@ -72,7 +72,7 @@ export default function AssessmentResultPage() {
       const assessmentData = await api.assessments.get(assessmentId)
       setState(assessmentData)
 
-      // Try to load report if assessment is completed or in progress
+      // Try to load report if simulation is completed or in progress
       try {
         const reportData = await api.assessments.getReport(assessmentId)
         setReport(reportData)
@@ -84,7 +84,7 @@ export default function AssessmentResultPage() {
         router.push('/login')
         return
       }
-      setError(err.message || 'Failed to load assessment results')
+      setError(err.message || 'Failed to load simulation results')
     } finally {
       setLoading(false)
     }
@@ -99,7 +99,7 @@ export default function AssessmentResultPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading assessment results...</p>
+          <p className="text-muted-foreground">Loading simulation results...</p>
         </div>
       </div>
     )
@@ -108,7 +108,7 @@ export default function AssessmentResultPage() {
   if (error || !state) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
-        <p className="text-destructive text-lg">{error || 'Assessment not found'}</p>
+        <p className="text-destructive text-lg">{error || 'Simulation not found'}</p>
         <Button onClick={() => router.push('/dashboard')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
@@ -117,17 +117,18 @@ export default function AssessmentResultPage() {
     )
   }
 
-  const { assessment, competencies, progress } = state
-  const isCompleted = assessment.status === 'COMPLETED'
-  const isInProgress = assessment.status === 'IN_PROGRESS'
+  const simulation = (state as any).simulation ?? state.assessment
+  const { competencies, progress } = state
+  const isCompleted = simulation.status === 'COMPLETED'
+  const isInProgress = simulation.status === 'IN_PROGRESS'
 
   // Compute stats
   const avgScore = competencies && competencies.length > 0
-    ? Math.round(competencies.reduce((sum, c) => sum + (c.weightedAverage || 0), 0) / competencies.length)
+    ? Math.round(competencies.reduce((sum: number, c: CompetencyScore) => sum + (c.weightedAverage || 0), 0) / competencies.length)
     : 0
-  const strengths = competencies?.filter(c => c.category === 'NATURAL_DOMINANT' || c.category === 'STRONG') || []
-  const weaknesses = competencies?.filter(c => c.category === 'HIGH_RISK' || c.category === 'DEVELOPMENT_REQUIRED') || []
-  const revenueProjection = (assessment as any).revenueProjection || 0
+  const strengths = competencies?.filter((c: CompetencyScore) => c.category === 'NATURAL_DOMINANT' || c.category === 'STRONG') || []
+  const weaknesses = competencies?.filter((c: CompetencyScore) => c.category === 'HIGH_RISK' || c.category === 'DEVELOPMENT_REQUIRED') || []
+  const revenueProjection = (simulation as any).revenueProjection || 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,10 +145,10 @@ export default function AssessmentResultPage() {
               </Link>
               <Separator orientation="vertical" className="h-6" />
               <div>
-                <h1 className="text-xl font-bold">Assessment Results</h1>
+                <h1 className="text-xl font-bold">Simulation Results</h1>
                 <p className="text-sm text-muted-foreground">
-                  {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : assessment.status}
-                  {assessment.startedAt && ` - Started ${new Date(assessment.startedAt).toLocaleDateString()}`}
+                  {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : simulation.status}
+                  {simulation.startedAt && ` - Started ${new Date(simulation.startedAt).toLocaleDateString()}`}
                 </p>
               </div>
             </div>
@@ -156,7 +157,7 @@ export default function AssessmentResultPage() {
                 {isCompleted ? (
                   <><CheckCircle2 className="h-4 w-4 mr-1" /> Completed</>
                 ) : (
-                  <><Clock className="h-4 w-4 mr-1" /> {assessment.status?.replace(/_/g, ' ')}</>
+                  <><Clock className="h-4 w-4 mr-1" /> {simulation.status?.replace(/_/g, ' ')}</>
                 )}
               </Badge>
               {isInProgress && (
@@ -222,9 +223,9 @@ export default function AssessmentResultPage() {
             <div className="grid grid-cols-3 md:grid-cols-9 gap-2">
               {Object.entries(STAGE_LABELS).map(([stageId, label]) => {
                 const stagesCompleted = Object.keys(STAGE_LABELS)
-                const currentIdx = stagesCompleted.indexOf(assessment.currentStage)
+                const currentIdx = stagesCompleted.indexOf(simulation.currentStage)
                 const thisIdx = stagesCompleted.indexOf(stageId)
-                const isActive = stageId === assessment.currentStage
+                const isActive = stageId === simulation.currentStage
                 const isDone = thisIdx < currentIdx || isCompleted
 
                 return (
@@ -280,12 +281,12 @@ export default function AssessmentResultPage() {
                         </Badge>
                       </div>
                       <Progress
-                        value={Math.min(comp.weightedAverage || 0, 100)}
+                        value={Math.min(((comp.weightedAverage || 0) / 3) * 100, 100)}
                         className="h-2"
                       />
                     </div>
                     <span className="text-sm font-mono font-bold w-10 text-right">
-                      {Math.round(comp.weightedAverage || 0)}
+                      {(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)}
                     </span>
                   </div>
                 ))}
@@ -375,53 +376,75 @@ export default function AssessmentResultPage() {
           </>
         )}
 
-        {/* Strengths & Weaknesses */}
-        {(strengths.length > 0 || weaknesses.length > 0) && (
-          <div className="grid md:grid-cols-2 gap-4">
-            {strengths.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" />
-                    Strengths
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {strengths.map((s) => (
-                      <li key={s.competencyCode} className="flex items-center gap-2 text-sm">
-                        <div className="h-2 w-2 rounded-full bg-green-500" />
-                        <span className="font-medium">{s.competencyName}</span>
-                        <span className="text-muted-foreground ml-auto">{Math.round(s.weightedAverage || 0)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-            {weaknesses.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Areas for Development
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {weaknesses.map((w) => (
-                      <li key={w.competencyCode} className="flex items-center gap-2 text-sm">
-                        <div className="h-2 w-2 rounded-full bg-amber-500" />
-                        <span className="font-medium">{w.competencyName}</span>
-                        <span className="text-muted-foreground ml-auto">{Math.round(w.weightedAverage || 0)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+        {/* Detailed Competency Breakdown */}
+        {competencies && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Competency Analysis
+              </CardTitle>
+              <CardDescription>
+                Detailed breakdown of your performance across the 8 core competencies.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {competencies.slice().sort((a: CompetencyScore, b: CompetencyScore) => (b.weightedAverage || 0) - (a.weightedAverage || 0)).map((comp: CompetencyScore) => (
+                  <div key={comp.competencyCode} className="space-y-3 p-4 rounded-xl border bg-card/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-sm tracking-tight">{comp.competencyName}</h4>
+                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">{comp.competencyCode}</span>
+                      </div>
+                      <Badge variant="outline" className={cn("text-[10px] px-2 py-0", CATEGORY_COLORS[comp.category] || '')}>
+                        {comp.category}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Proficiency</span>
+                        <span className="font-mono">{(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)} / 10.0</span>
+                      </div>
+                      <Progress value={((comp.weightedAverage || 0) / 3) * 100} className="h-1.5" />
+                    </div>
+
+                    {(comp as any).strengths?.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase">Positive Signals</span>
+                        <ul className="text-[11px] space-y-0.5">
+                          {(comp as any).strengths.slice(0, 2).map((s: string, i: number) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="text-green-500 mt-0.5">•</span>
+                              <span className="text-muted-foreground leading-tight">{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {(comp as any).weaknesses?.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">Development Areas</span>
+                        <ul className="text-[11px] space-y-0.5">
+                          {(comp as any).weaknesses.slice(0, 2).map((w: string, i: number) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="text-amber-500 mt-0.5">•</span>
+                              <span className="text-muted-foreground leading-tight">{w}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Previous sections... */}
 
         {/* Bottom Actions */}
         <div className="flex justify-center gap-4 pb-8">
@@ -435,7 +458,7 @@ export default function AssessmentResultPage() {
             <Link href={`/assessment/${assessmentId}`}>
               <Button size="lg">
                 <Play className="h-4 w-4 mr-2" />
-                Continue Assessment
+                Continue Simulation
               </Button>
             </Link>
           )}
