@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FadeInUp, GlowCard, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } from '@/src/components/AnimatedComponents'
 import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { EmberParticles } from '@/src/components/effects/EmberParticles'
+import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 
 const EMBER_COUNT = 18
 
@@ -364,8 +366,12 @@ export default function HomePage() {
       </section>
 
       {/* HOUSES */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8 relative" style={{ background: '#0a0806' }}>
-        <div className="mx-auto max-w-6xl">
+      <section className="px-4 py-24 sm:px-6 lg:px-8 relative overflow-hidden" style={{ background: '#0a0806' }}>
+        {/* Subtle atmosphere — low-density canvas embers + film grain.
+            EmberParticles renders nothing under prefers-reduced-motion. */}
+        <EmberParticles className="opacity-40" density={14} speed={0.55} />
+        <NoiseOverlay opacity={0.045} />
+        <div className="mx-auto max-w-6xl relative z-10">
           <FadeInUp>
             <div className="text-center mb-16">
               <div className="got-house-badge mx-auto mb-4 w-fit">The Council</div>

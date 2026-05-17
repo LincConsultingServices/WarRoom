@@ -19,6 +19,16 @@ import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
 import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
 import { MuteToggle } from '@/src/components/warroom/MuteToggle'
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
+// Chamber components — Phase B integration. The pitch route's data flow stays
+// the same; the chamber is a presentational shell that wraps the existing
+// recording / question UI with the cinematic 3-panel layout.
+import { CouncilChamberLayout } from '@/src/components/warroom/CouncilChamberLayout'
+import { ActiveInvestor } from '@/src/components/warroom/ActiveInvestor'
+import { ConversationZone } from '@/src/components/warroom/ConversationZone'
+import { CouncilRoster } from '@/src/components/warroom/CouncilRoster'
+import { CouncilDeliberatesLoader } from '@/src/components/warroom/CouncilDeliberatesLoader'
+import { useCouncilMoods } from '@/src/hooks/useCouncilMoods'
+import { useFeedbackSentiment } from '@/src/hooks/useFeedbackSentiment'
 
 // ============================================
 // WAR ROOM ΓÇô Investor Pitch Simulation
@@ -181,6 +191,9 @@ export default function WarRoomSimulation() {
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
     // Cinematic entrance overlay — shown until the door video / fallback completes.
     const [showEntrance, setShowEntrance] = useState(true)
+    // Cinematic exit overlay — shown briefly before pushing to the verdict ceremony,
+    // so the chamber doesn't snap-cut. ~900ms total before navigation fires.
+    const [showVerdictExit, setShowVerdictExit] = useState(false)
     const [assessmentState, setAssessmentState] = useState<AssessmentState | null>(null)
     const [investors, setInvestors] = useState<Investor[]>([])
     const [pitchText, setPitchText] = useState('')
@@ -783,6 +796,27 @@ export default function WarRoomSimulation() {
         router.push(`/assessment/${assessmentId}/final-report`)
     }
 
+    // Normal-completion path — the council has actually rendered a verdict
+    // (deal accepted or all offers declined). Plays a brief cinematic fade
+    // before pushing to the verdict ceremony, so the chamber doesn't snap-cut.
+    const handleCompleteToVerdict = useCallback(async () => {
+        if (timerRef.current) clearInterval(timerRef.current)
+        setShowVerdictExit(true)
+        // Fire walkout in the background — same backend contract as End Simulation,
+        // but the page won't wait on it before navigating. The ceremony's own
+        // GET /warroom/scorecard + GET /report calls handle data dependencies.
+        try {
+            await api.assessments.walkout(assessmentId as string)
+        } catch (e) {
+            console.error('Error finalising simulation:', e)
+        }
+        // Hold the fade for ~900ms total so the chamber visually settles
+        // before the verdict route mounts its ember backdrop.
+        window.setTimeout(() => {
+            router.push(`/assessment/${assessmentId}/verdict`)
+        }, 900)
+    }, [assessmentId, router])
+
     const currentInvestor = investors[currentInvestorIndex]
     const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
@@ -832,6 +866,16 @@ export default function WarRoomSimulation() {
     // ============================================
     // RENDER
     // ============================================
+    // Chamber-derived signals — derived from existing booleans without
+    // introducing a new state machine. Each cinematic component upstream
+    // consumes these as plain props.
+    const feedbackSentiment = useFeedbackSentiment(currentInvestorReaction || '')
+    const councilMoods = useCouncilMoods({
+        scorecards,
+        activeInvestorId: currentInvestor?.id ?? null,
+        activeInvestorSentiment: feedbackSentiment.label,
+    })
+
     // Map War Room phase → ambient audio scene. Empty (null) while the entrance
     // is still playing so we don't fight the door-video atmospherics.
     const ambientScene = useMemo<AmbientScene>(() => {
@@ -851,6 +895,31 @@ export default function WarRoomSimulation() {
                         key="entrance"
                         onComplete={() => setShowEntrance(false)}
                     />
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {showVerdictExit && (
+                    <motion.div
+                        key="verdict-exit"
+                        className="fixed inset-0 z-[9998] flex items-center justify-center bg-black"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.7, ease: 'easeOut' }}
+                        aria-live="polite"
+                    >
+                        <div className="flex flex-col items-center gap-3 text-center">
+                            <span
+                                aria-hidden
+                                className="font-display text-3xl text-[color:var(--color-warroom-gold)] opacity-80"
+                            >
+                                ⚜
+                            </span>
+                            <p className="font-display text-xs uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/85">
+                                The council retires to deliberate
+                            </p>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
             <AmbientAudioManager scene={ambientScene} />
@@ -1117,28 +1186,69 @@ export default function WarRoomSimulation() {
                         <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 ΓÇö INVESTOR QUESTIONS</motion.div>
                         <div className="investor-counter">Investor {currentInvestorIndex + 1} of {investors.length}</div>
 
-                        {/* Investor Card */}
-                        <AnimatePresence mode="wait">
-                            <motion.div key={currentInvestor.id || currentInvestorIndex} className="investor-card" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }} transition={{ duration: 0.4 }}>
-                                <motion.div className="investor-avatar" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}>
-                                    {currentInvestor.name.charAt(0)}
-                                </motion.div>
-                                <div className="investor-info">
-                                    <h2 className="investor-name">{currentInvestor.name}</h2>
-                                    <span className="investor-lens">{currentInvestor.primary_lens}</span>
-                                    <p className="investor-bio">{currentInvestor.bio}</p>
-                                </div>
-                            </motion.div>
-                        </AnimatePresence>
+                        {/* Chamber: active investor (left) · conversation (center) · roster (right) */}
+                        <CouncilChamberLayout
+                            className="mt-4 px-0"
+                            activeInvestor={
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={currentInvestor.id || currentInvestorIndex}
+                                        initial={{ x: 60, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: -60, opacity: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                        className="h-full"
+                                    >
+                                        <ActiveInvestor
+                                            investor={currentInvestor}
+                                            isSpeaking={isPlayingAudio}
+                                            isAnswering={responseRecorder.isRecording}
+                                            isReacting={isAnalyzing}
+                                            sentiment={feedbackSentiment.label}
+                                            className="h-full"
+                                        />
+                                    </motion.div>
+                                </AnimatePresence>
+                            }
+                            roster={
+                                <CouncilRoster
+                                    investors={investors}
+                                    activeInvestorId={currentInvestor?.id ?? null}
+                                    moods={councilMoods}
+                                />
+                            }
+                            conversation={
+                                <ConversationZone
+                                    overlay={
+                                        isAnalyzing ? (
+                                            <CouncilDeliberatesLoader
+                                                message={`${currentInvestor.name} weighs your words…`}
+                                            />
+                                        ) : undefined
+                                    }
+                                    question={
+                                        <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="question-label">{currentInvestor.name} asks:</span>
+                                                <QuestionAudioPlayer audioKeys={currentInvestorAudioKeys} />
+                                            </div>
+                                            <p className="question-text">{currentInvestor.signature_question}</p>
+                                        </motion.div>
+                                    }
+                                />
+                            }
+                        />
 
-                        {/* Question */}
-                        <motion.div className="investor-question" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                            <div className="flex items-center justify-between">
-                                <span className="question-label">{currentInvestor.name} asks:</span>
-                                <QuestionAudioPlayer audioKeys={currentInvestorAudioKeys} />
-                            </div>
-                            <p className="question-text">{currentInvestor.signature_question}</p>
-                        </motion.div>
+                        {/*
+                          The chamber above is purely the visual frame —
+                          portrait (left), question + deliberation overlay (center),
+                          roster (right). The recording UI and reaction
+                          rendering below remain full-width to preserve
+                          the existing affordances and accessibility.
+                          Every handler, ref, and state below is unchanged
+                          from the pre-chamber implementation.
+                        */}
+                        <div className="mx-auto max-w-3xl mt-6 px-2 sm:px-0">
 
                         {/* Follow-up Section */}
                         <AnimatePresence>
@@ -1306,14 +1416,12 @@ export default function WarRoomSimulation() {
                             </motion.div>
                         )}
 
-                        {/* Analyzing state */}
-                        {isAnalyzing && (
-                            <motion.div className="analyzing-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <div className="analyzing-spinner" />
-                                <h3>Analyzing Your Response...</h3>
-                                <p>{currentInvestor.name} is evaluating your answer.</p>
-                            </motion.div>
-                        )}
+                        {/*
+                          Analyzing-state UI lives as the chamber's overlay
+                          (<CouncilDeliberatesLoader />). Removed here to avoid
+                          two competing "deliberating" indicators.
+                        */}
+                        </div>
                     </motion.div>
                 )}
 
@@ -1625,8 +1733,8 @@ export default function WarRoomSimulation() {
                                         </div>
                                     </div>
                                 </div>
-                                <button className="final-report-btn" onClick={handleEndSimulation} style={{ position: 'relative', zIndex: 10 }}>
-                                    Complete Simulation and View Report
+                                <button className="final-report-btn" onClick={handleCompleteToVerdict} style={{ position: 'relative', zIndex: 10 }}>
+                                    The Council Renders Its Verdict
                                 </button>
                             </motion.div>
                         )}
@@ -1634,7 +1742,7 @@ export default function WarRoomSimulation() {
                         {!selectedOffer && !dealFinalized && (
                             <motion.button
                                 className="final-report-btn"
-                                onClick={handleEndSimulation}
+                                onClick={handleCompleteToVerdict}
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                                 initial={{ opacity: 0 }}
