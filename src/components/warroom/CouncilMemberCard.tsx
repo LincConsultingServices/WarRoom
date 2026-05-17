@@ -1,6 +1,7 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect } from 'react'
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { Investor } from '@/src/types'
@@ -26,6 +27,9 @@ interface CouncilMemberCardProps {
   isActive: boolean
   /** Disables the popover (e.g. while overlays are open). */
   disableBio?: boolean
+  /** Counter that increments whenever the council should "stir" (active
+   *  member just changed). When it bumps, the card briefly rotate-shakes. */
+  stirSignal?: number
   className?: string
 }
 
@@ -58,9 +62,11 @@ export function CouncilMemberCard({
   mood,
   isActive,
   disableBio = false,
+  stirSignal,
   className,
 }: CouncilMemberCardProps) {
   const reducedMotion = useReducedMotion()
+  const stirControls = useAnimationControls()
   const initials = investor.name
     .split(' ')
     .map((w) => w[0])
@@ -68,7 +74,20 @@ export function CouncilMemberCard({
     .join('')
     .toUpperCase()
 
+  // "Council stirs" — fire a brief shake when stirSignal increments.
+  // Skipped under reducedMotion. Skipped on the very first render so the
+  // initial mount doesn't stir.
+  useEffect(() => {
+    if (stirSignal === undefined) return
+    if (reducedMotion) return
+    void stirControls.start({
+      rotate: [0, -1.4, 1.2, -0.6, 0],
+      transition: { duration: 0.5, ease: 'easeInOut' },
+    })
+  }, [stirSignal, reducedMotion, stirControls])
+
   const card = (
+    <motion.div animate={stirControls} className="origin-center">
     <motion.div
       layout
       initial={false}
@@ -119,6 +138,7 @@ export function CouncilMemberCard({
           {MOOD_LABEL[mood]}
         </span>
       </div>
+    </motion.div>
     </motion.div>
   )
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { Investor } from '@/src/types'
 import { CouncilMemberCard, type CouncilMood } from './CouncilMemberCard'
@@ -30,6 +31,21 @@ export function CouncilRoster({
   moods = {},
   className,
 }: CouncilRosterProps) {
+  // Stir signal — increments whenever the floor moves to a different investor.
+  // Each card watches this and fires a brief rotate-shake. The previous-id ref
+  // is updated via effect (after render) so the very first mount doesn't stir.
+  const [stirSignal, setStirSignal] = useState(0)
+  const prevActiveRef = useRef<string | null | undefined>(activeInvestorId)
+  useEffect(() => {
+    if (prevActiveRef.current !== activeInvestorId) {
+      prevActiveRef.current = activeInvestorId
+      // Defer to a microtask so we don't bump state during the same commit
+      // that just changed activeInvestorId — keeps the React Compiler happy.
+      const t = window.setTimeout(() => setStirSignal((n) => n + 1), 0)
+      return () => window.clearTimeout(t)
+    }
+  }, [activeInvestorId])
+
   if (investors.length === 0) return null
 
   return (
@@ -57,6 +73,7 @@ export function CouncilRoster({
             investor={inv}
             mood={moods[inv.id] ?? 'neutral'}
             isActive={inv.id === activeInvestorId}
+            stirSignal={stirSignal}
           />
         ))}
       </div>
@@ -69,6 +86,7 @@ export function CouncilRoster({
               investor={inv}
               mood={moods[inv.id] ?? 'neutral'}
               isActive={inv.id === activeInvestorId}
+              stirSignal={stirSignal}
             />
           </div>
         ))}
