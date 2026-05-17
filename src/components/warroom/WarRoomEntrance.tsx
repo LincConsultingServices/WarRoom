@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { WarRoomSubtitles, type SubtitleCue } from './WarRoomSubtitles'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
+import { AssetPlaceholder } from '@/src/components/effects/AssetPlaceholder'
 import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 
 // ============================================================
@@ -233,6 +234,16 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
           boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.7), -8px 0 40px rgba(201,162,39,0.18)',
         }}
       />
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-48 w-72 max-w-[80%]">
+          <AssetPlaceholder
+            kind="video"
+            label="Door cinematic"
+            path="public/videos/warroom-door-opening.{webm,mp4}"
+            formatHint="1080p · 8–14s · ≤6MB · muted autoplay"
+          />
+        </div>
+      </div>
     </div>
   )
 }

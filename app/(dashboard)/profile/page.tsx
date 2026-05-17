@@ -1,0 +1,287 @@
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import api from '@/src/lib/api'
+import type { Assessment, EvaluationReport, InvestorScorecard } from '@/src/types'
+import { ArchetypeBadge } from '@/src/components/profile/ArchetypeBadge'
+import {
+  LegacyScoreSparkline,
+  type LegacyRun,
+} from '@/src/components/profile/LegacyScoreSparkline'
+import { PastVerdictCard } from '@/src/components/profile/PastVerdictCard'
+import { EmberDriftBackdrop } from '@/src/components/verdict/EmberDriftBackdrop'
+
+// ============================================================
+// /profile (route: /(dashboard)/profile)
+// ----------------------------------------------------------------
+// The founder's own war record. Surfaces:
+//   • Current archetype (from the most recent completed report)
+//   • Legacy score history (sparkline across all completed runs)
+//   • Past verdicts (clickable cards → cinematic verdict page)
+//
+// All data comes from existing endpoints. No new API contracts:
+//   • GET /auth/me                       → user
+//   • GET /assessments                   → Assessment[]
+//   • GET /assessments/:id/report        → EvaluationReport (best-effort, per completed run)
+//   • GET /assessments/:id/warroom/scorecard → InvestorScorecard[] (fallback score)
+//
+// Reports are fetched in parallel, best-effort. If a fetch fails
+// (e.g. report not yet generated), that run still appears in the
+// list — just without enrichment.
+// ============================================================
+
+interface EnrichedRun {
+  assessment: Assessment
+  archetypeName: string | null
+  legacyScore: number | null
+}
+
+function computeFallbackScore(cards: InvestorScorecard[]): number | null {
+  if (!cards || cards.length === 0) return null
+  const sum = cards.reduce((acc, c) => acc + (c.primaryScore || 0), 0)
+  return Math.round(sum / cards.length)
+}
+
+async function enrichAssessment(a: Assessment): Promise<EnrichedRun> {
+  if (a.status !== 'COMPLETED') {
+    return { assessment: a, archetypeName: null, legacyScore: null }
+  }
+
+  let archetypeName: string | null = null
+  let legacyScore: number | null = null
+
+  // Try report first
+  try {
+    const report = (await api.assessments.getReport(a.id)) as EvaluationReport
+    archetypeName = report.entrepreneurType?.trim() || null
+    // Composite from investorResults if available
+    if (report.dealSummary?.investorResults) {
+      legacyScore = computeFallbackScore(report.dealSummary.investorResults)
+    }
+  } catch {
+    // ignore — try scorecard fallback
+  }
+
+  if (legacyScore == null) {
+    try {
+      const cards = (await api.assessments.getScorecard(a.id)) as InvestorScorecard[]
+      legacyScore = computeFallbackScore(cards)
+    } catch {
+      legacyScore = null
+    }
+  }
+
+  return { assessment: a, archetypeName, legacyScore }
+}
+
+type LoadState =
+  | { kind: 'loading' }
+  | { kind: 'ready'; user: { name?: string } | null; runs: EnrichedRun[] }
+  | { kind: 'error'; message: string }
+
+// Module-scoped stable empty array so the "not ready" branch of `readyRuns`
+// doesn't allocate a fresh array each render and re-trigger downstream useMemo.
+const EMPTY_RUNS: EnrichedRun[] = []
+
+export default function ProfilePage() {
+  const router = useRouter()
+  const [state, setState] = useState<LoadState>({ kind: 'loading' })
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        const [user, assessments] = await Promise.all([
+          api.auth.me().catch(() => null) as Promise<{ name?: string } | null>,
+          api.assessments.list() as Promise<Assessment[]>,
+        ])
+
+        // Enrich in parallel — best-effort, never throws
+        const enriched = await Promise.all(assessments.map(enrichAssessment))
+
+        if (cancelled) return
+
+        // Sort newest first by completedAt || updatedAt || createdAt
+        enriched.sort((a, b) => {
+          const aTime = new Date(
+            a.assessment.completedAt || a.assessment.updatedAt || a.assessment.createdAt,
+          ).getTime()
+          const bTime = new Date(
+            b.assessment.completedAt || b.assessment.updatedAt || b.assessment.createdAt,
+          ).getTime()
+          return bTime - aTime
+        })
+
+        setState({ kind: 'ready', user, runs: enriched })
+      } catch (err) {
+        if (cancelled) return
+        setState({
+          kind: 'error',
+          message: err instanceof Error ? err.message : 'Failed to load your record.',
+        })
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Hooks must be unconditional — keep all useMemo calls before any early return.
+  const readyRuns = state.kind === 'ready' ? state.runs : EMPTY_RUNS
+
+  const currentArchetype = useMemo<string | null>(() => {
+    for (const run of readyRuns) {
+      if (run.archetypeName) return run.archetypeName
+    }
+    return null
+  }, [readyRuns])
+
+  const sparklineRuns = useMemo<LegacyRun[]>(() => {
+    // Chronological order (oldest → newest), only completed with a score.
+    return [...readyRuns]
+      .filter((r) => r.legacyScore != null && r.assessment.status === 'COMPLETED')
+      .sort((a, b) => {
+        const aT = new Date(a.assessment.completedAt || a.assessment.createdAt).getTime()
+        const bT = new Date(b.assessment.completedAt || b.assessment.createdAt).getTime()
+        return aT - bT
+      })
+      .map((r) => ({
+        id: r.assessment.id,
+        score: r.legacyScore!,
+        label: r.archetypeName || `Run ${r.assessment.attemptNumber}`,
+        completedAt: r.assessment.completedAt,
+      }))
+  }, [readyRuns])
+
+  const completedCount = useMemo(
+    () => readyRuns.filter((r) => r.assessment.status === 'COMPLETED').length,
+    [readyRuns],
+  )
+
+  if (state.kind === 'loading') {
+    return <ProfileLoading />
+  }
+
+  if (state.kind === 'error') {
+    return <ProfileError message={state.message} onRetry={() => router.refresh()} />
+  }
+
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-[color:var(--color-warroom-black)] text-foreground">
+      <EmberDriftBackdrop density={38} />
+
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-10 px-4 py-12 sm:py-16">
+        {/* Hero */}
+        <header className="flex flex-col items-center gap-4 text-center">
+          <p className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/70">
+            The Founder&apos;s Record
+          </p>
+          {state.user?.name && (
+            <h1
+              className="font-display text-3xl font-bold tracking-wider text-foreground sm:text-4xl"
+              style={{ textShadow: '0 0 24px rgba(201,162,39,0.25)' }}
+            >
+              {state.user.name}
+            </h1>
+          )}
+          {currentArchetype ? (
+            <ArchetypeBadge archetypeName={currentArchetype} variant="hero" />
+          ) : (
+            <p className="font-display text-xs uppercase tracking-[0.22em] text-foreground/45">
+              No archetype recorded yet
+            </p>
+          )}
+        </header>
+
+        {/* Legacy score history */}
+        <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
+          <div className="text-center">
+            <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-foreground/55">
+              Legacy Score History
+            </p>
+            <p className="mt-1 font-mono text-xs text-foreground/45">
+              {completedCount} completed {completedCount === 1 ? 'trial' : 'trials'}
+            </p>
+          </div>
+          <LegacyScoreSparkline
+            runs={sparklineRuns}
+            width={420}
+            height={96}
+            className="text-foreground/40"
+            onSelectRun={(run) => router.push(`/assessment/${run.id}/verdict`)}
+          />
+        </section>
+
+        {/* Past verdicts */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-baseline justify-between px-1">
+            <h2 className="font-display text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70">
+              Past Verdicts
+            </h2>
+            <span className="font-display text-[0.55rem] uppercase tracking-[0.18em] text-foreground/40">
+              {readyRuns.length} {readyRuns.length === 1 ? 'trial' : 'trials'}
+            </span>
+          </div>
+          {readyRuns.length === 0 ? (
+            <div className="rounded-md border border-dashed border-[color:var(--color-warroom-gold)]/20 bg-card/30 px-6 py-10 text-center">
+              <p className="font-display text-xs uppercase tracking-[0.22em] text-foreground/50">
+                The chamber awaits your first trial.
+              </p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {readyRuns.map((run) => (
+                <li key={run.assessment.id}>
+                  <PastVerdictCard
+                    assessment={run.assessment}
+                    archetypeName={run.archetypeName}
+                    legacyScore={run.legacyScore}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function ProfileLoading() {
+  return (
+    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-warroom-black)]">
+      <EmberDriftBackdrop density={30} />
+      <div className="relative z-10 flex flex-col items-center gap-4">
+        <div className="h-10 w-10 animate-spin-slow rounded-full border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)]" />
+        <p className="font-display text-xs uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/70">
+          Unrolling the scroll…
+        </p>
+      </div>
+    </main>
+  )
+}
+
+function ProfileError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-warroom-black)] px-4">
+      <EmberDriftBackdrop density={20} />
+      <div className="relative z-10 max-w-md rounded-md border border-[color:var(--color-warroom-crimson)]/40 bg-card/85 p-6 text-center backdrop-blur-md">
+        <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-crimson-bright)]">
+          The scroll is sealed
+        </p>
+        <p className="mt-3 text-sm text-foreground/80">{message}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/45 px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] transition-all hover:border-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-obsidian)]/70"
+        >
+          Try again
+        </button>
+      </div>
+    </main>
+  )
+}

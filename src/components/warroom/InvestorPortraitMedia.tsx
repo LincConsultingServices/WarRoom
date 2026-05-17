@@ -8,6 +8,7 @@ import {
   type ResolvedInvestorAsset,
 } from '@/src/lib/investorAssets'
 import type { PortraitState, Sentiment } from '@/src/hooks/useInvestorPortraitState'
+import { AssetPlaceholder } from '@/src/components/effects/AssetPlaceholder'
 
 // ============================================================
 // <InvestorPortraitMedia />
@@ -146,7 +147,16 @@ export function InvestorPortraitMedia({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <FallbackMonogram name={name} />
+        <>
+          <FallbackMonogram name={name} />
+          <AssetPlaceholder
+            kind="image"
+            label={`${name} portrait`}
+            path={`public/investors/${investorId}/portrait.{webp,jpg,png}`}
+            formatHint="3:4 · 720×960+ · ≤300KB"
+            className="bg-[color:var(--color-warroom-obsidian)]/60"
+          />
+        </>
       )}
 
       {/* Treatment overlays per state — these layer on top of the portrait
