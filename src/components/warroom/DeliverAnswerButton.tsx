@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { playGOTSound } from '@/src/components/GOTSoundManager'
 
 // ============================================================
 // <DeliverAnswerButton /> — the "submit" CTA. Styled as a forged
@@ -20,9 +21,10 @@ interface DeliverAnswerButtonProps {
   isPending?: boolean
   label?: string
   pendingLabel?: string
-  /** Optional callback fired on press, BEFORE onClick. Use to
-   *  trigger a one-shot SFX (sword unsheath). */
-  onPress?: () => void
+  /** Optional callback fired on press, BEFORE onClick. When omitted,
+   *  a default sword-clash SFX fires (respecting the shared MuteToggle).
+   *  Pass an explicit callback to override OR `false` to disable. */
+  onPress?: (() => void) | false
   className?: string
 }
 
@@ -39,7 +41,16 @@ export function DeliverAnswerButton({
 
   const handle = React.useCallback(() => {
     if (disabled || isPending) return
-    onPress?.()
+    if (onPress === false) {
+      // explicitly disabled
+    } else if (onPress) {
+      onPress()
+    } else {
+      // Default: sword-unsheath flourish. playGOTSound honours the
+      // shared mute toggle and falls back to Web Audio synthesis if
+      // the MP3 file isn't on disk — so this is safe with no assets.
+      playGOTSound('sword_clash', 0.45)
+    }
     onClick?.()
   }, [disabled, isPending, onPress, onClick])
 

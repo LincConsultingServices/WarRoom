@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
+import { isWarRoomAudioMuted } from '@/src/hooks/useAmbientAudio'
 
 // ============================================================
 // GOT Sound Manager — plays Web Audio synthesized sounds
@@ -182,6 +183,9 @@ export function useGOTSound() {
   const playSound = useCallback(async (event: SoundEvent, volume = 0.6) => {
     if (!enabled.current) return
     if (typeof window === 'undefined') return
+    // Honour the shared War Room mute toggle — same localStorage flag the
+    // ambient audio layer uses, so MuteToggle silences EVERYTHING.
+    if (isWarRoomAudioMuted()) return
 
     const filePath = GOT_AUDIO_MAP[event]
 
@@ -221,6 +225,8 @@ export function useGOTSound() {
 // ---- Standalone play utility (for non-hook contexts) ----
 export function playGOTSound(event: SoundEvent, volume = 0.6) {
   if (typeof window === 'undefined') return
+  // Same mute gate as the hook — respects the persisted MuteToggle preference.
+  if (isWarRoomAudioMuted()) return
   const filePath = GOT_AUDIO_MAP[event]
 
   const audio = new Audio(filePath)

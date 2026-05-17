@@ -35,7 +35,22 @@ const SCENE_TARGET_VOLUME: Record<Exclude<AmbientScene, null>, number> = {
   'verdict-ceremony': 0.28,
 }
 
-const MUTE_STORAGE_KEY = 'warroom_audio_muted'
+// Shared with GOTSoundManager so the single MuteToggle silences both the
+// ambient layer AND one-shot SFX. Exported so non-hook code can read the
+// flag without instantiating the hook.
+export const MUTE_STORAGE_KEY = 'warroom_audio_muted'
+
+/** Cheap synchronous read of the persisted mute preference.
+ *  Safe to call from anywhere (SSR-safe; defaults to false). */
+export function isWarRoomAudioMuted(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem(MUTE_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 const CROSSFADE_MS = 1200
 
 interface SceneTrack {
