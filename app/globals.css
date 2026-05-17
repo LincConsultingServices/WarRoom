@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=IM+Fell+English+SC&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -77,6 +78,27 @@
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-display: 'Cinzel', 'Georgia', serif;
+  --font-display-alt: 'IM Fell English SC', 'Cinzel', 'Georgia', serif;
+
+  /* === WAR ROOM design tokens ===
+     Self-contained on this base (no --got-* dependency). When the
+     GOT theme is merged forward, these can be re-aliased to var(--got-*). */
+  --color-warroom-black: #0a0805;
+  --color-warroom-obsidian: #14100c;
+  --color-warroom-stone: #2a2520;
+  --color-warroom-ember: #ff6b00;
+  --color-warroom-ember-bright: #ff9933;
+  --color-warroom-gold: #c9a227;
+  --color-warroom-gold-bright: #e8c84a;
+  --color-warroom-gold-dark: #8b6914;
+  --color-warroom-crimson: #8b1a1a;
+  --color-warroom-crimson-bright: #c23b3b;
+  --color-warroom-silver: #a8a8a8;
+  --color-warroom-parchment: #f5e6c8;
+  --color-warroom-ink: #1a1208;
+  --color-warroom-dragonglass: #0f1a2e;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -160,4 +182,75 @@
   .badge-error {
     @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/10 text-red-600;
   }
+}
+
+/* ============================================================
+ * WAR ROOM — candle flicker + atmospherics
+ * Sharper-than-torchlight cadence simulating a real candle.
+ * ============================================================ */
+@keyframes candle-flicker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  6%  { opacity: 0.82; filter: brightness(0.88); }
+  10% { opacity: 1; filter: brightness(1.06); }
+  18% { opacity: 0.74; filter: brightness(0.8); }
+  26% { opacity: 1; filter: brightness(1.04); }
+  34% { opacity: 0.9; filter: brightness(0.94); }
+  46% { opacity: 1; filter: brightness(1.08); }
+  58% { opacity: 0.78; filter: brightness(0.84); }
+  72% { opacity: 1; filter: brightness(1); }
+  84% { opacity: 0.92; filter: brightness(0.96); }
+  94% { opacity: 1; filter: brightness(1.05); }
+}
+
+.animate-candle-flicker {
+  animation: candle-flicker 4.8s ease-in-out infinite;
+}
+
+/* Soft torchlight flicker — used by InvestorPortraitMedia SPEAKING fallback */
+@keyframes torch-flicker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  15% { opacity: 0.95; filter: brightness(0.97); }
+  30% { opacity: 1; filter: brightness(1.03); }
+  45% { opacity: 0.92; filter: brightness(0.95); }
+  60% { opacity: 1; filter: brightness(1); }
+  75% { opacity: 0.96; filter: brightness(0.98); }
+  90% { opacity: 1; filter: brightness(1.02); }
+}
+
+.animate-torch-glow {
+  animation: torch-flicker 3s ease-in-out infinite;
+}
+
+/* Opt-in noise / film-grain overlay — gives flat panels physical grain */
+.noise-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.79 0 0 0 0 0.64 0 0 0 0 0.16 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  z-index: 0;
+}
+
+.noise-overlay > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Display-font convenience class for non-Tailwind contexts */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-candle-flicker,
+  .animate-torch-glow { animation: none; }
 }
