@@ -74,15 +74,28 @@ export const STAGE_DURATIONS: Record<string, number> = {
 // Short labels shown on stage timeline
 export const NARRATION_STAGE_LABELS = ['Idea', 'Vision', 'Commit', 'Validate', 'Grow', 'Expand', 'Scale', 'Prep', 'War Room']
 
-// Well-known investor voice filename overrides
-export const INVESTOR_VOICE_ALIASES: Record<string, string> = {
-  "Kevin O'Leary": 'kevin_oleary',
-  'Daymond John': 'daymond_john',
-  'Barbara Corcoran': 'barbara_corcoran',
-  'Mark Cuban': 'mark_cuban',
-  'Lori Greiner': 'lori_greiner',
-  'Robert Herjavec': 'robert_herjavec',
-  'Steven Bartlett': 'steven_bartlett',
+// Investor voice filename overrides, keyed by investor id (stable across rename)
+export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
+  kevin_oleary: 'kevin_oleary',
+  daymond_john: 'daymond_john',
+  barbara_corcoran: 'barbara_corcoran',
+  mark_cuban: 'mark_cuban',
+  lori_greiner: 'lori_greiner',
+  robert_herjavec: 'robert_herjavec',
+  steven_bartlett: 'steven_bartlett',
+}
+
+// Maps the public display title back to the stable investor id.
+// Investor panel context_text shows the title; we resolve it here to look up
+// voice assets and other id-keyed resources.
+export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
+  'The Mirror of Identity': 'steven_bartlett',
+  'The Master of Coin': 'kevin_oleary',
+  'The Lord of Hustle': 'daymond_john',
+  'The Mother of Instinct': 'barbara_corcoran',
+  'The Hand of Execution': 'mark_cuban',
+  'The Spider of Strategy': 'lori_greiner',
+  'The Warden of Trust': 'robert_herjavec',
 }
 
 // Scenario step styling

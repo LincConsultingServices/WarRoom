@@ -98,39 +98,112 @@ export function AIScenarioQuestion({
       {isDecisionStep && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-4">
           {isBuyout ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Accept buyout */}
-              <div className="p-6 rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 space-y-4">
-                <div className="h-10 w-10 rounded-full bg-emerald-500/20 text-emerald-600 flex items-center justify-center"><TrendingUp className="h-6 w-6" /></div>
-                <div>
-                  <h4 className="font-bold text-emerald-700 dark:text-emerald-400">Accept Buyout Deal</h4>
-                  <p className="text-xs text-muted-foreground mt-1">Exit now with a guaranteed return.</p>
-                </div>
-                <div className="space-y-3 pt-2">
-                  <div>
-                    <label className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Acquiring Company Name</label>
-                    <input type="text" value={buyoutCompany} onChange={e => onBuyoutCompanyChange(e.target.value)} placeholder="e.g. Google, Target" className="w-full mt-1 bg-background/50 border border-emerald-500/30 rounded-md py-1.5 px-3 text-sm" />
+            <div className="-mx-2 sm:-mx-4 md:-mx-6 overflow-hidden rounded-2xl border border-border/50 shadow-2xl">
+              <div className="flex flex-col md:flex-row min-h-[420px]">
+                {/* LEFT HALF — Accept Buyout */}
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="relative flex-1 p-7 md:p-10 flex flex-col justify-between bg-gradient-to-br from-emerald-900/50 via-emerald-700/25 to-emerald-500/10"
+                >
+                  <div className="space-y-5">
+                    <motion.div
+                      animate={{ scale: [1, 1.04, 1] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                      className="h-16 w-16 rounded-full bg-emerald-500/25 ring-2 ring-emerald-400/40 text-emerald-300 flex items-center justify-center shadow-lg shadow-emerald-500/20"
+                    >
+                      <TrendingUp className="h-8 w-8" />
+                    </motion.div>
+                    <div>
+                      <h3
+                        className="text-2xl md:text-3xl font-bold tracking-wide text-emerald-200"
+                        style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.04em' }}
+                      >
+                        Accept the Buyout
+                      </h3>
+                      <p className="text-sm text-emerald-100/70 mt-2 max-w-sm">
+                        Exit now with a guaranteed return. Your run ends here.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Deal Value ($)</label>
-                    <input type="number" value={buyoutAmount} onChange={e => onBuyoutAmountChange(e.target.value)} placeholder="e.g. 5000000" className="w-full mt-1 bg-background/50 border border-emerald-500/30 rounded-md py-1.5 px-3 text-sm" />
+                  <div className="space-y-3 pt-6">
+                    <div>
+                      <label className="text-[11px] uppercase tracking-wider font-bold text-emerald-300/80">Acquiring Company</label>
+                      <input
+                        type="text"
+                        value={buyoutCompany}
+                        onChange={e => onBuyoutCompanyChange(e.target.value)}
+                        placeholder="e.g. Google, Target"
+                        className="w-full mt-1.5 bg-background/40 border border-emerald-500/40 focus:border-emerald-400 rounded-md py-2 px-3 text-sm outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] uppercase tracking-wider font-bold text-emerald-300/80">Deal Value ($)</label>
+                      <input
+                        type="number"
+                        value={buyoutAmount}
+                        onChange={e => onBuyoutAmountChange(e.target.value)}
+                        placeholder="e.g. 5000000"
+                        className="w-full mt-1.5 bg-background/40 border border-emerald-500/40 focus:border-emerald-400 rounded-md py-2 px-3 text-sm outline-none transition"
+                      />
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={onBuyoutSubmit}
+                      disabled={submitting}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-3 rounded-md transition shadow-lg shadow-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.08em' }}
+                    >
+                      {submitting ? 'Finalizing…' : 'Accept & Exit'}
+                    </motion.button>
+                    {submitError && <p className="text-xs text-red-300 mt-1">{submitError}</p>}
                   </div>
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={onBuyoutSubmit} disabled={submitting} className="w-full bg-emerald-600/90 text-white text-sm font-bold py-2 rounded-md hover:bg-emerald-600 transition">Confirm</motion.button>
-                  {submitError && <p className="text-xs text-red-500 mt-1">{submitError}</p>}
-                </div>
+                </motion.div>
+
+                {/* Divider */}
+                <div
+                  className="hidden md:block w-px"
+                  style={{ background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent)' }}
+                />
+
+                {/* RIGHT HALF — Enter War Room (entire panel is the click target) */}
+                <motion.button
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  whileHover={{ scale: 1.005 }}
+                  whileTap={{ scale: 0.995 }}
+                  onClick={() => onTextChange('I choose to WALK OUT OF THE DEAL and ENTER THE WAR ROOM for investments.')}
+                  className={cn(
+                    'relative flex-1 p-7 md:p-10 flex flex-col justify-between text-left group transition-all bg-gradient-to-br from-red-900/50 via-red-700/25 to-red-500/10',
+                    currentAnswer?.text?.includes('WALK OUT') ? 'ring-2 ring-red-400/60 ring-inset' : 'hover:from-red-900/60 hover:via-red-700/30',
+                  )}
+                >
+                  <div className="space-y-5">
+                    <div className="h-16 w-16 rounded-full bg-red-500/25 ring-2 ring-red-400/40 text-red-300 flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:scale-110 transition-transform">
+                      <ShieldAlert className="h-8 w-8" />
+                    </div>
+                    <div>
+                      <h3
+                        className="text-2xl md:text-3xl font-bold tracking-wide text-red-200"
+                        style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.04em' }}
+                      >
+                        Enter the War Room
+                      </h3>
+                      <p className="text-sm text-red-100/70 mt-2 max-w-sm">
+                        Reject the buyout. Fight for valuation and retain control of the throne.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="pt-6 flex items-center gap-2 text-xs font-bold text-red-200 uppercase tracking-widest opacity-80 group-hover:opacity-100 transition-opacity"
+                    style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.12em' }}
+                  >
+                    Prepare for War <ChevronRight className="h-4 w-4" />
+                  </div>
+                </motion.button>
               </div>
-              {/* Enter War Room */}
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                onClick={() => onTextChange('I choose to WALK OUT OF THE DEAL and ENTER THE WAR ROOM for investments.')}
-                className={cn('p-6 rounded-2xl border-2 text-left space-y-3 transition-all group', currentAnswer?.text?.includes('WALK OUT') ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-muted')}
-              >
-                <div className="h-10 w-10 rounded-full bg-red-500/20 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform"><ShieldAlert className="h-6 w-6" /></div>
-                <div>
-                  <h4 className="font-bold">Enter War Room</h4>
-                  <p className="text-xs text-muted-foreground mt-1">Reject the buyout. Fight for valuation and retain control.</p>
-                </div>
-                <div className="text-xs font-bold text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">Prepare for War <ChevronRight className="h-3 w-3" /></div>
-              </motion.button>
             </div>
           ) : (
             <>

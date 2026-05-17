@@ -8,6 +8,7 @@ import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import { useMicPermission } from '@/src/hooks/useMicPermission'
 import { MicPermissionDialog } from '@/components/MicPermissionDialog'
+import { normalizeVoiceSlug as sharedNormalizeVoiceSlug } from '@/src/lib/helpers'
 import type {
     AssessmentState,
     Investor,
@@ -140,14 +141,9 @@ function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[] {
     return []
 }
 
-function normalizeVoiceSlug(value: string): string {
-    return value
-        .trim()
-        .toLowerCase()
-        .replace(/[\u2019']/g, '')
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '')
-}
+// Re-exported via shared helper so investor title \u2192 id \u2192 voice-slug resolution
+// stays in one place (see src/lib/helpers.tsx).
+const normalizeVoiceSlug = sharedNormalizeVoiceSlug
 
 function getPreparedPitchFromState(state: AssessmentState | null): string {
     const directPitch = state?.assessment?.warRoomPitch?.trim()

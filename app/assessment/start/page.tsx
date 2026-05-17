@@ -132,12 +132,12 @@ export default function SimulationStartPage() {
           <div className="feature-card">
             <div className="feature-icon">M3</div>
             <h3>3 Mentor Lifelines</h3>
-            <p>Consult Tony Robbins, Grant Cardone, Richard Branson, and 4 more world-class mentors when you need guidance</p>
+            <p>Consult the Mindset Architect, the Sales Commander, the Brand Pioneer, and four more world-class mentors when you need guidance</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">WR</div>
             <h3>Investor War Room</h3>
-            <p>Pitch to 7 investors including Kevin O&apos;Leary, Mark Cuban, and Barbara Corcoran. Negotiate your deal.</p>
+            <p>Pitch to seven investors including the Master of Coin, the Hand of Execution, and the Mother of Instinct. Negotiate your deal.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">E3</div>

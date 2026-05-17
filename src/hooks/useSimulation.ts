@@ -297,7 +297,7 @@ export function useSimulation(assessmentId: string) {
       try {
         const amount = Math.max(revenue || 0, 1_000_000)
         await api.assessments.chooseBuyout(assessmentId, 'Strategic Buyer', amount)
-        router.push(`/assessment/${assessmentId}/final-report`)
+        transition.triggerBuyoutLockout('Strategic Buyer', amount)
       } catch (err: any) {
         transition.setSubmitError(err.message || 'Failed to finalise buyout')
       } finally {
@@ -407,6 +407,9 @@ export function useSimulation(assessmentId: string) {
     phaseScenario: transition.phaseScenario,
     showingScenario: transition.showingScenario,
     showRestartCheckpoint: transition.showRestartCheckpoint,
+    showBuyoutLockout: transition.showBuyoutLockout,
+    buyoutContext: transition.buyoutContext,
+    dismissBuyoutLockout: transition.dismissBuyoutLockout,
     showMentorPanel: mentor.showMentorPanel,
     selectedMentorId: mentor.selectedMentorId,
     mentorQuestion: mentor.mentorQuestion,

@@ -67,12 +67,12 @@ export default function HomePage() {
   ]
 
   const panelists = [
-    { name: "Kevin O'Leary", avatar: 'KO', house: 'Lannister', color: '#c9a227' },
-    { name: 'Tony Robbins', avatar: 'TR', house: 'Targaryen', color: '#8b1a1a' },
-    { name: 'Mark Cuban', avatar: 'MC', house: 'Stark', color: '#3b82f6' },
-    { name: 'Simon Sinek', avatar: 'SS', house: 'Baratheon', color: '#1a1a1a' },
-    { name: 'Barbara Corcoran', avatar: 'BC', house: 'Tyrell', color: '#16a34a' },
-    { name: 'Indra Nooyi', avatar: 'IN', house: 'Martell', color: '#ea580c' },
+    { name: 'The Master of Coin', avatar: 'MC', house: 'Lannister', color: '#c9a227' },
+    { name: 'The Mindset Architect', avatar: 'MA', house: 'Targaryen', color: '#8b1a1a' },
+    { name: 'The Hand of Execution', avatar: 'HE', house: 'Stark', color: '#3b82f6' },
+    { name: 'The Purpose Translator', avatar: 'PT', house: 'Baratheon', color: '#1a1a1a' },
+    { name: 'The Mother of Instinct', avatar: 'MI', house: 'Tyrell', color: '#16a34a' },
+    { name: 'The Institution Builder', avatar: 'IB', house: 'Martell', color: '#ea580c' },
   ]
 
   const stages = [
@@ -419,8 +419,8 @@ export default function HomePage() {
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <p className="text-base mb-6" style={{ color: '#8c8075', maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 1.8 }}>
-              Kevin O&apos;Leary demands profit above honor. Richard Branson preaches culture first.
-              Grant Cardone screams 10X. Codie Sanchez warns of the debt dragon.
+              The Master of Coin demands profit above honor. The Brand Pioneer preaches culture first.
+              The Sales Commander screams ten-times growth. The Acquisition Operator warns of the debt dragon.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.3}>
