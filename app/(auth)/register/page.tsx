@@ -1,19 +1,36 @@
-﻿'use client'
+'use client'
 
-import React from "react"
+import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Check, X } from 'lucide-react'
 import api from '@/src/lib/api'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ThemeToggle } from '@/components/theme-toggle'
+import {
+  StoneCard,
+  WarRoomCTA,
+  WarRoomCrest,
+} from '@/src/components/primitives'
+import { audioManager } from '@/lib/audio/audioManager'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
+import { easeDramatic } from '@/lib/animations/variants'
+
+// ─── Shared style tokens ────────────────────────────────────────────────────
+
+const INPUT_CLASSES = cn(
+  'bg-[color:var(--color-warroom-rampart)]/80 border-[color:var(--color-warroom-ash)]/50',
+  'text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]/50',
+  'focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20',
+)
+
+// ─── Page ───────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -70,126 +87,339 @@ export default function RegisterPage() {
         batchCode: batchCode.trim().toUpperCase(),
       })
       acceptTerms()
+      audioManager.playSfx('ui.click')
       router.push('/login?registered=true')
-    } catch (err: any) {
-      setError(err.message || 'Registration failed')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary/5 to-transparent px-4">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-            KK
-          </div>
-          <h1 className="text-3xl font-bold">Get Started</h1>
-          <p className="text-muted-foreground mt-2">Create your War Room account</p>
-        </div>
+  const toggleTerms = useCallback(() => {
+    setAcceptedTerms((prev) => !prev)
+    audioManager.playSfx('ui.click')
+  }, [])
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Create Account</CardTitle>
-            <CardDescription>
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? false : { y: 28, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: easeDramatic }}
+      className="w-full max-w-md"
+    >
+      {/* ── Hero ── */}
+      <div className="text-center mb-8">
+        <motion.div
+          initial={prefersReducedMotion ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+          className="flex justify-center mb-5"
+        >
+          <WarRoomCrest size={56} />
+        </motion.div>
+
+        <motion.h1
+          initial={prefersReducedMotion ? false : { y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.25, duration: 0.45, ease: easeDramatic }}
+          className="text-2xl font-semibold tracking-[0.04em]"
+          style={{
+            fontFamily: 'var(--font-display)',
+            background:
+              'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Claim Your Seat
+        </motion.h1>
+
+        <motion.p
+          initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35, duration: 0.4, ease: easeDramatic }}
+          className="text-sm text-[color:var(--color-warroom-smoke)] mt-2"
+          style={{ fontFamily: 'var(--font-body, serif)' }}
+        >
+          Create your War Room account and join the Council.
+        </motion.p>
+      </div>
+
+      {/* ── Form Card ── */}
+      <motion.div
+        initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.5, ease: easeDramatic }}
+      >
+        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+          <div className="mb-5">
+            <h2
+              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-warroom-ivory)] mb-1"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Create Account
+            </h2>
+            <p
+              className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
               Enter your batch code and details to begin your simulation. Review the{' '}
-              <Link href="/terms" className="text-primary hover:underline">Terms &amp; Conditions</Link>{' '}
+              <Link
+                href="/terms"
+                className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+              >
+                Terms &amp; Conditions
+              </Link>{' '}
               before continuing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Batch Code</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. BATCH2024A"
-                  value={batchCode}
-                  onChange={(e) => {
-                    setBatchCode(e.target.value.toUpperCase())
-                    setBatchValid(null)
-                    setBatchName('')
-                  }}
-                  onBlur={handleBatchCodeBlur}
-                  required
-                  className={`mt-1 ${batchValid === true ? 'border-green-500' : batchValid === false ? 'border-red-500' : ''}`}
-                />
+            </p>
+          </div>
+
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ x: -8, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-sm text-[color:var(--color-warroom-crimson-bright)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Batch Code */}
+            <div>
+              <label
+                htmlFor="reg-batch"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Batch Code
+              </label>
+              <Input
+                id="reg-batch"
+                type="text"
+                placeholder="e.g. BATCH2024A"
+                value={batchCode}
+                onChange={(e) => {
+                  setBatchCode(e.target.value.toUpperCase())
+                  setBatchValid(null)
+                  setBatchName('')
+                }}
+                onBlur={handleBatchCodeBlur}
+                required
+                className={cn(
+                  INPUT_CLASSES,
+                  batchValid === true &&
+                    'border-[color:var(--color-warroom-verdant)] focus-visible:border-[color:var(--color-warroom-verdant)]',
+                  batchValid === false &&
+                    'border-[color:var(--color-warroom-crimson)] focus-visible:border-[color:var(--color-warroom-crimson)]',
+                )}
+              />
+              <AnimatePresence>
                 {batchValid === true && batchName && (
-                  <p className="text-xs text-green-600 mt-1">âœ“ {batchName}</p>
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-verdant)] mt-1.5"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    <Check className="w-3 h-3" /> {batchName}
+                  </motion.p>
                 )}
                 {batchValid === false && (
-                  <p className="text-xs text-red-500 mt-1">Invalid or inactive batch code</p>
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-crimson-bright)] mt-1.5"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    <X className="w-3 h-3" /> Invalid or inactive batch code
+                  </motion.p>
                 )}
-              </div>
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <Input
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Password</label>
-                <Input
-                  type="password"
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
-                <Checkbox
-                  id="register-terms"
-                  checked={acceptedTerms}
-                  onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
-                  className="mt-0.5"
-                />
-                <label htmlFor="register-terms" className="text-sm leading-6 text-muted-foreground">
-                  I have read and agree to the{' '}
-                  <Link href="/terms" className="font-medium text-primary hover:underline">
-                    Terms &amp; Conditions
-                  </Link>
-                </label>
-              </div>
-              <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
-                {loading ? 'Creating account...' : 'Create Account'}
-              </Button>
+              </AnimatePresence>
+            </div>
 
-              {error && (
-                <p className="text-sm text-red-500 text-center">{error}</p>
+            {/* Full Name */}
+            <div>
+              <label
+                htmlFor="reg-name"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Full Name
+              </label>
+              <Input
+                id="reg-name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className={INPUT_CLASSES}
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="reg-email"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Email
+              </label>
+              <Input
+                id="reg-email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={INPUT_CLASSES}
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="reg-password"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Password
+              </label>
+              <Input
+                id="reg-password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={INPUT_CLASSES}
+              />
+            </div>
+
+            {/* Wax-seal terms toggle */}
+            <motion.div
+              className={cn(
+                'flex items-start gap-3.5 p-4 rounded-[3px] border transition-all duration-300 cursor-pointer select-none',
+                acceptedTerms
+                  ? 'border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-gold)]/[0.04]'
+                  : 'border-[color:var(--color-warroom-ash)]/30 bg-[color:var(--color-warroom-rampart)]/50',
               )}
-            </form>
-          </CardContent>
-        </Card>
+              onClick={toggleTerms}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.997 }}
+            >
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={acceptedTerms}
+                aria-label="Accept Terms & Conditions"
+                className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-full"
+                tabIndex={0}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <motion.div
+                  className={cn(
+                    'w-6 h-6 rounded-full border-2 flex items-center justify-center relative overflow-hidden transition-colors duration-300',
+                    acceptedTerms
+                      ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]'
+                      : 'border-[color:var(--color-warroom-ash)] bg-[color:var(--color-warroom-rampart)]',
+                  )}
+                  animate={
+                    acceptedTerms && !prefersReducedMotion
+                      ? { scale: [1, 0.8, 1.08, 1] }
+                      : { scale: 1 }
+                  }
+                  transition={{ duration: 0.3, ease: easeDramatic }}
+                >
+                  <AnimatePresence mode="wait">
+                    {acceptedTerms ? (
+                      <motion.span
+                        key="check"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.16 }}
+                      >
+                        <Check
+                          className="w-3 h-3 text-[color:var(--color-warroom-void)]"
+                          strokeWidth={3}
+                        />
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="seal-glyph"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[6px] font-bold text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        WR
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </button>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+              <p
+                className="text-xs leading-relaxed"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                <span className="text-[color:var(--color-warroom-ivory)]">
+                  I have read and agree to the{' '}
+                </span>
+                <Link
+                  href="/terms"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                >
+                  Terms &amp; Conditions
+                </Link>
+              </p>
+            </motion.div>
+
+            {/* Submit */}
+            <WarRoomCTA
+              type="submit"
+              size="md"
+              variant="primary"
+              disabled={loading || !acceptedTerms}
+              className="w-full justify-center"
+            >
+              {loading ? 'Forging your banner…' : 'Create Account'}
+            </WarRoomCTA>
+          </form>
+        </StoneCard>
+      </motion.div>
+
+      {/* ── Login link ── */}
+      <motion.p
+        initial={prefersReducedMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.75, duration: 0.4 }}
+        className="text-center text-sm mt-7"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        <span className="text-[color:var(--color-warroom-smoke)]">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-primary hover:underline">
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+        </span>
+        <Link
+          href="/login"
+          className="font-semibold text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] underline underline-offset-2 transition-colors"
+        >
+          Sign in
+        </Link>
+      </motion.p>
+    </motion.div>
   )
 }

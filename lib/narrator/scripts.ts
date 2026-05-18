@@ -72,4 +72,36 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 2600,
     },
   ],
+
+  'assessment.first-visit': [
+    {
+      text: 'The Trial has many paths, lord. Choose your rank with care.',
+      mood: 'idle',
+      duration: 3400,
+    },
+    {
+      text: 'A Student walks the guided path. A Commander faces the full gauntlet.',
+      mood: 'speaking',
+      duration: 4000,
+    },
+    {
+      text: 'Nine stages await — from first spark of Ideation to the War Room itself.',
+      mood: 'speaking',
+      duration: 3600,
+    },
+    {
+      text: 'Seal your oath below, then press Enter the Trial when you are ready.',
+      mood: 'pointing',
+      highlight: 'assessment-start-cta',
+      duration: 0,
+    },
+  ],
+
+  'assessment.returning': [
+    {
+      text: 'You return to the threshold, lord. The Council remembers your last campaign.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
 }

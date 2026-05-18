@@ -1,432 +1,569 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import {
+  ChevronLeft,
+  Check,
+  Shield,
+  Users,
+  Crown,
+  FileText,
+  Swords,
+} from 'lucide-react'
 import api from '@/src/lib/api'
-import { Checkbox } from '@/components/ui/checkbox'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
+import { cn } from '@/lib/utils'
+import { CampaignMap } from '@/src/components/dashboard/CampaignMap'
+import {
+  StoneCard,
+  WarRoomCTA,
+  GoldDivider,
+  SigilBadge,
+  WarRoomCrest,
+} from '@/src/components/primitives'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { audioManager } from '@/lib/audio/audioManager'
+import {
+  staggerContainer,
+  staggerItem,
+  easeDramatic,
+} from '@/lib/animations/variants'
 
-const STAGES = [
-  { name: 'Ideation', number: -2, duration: '10 min', competencies: ['C1', 'C2'] },
-  { name: 'Vision', number: -1, duration: '5 min', competencies: ['C5', 'C8'] },
-  { name: 'Commitment', number: 0, duration: '10 min', competencies: ['C3', 'C4'] },
-  { name: 'Validation', number: 1, duration: '10 min', competencies: ['C1', 'C2', 'C7'] },
-  { name: 'Growth', number: 2, duration: '10 min', competencies: ['C4', 'C5', 'C7'] },
-  { name: 'Expansion', number: 2, duration: '10 min', competencies: ['C6', 'C5', 'C3'] },
-  { name: 'Scale', number: 3, duration: '10 min', competencies: ['C7', 'C8', 'C2'] },
-  { name: 'War Room Prep', number: 3, duration: '5 min', competencies: ['C4', 'C6', 'C5'] },
-  { name: 'War Room', number: 4, duration: '15 min', competencies: ['C1-C8'] },
-]
+// ─── Data ──────────────────────────────────────────────────────────────────
+
+const LEVELS = [
+  {
+    id: 1 as const,
+    badge: 'L1',
+    title: 'Student of the Realm',
+    subtitle:
+      'For students & early-career professionals exploring entrepreneurship.',
+    features: ['Guided scenarios', 'Foundational questions', '~85 minutes total'],
+    sigil: '⚔',
+  },
+  {
+    id: 2 as const,
+    badge: 'L2',
+    title: 'Commander of the Realm',
+    subtitle:
+      'For mid-level managers & experienced professionals ready for the full gauntlet.',
+    features: ['Complex scenarios', 'Advanced pressure', '~85 minutes total'],
+    sigil: '♛',
+  },
+] as const
+
+const FEATURES = [
+  {
+    glyph: 'C8',
+    title: '8 Core Competencies',
+    desc: 'Problem Sensing, Learning Agility, Courage, Financial Discipline, Strategy, Influence, Team Management, Value Creation.',
+    icon: Shield,
+    tone: 'gold' as const,
+    accent: 'var(--color-warroom-gold)',
+  },
+  {
+    glyph: 'M3',
+    title: '3 Mentor Lifelines',
+    desc: 'Consult the Mindset Architect, the Sales Commander, the Brand Pioneer, and four more world-class mentors when you need guidance.',
+    icon: Users,
+    tone: 'verdant' as const,
+    accent: 'var(--color-warroom-verdant)',
+  },
+  {
+    glyph: 'WR',
+    title: 'Investor War Room',
+    desc: 'Pitch to seven investors — the Master of Coin, the Hand of Execution, the Mother of Instinct. Negotiate your deal.',
+    icon: Crown,
+    tone: 'crimson' as const,
+    accent: 'var(--color-warroom-crimson)',
+  },
+  {
+    glyph: 'E3',
+    title: '3-Page Evaluation',
+    desc: 'Get your entrepreneur archetype, competency spider chart, role fit map, and a personalised action plan.',
+    icon: FileText,
+    tone: 'amethyst' as const,
+    accent: 'var(--color-warroom-amethyst)',
+  },
+] as const
+
+// ─── Page ───────────────────────────────────────────────────────────────────
 
 export default function SimulationStartPage() {
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
+
   const [level, setLevel] = useState<1 | 2>(1)
   const [acceptedTerms, setAcceptedTerms] = useState(() => hasAcceptedTerms())
   const [isStarting, setIsStarting] = useState(false)
   const [error, setError] = useState('')
 
+  // Narrator onboarding for this phase
+  useNarratorOnboarding('assessment', { delayMs: 1200 })
+
   const handleStart = async () => {
     if (!acceptedTerms) {
-      setError('Please accept the Terms & Conditions before attending the simulation')
+      setError('Please accept the Terms & Conditions before attending the simulation.')
       return
     }
-
     setIsStarting(true)
     setError('')
     try {
       const simulation = await api.assessments.create({ level })
       acceptTerms()
+      audioManager.playSfx('wr.door-creak')
       router.push(`/assessment/${simulation.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to start simulation')
+      setError(err instanceof Error ? err.message : 'Failed to start simulation.')
       setIsStarting(false)
     }
   }
 
+  const handleLevelSelect = useCallback(
+    (id: 1 | 2) => {
+      setLevel(id)
+      audioManager.playSfx('ui.click')
+    },
+    [],
+  )
+
+  const toggleTerms = useCallback(() => {
+    setAcceptedTerms((prev) => !prev)
+    audioManager.playSfx('ui.click')
+  }, [])
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
   return (
-    <div className="simulation-start-page">
-      <div className="start-container">
-        <Link href="/" className="back-link">← Back to Dashboard</Link>
-        <div className="terms-banner">
-          <div>
-            <strong>Before attending:</strong> please review and accept the{' '}
-            <Link href="/terms">Terms &amp; Conditions</Link>.
-          </div>
-        </div>
-
-        <div className="hero-section">
-          <div className="hero-badge">KK&apos;s War Room 2.0</div>
-          <h1>Business Simulation Simulation</h1>
-          <p className="hero-subtitle">
-            Navigate a 12-month startup journey across 7 stages. Make decisions under pressure,
-            consult mentors, and pitch to investors. Your 8 core competencies will be evaluated
-            to reveal your entrepreneur type and organizational role fit.
-          </p>
-        </div>
-
-        {/* Level Selection */}
-        <div className="level-selection">
-          <h2>Select Your Level</h2>
-          <div className="level-cards">
-            <button
-              className={`level-card ${level === 1 ? 'selected' : ''}`}
-              onClick={() => setLevel(1)}
-            >
-              <div className="level-icon">L1</div>
-              <h3>Level 1: Student</h3>
-              <p>For students & early-career professionals exploring entrepreneurship</p>
-              <ul>
-                <li>Guided scenarios</li>
-                <li>Foundational questions</li>
-                <li>~85 minutes total</li>
-              </ul>
-            </button>
-            <button
-              className={`level-card ${level === 2 ? 'selected' : ''}`}
-              onClick={() => setLevel(2)}
-            >
-              <div className="level-icon">L2</div>
-              <h3>Level 2: Manager</h3>
-              <p>For mid-level managers & experienced professionals</p>
-              <ul>
-                <li>Complex scenarios</li>
-                <li>Advanced pressure</li>
-                <li>~85 minutes total</li>
-              </ul>
-            </button>
-          </div>
-        </div>
-
-        {/* Journey Overview */}
-        <div className="journey-overview">
-          <h2>Your 12-Month Journey</h2>
-          <div className="journey-timeline">
-            {STAGES.map((stage, i) => (
-              <div key={i} className="timeline-item">
-                <div className="timeline-dot" />
-                <div className="timeline-content">
-                  <div className="timeline-header">
-                    <span className="stage-badge">Stage {stage.number}</span>
-                    <span className="duration-badge">{stage.duration}</span>
-                  </div>
-                  <h4>{stage.name}</h4>
-                  <div className="competency-tags">
-                    {stage.competencies.map((c, j) => (
-                      <span key={j} className="comp-tag">{c}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Key Features */}
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">C8</div>
-            <h3>8 Core Competencies</h3>
-            <p>Problem Sensing, Learning Agility, Courage, Financial Discipline, Strategy, Influence, Team Management, Value Creation</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">M3</div>
-            <h3>3 Mentor Lifelines</h3>
-            <p>Consult the Mindset Architect, the Sales Commander, the Brand Pioneer, and four more world-class mentors when you need guidance</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">WR</div>
-            <h3>Investor War Room</h3>
-            <p>Pitch to seven investors including the Master of Coin, the Hand of Execution, and the Mother of Instinct. Negotiate your deal.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">E3</div>
-            <h3>3-Page Evaluation</h3>
-            <p>Get your entrepreneur archetype, competency spider chart, role fit map, and personalized action plan</p>
-          </div>
-        </div>
-
-        {error && <div className="error-message">{error}</div>}
-
-        <div className="consent-box">
-          <Checkbox
-            id="simulation-terms"
-            checked={acceptedTerms}
-            onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
-          />
-          <label htmlFor="simulation-terms">
-            I have read and agree to the <Link href="/terms">Terms &amp; Conditions</Link>.
-          </label>
-        </div>
-
-        <button
-          className="start-button"
-          onClick={handleStart}
-          disabled={isStarting || !acceptedTerms}
-        >
-          {isStarting ? 'Initializing Simulation...' : 'Begin Simulation →'}
-        </button>
-      </div>
-
-      <style jsx>{`
-        .simulation-start-page {
-          min-height: 100vh;
+    <div className="min-h-screen bg-[color:var(--color-warroom-void)] text-[color:var(--color-warroom-ivory)] relative overflow-x-hidden">
+      {/* Atmospheric backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
           background:
-            radial-gradient(circle at top, rgba(0,0,0,0.08), transparent 35%),
-            linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
-          color: #111111;
-          padding: 2rem;
-        }
-        .start-container {
-          max-width: 900px;
-          margin: 0 auto;
-        }
-        .back-link {
-          color: #111111;
-          text-decoration: none;
-          font-size: 0.9rem;
-          display: inline-block;
-          margin-bottom: 2rem;
-          transition: color 0.2s;
-        }
-        .back-link:hover { color: #000000; }
+            'radial-gradient(ellipse 110% 55% at 50% 0%, rgba(201,162,39,0.07) 0%, transparent 65%)',
+        }}
+      />
 
-        .terms-banner {
-          max-width: 900px;
-          margin: 0 auto 1.5rem;
-          padding: 0.9rem 1rem;
-          border: 1px solid rgba(0, 0, 0, 0.12);
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 12px;
-          color: #111111;
-          font-size: 0.92rem;
-          line-height: 1.5;
-        }
+      {/* ── Top Navigation ── */}
+      <nav className="sticky top-0 z-20 flex items-center gap-2 px-6 py-3.5 border-b border-[color:var(--color-warroom-ash)]/25 bg-[color:var(--color-warroom-void)]/90 backdrop-blur-sm">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-1.5 text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-[10px] uppercase tracking-[0.14em]">
+            The Great Hall
+          </span>
+        </Link>
+        <span className="text-[color:var(--color-warroom-ash)] text-xs">/</span>
+        <span
+          className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-gold)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          The Trial
+        </span>
+      </nav>
 
-        .terms-banner a,
-        .consent-box a {
-          color: #000000;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-        }
+      {/* ── Main Content ── */}
+      <main className="relative z-10 mx-auto max-w-4xl px-6 py-14">
 
-        .hero-section {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-        .hero-badge {
-          display: inline-block;
-          background: #000000;
-          color: white;
-          padding: 0.4rem 1.2rem;
-          border-radius: 20px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          margin-bottom: 1rem;
-          letter-spacing: 0.5px;
-        }
-        h1 {
-          font-size: 2.5rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, #111111, #555555);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 1rem;
-        }
-        .hero-subtitle {
-          color: #444444;
-          font-size: 1.05rem;
-          line-height: 1.6;
-          max-width: 700px;
-          margin: 0 auto;
-        }
+        {/* ── Hero ── */}
+        <motion.section
+          className="text-center mb-14"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, ease: easeDramatic }}
+        >
+          <div className="flex justify-center mb-6">
+            <WarRoomCrest size={88} />
+          </div>
 
-        .level-selection, .journey-overview { margin-bottom: 3rem; }
-        h2 {
-          font-size: 1.4rem;
-          font-weight: 700;
-          color: #111111;
-          margin-bottom: 1.5rem;
-          text-align: center;
-        }
+          <div className="flex justify-center mb-5">
+            <SigilBadge tone="gold" icon={Swords}>
+              KK&apos;s War Room 2.0
+            </SigilBadge>
+          </div>
 
-        .level-cards {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.5rem;
-        }
-        .level-card {
-          background: rgba(255,255,255,0.96);
-          border: 2px solid rgba(0,0,0,0.08);
-          border-radius: 16px;
-          padding: 2rem;
-          text-align: left;
-          cursor: pointer;
-          transition: all 0.3s;
-          color: #111111;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-        .level-card:hover {
-          border-color: rgba(0, 0, 0, 0.18);
-          background: #ffffff;
-        }
-        .level-card.selected {
-          border-color: #000000;
-          background: rgba(0, 0, 0, 0.04);
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
-        }
-        .level-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-        .level-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #111111; }
-        .level-card p { font-size: 0.9rem; color: #444444; margin-bottom: 1rem; }
-        .level-card ul {
-          list-style: none;
-          padding: 0;
-          font-size: 0.85rem;
-          color: #111111;
-        }
-        .level-card ul li {
-          padding: 0.2rem 0;
-        }
-        .level-card ul li::before {
-          content: '✓ ';
-          color: #34d399;
-        }
+          <h1
+            className="text-3xl sm:text-[2.4rem] font-semibold mb-4 tracking-[0.04em] leading-tight"
+            style={{
+              fontFamily: 'var(--font-display)',
+              background:
+                'linear-gradient(135deg, var(--color-warroom-gold) 0%, var(--color-warroom-gold-bright) 50%, var(--color-warroom-gold) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            The Business Simulation
+          </h1>
 
-        .journey-timeline {
-          position: relative;
-          padding-left: 2rem;
-        }
-        .journey-timeline::before {
-          content: '';
-          position: absolute;
-          left: 8px;
-          top: 0;
-          bottom: 0;
-          width: 2px;
-          background: linear-gradient(to bottom, #111111, #444444, #111111);
-        }
-        .timeline-item {
-          position: relative;
-          padding-bottom: 1.2rem;
-          padding-left: 1.5rem;
-        }
-        .timeline-dot {
-          position: absolute;
-          left: -1.95rem;
-          top: 4px;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: #111111;
-          border: 2px solid #ffffff;
-        }
-        .timeline-header {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-          margin-bottom: 0.3rem;
-        }
-        .stage-badge {
-          background: rgba(0, 0, 0, 0.08);
-          color: #111111;
-          padding: 0.15rem 0.6rem;
-          border-radius: 8px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-        .duration-badge {
-          color: #555555;
-          font-size: 0.75rem;
-        }
-        .timeline-content h4 {
-          color: #111111;
-          font-size: 1rem;
-          margin-bottom: 0.4rem;
-        }
-        .competency-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-        .comp-tag {
-          background: rgba(0, 0, 0, 0.05);
-          color: #111111;
-          padding: 0.1rem 0.5rem;
-          border-radius: 6px;
-          font-size: 0.7rem;
-          font-weight: 600;
-        }
+          <p
+            className="text-[color:var(--color-warroom-smoke)] text-[0.95rem] leading-relaxed max-w-[580px] mx-auto"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
+          >
+            Navigate a 12-month startup journey across 9 stages. Make decisions under
+            pressure, consult mentors, and pitch to investors. Your 8 core competencies
+            will be evaluated to reveal your entrepreneur type and organisational role fit.
+          </p>
+        </motion.section>
 
-        .features-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.2rem;
-          margin-bottom: 2.5rem;
-        }
-        .feature-card {
-          background: rgba(255,255,255,0.96);
-          border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 12px;
-          padding: 1.5rem;
-          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
-        }
-        .feature-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
+        <GoldDivider variant="sword" className="mb-14" />
 
-        .consent-box {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.75rem;
-          margin-bottom: 1rem;
-          padding: 0.9rem 1rem;
-          border-radius: 12px;
-          border: 1px solid rgba(0,0,0,0.08);
-          background: rgba(255,255,255,0.96);
-          color: #111111;
-          font-size: 0.95rem;
-          line-height: 1.5;
-        }
+        {/* ── Level Selection ── */}
+        <section className="mb-14">
+          <SectionHeader>Choose Your Rank</SectionHeader>
 
-        .consent-box label {
-          cursor: pointer;
-        }
-        .feature-card h3 { font-size: 1rem; color: #111111; margin-bottom: 0.4rem; }
-        .feature-card p { font-size: 0.85rem; color: #444444; line-height: 1.5; }
+          <motion.div
+            className="grid sm:grid-cols-2 gap-4 mt-6"
+            variants={staggerContainer}
+            initial={prefersReducedMotion ? false : 'hidden'}
+            animate="show"
+          >
+            {LEVELS.map((item) => (
+              <motion.button
+                key={item.id}
+                type="button"
+                variants={staggerItem}
+                onClick={() => handleLevelSelect(item.id)}
+                whileHover={prefersReducedMotion ? undefined : { y: -4 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
+                transition={{ duration: 0.2, ease: easeDramatic }}
+                className="text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-[3px]"
+                aria-pressed={level === item.id}
+              >
+                <StoneCard
+                  accent={
+                    level === item.id
+                      ? 'var(--color-warroom-gold)'
+                      : 'var(--color-warroom-ash)'
+                  }
+                  sigilWatermark={
+                    <span
+                      className="text-[9rem] leading-none select-none"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {item.sigil}
+                    </span>
+                  }
+                  className={cn(
+                    'h-full p-6 transition-all duration-300',
+                    level === item.id
+                      ? 'ring-1 ring-[color:var(--color-warroom-gold)]/40 shadow-[0_0_32px_-8px_rgba(201,162,39,0.55)]'
+                      : '',
+                  )}
+                >
+                  {/* Badge + checkmark row */}
+                  <div className="flex items-start justify-between mb-5">
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-[2px] border tracking-[0.14em] uppercase transition-all duration-300',
+                        level === item.id
+                          ? 'text-[color:var(--color-warroom-void)] bg-[color:var(--color-warroom-gold)] border-[color:var(--color-warroom-gold)]'
+                          : 'text-[color:var(--color-warroom-smoke)] bg-transparent border-[color:var(--color-warroom-ash)]/50',
+                      )}
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {item.badge}
+                    </span>
 
-        .error-message {
-          background: rgba(239, 68, 68, 0.06);
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          color: #991b1b;
-          padding: 0.8rem 1.2rem;
-          border-radius: 8px;
-          margin-bottom: 1.5rem;
-          text-align: center;
-        }
+                    <AnimatePresence>
+                      {level === item.id && (
+                        <motion.span
+                          key="check"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 380,
+                            damping: 20,
+                          }}
+                        >
+                          <Check
+                            className="w-5 h-5 text-[color:var(--color-warroom-gold)]"
+                            strokeWidth={2.5}
+                          />
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
-        .start-button {
-          display: block;
-          width: 100%;
-          padding: 1.2rem;
-          background: linear-gradient(135deg, #111111, #333333);
-          color: white;
-          border: none;
-          border-radius: 12px;
-          font-size: 1.15rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s;
-          letter-spacing: 0.5px;
-        }
-        .start-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
-        }
-        .start-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+                  {/* Title */}
+                  <h3
+                    className={cn(
+                      'text-base font-semibold mb-2.5 tracking-[0.05em] transition-colors duration-300',
+                      level === item.id
+                        ? 'text-[color:var(--color-warroom-gold)]'
+                        : 'text-[color:var(--color-warroom-ivory)]',
+                    )}
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {item.title}
+                  </h3>
 
-        @media (max-width: 768px) {
-          .level-cards, .features-grid { grid-template-columns: 1fr; }
-          h1 { font-size: 1.8rem; }
-        }
-      `}</style>
+                  {/* Subtitle */}
+                  <p
+                    className="text-sm text-[color:var(--color-warroom-smoke)] mb-5 leading-relaxed"
+                    style={{ fontFamily: 'var(--font-body, serif)' }}
+                  >
+                    {item.subtitle}
+                  </p>
+
+                  {/* Feature bullets */}
+                  <ul className="space-y-2">
+                    {item.features.map((f) => (
+                      <li
+                        key={f}
+                        className="flex items-center gap-2.5 text-xs tracking-[0.05em] text-[color:var(--color-warroom-ivory)]/70"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        <span
+                          className={cn(
+                            'w-1 h-1 rounded-full flex-shrink-0 transition-colors duration-300',
+                            level === item.id
+                              ? 'bg-[color:var(--color-warroom-gold)]'
+                              : 'bg-[color:var(--color-warroom-ash)]',
+                          )}
+                        />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </StoneCard>
+              </motion.button>
+            ))}
+          </motion.div>
+        </section>
+
+        <GoldDivider variant="line" className="mb-14" />
+
+        {/* ── The 12-Month Journey ── */}
+        <section className="mb-14">
+          <SectionHeader>The 12-Month Journey</SectionHeader>
+
+          <motion.div
+            className="mt-6"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: easeDramatic }}
+          >
+            <StoneCard className="p-5 sm:p-7 overflow-x-auto">
+              {/* currentStage=null → all nodes appear locked (not yet started) */}
+              <CampaignMap currentStage={null} className="min-w-[540px]" />
+            </StoneCard>
+          </motion.div>
+        </section>
+
+        <GoldDivider variant="rune" className="mb-14" />
+
+        {/* ── What Awaits ── */}
+        <section className="mb-14">
+          <SectionHeader>What Awaits</SectionHeader>
+
+          <motion.div
+            className="grid sm:grid-cols-2 gap-4 mt-6"
+            variants={staggerContainer}
+            initial={prefersReducedMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true }}
+          >
+            {FEATURES.map((feat) => (
+              <motion.div key={feat.glyph} variants={staggerItem}>
+                <StoneCard
+                  accent={feat.accent}
+                  sigilWatermark={
+                    <span
+                      className="text-[6.5rem] font-bold leading-none select-none tracking-tight"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {feat.glyph}
+                    </span>
+                  }
+                  className="h-full p-5"
+                >
+                  <div className="mb-3">
+                    <SigilBadge tone={feat.tone} icon={feat.icon}>
+                      {feat.glyph}
+                    </SigilBadge>
+                  </div>
+                  <h3
+                    className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] mb-2 tracking-[0.06em]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {feat.title}
+                  </h3>
+                  <p
+                    className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+                    style={{ fontFamily: 'var(--font-body, serif)' }}
+                  >
+                    {feat.desc}
+                  </p>
+                </StoneCard>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* ── Terms & CTA ── */}
+        <section>
+          <GoldDivider variant="line" className="mb-8" />
+
+          {/* Wax-seal terms toggle */}
+          <motion.div
+            role="group"
+            aria-labelledby="terms-label"
+            className={cn(
+              'flex items-start gap-4 p-5 rounded-[3px] border mb-4 transition-all duration-300 cursor-pointer select-none',
+              acceptedTerms
+                ? 'border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-gold)]/[0.04]'
+                : 'border-[color:var(--color-warroom-ash)]/30 bg-[color:var(--color-warroom-rampart)]/50',
+            )}
+            onClick={toggleTerms}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.997 }}
+          >
+            {/* Wax seal visual checkbox */}
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={acceptedTerms}
+              aria-label="Accept Terms & Conditions"
+              className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-full"
+              tabIndex={0}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                className={cn(
+                  'w-7 h-7 rounded-full border-2 flex items-center justify-center relative overflow-hidden transition-colors duration-300',
+                  acceptedTerms
+                    ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]'
+                    : 'border-[color:var(--color-warroom-ash)] bg-[color:var(--color-warroom-rampart)]',
+                )}
+                animate={
+                  acceptedTerms && !prefersReducedMotion
+                    ? { scale: [1, 0.8, 1.08, 1] }
+                    : { scale: 1 }
+                }
+                transition={{ duration: 0.3, ease: easeDramatic }}
+              >
+                <AnimatePresence mode="wait">
+                  {acceptedTerms ? (
+                    <motion.span
+                      key="check"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.16 }}
+                    >
+                      <Check
+                        className="w-3.5 h-3.5 text-[color:var(--color-warroom-void)]"
+                        strokeWidth={3}
+                      />
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="seal-glyph"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[7px] font-bold text-[color:var(--color-warroom-smoke)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      WR
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </button>
+
+            {/* Terms text */}
+            <p
+              id="terms-label"
+              className="text-sm leading-relaxed"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              <span className="text-[color:var(--color-warroom-ivory)]">
+                I have read and agree to the{' '}
+              </span>
+              <Link
+                href="/terms"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+              >
+                Terms &amp; Conditions
+              </Link>
+              <span className="text-[color:var(--color-warroom-ivory)]">
+                {' '}of the War Room.
+              </span>
+            </p>
+          </motion.div>
+
+          {/* Error message */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="mb-5 p-4 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-[color:var(--color-warroom-crimson-bright)] text-sm text-center"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Start CTA */}
+          <div id="assessment-start-cta" className="flex flex-col items-stretch gap-3">
+            <WarRoomCTA
+              size="lg"
+              variant="primary"
+              icon={Swords}
+              disabled={isStarting || !acceptedTerms}
+              onClick={handleStart}
+              className="w-full justify-center"
+            >
+              {isStarting ? 'Preparing the War Room…' : 'Enter the Trial'}
+            </WarRoomCTA>
+
+            {!acceptedTerms && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Accept the terms above to enter the trial
+              </motion.p>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
 
+// ─── Sub-component ──────────────────────────────────────────────────────────
+
+/** Inline horizontal rule with centred section title. */
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <GoldDivider variant="line" className="flex-1" />
+      <h2
+        className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--color-warroom-smoke)] whitespace-nowrap"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        {children}
+      </h2>
+      <GoldDivider variant="line" className="flex-1" />
+    </div>
+  )
+}

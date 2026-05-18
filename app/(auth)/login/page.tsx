@@ -1,21 +1,36 @@
 'use client'
 
-import React, { Suspense, useEffect, useRef } from "react"
+import React, { Suspense, useState } from 'react'
 import Link from 'next/link'
-import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Check, X } from 'lucide-react'
 import api from '@/src/lib/api'
-import gsap from 'gsap'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ThemeToggle } from '@/components/theme-toggle'
+import {
+  StoneCard,
+  WarRoomCTA,
+  WarRoomCrest,
+} from '@/src/components/primitives'
+import { audioManager } from '@/lib/audio/audioManager'
+import { easeDramatic } from '@/lib/animations/variants'
+
+// ─── Shared style tokens ────────────────────────────────────────────────────
+
+const INPUT_CLASSES = cn(
+  'bg-[color:var(--color-warroom-rampart)]/80 border-[color:var(--color-warroom-ash)]/50',
+  'text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]/50',
+  'focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20',
+)
+
+// ─── Login content (wrapped in Suspense for useSearchParams) ────────────────
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
+  const prefersReducedMotion = useReducedMotion()
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [email, setEmail] = useState('')
@@ -70,6 +85,8 @@ function LoginContent() {
           localStorage.setItem('batch', JSON.stringify(response.batch))
         }
 
+        audioManager.playSfx('wr.door-creak')
+
         if (response.user?.role === 'admin') {
           router.push('/admin/cohorts')
         } else {
@@ -78,204 +95,298 @@ function LoginContent() {
       } else {
         setError('Invalid credentials')
       }
-    } catch (err: any) {
-      setError(err.message || 'Invalid email or password')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Invalid email or password')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Animated mesh background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-mesh-move" />
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-yellow-500/5 rounded-full blur-3xl animate-mesh-move" style={{ animationDelay: '-7s' }} />
-        <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl animate-mesh-move" style={{ animationDelay: '-3s' }} />
+    <motion.div
+      initial={prefersReducedMotion ? false : { y: 28, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: easeDramatic }}
+      className="w-full max-w-md"
+    >
+      {/* ── Hero ── */}
+      <div className="text-center mb-8">
+        <motion.div
+          initial={prefersReducedMotion ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+          className="flex justify-center mb-5"
+        >
+          <WarRoomCrest size={56} />
+        </motion.div>
+
+        <motion.h1
+          initial={prefersReducedMotion ? false : { y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.25, duration: 0.45, ease: easeDramatic }}
+          className="text-2xl font-semibold tracking-[0.04em]"
+          style={{
+            fontFamily: 'var(--font-display)',
+            background:
+              'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Return to the War Room
+        </motion.h1>
+
+        <motion.p
+          initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35, duration: 0.4, ease: easeDramatic }}
+          className="text-sm text-[color:var(--color-warroom-smoke)] mt-2"
+          style={{ fontFamily: 'var(--font-body, serif)' }}
+        >
+          {isAdmin
+            ? 'Sign in to the admin panel'
+            : 'Sign in to your War Room simulation'}
+        </motion.p>
       </div>
 
-      <div className="absolute top-4 right-4 z-10">
-        <ThemeToggle />
-      </div>
-
+      {/* ── Admin / Participant Toggle ── */}
       <motion.div
-        initial={{ y: 30, opacity: 0 }}
+        initial={prefersReducedMotion ? false : { y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
-        className="w-full max-w-md relative z-10"
+        transition={{ delay: 0.4, duration: 0.4, ease: easeDramatic }}
+        className="flex rounded-[3px] border border-[color:var(--color-warroom-ash)]/40 bg-[color:var(--color-warroom-rampart)]/60 p-1 mb-5"
       >
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-            className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-yellow-500 flex items-center justify-center text-white font-bold text-xl mx-auto mb-4 animate-glow-pulse"
-          >
-            KK
-          </motion.div>
-          <motion.h1
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-3xl font-bold"
-          >
-            Welcome Back
-          </motion.h1>
-          <motion.p
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-muted-foreground mt-2"
-          >
-            {isAdmin ? 'Sign in to the admin panel' : 'Sign in to your War Room simulation'}
-          </motion.p>
-        </div>
-
-        {/* Admin / Participant Toggle */}
-        <motion.div
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.45 }}
-          className="flex rounded-lg border bg-muted p-1 mb-4"
-        >
-          <button
-            type="button"
-            className={`flex-1 rounded-md py-2 text-sm font-medium transition-all duration-300 ${
-              !isAdmin ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => { setIsAdmin(false); setError('') }}
-          >
-            Participant
-          </button>
-          <button
-            type="button"
-            className={`flex-1 rounded-md py-2 text-sm font-medium transition-all duration-300 ${
-              isAdmin ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => { setIsAdmin(true); setError('') }}
-          >
-            Admin
-          </button>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <Card className="backdrop-blur-xl bg-card/80 border-border/50 shadow-xl">
-            <CardHeader>
-              <CardTitle>{isAdmin ? 'Admin Sign In' : 'Sign In'}</CardTitle>
-              <CardDescription>
-                {isAdmin
-                  ? 'Enter your admin credentials'
-                  : 'Enter your batch code and credentials to access your simulations'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {registered && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-md text-sm"
-                >
-                  Account created successfully! Please sign in.
-                </motion.div>
+        {(['Participant', 'Admin'] as const).map((label) => {
+          const active = label === 'Participant' ? !isAdmin : isAdmin
+          return (
+            <button
+              key={label}
+              type="button"
+              className={cn(
+                'flex-1 rounded-[2px] py-2 text-[10px] font-semibold uppercase tracking-[0.14em] transition-all duration-300',
+                active
+                  ? 'bg-[color:var(--color-warroom-gold)]/[0.12] text-[color:var(--color-warroom-gold)] shadow-sm'
+                  : 'text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)]',
               )}
-
-              {error && (
-                <motion.div
-                  initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm"
-                >
-                  {error}
-                </motion.div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isAdmin && (
-                  <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
-                    <label className="text-sm font-medium">Batch Code</label>
-                    <div className="flex gap-2 mt-1">
-                      <Input
-                        type="text"
-                        placeholder="e.g. BATCH2024A"
-                        value={batchCode}
-                        onChange={(e) => {
-                          setBatchCode(e.target.value.toUpperCase())
-                          setBatchValid(null)
-                          setBatchName('')
-                        }}
-                        onBlur={handleBatchCodeBlur}
-                        required={!isAdmin}
-                        className={`transition-all duration-300 focus:animate-glow-border ${batchValid === true ? 'border-emerald-500 shadow-emerald-500/30 shadow-md' : batchValid === false ? 'border-red-500 shadow-red-500/30 shadow-md' : ''}`}
-                      />
-                    </div>
-                    {batchValid === true && batchName && (
-                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                        &#10003; {batchName}
-                      </motion.p>
-                    )}
-                    {batchValid === false && (
-                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-red-500 mt-1">Invalid or inactive batch code</motion.p>
-                    )}
-                  </motion.div>
-                )}
-                <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65 }}>
-                  <label className="text-sm font-medium">Email</label>
-                  <Input
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="mt-1 transition-all duration-300 focus:shadow-md focus:animate-glow-border"
-                  />
-                </motion.div>
-                <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-                  <label className="text-sm font-medium">Password</label>
-                  <Input
-                    type="password"
-                    placeholder="********"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="mt-1 transition-all duration-300 focus:shadow-md focus:animate-glow-border"
-                  />
-                </motion.div>
-                <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.75 }}>
-                  <Button type="submit" className="w-full glow-button" disabled={loading}>
-                    {loading ? 'Signing in...' : isAdmin ? 'Sign In as Admin' : 'Sign In'}
-                  </Button>
-                </motion.div>
-              </form>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {!isAdmin && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="text-center text-sm text-muted-foreground mt-6"
-          >
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
-              Sign up
-            </Link>
-          </motion.p>
-        )}
+              style={{ fontFamily: 'var(--font-display)' }}
+              onClick={() => {
+                setIsAdmin(label === 'Admin')
+                setError('')
+              }}
+            >
+              {label}
+            </button>
+          )
+        })}
       </motion.div>
-    </div>
+
+      {/* ── Form Card ── */}
+      <motion.div
+        initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.45, duration: 0.5, ease: easeDramatic }}
+      >
+        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+          <div className="mb-5">
+            <h2
+              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-warroom-ivory)] mb-1"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {isAdmin ? 'Admin Sign In' : 'Sign In'}
+            </h2>
+            <p
+              className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
+              {isAdmin
+                ? 'Enter your admin credentials.'
+                : 'Enter your batch code and credentials to access your simulations.'}
+            </p>
+          </div>
+
+          {/* Success banner (from register redirect) */}
+          <AnimatePresence>
+            {registered && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="mb-4 overflow-hidden"
+              >
+                <div className="p-3 rounded-[3px] border border-[color:var(--color-warroom-verdant)]/40 bg-[color:var(--color-warroom-verdant)]/[0.08] text-sm text-[color:var(--color-warroom-verdant)]">
+                  Account created successfully! Please sign in.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ x: -8, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-sm text-[color:var(--color-warroom-crimson-bright)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Batch Code (participant only) */}
+            {!isAdmin && (
+              <div>
+                <label
+                  htmlFor="login-batch"
+                  className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Batch Code
+                </label>
+                <Input
+                  id="login-batch"
+                  type="text"
+                  placeholder="e.g. BATCH2024A"
+                  value={batchCode}
+                  onChange={(e) => {
+                    setBatchCode(e.target.value.toUpperCase())
+                    setBatchValid(null)
+                    setBatchName('')
+                  }}
+                  onBlur={handleBatchCodeBlur}
+                  required={!isAdmin}
+                  className={cn(
+                    INPUT_CLASSES,
+                    batchValid === true &&
+                      'border-[color:var(--color-warroom-verdant)] focus-visible:border-[color:var(--color-warroom-verdant)]',
+                    batchValid === false &&
+                      'border-[color:var(--color-warroom-crimson)] focus-visible:border-[color:var(--color-warroom-crimson)]',
+                  )}
+                />
+                <AnimatePresence>
+                  {batchValid === true && batchName && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-verdant)] mt-1.5"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      <Check className="w-3 h-3" /> {batchName}
+                    </motion.p>
+                  )}
+                  {batchValid === false && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-crimson-bright)] mt-1.5"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      <X className="w-3 h-3" /> Invalid or inactive batch code
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="login-email"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Email
+              </label>
+              <Input
+                id="login-email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={INPUT_CLASSES}
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="login-password"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Password
+              </label>
+              <Input
+                id="login-password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={INPUT_CLASSES}
+              />
+            </div>
+
+            {/* Submit */}
+            <WarRoomCTA
+              type="submit"
+              size="md"
+              variant="primary"
+              disabled={loading}
+              className="w-full justify-center"
+            >
+              {loading
+                ? 'Opening the gates…'
+                : isAdmin
+                  ? 'Sign In as Admin'
+                  : 'Enter the War Room'}
+            </WarRoomCTA>
+          </form>
+        </StoneCard>
+      </motion.div>
+
+      {/* ── Register link ── */}
+      {!isAdmin && (
+        <motion.p
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          className="text-center text-sm mt-7"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          <span className="text-[color:var(--color-warroom-smoke)]">
+            Don&apos;t have an account?{' '}
+          </span>
+          <Link
+            href="/register"
+            className="font-semibold text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] underline underline-offset-2 transition-colors"
+          >
+            Claim your seat
+          </Link>
+        </motion.p>
+      )}
+    </motion.div>
   )
 }
 
+// ─── Page (Suspense boundary for useSearchParams) ───────────────────────────
+
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" />}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   )
