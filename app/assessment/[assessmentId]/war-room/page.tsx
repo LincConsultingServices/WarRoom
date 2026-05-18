@@ -219,7 +219,6 @@ export default function WarRoomSimulation() {
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
     const [responseSubmitted, setResponseSubmitted] = useState(false)
-    const [feedbackResponseSubmitted, setFeedbackResponseSubmitted] = useState(false)
 
     const [followupPhase, setFollowupPhase] = useState<'initial' | 'followup_pending' | 'followup_answered'>('initial')
     const [followupQuestion, setFollowupQuestion] = useState('')
@@ -841,7 +840,6 @@ export default function WarRoomSimulation() {
         setInitialTranscription('')
         setCurrentInvestorReaction('')
         setResponseTranscription('')
-        setFeedbackResponseSubmitted(false)
         setResponseSubmitted(false)
         responseRecorder.resetRecording()
     }, [responseRecorder])
@@ -1141,19 +1139,14 @@ export default function WarRoomSimulation() {
                                     >
                                         Retry Pitch
                                     </motion.button>
-                                    <motion.button 
-                                        className="submit-pitch-btn" 
-                                        style={{ flex: 2, ...(!feedbackResponseSubmitted && !error ? { opacity: 0.5 } : {}) }}
-                                        onClick={handleContinueFromPitch} 
-                                        disabled={!feedbackResponseSubmitted && !error}
-                                        whileHover={{ scale: 1.03 }} 
+                                    <motion.button
+                                        className="submit-pitch-btn"
+                                        style={{ flex: 2 }}
+                                        onClick={handleContinueFromPitch}
+                                        whileHover={{ scale: 1.03 }}
                                         whileTap={{ scale: 0.97 }}
                                     >
-                                        {feedbackResponseSubmitted
-                                            ? 'Continue to Investor Questions'
-                                            : error
-                                                ? 'Skip to Investor Q&A →'
-                                                : 'Answer the follow-up first'}
+                                        {error ? 'Skip to Investor Q&A →' : 'Continue to Investor Questions'}
                                     </motion.button>
                                 </div>
                             </motion.div>
