@@ -3,41 +3,46 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'framer-motion'
 import api from '@/src/lib/api'
 import type { AdminBatchDetail, BatchParticipant, BatchStats, UpdateBatchRequest } from '@/src/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import {
   ArrowLeft,
   Users,
-  BarChart3,
   Copy,
   Check,
   Hash,
   Trash2,
   Pencil,
   Eye,
-  Trophy
+  Trophy,
 } from 'lucide-react'
+import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
+import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
+
+const INPUT_CLASSES =
+  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]/50 focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
+
+interface AdminLeaderboardEntry {
+  rank: number
+  name: string
+  stageName?: string
+  revenueProjection?: number
+  [key: string]: unknown
+}
 
 export default function BatchDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
   const batchId = params.id as string
 
   const [batch, setBatch] = useState<AdminBatchDetail | null>(null)
   const [participants, setParticipants] = useState<BatchParticipant[]>([])
   const [stats, setStats] = useState<BatchStats | null>(null)
-  const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [leaderboard, setLeaderboard] = useState<AdminLeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedCode, setCopiedCode] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
@@ -54,14 +59,14 @@ export default function BatchDetailPage() {
         api.admin.getParticipants(batchId),
         api.admin.getStats(batchId),
       ])
-      let leaderboardData: any[] = []
+      let leaderboardData: AdminLeaderboardEntry[] = []
       try {
         if (batchData?.code) {
-           const lbResponse = await api.batches.getLeaderboard(batchData.code)
-           leaderboardData = lbResponse.entries || []
+          const lbResponse = await api.batches.getLeaderboard(batchData.code)
+          leaderboardData = (lbResponse.entries || []) as unknown as AdminLeaderboardEntry[]
         }
-      } catch (e) {
-         console.warn("Leaderboard fetch failed", e)
+      } catch (e: unknown) {
+        console.warn('Leaderboard fetch failed', e)
       }
       setBatch(batchData)
       setParticipants(participantsData)
@@ -69,7 +74,7 @@ export default function BatchDetailPage() {
       setLeaderboard(leaderboardData)
       setEditName(batchData.name)
       setEditLevel(batchData.level)
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to fetch batch:', err)
     } finally {
       setLoading(false)
@@ -97,7 +102,7 @@ export default function BatchDetailPage() {
       await api.admin.updateBatch(batchId, updates)
       setShowEdit(false)
       fetchData()
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to update batch:', err)
     } finally {
       setSaving(false)
@@ -109,7 +114,7 @@ export default function BatchDetailPage() {
     try {
       await api.admin.updateBatch(batchId, { active: !batch.active })
       fetchData()
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to toggle batch:', err)
     }
   }
@@ -119,7 +124,7 @@ export default function BatchDetailPage() {
     try {
       await api.admin.deleteBatch(batchId)
       router.push('/admin/cohorts')
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to delete batch:', err)
     } finally {
       setDeleting(false)
@@ -129,20 +134,25 @@ export default function BatchDetailPage() {
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'IN_PROGRESS':
-        return <Badge variant="default">In Progress</Badge>
+        return <SigilBadge tone="gold">In Progress</SigilBadge>
       case 'COMPLETED':
-        return <Badge className="bg-green-600 text-white">Completed</Badge>
+        return <SigilBadge tone="verdant">Completed</SigilBadge>
       case 'NOT_STARTED':
-        return <Badge variant="secondary">Not Started</Badge>
+        return <SigilBadge>Not Started</SigilBadge>
       default:
-        return <Badge variant="outline">No Simulation</Badge>
+        return <SigilBadge>No Simulation</SigilBadge>
     }
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Loading batch details...</p>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-7 h-7 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+          <p className="text-sm text-[color:var(--color-warroom-smoke)]" style={{ fontFamily: 'var(--font-display)' }}>
+            Loading batch details&hellip;
+          </p>
+        </div>
       </div>
     )
   }
@@ -150,7 +160,9 @@ export default function BatchDetailPage() {
   if (!batch) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Batch not found</p>
+        <p className="text-[color:var(--color-warroom-smoke)]" style={{ fontFamily: 'var(--font-display)' }}>
+          Batch not found
+        </p>
       </div>
     )
   }
@@ -158,164 +170,169 @@ export default function BatchDetailPage() {
   return (
     <div className="py-6 space-y-6">
       {/* Back + Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/cohorts">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
+      <motion.div
+        className="flex items-center gap-4"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeDramatic }}
+      >
+        <Link
+          href="/admin/cohorts"
+          className="flex items-center justify-center w-9 h-9 rounded-lg border border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] hover:border-[color:var(--color-warroom-gold)]/30 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">{batch.name}</h1>
+          <h1
+            className="text-xl font-bold tracking-[0.04em]"
+            style={{
+              fontFamily: 'var(--font-display)',
+              background:
+                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            {batch.name}
+          </h1>
           <div className="flex items-center gap-3 mt-1">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 font-mono text-xs text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
             >
               <Hash className="h-3 w-3" />
               {batch.code}
               {copiedCode ? (
-                <Check className="h-3 w-3 text-green-500" />
+                <Check className="h-3 w-3 text-[color:var(--color-warroom-verdant)]" />
               ) : (
                 <Copy className="h-3 w-3" />
               )}
             </button>
-            <Badge variant={batch.active ? 'default' : 'secondary'}>
+            <SigilBadge tone={batch.active ? 'verdant' : 'crimson'}>
               {batch.active ? 'Active' : 'Inactive'}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
+            </SigilBadge>
+            <span
+              className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               Level {batch.level} {batch.level === 1 ? '(Student)' : '(Manager)'}
             </span>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
-            <Pencil className="h-4 w-4 mr-1" /> Edit
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleToggleActive}
-          >
+          <WarRoomCTA variant="ghost" size="sm" icon={Pencil} onClick={() => setShowEdit(true)}>
+            Edit
+          </WarRoomCTA>
+          <WarRoomCTA variant="ghost" size="sm" onClick={handleToggleActive}>
             {batch.active ? 'Deactivate' : 'Activate'}
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowDelete(true)}
-          >
-            <Trash2 className="h-4 w-4 mr-1" /> Delete
-          </Button>
+          </WarRoomCTA>
+          <WarRoomCTA variant="ghost" size="sm" icon={Trash2} onClick={() => setShowDelete(true)}>
+            Delete
+          </WarRoomCTA>
         </div>
-      </div>
+      </motion.div>
+
+      <GoldDivider variant="line" />
 
       {/* Stats Row */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">{stats.totalParticipants}</div>
-              <p className="text-xs text-muted-foreground">Participants</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">{stats.simulationsTotal ?? stats.assessmentsTotal}</div>
-              <p className="text-xs text-muted-foreground">Simulations</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">{stats.completed}</div>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">{stats.inProgress}</div>
-              <p className="text-xs text-muted-foreground">In Progress</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">{stats.notStarted}</div>
-              <p className="text-xs text-muted-foreground">Not Started</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">${Math.round(stats.avgRevenue).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Avg Revenue</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3">
-              <div className="text-2xl font-bold">${stats.maxRevenue.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Max Revenue</p>
-            </CardContent>
-          </Card>
-        </div>
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4"
+          variants={staggerContainer}
+          initial={prefersReducedMotion ? false : 'hidden'}
+          animate="show"
+        >
+          {[
+            { label: 'Participants', value: stats.totalParticipants },
+            { label: 'Simulations', value: stats.simulationsTotal ?? stats.assessmentsTotal },
+            { label: 'Completed', value: stats.completed },
+            { label: 'In Progress', value: stats.inProgress },
+            { label: 'Not Started', value: stats.notStarted },
+            { label: 'Avg Revenue', value: `$${Math.round(stats.avgRevenue).toLocaleString()}` },
+            { label: 'Max Revenue', value: `$${stats.maxRevenue.toLocaleString()}` },
+          ].map((s) => (
+            <motion.div key={s.label} variants={staggerItem}>
+              <StoneCard>
+                <div className="text-2xl font-bold text-[color:var(--color-warroom-ivory)]" style={{ fontFamily: 'var(--font-display)' }}>
+                  {s.value}
+                </div>
+                <p className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--color-warroom-smoke)] mt-1" style={{ fontFamily: 'var(--font-display)' }}>
+                  {s.label}
+                </p>
+              </StoneCard>
+            </motion.div>
+          ))}
+        </motion.div>
       )}
 
-      {/* Leaderboard Card */}
+      {/* Leaderboard */}
       {leaderboard.length > 0 && (
-         <Card>
-           <CardHeader>
-             <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-yellow-500" />
-                Batch Leaderboard
-             </CardTitle>
-           </CardHeader>
-           <CardContent>
-              <div className="overflow-x-auto">
-                 <table className="w-full text-sm">
-                    <thead>
-                       <tr className="border-b">
-                         <th className="text-left py-3 px-2 font-medium w-16">Rank</th>
-                         <th className="text-left py-3 px-2 font-medium">Participant</th>
-                         <th className="text-left py-3 px-2 font-medium">Stage</th>
-                         <th className="text-right py-3 px-2 font-medium">Revenue</th>
-                       </tr>
-                    </thead>
-                    <tbody>
-                       {leaderboard.map((lb) => (
-                           <tr key={lb.id} className="border-b last:border-0 hover:bg-muted/50">
-                               <td className="py-3 px-2 font-bold w-16">
-                               {lb.rank === 1 ? '1st' : lb.rank === 2 ? '2nd' : lb.rank === 3 ? '3rd' : `#${lb.rank}`}
-                               </td>
-                               <td className="py-3 px-2">{lb.name}</td>
-                               <td className="py-3 px-2 text-muted-foreground">{lb.stageName || '-'}</td>
-                               <td className="py-3 px-2 text-right font-mono font-bold">${lb.revenueProjection?.toLocaleString() || 0}</td>
-                           </tr>
-                       ))}
-                    </tbody>
-                 </table>
-              </div>
-           </CardContent>
-         </Card>
+        <StoneCard padding="none">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+            <Trophy className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+            <h2 className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]" style={{ fontFamily: 'var(--font-display)' }}>
+              Batch Leaderboard
+            </h2>
+          </div>
+          <div className="p-6 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[color:var(--color-warroom-ash)]/20">
+                  {['Rank', 'Participant', 'Stage', 'Revenue'].map((h, i) => (
+                    <th
+                      key={h}
+                      className={`py-3 px-2 font-medium text-[color:var(--color-warroom-smoke)] text-[10px] uppercase tracking-[0.14em] ${i === 3 ? 'text-right' : 'text-left'} ${i === 0 ? 'w-16' : ''}`}
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map((lb, idx) => (
+                  <tr key={String(lb.rank ?? idx)} className="border-b border-[color:var(--color-warroom-ash)]/10 last:border-0 hover:bg-[color:var(--color-warroom-gold)]/[0.02]">
+                    <td className="py-3 px-2 font-bold w-16 text-[color:var(--color-warroom-gold)]" style={{ fontFamily: 'var(--font-display)' }}>
+                      {lb.rank === 1 ? '1st' : lb.rank === 2 ? '2nd' : lb.rank === 3 ? '3rd' : `#${lb.rank}`}
+                    </td>
+                    <td className="py-3 px-2 text-[color:var(--color-warroom-ivory)]">{lb.name}</td>
+                    <td className="py-3 px-2 text-[color:var(--color-warroom-smoke)] text-xs">{lb.stageName || '-'}</td>
+                    <td className="py-3 px-2 text-right font-mono font-bold text-[color:var(--color-warroom-gold)]">
+                      ${lb.revenueProjection?.toLocaleString() || 0}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </StoneCard>
       )}
 
       {/* Participants Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+      <StoneCard padding="none">
+        <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+          <Users className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+          <h2 className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]" style={{ fontFamily: 'var(--font-display)' }}>
             Participants ({participants.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h2>
+        </div>
+        <div className="p-6">
           {participants.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-2 font-medium">Name</th>
-                    <th className="text-left py-3 px-2 font-medium">Email</th>
-                    <th className="text-left py-3 px-2 font-medium">Joined</th>
-                    <th className="text-left py-3 px-2 font-medium">Status</th>
-                    <th className="text-left py-3 px-2 font-medium">Stage</th>
-                    <th className="text-right py-3 px-2 font-medium">Revenue</th>
-                    <th className="text-right py-3 px-2 font-medium">Engagement</th>
-                    <th className="text-right py-3 px-2 font-medium">Report</th>
+                  <tr className="border-b border-[color:var(--color-warroom-ash)]/20">
+                    {['Name', 'Email', 'Joined', 'Status', 'Stage', 'Revenue', 'Engagement', 'Report'].map(
+                      (h, i) => (
+                        <th
+                          key={h}
+                          className={`py-3 px-2 font-medium text-[color:var(--color-warroom-smoke)] text-[10px] uppercase tracking-[0.14em] ${i >= 5 ? 'text-right' : 'text-left'}`}
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {h}
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -324,39 +341,40 @@ export default function BatchDetailPage() {
                     const meanSpam = engagementEntries.length
                       ? engagementEntries.reduce((acc, e) => acc + (e?.spamPercent || 0), 0) / engagementEntries.length
                       : null
-                    const engagementColor = meanSpam == null
-                      ? 'text-muted-foreground'
-                      : meanSpam >= 40
-                        ? 'text-red-500'
-                        : meanSpam >= 20
-                          ? 'text-amber-500'
-                          : 'text-green-500'
+                    const engagementColor =
+                      meanSpam == null
+                        ? 'text-[color:var(--color-warroom-smoke)]'
+                        : meanSpam >= 40
+                          ? 'text-[color:var(--color-warroom-crimson)]'
+                          : meanSpam >= 20
+                            ? 'text-amber-500'
+                            : 'text-[color:var(--color-warroom-verdant)]'
                     return (
-                      <tr key={p.userId} className="border-b last:border-0 hover:bg-muted/50">
-                        <td className="py-3 px-2 font-medium">{p.userName}</td>
-                        <td className="py-3 px-2 text-muted-foreground">{p.email}</td>
-                        <td className="py-3 px-2 text-muted-foreground">
+                      <tr key={p.userId} className="border-b border-[color:var(--color-warroom-ash)]/10 last:border-0 hover:bg-[color:var(--color-warroom-gold)]/[0.02]">
+                        <td className="py-3 px-2 font-medium text-[color:var(--color-warroom-ivory)]">{p.userName}</td>
+                        <td className="py-3 px-2 text-[color:var(--color-warroom-smoke)] text-xs">{p.email}</td>
+                        <td className="py-3 px-2 text-[color:var(--color-warroom-smoke)] text-xs">
                           {new Date(p.joinedAt).toLocaleDateString()}
                         </td>
                         <td className="py-3 px-2">{getStatusBadge(p.status)}</td>
-                        <td className="py-3 px-2 text-muted-foreground font-mono text-xs">
+                        <td className="py-3 px-2 text-[color:var(--color-warroom-smoke)] font-mono text-[10px]">
                           {p.currentStage?.replace('STAGE_', '').replace(/_/g, ' ') || '-'}
                         </td>
-                        <td className="py-3 px-2 text-right font-mono">
+                        <td className="py-3 px-2 text-right font-mono text-xs text-[color:var(--color-warroom-ivory)]">
                           {p.revenueProjection != null ? `$${p.revenueProjection.toLocaleString()}` : '-'}
                         </td>
-                        <td className={`py-3 px-2 text-right font-mono ${engagementColor}`}>
+                        <td className={`py-3 px-2 text-right font-mono text-xs ${engagementColor}`}>
                           {meanSpam == null ? '-' : `${Math.round(meanSpam)}%`}
                         </td>
                         <td className="py-3 px-2 text-right">
                           {p.assessmentId ? (
                             <Link href={`/admin/cohorts/${batchId}/report/${p.assessmentId}`}>
-                              <Button variant="ghost" size="sm" title="View Competency Report">
-                                <Eye className="h-4 w-4 text-blue-500" />
-                              </Button>
+                              <WarRoomCTA size="sm" variant="ghost" icon={Eye}>
+                                View
+                              </WarRoomCTA>
                             </Link>
                           ) : (
-                            <span className="text-muted-foreground text-xs">No data</span>
+                            <span className="text-[color:var(--color-warroom-smoke)] text-[10px]">No data</span>
                           )}
                         </td>
                       </tr>
@@ -366,74 +384,68 @@ export default function BatchDetailPage() {
               </table>
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
+            <p className="text-center text-[color:var(--color-warroom-smoke)] py-8 text-sm" style={{ fontFamily: 'var(--font-body, serif)' }}>
               No participants have joined this batch yet. Share the batch code to invite participants.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </StoneCard>
 
       {/* Edit Dialog */}
       <Dialog open={showEdit} onOpenChange={setShowEdit}>
-        <DialogContent>
+        <DialogContent className="bg-[color:var(--color-warroom-rampart)] border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)]">
           <DialogHeader>
-            <DialogTitle>Edit Batch</DialogTitle>
+            <DialogTitle className="text-[color:var(--color-warroom-gold)]" style={{ fontFamily: 'var(--font-display)' }}>
+              Edit Batch
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">Batch Name</label>
-              <Input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="mt-1"
-              />
+              <label className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-1.5 block" style={{ fontFamily: 'var(--font-display)' }}>
+                Batch Name
+              </label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} className={`mt-1 ${INPUT_CLASSES}`} />
             </div>
             <div>
-              <label className="text-sm font-medium">Level</label>
+              <label className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-1.5 block" style={{ fontFamily: 'var(--font-display)' }}>
+                Level
+              </label>
               <div className="flex gap-2 mt-1">
-                <Button
-                  type="button"
-                  variant={editLevel === 1 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setEditLevel(1)}
-                >
+                <WarRoomCTA type="button" size="sm" variant={editLevel === 1 ? 'primary' : 'ghost'} onClick={() => setEditLevel(1)}>
                   Level 1 (Student)
-                </Button>
-                <Button
-                  type="button"
-                  variant={editLevel === 2 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setEditLevel(2)}
-                >
+                </WarRoomCTA>
+                <WarRoomCTA type="button" size="sm" variant={editLevel === 2 ? 'primary' : 'ghost'} onClick={() => setEditLevel(2)}>
                   Level 2 (Manager)
-                </Button>
+                </WarRoomCTA>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEdit(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <WarRoomCTA variant="ghost" size="sm" onClick={() => setShowEdit(false)}>Cancel</WarRoomCTA>
+            <WarRoomCTA size="sm" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : 'Save Changes'}
+            </WarRoomCTA>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDelete} onOpenChange={setShowDelete}>
-        <DialogContent>
+        <DialogContent className="bg-[color:var(--color-warroom-rampart)] border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)]">
           <DialogHeader>
-            <DialogTitle>Delete Batch</DialogTitle>
+            <DialogTitle className="text-[color:var(--color-warroom-crimson)]" style={{ fontFamily: 'var(--font-display)' }}>
+              Delete Batch
+            </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground py-4">
-            Are you sure you want to delete <strong>{batch.name}</strong> ({batch.code})?
+          <p className="text-sm text-[color:var(--color-warroom-smoke)] py-4" style={{ fontFamily: 'var(--font-body, serif)' }}>
+            Are you sure you want to delete <strong className="text-[color:var(--color-warroom-ivory)]">{batch.name}</strong> ({batch.code})?
             This action cannot be undone. All participant data will remain but the batch will be removed.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDelete(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-              {deleting ? 'Deleting...' : 'Delete Batch'}
-            </Button>
+            <WarRoomCTA variant="ghost" size="sm" onClick={() => setShowDelete(false)}>Cancel</WarRoomCTA>
+            <WarRoomCTA size="sm" onClick={handleDelete} disabled={deleting} icon={Trash2}>
+              {deleting ? 'Deleting…' : 'Delete Batch'}
+            </WarRoomCTA>
           </DialogFooter>
         </DialogContent>
       </Dialog>

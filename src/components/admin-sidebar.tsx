@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
-  Users,
   BarChart3,
   LogOut,
   ShieldCheck,
@@ -68,18 +67,28 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   }
 
   return (
-    <Sidebar variant="inset" collapsible="icon">
+    <Sidebar variant="inset" collapsible="icon" className="border-r-[color:var(--color-warroom-ash)]/20">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/admin/cohorts">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-void)]">
                   <ShieldCheck className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">War Room</span>
-                  <span className="truncate text-xs">Admin Panel</span>
+                  <span
+                    className="truncate font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    War Room
+                  </span>
+                  <span
+                    className="truncate text-xs text-[color:var(--color-warroom-smoke)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Admin Panel
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -88,7 +97,12 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupLabel
+            className="text-[color:var(--color-warroom-smoke)] tracking-[0.08em]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Management
+          </SidebarGroupLabel>
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.title}>
@@ -113,7 +127,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg">
+                    <AvatarFallback className="rounded-lg bg-[color:var(--color-warroom-gold)]/15 text-[color:var(--color-warroom-gold)] text-xs font-bold">
                       {user.name?.substring(0, 2).toUpperCase() || 'AD'}
                     </AvatarFallback>
                   </Avatar>
@@ -133,7 +147,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarFallback className="rounded-lg">
+                      <AvatarFallback className="rounded-lg bg-[color:var(--color-warroom-gold)]/15 text-[color:var(--color-warroom-gold)] text-xs font-bold">
                         {user.name?.substring(0, 2).toUpperCase() || 'AD'}
                       </AvatarFallback>
                     </Avatar>

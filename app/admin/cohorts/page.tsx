@@ -2,18 +2,34 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import api from '@/src/lib/api'
 import type { AdminBatch, CreateBatchRequest } from '@/src/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
-import { Plus, Search, Users, Calendar, Hash, Copy, Check, Power, PowerOff, Loader2, AlertTriangle } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Users,
+  Calendar,
+  Hash,
+  Copy,
+  Check,
+  Power,
+  PowerOff,
+  Loader2,
+  AlertTriangle,
+  Shield,
+} from 'lucide-react'
+import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
+import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
+
+const INPUT_CLASSES =
+  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]/50 focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
 
 export default function CohortsPage() {
+  const prefersReducedMotion = useReducedMotion()
   const [batches, setBatches] = useState<AdminBatch[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -37,7 +53,7 @@ export default function CohortsPage() {
     try {
       const data = await api.admin.listBatches()
       setBatches(data)
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to fetch batches:', err)
     } finally {
       setLoading(false)
@@ -67,8 +83,8 @@ export default function CohortsPage() {
       setNewName('')
       setNewLevel(1)
       fetchBatches()
-    } catch (err: any) {
-      setCreateError(err.message || 'Failed to create batch')
+    } catch (err: unknown) {
+      setCreateError(err instanceof Error ? err.message : 'Failed to create batch')
     } finally {
       setCreating(false)
     }
@@ -82,7 +98,6 @@ export default function CohortsPage() {
 
   // Called when the Switch is toggled
   async function handleToggle(batch: AdminBatch, newActive: boolean) {
-    // Show confirmation when disabling
     if (!newActive) {
       setConfirmDisable(batch)
       return
@@ -92,17 +107,15 @@ export default function CohortsPage() {
 
   async function doToggle(batch: AdminBatch, active: boolean) {
     setTogglingId(batch.id)
-    // Optimistic update
-    setBatches(prev =>
-      prev.map(b => b.id === batch.id ? { ...b, active } : b)
+    setBatches((prev) =>
+      prev.map((b) => (b.id === batch.id ? { ...b, active } : b)),
     )
     try {
       await api.admin.updateBatch(batch.id, { active })
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to toggle batch:', err)
-      // Rollback on error
-      setBatches(prev =>
-        prev.map(b => b.id === batch.id ? { ...b, active: !active } : b)
+      setBatches((prev) =>
+        prev.map((b) => (b.id === batch.id ? { ...b, active: !active } : b)),
       )
     } finally {
       setTogglingId(null)
@@ -118,14 +131,21 @@ export default function CohortsPage() {
   const filteredBatches = batches.filter(
     (b) =>
       b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.code.toLowerCase().includes(searchQuery.toLowerCase())
+      b.code.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
-        <p className="text-muted-foreground">Loading batches...</p>
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-5 w-5 animate-spin text-[color:var(--color-warroom-gold)]" />
+          <p
+            className="text-sm text-[color:var(--color-warroom-smoke)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Loading batches&hellip;
+          </p>
+        </div>
       </div>
     )
   }
@@ -133,53 +153,84 @@ export default function CohortsPage() {
   return (
     <div className="py-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Batch Management</h1>
-          <p className="text-muted-foreground mt-1">Create and manage simulation batches</p>
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeDramatic }}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Shield className="h-6 w-6 text-[color:var(--color-warroom-gold)]" />
+              <h1
+                className="text-xl font-semibold tracking-[0.04em]"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  background:
+                    'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Batch Management
+              </h1>
+            </div>
+            <p
+              className="text-sm text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
+              Create and manage simulation batches
+            </p>
+          </div>
+          <WarRoomCTA size="sm" icon={Plus} onClick={() => setShowCreate(true)}>
+            Create Batch
+          </WarRoomCTA>
         </div>
-        <Button onClick={() => setShowCreate(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Batch
-        </Button>
-      </div>
+        <div className="mt-5">
+          <GoldDivider variant="line" />
+        </div>
+      </motion.div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{batches.length}</div>
-            <p className="text-xs text-muted-foreground">Total Batches</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{batches.filter(b => b.active).length}</div>
-            <p className="text-xs text-muted-foreground">Enabled</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{batches.reduce((sum, b) => sum + b.participantCount, 0)}</div>
-            <p className="text-xs text-muted-foreground">Total Participants</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-red-500">{batches.filter(b => !b.active).length}</div>
-            <p className="text-xs text-muted-foreground">Disabled</p>
-          </CardContent>
-        </Card>
-      </div>
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+        variants={staggerContainer}
+        initial={prefersReducedMotion ? false : 'hidden'}
+        animate="show"
+      >
+        {[
+          { label: 'Total Batches', value: batches.length, tone: undefined },
+          { label: 'Enabled', value: batches.filter((b) => b.active).length, tone: 'verdant' as const },
+          { label: 'Total Participants', value: batches.reduce((sum, b) => sum + b.participantCount, 0), tone: undefined },
+          { label: 'Disabled', value: batches.filter((b) => !b.active).length, tone: 'crimson' as const },
+        ].map((stat) => (
+          <motion.div key={stat.label} variants={staggerItem}>
+            <StoneCard>
+              <div
+                className={`text-2xl font-bold ${stat.tone === 'verdant' ? 'text-[color:var(--color-warroom-verdant)]' : stat.tone === 'crimson' ? 'text-[color:var(--color-warroom-crimson)]' : 'text-[color:var(--color-warroom-ivory)]'}`}
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {stat.value}
+              </div>
+              <p
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {stat.label}
+              </p>
+            </StoneCard>
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute left-3 top-3 h-5 w-5 text-[color:var(--color-warroom-smoke)]/50" />
         <Input
           placeholder="Search batches by name or code..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className={`pl-10 ${INPUT_CLASSES}`}
         />
       </div>
 
@@ -196,190 +247,224 @@ export default function CohortsPage() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className={`transition-shadow ${batch.active ? 'hover:shadow-md' : 'opacity-70 border-dashed'}`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-lg truncate">{batch.name}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1">
-                          <button
-                            onClick={() => handleCopyCode(batch.code)}
-                            className="flex items-center gap-1 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <Hash className="h-3 w-3" />
-                            {batch.code}
-                            {copiedCode === batch.code ? (
-                              <Check className="h-3 w-3 text-green-500" />
-                            ) : (
-                              <Copy className="h-3 w-3" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Status badge */}
-                      <div className="flex-shrink-0">
-                        {batch.active ? (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-semibold border border-green-500/20">
-                            <Power className="h-3 w-3" />
-                            Enabled
-                          </div>
+                <StoneCard interactive className={!batch.active ? 'opacity-70' : undefined}>
+                  {/* Card header */}
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className="text-base font-semibold text-[color:var(--color-warroom-ivory)] truncate"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {batch.name}
+                      </h3>
+                      <button
+                        onClick={() => handleCopyCode(batch.code)}
+                        className="flex items-center gap-1 font-mono text-xs text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors mt-1"
+                      >
+                        <Hash className="h-3 w-3" />
+                        {batch.code}
+                        {copiedCode === batch.code ? (
+                          <Check className="h-3 w-3 text-[color:var(--color-warroom-verdant)]" />
                         ) : (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-semibold border border-red-500/20">
-                            <PowerOff className="h-3 w-3" />
-                            Disabled
-                          </div>
+                          <Copy className="h-3 w-3" />
                         )}
-                      </div>
+                      </button>
                     </div>
-                  </CardHeader>
+                    <div className="flex-shrink-0">
+                      {batch.active ? (
+                        <SigilBadge tone="verdant" icon={Power}>
+                          Enabled
+                        </SigilBadge>
+                      ) : (
+                        <SigilBadge tone="crimson" icon={PowerOff}>
+                          Disabled
+                        </SigilBadge>
+                      )}
+                    </div>
+                  </div>
 
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Users className="h-4 w-4" />
-                        <span>{batch.participantCount} participants</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(batch.createdAt).toLocaleDateString()}</span>
-                      </div>
+                  {/* Meta */}
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                    <div className="flex items-center gap-2 text-[color:var(--color-warroom-smoke)]">
+                      <Users className="h-4 w-4" />
+                      <span className="text-xs">{batch.participantCount} participants</span>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Level {batch.level} {batch.level === 1 ? '(Student)' : '(Manager)'}
+                    <div className="flex items-center gap-2 text-[color:var(--color-warroom-smoke)]">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-xs">{new Date(batch.createdAt).toLocaleDateString()}</span>
                     </div>
+                  </div>
+                  <p
+                    className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--color-warroom-smoke)] mb-3"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Level {batch.level} {batch.level === 1 ? '(Student)' : '(Manager)'}
+                  </p>
 
-                    {/* Toggle row */}
-                    <div className="flex items-center justify-between pt-1 border-t border-border/50">
-                      <div className="flex items-center gap-2">
-                        {togglingId === batch.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                        ) : (
-                          <Switch
-                            id={`toggle-${batch.id}`}
-                            checked={batch.active}
-                            onCheckedChange={(checked) => handleToggle(batch, checked)}
-                            disabled={togglingId === batch.id}
-                            className="data-[state=checked]:bg-green-600"
-                          />
-                        )}
-                        <label
-                          htmlFor={`toggle-${batch.id}`}
-                          className="text-xs text-muted-foreground cursor-pointer select-none"
-                        >
-                          {batch.active ? 'Click to disable assessments' : 'Click to enable assessments'}
-                        </label>
-                      </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/cohorts/${batch.id}`}>Details</Link>
-                      </Button>
+                  {/* Toggle row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-[color:var(--color-warroom-ash)]/20">
+                    <div className="flex items-center gap-2">
+                      {togglingId === batch.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-[color:var(--color-warroom-smoke)]" />
+                      ) : (
+                        <Switch
+                          id={`toggle-${batch.id}`}
+                          checked={batch.active}
+                          onCheckedChange={(checked) => handleToggle(batch, checked)}
+                          disabled={togglingId === batch.id}
+                          className="data-[state=checked]:bg-[color:var(--color-warroom-verdant)]"
+                        />
+                      )}
+                      <label
+                        htmlFor={`toggle-${batch.id}`}
+                        className="text-[10px] text-[color:var(--color-warroom-smoke)] cursor-pointer select-none"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {batch.active ? 'Click to disable' : 'Click to enable'}
+                      </label>
                     </div>
-                  </CardContent>
-                </Card>
+                    <Link href={`/admin/cohorts/${batch.id}`}>
+                      <WarRoomCTA size="sm" variant="ghost">
+                        Details
+                      </WarRoomCTA>
+                    </Link>
+                  </div>
+                </StoneCard>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
       ) : (
-        <Card className="text-center py-12">
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
+        <StoneCard>
+          <div className="text-center py-6">
+            <p
+              className="text-[color:var(--color-warroom-smoke)] mb-4 text-sm"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
               {searchQuery ? 'No batches match your search.' : 'No batches created yet.'}
             </p>
             {!searchQuery && (
-              <Button onClick={() => setShowCreate(true)}>Create First Batch</Button>
+              <WarRoomCTA size="sm" onClick={() => setShowCreate(true)}>
+                Create First Batch
+              </WarRoomCTA>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </StoneCard>
       )}
 
       {/* ── Create Dialog ── */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent>
+        <DialogContent className="bg-[color:var(--color-warroom-rampart)] border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)]">
           <DialogHeader>
-            <DialogTitle>Create New Batch</DialogTitle>
+            <DialogTitle
+              className="text-[color:var(--color-warroom-gold)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Create New Batch
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {createError && (
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
+              <div className="p-3 bg-[color:var(--color-warroom-crimson)]/10 border border-[color:var(--color-warroom-crimson)]/30 text-[color:var(--color-warroom-crimson)] rounded-md text-sm">
                 {createError}
               </div>
             )}
             <div>
-              <label className="text-sm font-medium">Batch Code</label>
+              <label
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Batch Code
+              </label>
               <Input
                 placeholder="e.g. SPRING2025A"
                 value={newCode}
                 onChange={(e) => setNewCode(e.target.value.toUpperCase())}
-                className="mt-1 font-mono"
+                className={`mt-1 font-mono ${INPUT_CLASSES}`}
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] text-[color:var(--color-warroom-smoke)] mt-1">
                 Participants will use this code to join. Must be unique.
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium">Batch Name</label>
+              <label
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Batch Name
+              </label>
               <Input
                 placeholder="e.g. Spring 2025 Cohort A"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="mt-1"
+                className={`mt-1 ${INPUT_CLASSES}`}
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Level</label>
+              <label
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Level
+              </label>
               <div className="flex gap-2 mt-1">
-                <Button
+                <WarRoomCTA
                   type="button"
-                  variant={newLevel === 1 ? 'default' : 'outline'}
                   size="sm"
+                  variant={newLevel === 1 ? 'primary' : 'ghost'}
                   onClick={() => setNewLevel(1)}
                 >
                   Level 1 (Student)
-                </Button>
-                <Button
+                </WarRoomCTA>
+                <WarRoomCTA
                   type="button"
-                  variant={newLevel === 2 ? 'default' : 'outline'}
                   size="sm"
+                  variant={newLevel === 2 ? 'primary' : 'ghost'}
                   onClick={() => setNewLevel(2)}
                 >
                   Level 2 (Manager)
-                </Button>
+                </WarRoomCTA>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>
+            <WarRoomCTA variant="ghost" size="sm" onClick={() => setShowCreate(false)}>
               Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={creating}>
-              {creating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating...</> : 'Create Batch'}
-            </Button>
+            </WarRoomCTA>
+            <WarRoomCTA size="sm" onClick={handleCreate} disabled={creating}>
+              {creating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating&hellip;
+                </>
+              ) : (
+                'Create Batch'
+              )}
+            </WarRoomCTA>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* ── Confirm Disable Dialog ── */}
       <Dialog open={!!confirmDisable} onOpenChange={(v) => { if (!v) setConfirmDisable(null) }}>
-        <DialogContent>
+        <DialogContent className="bg-[color:var(--color-warroom-rampart)] border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+            <DialogTitle className="flex items-center gap-2 text-[color:var(--color-warroom-crimson)]" style={{ fontFamily: 'var(--font-display)' }}>
               <AlertTriangle className="h-5 w-5" />
               Disable Batch?
             </DialogTitle>
-            <DialogDescription>
-              Disabling <strong>{confirmDisable?.name}</strong> ({confirmDisable?.code}) will prevent all participants
+            <DialogDescription className="text-[color:var(--color-warroom-smoke)]" style={{ fontFamily: 'var(--font-body, serif)' }}>
+              Disabling <strong className="text-[color:var(--color-warroom-ivory)]">{confirmDisable?.name}</strong> ({confirmDisable?.code}) will prevent all participants
               in this batch from starting new assessments. Existing in-progress simulations will not be affected.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setConfirmDisable(null)}>
+            <WarRoomCTA variant="ghost" size="sm" onClick={() => setConfirmDisable(null)}>
               Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDoDisable}>
-              <PowerOff className="h-4 w-4 mr-2" />
+            </WarRoomCTA>
+            <WarRoomCTA size="sm" onClick={confirmDoDisable} icon={PowerOff}>
               Disable Batch
-            </Button>
+            </WarRoomCTA>
           </DialogFooter>
         </DialogContent>
       </Dialog>
