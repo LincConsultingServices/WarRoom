@@ -1,9 +1,8 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { Loader2, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
 import { RevenueSidePanel } from '@/src/components/RevenueSidePanel'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
 import { CharacterPicker } from '@/src/components/CharacterPicker'

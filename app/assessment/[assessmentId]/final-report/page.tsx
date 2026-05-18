@@ -2,14 +2,24 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
+import {
+  ArrowLeft,
+  ScrollText,
+  Swords,
+  Brain,
+  Sparkles,
+  MessageSquare,
+} from 'lucide-react'
 import api from '@/src/lib/api'
 import type { EvaluationReport } from '@/src/types'
 import { DealSummaryTab } from './_sections/DealSummaryTab'
 import { CompetencyTab } from './_sections/CompetencyTab'
 import { AIAnalysisTab } from './_sections/AIAnalysisTab'
 import { ResponsesTab } from './_sections/ResponsesTab'
+import { GoldDivider } from '@/src/components/primitives'
+import { easeDramatic } from '@/lib/animations/variants'
 
 // ============================================
 // Final Report — thin orchestrator shell
@@ -18,17 +28,18 @@ import { ResponsesTab } from './_sections/ResponsesTab'
 // ============================================
 
 const TABS = [
-  { id: 1, label: 'Deal Summary' },
-  { id: 2, label: 'Competency Profile' },
-  { id: 3, label: 'AI Analysis' },
-  { id: 4, label: 'Your Responses' },
+  { id: 1, label: 'Deal Summary', icon: Swords },
+  { id: 2, label: 'Competency Profile', icon: Brain },
+  { id: 3, label: 'AI Analysis', icon: Sparkles },
+  { id: 4, label: 'Your Responses', icon: MessageSquare },
 ] as const
 
-type TabId = typeof TABS[number]['id']
+type TabId = (typeof TABS)[number]['id']
 
 export default function FinalReportPage() {
   const params = useParams()
   const assessmentId = params?.assessmentId as string
+  const prefersReducedMotion = useReducedMotion()
 
   const [report, setReport] = useState<EvaluationReport | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,83 +50,146 @@ export default function FinalReportPage() {
     api.assessments
       .getReport(assessmentId)
       .then(setReport)
-      .catch((err) => setError(err.message))
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : 'Failed to load report'),
+      )
       .finally(() => setLoading(false))
   }, [assessmentId])
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'hsl(var(--background))', color: 'hsl(var(--primary))', fontSize: '1.2rem' }}>
-        Loading your evaluation report...
+      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-warroom-void)]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+          <p
+            className="text-sm text-[color:var(--color-warroom-smoke)] tracking-[0.04em]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Unsealing the Legacy Scroll&hellip;
+          </p>
+        </div>
       </div>
     )
   }
 
   if (error || !report) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a1a', color: '#fca5a5' }}>
-        <div style={{ textAlign: 'center' }}>
-          <p>{error || 'Report not found'}</p>
-          <Link href="/" style={{ color: '#a5b4fc' }}>← Return Home</Link>
+      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-warroom-void)]">
+        <div className="text-center space-y-3">
+          <p className="text-[color:var(--color-warroom-crimson)]">
+            {error || 'Report not found'}
+          </p>
+          <Link
+            href="/"
+            className="text-sm text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+          >
+            &larr; Return to the Great Hall
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="report-page">
-      <header className="report-header">
-        <Link href="/" className="back-link">← Dashboard</Link>
-        <h1>Evaluation Report</h1>
-        <p className="subtitle">{report.entrepreneurType} • {report.organizationalRole}</p>
-      </header>
+    <div className="min-h-screen bg-[color:var(--color-warroom-void)]">
+      {/* Atmospheric glow */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 0%, var(--color-warroom-gold)/0.03 0%, transparent 60%)',
+        }}
+      />
 
-      <nav className="page-tabs">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={`tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+      <div className="relative z-10 max-w-[940px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Header */}
+        <motion.header
+          className="mb-8"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: easeDramatic }}
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors mb-6"
+            style={{ fontFamily: 'var(--font-display)' }}
           >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Dashboard
+          </Link>
 
-      <main className="report-content">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+          <div className="flex items-center gap-3 mb-3">
+            <ScrollText className="h-6 w-6 text-[color:var(--color-warroom-gold)]" />
+            <h1
+              className="text-xl sm:text-2xl font-bold tracking-[0.04em]"
+              style={{
+                fontFamily: 'var(--font-display)',
+                background:
+                  'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Evaluation Report
+            </h1>
+          </div>
+          <p
+            className="text-sm text-[color:var(--color-warroom-smoke)]"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
           >
-            {activeTab === 1 && <DealSummaryTab report={report} />}
-            {activeTab === 2 && <CompetencyTab report={report} />}
-            {activeTab === 3 && <AIAnalysisTab report={report} />}
-            {activeTab === 4 && <ResponsesTab report={report} />}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+            {report.entrepreneurType} &bull; {report.organizationalRole}
+          </p>
+          <div className="mt-5">
+            <GoldDivider variant="line" />
+          </div>
+        </motion.header>
 
-      <style jsx>{`
-        .report-page {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
-          color: #e0e0e0;
-          padding: 2rem;
-        }
-        .report-header { text-align: center; margin-bottom: 2rem; }
-        .back-link { color: #8b8bcc; text-decoration: none; font-size: 0.85rem; display: inline-block; margin-bottom: 1rem; }
-        h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
-        .subtitle { color: hsl(var(--muted-foreground)); font-size: 1rem; font-weight: 500; }
-        .page-tabs { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        .tab { background: hsl(var(--muted)); border: 1px solid rgba(255,255,255,0.08); color: #9ca3af; padding: 0.7rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
-        .tab:hover { background: rgba(255,255,255,0.08); }
-        .tab.active { background: rgba(139,92,246,0.15); border-color: #8b5cf6; color: hsl(var(--primary)); }
-        .report-content { max-width: 900px; margin: 0 auto; }
-      `}</style>
+        {/* Tab Navigation */}
+        <nav className="flex justify-center gap-2 mb-8 flex-wrap">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border
+                  ${
+                    isActive
+                      ? 'bg-[color:var(--color-warroom-gold)]/10 border-[color:var(--color-warroom-gold)]/40 text-[color:var(--color-warroom-gold)]'
+                      : 'bg-transparent border-[color:var(--color-warroom-ash)]/20 text-[color:var(--color-warroom-smoke)] hover:bg-[color:var(--color-warroom-gold)]/[0.04] hover:text-[color:var(--color-warroom-ivory)]'
+                  }
+                `}
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            )
+          })}
+        </nav>
+
+        {/* Tab Content */}
+        <main>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={
+                prefersReducedMotion ? false : { opacity: 0, y: 10 }
+              }
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: easeDramatic }}
+            >
+              {activeTab === 1 && <DealSummaryTab report={report} />}
+              {activeTab === 2 && <CompetencyTab report={report} />}
+              {activeTab === 3 && <AIAnalysisTab report={report} />}
+              {activeTab === 4 && <ResponsesTab report={report} />}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
     </div>
   )
 }

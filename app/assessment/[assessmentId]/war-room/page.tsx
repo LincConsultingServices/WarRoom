@@ -251,7 +251,7 @@ export default function WarRoomSimulation() {
     const [timeRemaining, setTimeRemaining] = useState(15 * 60); /* Disabled countdown logic */ // 15 minutes in seconds
 
     // -- Negotiation Logic --
-    const handleSelectOffer = (offer: any) => {
+    const handleSelectOffer = (offer: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setSelectedOffer(offer)
         setNegRound(0) // Round increments on each voice submission
         setNegHistory([
@@ -372,14 +372,14 @@ export default function WarRoomSimulation() {
             }
 
             negotiationRecorder.resetRecording()
-        } catch (err: any) {
-            setError(err.message || 'Failed to negotiate via voice')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to negotiate via voice')
         } finally {
             setIsNegVoiceSubmitting(false)
         }
     }
 
-    const handleAcceptDeal = async (offer: any) => {
+    const handleAcceptDeal = async (offer: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         try {
             setAcceptedDealTerms({
                 capital: offer.capital,
@@ -453,8 +453,8 @@ export default function WarRoomSimulation() {
                 // Fallback: if ID matching yielded nothing, use the full list
                 setInvestors(filtered.length > 0 ? filtered : investorList)
                 setPhase('PITCH')
-            } catch (err: any) {
-                setError(err.message || 'Failed to load War Room data')
+            } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : 'Failed to load War Room data')
                 setPhase('PITCH') // Still show pitch even if load fails
             }
         }
@@ -481,7 +481,7 @@ export default function WarRoomSimulation() {
 
             const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
 
-            const interval: any = setInterval(function() {
+            const interval: ReturnType<typeof setInterval> = setInterval(function() {
                 const timeLeft = animationEnd - Date.now()
 
                 if (timeLeft <= 0) {
@@ -528,8 +528,8 @@ export default function WarRoomSimulation() {
             setPitchAnalysis(result.analysis)
             setPitchText(result.analysis.transcription)
             resetPitchFollowupState()
-        } catch (err: any) {
-            setError(err.message || 'Failed to analyze pitch')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to analyze pitch')
         } finally {
             setIsAnalyzing(false)
             setIsSubmitting(false)
@@ -560,8 +560,8 @@ export default function WarRoomSimulation() {
             })
             setPitchText(trimmed)
             setTextPitchInput('')
-        } catch (err: any) {
-            setError(err.message || 'Failed to submit pitch')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to submit pitch')
         } finally {
             setIsAnalyzing(false); setIsSubmitting(false)
         }
@@ -580,8 +580,8 @@ export default function WarRoomSimulation() {
             setCurrentInvestorReaction(scorecard.investorReaction || `${investor.name} has considered your response.`)
             setResponseSubmitted(true)
             setTextResponseInput('')
-        } catch (err: any) {
-            setError(err.message || 'Failed to submit response')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to submit response')
         } finally {
             setIsAnalyzing(false); setIsSubmitting(false)
         }
@@ -616,8 +616,8 @@ export default function WarRoomSimulation() {
                 setSelectedOffer({ ...selectedOffer, capital: result.capital ?? capital, equity: result.equity ?? equity })
             }
             setTextNegCapital(''); setTextNegEquity('')
-        } catch (err: any) {
-            setError(err.message || 'Failed to submit counter-offer')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to submit counter-offer')
         } finally {
             setIsNegVoiceSubmitting(false)
         }
@@ -702,8 +702,8 @@ export default function WarRoomSimulation() {
                 audio.onerror = () => setIsPlayingAudio(false)
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
-        } catch (err: any) {
-            setError(err.message || 'Failed to analyze response')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to analyze response')
         } finally {
             setIsAnalyzing(false)
             setIsSubmitting(false)
@@ -749,8 +749,8 @@ export default function WarRoomSimulation() {
                 audio.onerror = () => setIsPlayingAudio(false)
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
-        } catch (err: any) {
-            setError(err.message || 'Failed to submit follow-up response')
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to submit follow-up response')
         } finally {
             setIsAnalyzing(false)
             setIsSubmitting(false)
