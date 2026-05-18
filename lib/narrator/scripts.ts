@@ -182,4 +182,46 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
+
+  'settings.first-visit': [
+    {
+      text: 'The Forge, lord. Here you may temper your preferences.',
+      mood: 'idle',
+      duration: 3200,
+    },
+    {
+      text: 'Shape the War Room to your liking — but the trials remain the same.',
+      mood: 'speaking',
+      duration: 0,
+    },
+  ],
+
+  'settings.returning': [
+    {
+      text: 'Adjusting the armour again, lord?',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'support.first-visit': [
+    {
+      text: 'If the War Room confounds you, seek counsel here.',
+      mood: 'idle',
+      duration: 3200,
+    },
+    {
+      text: 'The scribes answer every summons within a day.',
+      mood: 'speaking',
+      duration: 0,
+    },
+  ],
+
+  'support.returning': [
+    {
+      text: 'The Council stands ready to assist, lord.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
 }
