@@ -1,23 +1,38 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Progress } from '@/components/ui/progress'
-import { ThemeToggle } from '@/components/theme-toggle'
-import { ArrowLeft, CheckCircle2, Clock, Play, BarChart3, AlertTriangle } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { CompetencyRadarChart } from '@/components/competency-radar-chart'
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import {
+  CheckCircle2,
+  Clock,
+  Play,
+  BarChart3,
+  AlertTriangle,
+  ScrollText,
+  Swords,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import api from '@/src/lib/api'
+import { cn } from '@/lib/utils'
+import { Progress } from '@/components/ui/progress'
+import { CompetencyRadarChart } from '@/components/competency-radar-chart'
+import {
+  StoneCard,
+  WarRoomCTA,
+  GoldDivider,
+  SigilBadge,
+} from '@/src/components/primitives'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import {
+  staggerContainer,
+  staggerItem,
+  easeDramatic,
+} from '@/lib/animations/variants'
 
-gsap.registerPlugin(ScrollTrigger)
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface SimulationResult {
   id: string
@@ -51,55 +66,43 @@ interface SimulationResult {
   }[]
 }
 
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const STAGE_NAMES: Record<number, string> = {
+  [-2]: 'Ideating',
+  [-1]: 'Concepting',
+  0: 'Committing',
+  1: 'Validating',
+  2: 'Scaling',
+  3: 'Establishing',
+}
+
+const PROGRESS_CLASSES =
+  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+
+// ─── Page ───────────────────────────────────────────────────────────────────
+
 export default function ResultsPage() {
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
+
   const [simulations, setSimulations] = useState<SimulationResult[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    // Header animation
-    if (headerRef.current && !loading) {
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }
-      )
-    }
-
-    // Cards entrance with stagger
-    if (cardsRef.current && !loading) {
-      const cards = cardsRef.current.querySelectorAll('.result-card')
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 40, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'back.out(1.7)',
-        }
-      )
-    }
-  }, [loading])
+  useNarratorOnboarding('results', { delayMs: 1400 })
 
   useEffect(() => {
     async function fetchResults() {
       try {
-        const simulations: any = await api.assessments.list()
-
-        // Transform data if needed
-        setSimulations(simulations || [])
-        if (simulations?.length > 0) {
-          setExpandedAttempt(simulations[0].id)
-        }
-      } catch (err: any) {
-        if (err.message?.includes('Unauthorized')) {
+        const data: unknown = await api.assessments.list()
+        const sims = (data as SimulationResult[]) || []
+        setSimulations(sims)
+        if (sims.length > 0) setExpandedAttempt(sims[0].id)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : ''
+        if (msg.includes('Unauthorized')) {
           router.push('/login')
           return
         }
@@ -109,302 +112,474 @@ export default function ResultsPage() {
         setLoading(false)
       }
     }
-
     fetchResults()
   }, [router])
 
+  // ── Loading ──
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Skeleton className="h-9 w-48 mb-2 animate-pulse" />
-              <Skeleton className="h-5 w-64 animate-pulse" />
-            </motion.div>
-          </div>
-        </header>
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          {[1, 2].map(i => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <Skeleton className="h-64 w-full mb-6 animate-pulse" />
-            </motion.div>
-          ))}
-        </main>
+      <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 space-y-6">
+        <div className="flex items-center gap-3">
+          <ScrollText className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+          <div className="h-6 w-48 rounded bg-[color:var(--color-warroom-rampart)] animate-pulse" />
+        </div>
+        {[1, 2].map((i) => (
+          <div
+            key={i}
+            className="got-stone-card h-48 animate-pulse"
+            style={{ animationDelay: `${i * 120}ms` }}
+          />
+        ))}
       </div>
     )
   }
+
+  // ── Error ──
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="pt-6 text-center">
-            <p className="text-destructive mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </CardContent>
-        </Card>
+      <div className="py-12 max-w-md mx-auto text-center">
+        <StoneCard accent="var(--color-warroom-crimson)" className="py-10">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-crimson-bright)]" />
+          <p
+            className="text-sm text-[color:var(--color-warroom-crimson-bright)] mb-5"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {error}
+          </p>
+          <WarRoomCTA
+            size="sm"
+            variant="ghost"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </WarRoomCTA>
+        </StoneCard>
       </div>
     )
   }
 
-  const stageNames: Record<number, string> = {
-    [-2]: 'Ideating',
-    [-1]: 'Concepting',
-    0: 'Committing',
-    1: 'Validating',
-    2: 'Scaling',
-    3: 'Establishing',
-  }
+  // ── Main ──
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 w-full">
       {/* Header */}
-      <header ref={headerRef} className="border-b border-border bg-card">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Dashboard
-                  </Button>
-                </Link>
-              </div>
-              <h1 className="text-3xl font-bold">Simulation Results</h1>
-              <p className="text-muted-foreground mt-1">Detailed breakdown of all your simulation attempts</p>
-            </div>
-            <ThemeToggle />
-          </div>
+      <motion.div
+        className="mb-8"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeDramatic }}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <ScrollText
+            className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+            aria-hidden
+          />
+          <h1
+            className="text-xl font-semibold tracking-[0.04em]"
+            style={{
+              fontFamily: 'var(--font-display)',
+              background:
+                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            The Legacy Scroll
+          </h1>
         </div>
-      </header>
+        <p
+          className="text-sm text-[color:var(--color-warroom-smoke)] mb-4"
+          style={{ fontFamily: 'var(--font-body, serif)' }}
+        >
+          Detailed breakdown of all your simulation campaigns.
+        </p>
+        <GoldDivider variant="line" />
+      </motion.div>
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        {simulations.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <p className="text-muted-foreground mb-4">No simulations found. Start your first simulation to see results here.</p>
-              <Link href="/assessment/start">
-                <Button>
-                  <Play className="h-4 w-4 mr-2" />
-                  Start Simulation
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div ref={cardsRef} className="space-y-8">
-            {simulations.map((simulation) => {
-              const isCompleted = simulation.status === 'COMPLETED'
-              const isExpanded = expandedAttempt === simulation.id
-              const totalResponses = simulation.responses?.length || 0
-              const completedStages = simulation.stages?.filter((s: any) => s.completedAt)?.length || 0
-              const avgScore = simulation.competencyScores?.length > 0
-                ? Math.round(simulation.competencyScores.reduce((sum, c) => sum + (c.normalizedScore || 0), 0) / simulation.competencyScores.length)
-                : null
-
-              return (
-                <motion.div key={simulation.id} className="result-card">
-                  <Card className="overflow-hidden border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl">Attempt {simulation.attemptNumber}</CardTitle>
-                        <CardDescription>
-                          {isCompleted && simulation.completedAt
-                            ? `Completed on ${new Date(simulation.completedAt).toLocaleDateString()}`
-                            : simulation.startedAt
-                              ? `Started on ${new Date(simulation.startedAt).toLocaleDateString()}`
-                              : 'Not started'}
-                        </CardDescription>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {avgScore !== null && (
-                          <motion.div
-                            className="text-right"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, type: 'spring', stiffness: 300 }}
-                            viewport={{ once: true }}
-                          >
-                            <div className="text-2xl font-bold text-primary animate-glow-border pb-1">{avgScore}</div>
-                            <div className="text-xs text-muted-foreground">Avg Score</div>
-                          </motion.div>
-                        )}
-                        <motion.div
-                          initial={{ opacity: 0, x: 10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.1 }}
-                          viewport={{ once: true }}
-                        >
-                          <Badge variant={isCompleted ? 'default' : 'outline'} className={isCompleted ? 'animate-pulse-ring-thick' : ''}>
-                            {isCompleted ? (
-                              <><CheckCircle2 className="h-3 w-3 mr-1" /> Completed</>
-                            ) : (
-                              <><Clock className="h-3 w-3 mr-1" /> {simulation.status?.replace('_', ' ')}</>
-                            )}
-                          </Badge>
-                        </motion.div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Quick Stats Row */}
-                    <motion.div className="grid grid-cols-4 gap-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                      {[
-                        { label: 'Responses', value: totalResponses },
-                        { label: 'Stages', value: `${completedStages}/6` },
-                        { label: 'Competencies', value: simulation.competencyScores?.length || 0 },
-                        { label: 'Mistakes', value: simulation.mistakesTriggered?.length || 0 },
-                      ].map((stat, idx) => (
-                        <motion.div
-                          key={idx}
-                          className="text-center p-3 bg-muted/50 rounded-lg border border-border/50 hover:border-primary/50 transition-all"
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.05 }}
-                          viewport={{ once: true }}
-                          whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(99, 102, 241, 0.1)' }}
-                        >
-                          <div className="text-lg font-bold text-primary">{stat.value}</div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-
-                    {/* Stage Progress */}
-                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                      <h4 className="text-sm font-semibold mb-3">Stage Progress</h4>
-                      <motion.div className="grid grid-cols-6 gap-2">
-                        {[-2, -1, 0, 1, 2, 3].map((stageNum, idx) => {
-                          const stage = simulation.stages?.find((s: any) => s.stageNumber === stageNum)
-                          const isStageCompleted = stage?.completedAt
-                          const isCurrent = !isStageCompleted && simulation.currentStage === stageNum
-                          const stageResponses = simulation.responses?.filter((r: any) => r.stage?.stageNumber === stageNum) || []
-
-                          return (
-                            <motion.div
-                              key={stageNum}
-                              className={`text-center p-2 rounded-lg text-xs cursor-pointer transition-all ${isStageCompleted ? 'bg-emerald-100 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700 shadow-sm shadow-emerald-500/10' :
-                                  isCurrent ? 'bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-700 animate-pulse-ring-thick' :
-                                    'bg-muted/30 border border-border/50 hover:border-primary/30'
-                                }`}
-                              initial={{ opacity: 0, y: 10 }}
-                              whileInView={{ opacity: 1, y: 0 }}
-                              transition={{ delay: idx * 0.05 }}
-                              whileHover={{ scale: 1.05 }}
-                              viewport={{ once: true }}
-                            >
-                              <div className="font-semibold truncate">{stageNames[stageNum] || `S${stageNum}`}</div>
-                              <div className="text-muted-foreground">
-                                {stageResponses.length > 0 ? `${stageResponses.length} Q` : '--'}
-                              </div>
-                            </motion.div>
-                          )
-                        })}
-                      </motion.div>
-                    </motion.div>
-
-                    {/* Expand/Collapse Details */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setExpandedAttempt(isExpanded ? null : simulation.id)}
-                      className="w-full"
-                    >
-                      {isExpanded ? 'Hide Details' : 'Show Details'}
-                    </Button>
-
-                    {isExpanded && (
-                      <div className="space-y-6 pt-4 border-t border-border">
-                        {/* Competency Scores */}
-                        {simulation.competencyScores?.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                              <BarChart3 className="h-4 w-4" />
-                              Competency Profile
-                            </h4>
-                            <div className="mb-6 border border-border rounded-xl bg-card p-4">
-                               <CompetencyRadarChart 
-                                 spiderData={simulation.competencyScores.reduce((acc, c) => ({...acc, [c.competencyCode]: c.normalizedScore || 0}), {})}
-                                 competencyRanking={simulation.competencyScores.map(c => ({ code: c.competencyCode, name: c.competencyName }))}
-                               />
-                            </div>
-                            <div className="space-y-2">
-                              {simulation.competencyScores.map((c) => (
-                                <div key={c.competencyCode} className="flex items-center gap-3">
-                                  <span className="text-xs w-8 text-muted-foreground">{c.competencyCode}</span>
-                                  <span className="text-sm w-48 truncate">{c.competencyName}</span>
-                                  <Progress value={c.normalizedScore || 0} className="flex-1 h-2" />
-                                  <Badge variant="outline" className="text-xs w-10 justify-center">
-                                    {c.levelAchieved}
-                                  </Badge>
-                                  <span className="text-sm font-mono w-8 text-right">{c.normalizedScore || 0}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Mistakes Triggered */}
-                        {simulation.mistakesTriggered?.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4" />
-                              Mistakes Triggered
-                            </h4>
-                            <div className="space-y-2">
-                              {simulation.mistakesTriggered.map((m, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950/20 rounded-lg">
-                                  <div>
-                                    <span className="text-sm font-medium">{m.mistakeName || m.mistakeCode}</span>
-                                    <span className="text-xs text-muted-foreground ml-2">Stage {m.triggeredAtStage}</span>
-                                  </div>
-                                  {m.hasCompounded && (
-                                    <Badge variant="destructive" className="text-xs">Compounded</Badge>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-2">
-                      {isCompleted && (
-                        <Link href={`/assessment/${simulation.id}/final-report`}>
-                          <Button variant="outline" size="sm">
-                            <BarChart3 className="h-4 w-4 mr-2" />
-                            View Full Report
-                          </Button>
-                        </Link>
-                      )}
-                      {!isCompleted && simulation.status !== 'NOT_STARTED' && (
-                        <Link href={`/assessment/${simulation.id}`}>
-                          <Button size="sm">
-                            <Play className="h-4 w-4 mr-2" />
-                            Continue Simulation
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </div>
-        )}
-      </main>
+      {simulations.length === 0 ? (
+        /* ── Empty state ── */
+        <StoneCard className="py-14 text-center">
+          <Swords className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-warroom-ash)]" />
+          <p
+            className="text-sm text-[color:var(--color-warroom-smoke)] mb-5"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            No simulations found. Begin your first trial to see results here.
+          </p>
+          <Link href="/assessment/start">
+            <WarRoomCTA size="sm" variant="ghost" icon={Play}>
+              Start Simulation
+            </WarRoomCTA>
+          </Link>
+        </StoneCard>
+      ) : (
+        /* ── Simulation cards ── */
+        <motion.div
+          className="space-y-6"
+          variants={staggerContainer}
+          initial={prefersReducedMotion ? false : 'hidden'}
+          animate="show"
+        >
+          {simulations.map((simulation) => (
+            <SimulationCard
+              key={simulation.id}
+              simulation={simulation}
+              isExpanded={expandedAttempt === simulation.id}
+              onToggle={() =>
+                setExpandedAttempt(
+                  expandedAttempt === simulation.id ? null : simulation.id,
+                )
+              }
+            />
+          ))}
+        </motion.div>
+      )}
     </div>
   )
 }
 
+// ─── Simulation Card ────────────────────────────────────────────────────────
+
+function SimulationCard({
+  simulation,
+  isExpanded,
+  onToggle,
+}: {
+  simulation: SimulationResult
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const isCompleted = simulation.status === 'COMPLETED'
+  const totalResponses = simulation.responses?.length || 0
+  const completedStages =
+    simulation.stages?.filter((s) => s.completedAt)?.length || 0
+  const avgScore =
+    simulation.competencyScores?.length > 0
+      ? Math.round(
+          simulation.competencyScores.reduce(
+            (sum, c) => sum + (c.normalizedScore || 0),
+            0,
+          ) / simulation.competencyScores.length,
+        )
+      : null
+
+  return (
+    <motion.div variants={staggerItem}>
+      <StoneCard
+        accent={
+          isCompleted
+            ? 'var(--color-warroom-gold)'
+            : 'var(--color-warroom-ember)'
+        }
+        padding="none"
+      >
+        {/* ── Header row ── */}
+        <div className="flex items-start justify-between px-6 pt-6 pb-4">
+          <div>
+            <h2
+              className="text-base font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Campaign {simulation.attemptNumber}
+            </h2>
+            <p
+              className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
+              {isCompleted && simulation.completedAt
+                ? `Completed on ${new Date(simulation.completedAt).toLocaleDateString()}`
+                : simulation.startedAt
+                  ? `Started on ${new Date(simulation.startedAt).toLocaleDateString()}`
+                  : 'Not started'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {avgScore !== null && (
+              <div className="text-right">
+                <div
+                  className="text-xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                  style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                >
+                  {avgScore}
+                </div>
+                <div
+                  className="text-[9px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Avg Score
+                </div>
+              </div>
+            )}
+            <SigilBadge
+              tone={isCompleted ? 'gold' : 'crimson'}
+              icon={isCompleted ? CheckCircle2 : Clock}
+            >
+              {isCompleted
+                ? 'Complete'
+                : simulation.status?.replace('_', ' ') || 'Active'}
+            </SigilBadge>
+          </div>
+        </div>
+
+        {/* ── Quick stats ── */}
+        <div className="grid grid-cols-4 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-warroom-ash)]/25">
+          {[
+            { label: 'Responses', value: totalResponses },
+            { label: 'Stages', value: `${completedStages}/6` },
+            {
+              label: 'Competencies',
+              value: simulation.competencyScores?.length || 0,
+            },
+            {
+              label: 'Mistakes',
+              value: simulation.mistakesTriggered?.length || 0,
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="text-center py-3 bg-[color:var(--color-warroom-rampart)]/50"
+            >
+              <div
+                className="text-sm font-bold text-[color:var(--color-warroom-gold)]"
+                style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+              >
+                {stat.value}
+              </div>
+              <div
+                className="text-[9px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Stage progress ── */}
+        <div className="px-6 pb-4">
+          <div className="grid grid-cols-6 gap-1.5">
+            {([-2, -1, 0, 1, 2, 3] as const).map((stageNum) => {
+              const stage = simulation.stages?.find(
+                (s) => s.stageNumber === stageNum,
+              )
+              const isDone = Boolean(stage?.completedAt)
+              const isCurrent =
+                !isDone && simulation.currentStage === stageNum
+              const stageResponses =
+                simulation.responses?.filter(
+                  (r) => r.stage?.stageNumber === stageNum,
+                ) || []
+
+              return (
+                <div
+                  key={stageNum}
+                  className={cn(
+                    'text-center py-2 px-1 rounded-[3px] text-[10px] border transition-colors',
+                    isDone &&
+                      'bg-[color:var(--color-warroom-gold)]/[0.08] border-[color:var(--color-warroom-gold)]/30',
+                    isCurrent &&
+                      'bg-[color:var(--color-warroom-ember)]/[0.08] border-[color:var(--color-warroom-ember)]/40 ring-1 ring-[color:var(--color-warroom-ember)]/30',
+                    !isDone &&
+                      !isCurrent &&
+                      'bg-[color:var(--color-warroom-rampart)]/40 border-[color:var(--color-warroom-ash)]/20',
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'font-semibold truncate',
+                      isDone
+                        ? 'text-[color:var(--color-warroom-gold)]'
+                        : isCurrent
+                          ? 'text-[color:var(--color-warroom-ember)]'
+                          : 'text-[color:var(--color-warroom-smoke)]',
+                    )}
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {STAGE_NAMES[stageNum] || `S${stageNum}`}
+                  </div>
+                  <div className="text-[color:var(--color-warroom-smoke)]/70 mt-0.5">
+                    {stageResponses.length > 0
+                      ? `${stageResponses.length} Q`
+                      : '—'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* ── Expand toggle ── */}
+        <button
+          type="button"
+          onClick={onToggle}
+          className="w-full flex items-center justify-center gap-2 py-3 border-t border-[color:var(--color-warroom-ash)]/20 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {isExpanded ? (
+            <>
+              Hide Details <ChevronUp className="w-3 h-3" />
+            </>
+          ) : (
+            <>
+              Show Details <ChevronDown className="w-3 h-3" />
+            </>
+          )}
+        </button>
+
+        {/* ── Expanded details ── */}
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: easeDramatic }}
+              className="overflow-hidden"
+            >
+              <div className="px-6 pb-6 pt-2 border-t border-[color:var(--color-warroom-ash)]/20 space-y-6">
+                {/* Competency Scores */}
+                {simulation.competencyScores?.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+                      <h3
+                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        Competency Profile
+                      </h3>
+                    </div>
+
+                    {/* Radar chart */}
+                    <div className="got-stone-card p-4 mb-4">
+                      <CompetencyRadarChart
+                        spiderData={simulation.competencyScores.reduce(
+                          (acc, c) => ({
+                            ...acc,
+                            [c.competencyCode]: c.normalizedScore || 0,
+                          }),
+                          {},
+                        )}
+                        competencyRanking={simulation.competencyScores.map(
+                          (c) => ({
+                            code: c.competencyCode,
+                            name: c.competencyName,
+                          }),
+                        )}
+                      />
+                    </div>
+
+                    {/* Competency bars */}
+                    <div className="space-y-3">
+                      {simulation.competencyScores.map((c) => (
+                        <div
+                          key={c.competencyCode}
+                          className="flex items-center gap-3"
+                        >
+                          <span
+                            className="text-[10px] w-7 text-[color:var(--color-warroom-smoke)] shrink-0"
+                            style={{
+                              fontFamily: 'var(--font-data, var(--font-mono))',
+                            }}
+                          >
+                            {c.competencyCode}
+                          </span>
+                          <span
+                            className="text-xs w-36 truncate text-[color:var(--color-warroom-ivory)]"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {c.competencyName}
+                          </span>
+                          <Progress
+                            value={c.normalizedScore || 0}
+                            className={cn('flex-1', PROGRESS_CLASSES)}
+                          />
+                          <span
+                            className="text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-[2px] border border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-smoke)] w-10 text-center shrink-0"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {c.levelAchieved}
+                          </span>
+                          <span
+                            className="text-xs w-7 text-right text-[color:var(--color-warroom-ivory)] shrink-0"
+                            style={{
+                              fontFamily: 'var(--font-data, var(--font-mono))',
+                            }}
+                          >
+                            {c.normalizedScore || 0}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mistakes */}
+                {simulation.mistakesTriggered?.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="h-4 w-4 text-[color:var(--color-warroom-crimson-bright)]" />
+                      <h3
+                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        Mistakes Triggered
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      {simulation.mistakesTriggered.map((m, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/20 bg-[color:var(--color-warroom-crimson)]/[0.05]"
+                        >
+                          <div>
+                            <span
+                              className="text-xs text-[color:var(--color-warroom-ivory)]"
+                              style={{ fontFamily: 'var(--font-display)' }}
+                            >
+                              {m.mistakeName || m.mistakeCode}
+                            </span>
+                            <span className="text-[10px] text-[color:var(--color-warroom-smoke)] ml-2">
+                              Stage {m.triggeredAtStage}
+                            </span>
+                          </div>
+                          {m.hasCompounded && (
+                            <SigilBadge tone="crimson">Compounded</SigilBadge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {isCompleted && (
+                    <Link href={`/assessment/${simulation.id}/final-report`}>
+                      <WarRoomCTA
+                        size="sm"
+                        variant="ghost"
+                        icon={BarChart3}
+                      >
+                        View Full Report
+                      </WarRoomCTA>
+                    </Link>
+                  )}
+                  {!isCompleted && simulation.status !== 'NOT_STARTED' && (
+                    <Link href={`/assessment/${simulation.id}`}>
+                      <WarRoomCTA size="sm" variant="primary" icon={Play}>
+                        Continue Simulation
+                      </WarRoomCTA>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </StoneCard>
+    </motion.div>
+  )
+}

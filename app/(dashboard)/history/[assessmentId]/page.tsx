@@ -3,21 +3,32 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, Clock, ArrowLeft, Download, AlertCircle, Share2, Printer, MapPin } from 'lucide-react'
-import { format } from 'date-fns'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+  Archive,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  Download,
+  Share2,
+  Printer,
+  MessageSquare,
+  BarChart3,
+  ChevronDown,
+  Star,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Progress } from '@/components/ui/progress'
+import { format } from 'date-fns'
+import {
+  StoneCard,
+  WarRoomCTA,
+  GoldDivider,
+  SigilBadge,
+} from '@/src/components/primitives'
+import { easeDramatic } from '@/lib/animations/variants'
+
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface ResponseDetail {
   id: string
@@ -42,14 +53,35 @@ interface SimulationDetail {
   responses: ResponseDetail[]
 }
 
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const PROGRESS_CLASSES =
+  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+
+const LEVEL_TONES: Record<string, string> = {
+  Expert: 'text-[color:var(--color-warroom-gold-bright)]',
+  Advanced: 'text-[color:var(--color-warroom-gold)]',
+  Intermediate: 'text-[color:var(--color-warroom-silver)]',
+  Developing: 'text-[color:var(--color-warroom-ember)]',
+  Beginner: 'text-[color:var(--color-warroom-crimson-bright)]',
+}
+
+type TabKey = 'overview' | 'responses' | 'competencies'
+
+// ─── Page ───────────────────────────────────────────────────────────────────
+
 export default function HistoryDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
+
   const assessmentId = params.assessmentId as string
-  
+
   const [simulation, setSimulation] = useState<SimulationDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<TabKey>('overview')
+  const [expandedResponse, setExpandedResponse] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchDetail() {
@@ -62,7 +94,7 @@ export default function HistoryDetailPage() {
         if (!res.ok) throw new Error('Failed to load simulation details')
         const data = await res.json()
         setSimulation(data)
-      } catch (err) {
+      } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setLoading(false)
@@ -71,236 +103,514 @@ export default function HistoryDetailPage() {
     fetchDetail()
   }, [assessmentId, router])
 
-  if (loading) return <DetailSkeleton />
-  
-  if (error || !simulation) {
+  // ── Loading ──
+
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-        <AlertCircle className="h-12 w-12 text-destructive" />
-        <h2 className="text-xl font-semibold">Error Loading Simulation</h2>
-        <p className="text-muted-foreground">{error || 'Simulation not found'}</p>
-        <Link href="/history">
-          <Button variant="outline">Back to History</Button>
-        </Link>
+      <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 space-y-6">
+        <div className="flex items-center gap-3">
+          <Archive className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+          <div className="h-6 w-48 rounded bg-[color:var(--color-warroom-rampart)] animate-pulse" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="got-stone-card h-28 animate-pulse"
+              style={{ animationDelay: `${i * 100}ms` }}
+            />
+          ))}
+        </div>
+        <div className="got-stone-card h-[400px] animate-pulse" />
       </div>
     )
   }
 
+  // ── Error ──
+
+  if (error || !simulation) {
+    return (
+      <div className="py-12 max-w-md mx-auto text-center">
+        <StoneCard accent="var(--color-warroom-crimson)" className="py-10">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-crimson-bright)]" />
+          <p
+            className="text-sm text-[color:var(--color-warroom-crimson-bright)] mb-5"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {error || 'Campaign not found'}
+          </p>
+          <Link href="/history">
+            <WarRoomCTA size="sm" variant="ghost">
+              Return to Archives
+            </WarRoomCTA>
+          </Link>
+        </StoneCard>
+      </div>
+    )
+  }
+
+  const isCompleted = simulation.status === 'COMPLETED'
+
+  // ── Tabs ──
+
+  const TABS: { key: TabKey; label: string }[] = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'responses', label: 'Session Transcript' },
+    { key: 'competencies', label: 'Competencies' },
+  ]
+
+  // ── Main ──
+
   return (
-    <div className="max-w-5xl mx-auto py-8 space-y-8">
+    <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 w-full">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Link href="/history" className="hover:text-primary transition-colors flex items-center gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Back to History
-            </Link>
-            <span>/</span>
-            <span>Attempt {simulation.attemptNumber}</span>
+      <motion.div
+        className="mb-8"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeDramatic }}
+      >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Archive
+                className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+                aria-hidden
+              />
+              <h1
+                className="text-xl font-semibold tracking-[0.04em]"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  background:
+                    'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Campaign {simulation.attemptNumber} Report
+              </h1>
+            </div>
+
+            <div
+              className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" />
+                {format(new Date(simulation.createdAt), 'PPP')}
+              </span>
+              {simulation.totalDuration > 0 && (
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  {simulation.totalDuration} min
+                </span>
+              )}
+              <SigilBadge tone={isCompleted ? 'gold' : 'crimson'}>
+                {simulation.status.replace('_', ' ')}
+              </SigilBadge>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Simulation Report</h1>
-          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              {format(new Date(simulation.createdAt), 'PPP')}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {simulation.totalDuration} min
-            </span>
-            <Badge variant={simulation.status === 'COMPLETED' ? 'default' : 'secondary'}>
-              {simulation.status.replace('_', ' ')}
-            </Badge>
+
+          {/* Action buttons */}
+          <div className="flex gap-2">
+            <WarRoomCTA size="sm" variant="ghost" icon={Printer}>
+              Print
+            </WarRoomCTA>
+            <WarRoomCTA size="sm" variant="ghost" icon={Share2}>
+              Share
+            </WarRoomCTA>
+            <WarRoomCTA size="sm" variant="ghost" icon={Download}>
+              Export
+            </WarRoomCTA>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm">
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
-          </Button>
+        <GoldDivider variant="line" />
+      </motion.div>
+
+      {/* ── Tab navigation ── */}
+      <motion.div
+        className="mb-6"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4, ease: easeDramatic }}
+      >
+        <div className="flex gap-1 p-1 rounded-[4px] bg-[color:var(--color-warroom-rampart)]/60 border border-[color:var(--color-warroom-ash)]/25 w-fit">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                'px-4 py-2 text-[10px] uppercase tracking-[0.14em] rounded-[3px] transition-all',
+                activeTab === tab.key
+                  ? 'bg-[color:var(--color-warroom-gold)]/[0.12] text-[color:var(--color-warroom-gold)] border border-[color:var(--color-warroom-gold)]/30'
+                  : 'text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)] border border-transparent',
+              )}
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="responses">Response History</TabsTrigger>
-          <TabsTrigger value="competencies">Competencies</TabsTrigger>
-        </TabsList>
+      {/* ── Tab content ── */}
+      <AnimatePresence mode="wait">
+        {activeTab === 'overview' && (
+          <motion.div
+            key="overview"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: easeDramatic }}
+            className="space-y-6"
+          >
+            {/* Stat tiles */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <StoneCard
+                accent="var(--color-warroom-gold)"
+                className="text-center py-6"
+              >
+                <div
+                  className="text-3xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                  style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                >
+                  {simulation.score}%
+                </div>
+                <div
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Overall Score
+                </div>
+              </StoneCard>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Score Card */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Overall Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-primary">{simulation.score}%</div>
-                <p className="text-xs text-muted-foreground mt-1">Based on 14 competencies</p>
-              </CardContent>
-            </Card>
+              <StoneCard
+                accent={
+                  simulation.mistakes.length > 0
+                    ? 'var(--color-warroom-crimson)'
+                    : 'var(--color-warroom-verdant)'
+                }
+                className="text-center py-6"
+              >
+                <div
+                  className={cn(
+                    'text-3xl font-bold',
+                    simulation.mistakes.length > 0
+                      ? 'text-[color:var(--color-warroom-crimson-bright)]'
+                      : 'text-[color:var(--color-warroom-verdant)]',
+                  )}
+                  style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                >
+                  {simulation.mistakes.length}
+                </div>
+                <div
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Critical Mistakes
+                </div>
+              </StoneCard>
 
-            {/* Mistakes Card */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Critical Mistakes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-orange-500">{simulation.mistakes.length}</div>
-                <p className="text-xs text-muted-foreground mt-1">Fatal errors triggered</p>
-              </CardContent>
-            </Card>
-            
-            {/* Completion Card */}
-             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Completion Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{simulation.status === 'COMPLETED' ? '100%' : 'Partial'}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {simulation.completedAt ? `Finished on ${format(new Date(simulation.completedAt), 'P')}` : 'In progress'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+              <StoneCard
+                accent="var(--color-warroom-gold)"
+                className="text-center py-6"
+              >
+                <div
+                  className="text-2xl font-bold text-[color:var(--color-warroom-ivory)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {isCompleted ? 'Complete' : 'Partial'}
+                </div>
+                <div
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {simulation.completedAt
+                    ? `Finished ${format(new Date(simulation.completedAt), 'P')}`
+                    : 'In progress'}
+                </div>
+              </StoneCard>
+            </div>
 
-          {/* Mistakes Detail */}
-          {simulation.mistakes.length > 0 && (
-            <Card className="border-orange-200 bg-orange-50/50">
-              <CardHeader>
-                <CardTitle className="text-lg text-orange-700 flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5" />
-                  Critical Mistakes Identified
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {simulation.mistakes.map((mistake, idx) => (
-                  <div key={idx} className="flex gap-4 items-start p-3 bg-white rounded-lg border border-orange-100">
-                    <div className="h-6 w-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 text-sm font-bold">
-                      !
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-orange-900">{mistake.name}</h4>
-                      <p className="text-sm text-orange-800 mt-1">{mistake.impact}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* Responses History Tab */}
-        <TabsContent value="responses">
-          <Card>
-            <CardHeader>
-              <CardTitle>Session Transcript</CardTitle>
-              <CardDescription>
-                Review every question, your answer, and the panel's feedback.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {simulation.responses.map((resp, index) => (
-                  <AccordionItem key={resp.id} value={resp.id}>
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex text-left gap-4 items-center w-full pr-4">
-                        <Badge variant="outline" className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full p-0">
-                          {index + 1}
-                        </Badge>
-                        <div className="flex-1">
-                          <p className="font-medium line-clamp-1">{resp.questionText}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Stage {resp.stage} • {format(new Date(resp.timestamp), 'p')}
-                          </p>
-                        </div>
-                        <Badge variant={resp.score >= 70 ? 'default' : resp.score >= 40 ? 'secondary' : 'destructive'}>
-                          {resp.score}/100
-                        </Badge>
+            {/* Mistakes detail */}
+            {simulation.mistakes.length > 0 && (
+              <StoneCard
+                accent="var(--color-warroom-crimson)"
+                padding="none"
+              >
+                <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+                  <AlertTriangle className="h-4 w-4 text-[color:var(--color-warroom-crimson-bright)]" />
+                  <h3
+                    className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-crimson-bright)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Critical Mistakes Identified
+                  </h3>
+                </div>
+                <div className="px-6 py-4 space-y-3">
+                  {simulation.mistakes.map((mistake, idx) => (
+                    <div
+                      key={idx}
+                      className="flex gap-4 items-start p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/20 bg-[color:var(--color-warroom-crimson)]/[0.05]"
+                    >
+                      <div
+                        className="h-6 w-6 rounded-full border border-[color:var(--color-warroom-crimson)]/40 text-[color:var(--color-warroom-crimson-bright)] flex items-center justify-center shrink-0 text-xs font-bold"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        !
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-6 pt-2 bg-muted/30 rounded-b-lg space-y-4">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Your Answer</h4>
-                        <div className="p-4 bg-background rounded-md border text-sm whitespace-pre-wrap">
-                          {resp.userAnswer}
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          Panel Feedback
+                      <div>
+                        <h4
+                          className="text-sm font-semibold text-[color:var(--color-warroom-ivory)]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {mistake.name}
                         </h4>
-                        <div className="p-4 bg-primary/5 border border-primary/10 rounded-md text-sm">
-                          {resp.aiFeedback || "No specific feedback recorded for this response."}
-                        </div>
+                        <p
+                          className="text-xs text-[color:var(--color-warroom-smoke)] mt-1"
+                          style={{ fontFamily: 'var(--font-body, serif)' }}
+                        >
+                          {mistake.impact}
+                        </p>
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    </div>
+                  ))}
+                </div>
+              </StoneCard>
+            )}
+          </motion.div>
+        )}
 
-        {/* Competencies Tab */}
-        <TabsContent value="competencies">
-           <Card>
-            <CardHeader>
-              <CardTitle>Competency Breakdown</CardTitle>
-              <CardDescription>Detailed analysis of your entrepreneurial skills.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
-                {simulation.competencies.map((comp, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="flex justify-between items-end">
-                      <h4 className="font-medium">{comp.name}</h4>
-                      <span className="text-sm font-mono text-muted-foreground">{comp.score}/100</span>
-                    </div>
-                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-500" 
-                        style={{ width: `${comp.score}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Level: {comp.level}</p>
-                  </div>
-                ))}
+        {activeTab === 'responses' && (
+          <motion.div
+            key="responses"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: easeDramatic }}
+          >
+            <StoneCard padding="none">
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+                <MessageSquare className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+                <h3
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Session Transcript
+                </h3>
+                <span
+                  className="text-[10px] text-[color:var(--color-warroom-smoke)]/60 ml-auto"
+                  style={{ fontFamily: 'var(--font-body, serif)' }}
+                >
+                  Every question, answer, and the Council&apos;s feedback
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
-}
 
-function DetailSkeleton() {
-  return (
-    <div className="max-w-5xl mx-auto py-8 space-y-8">
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-4 w-96" />
-      </div>
-      <div className="grid md:grid-cols-3 gap-6">
-        {[1, 2, 3].map(i => <Skeleton key={i} className="h-32" />)}
-      </div>
-      <Skeleton className="h-[500px]" />
+              <div className="divide-y divide-[color:var(--color-warroom-ash)]/15">
+                {simulation.responses.length === 0 ? (
+                  <div className="py-10 text-center">
+                    <MessageSquare className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-ash)]" />
+                    <p
+                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      No responses recorded for this campaign.
+                    </p>
+                  </div>
+                ) : (
+                  simulation.responses.map((resp, index) => {
+                    const isOpen = expandedResponse === resp.id
+                    const scoreColor =
+                      resp.score >= 70
+                        ? 'gold'
+                        : resp.score >= 40
+                          ? 'amethyst'
+                          : 'crimson'
+
+                    return (
+                      <div key={resp.id}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedResponse(isOpen ? null : resp.id)
+                          }
+                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[color:var(--color-warroom-gold)]/[0.02] transition-colors text-left"
+                        >
+                          <div
+                            className="w-8 h-8 rounded-full border border-[color:var(--color-warroom-ash)]/30 flex items-center justify-center text-xs font-bold text-[color:var(--color-warroom-smoke)] shrink-0"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {index + 1}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className="text-sm text-[color:var(--color-warroom-ivory)] line-clamp-1"
+                              style={{ fontFamily: 'var(--font-body, serif)' }}
+                            >
+                              {resp.questionText}
+                            </p>
+                            <p
+                              className="text-[10px] text-[color:var(--color-warroom-smoke)] mt-0.5"
+                              style={{ fontFamily: 'var(--font-display)' }}
+                            >
+                              Stage {resp.stage}
+                              {resp.timestamp &&
+                                ` • ${format(new Date(resp.timestamp), 'p')}`}
+                            </p>
+                          </div>
+
+                          <SigilBadge tone={scoreColor as 'gold' | 'crimson' | 'amethyst'}>
+                            {resp.score}/100
+                          </SigilBadge>
+
+                          <ChevronDown
+                            className={cn(
+                              'h-4 w-4 text-[color:var(--color-warroom-smoke)] transition-transform shrink-0',
+                              isOpen && 'rotate-180',
+                            )}
+                          />
+                        </button>
+
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{
+                                duration: 0.25,
+                                ease: easeDramatic,
+                              }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-6 pb-5 pt-1 space-y-4 ml-12">
+                                {/* Your answer */}
+                                <div>
+                                  <h4
+                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-2"
+                                    style={{
+                                      fontFamily: 'var(--font-display)',
+                                    }}
+                                  >
+                                    Your Answer
+                                  </h4>
+                                  <div
+                                    className="p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/20 bg-[color:var(--color-warroom-rampart)]/40 text-sm text-[color:var(--color-warroom-ivory)] whitespace-pre-wrap"
+                                    style={{
+                                      fontFamily: 'var(--font-body, serif)',
+                                    }}
+                                  >
+                                    {resp.userAnswer}
+                                  </div>
+                                </div>
+
+                                {/* Council feedback */}
+                                <div>
+                                  <h4
+                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-2 flex items-center gap-1.5"
+                                    style={{
+                                      fontFamily: 'var(--font-display)',
+                                    }}
+                                  >
+                                    <Star className="h-3 w-3 text-[color:var(--color-warroom-gold)]" />
+                                    Council Feedback
+                                  </h4>
+                                  <div
+                                    className="p-4 rounded-[3px] border border-[color:var(--color-warroom-gold)]/15 bg-[color:var(--color-warroom-gold)]/[0.03] text-sm text-[color:var(--color-warroom-ivory)]"
+                                    style={{
+                                      fontFamily: 'var(--font-body, serif)',
+                                    }}
+                                  >
+                                    {resp.aiFeedback ||
+                                      'No specific feedback recorded for this response.'}
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </StoneCard>
+          </motion.div>
+        )}
+
+        {activeTab === 'competencies' && (
+          <motion.div
+            key="competencies"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: easeDramatic }}
+          >
+            <StoneCard padding="none">
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+                <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+                <h3
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Competency Breakdown
+                </h3>
+              </div>
+
+              {simulation.competencies.length === 0 ? (
+                <div className="py-10 text-center">
+                  <BarChart3 className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-ash)]" />
+                  <p
+                    className="text-xs text-[color:var(--color-warroom-smoke)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    No competency data available.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-6 grid gap-5 md:grid-cols-2">
+                  {simulation.competencies.map((comp, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="flex justify-between items-end">
+                        <h4
+                          className="text-sm font-semibold text-[color:var(--color-warroom-ivory)]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {comp.name}
+                        </h4>
+                        <span
+                          className="text-xs text-[color:var(--color-warroom-smoke)]"
+                          style={{
+                            fontFamily: 'var(--font-data, var(--font-mono))',
+                          }}
+                        >
+                          {comp.score}/100
+                        </span>
+                      </div>
+                      <Progress
+                        value={comp.score || 0}
+                        className={cn('flex-1', PROGRESS_CLASSES)}
+                      />
+                      <p
+                        className={cn(
+                          'text-[10px] uppercase tracking-[0.12em]',
+                          LEVEL_TONES[comp.level] ||
+                            'text-[color:var(--color-warroom-smoke)]',
+                        )}
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {comp.level}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </StoneCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

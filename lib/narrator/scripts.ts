@@ -104,4 +104,82 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
+
+  'leaderboard.first-visit': [
+    {
+      text: 'The Iron Rankings, lord. Here, all founders are measured by the coin they command.',
+      mood: 'idle',
+      duration: 3600,
+    },
+    {
+      text: 'Your projected revenue determines your standing among the realm.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'The throne awaits the boldest.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'leaderboard.returning': [
+    {
+      text: 'The rankings shift with every trial. Where do you stand now, lord?',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'results.first-visit': [
+    {
+      text: 'The Legacy Scroll, lord. Every campaign you have fought is recorded here.',
+      mood: 'idle',
+      duration: 3600,
+    },
+    {
+      text: 'Study your strengths and failures — the Council remembers every choice.',
+      mood: 'speaking',
+      duration: 3400,
+    },
+    {
+      text: 'The wisest commanders learn before they march again.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'results.returning': [
+    {
+      text: 'Your campaigns await review, lord. Has the scroll revealed new wisdom?',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'history.first-visit': [
+    {
+      text: 'The Archives, lord. A chronicle of every question asked and answer given.',
+      mood: 'idle',
+      duration: 3600,
+    },
+    {
+      text: 'No detail is lost here — the scribes recorded your every word.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Review your past, and the future campaigns will be sharper for it.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'history.returning': [
+    {
+      text: 'The archives remain as you left them, lord.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
 }

@@ -1,9 +1,13 @@
 'use client'
 
 import React from 'react'
-import { Trophy, Wifi, WifiOff } from 'lucide-react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { staggerContainer, staggerItem } from '@/lib/animations/variants'
 import type { LeaderboardEntry } from '@/src/types'
+
+// ─── Props ──────────────────────────────────────────────────────────────────
 
 interface LeaderboardPanelProps {
   entries: LeaderboardEntry[]
@@ -13,19 +17,47 @@ interface LeaderboardPanelProps {
   className?: string
 }
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
 function formatRevenue(amount: number): string {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`
   return `$${amount}`
 }
 
-const RANK_COLORS = [
-  'text-yellow-500',
-  'text-slate-400',
-  'text-amber-600',
-]
+/** Per-rank visual tokens for the top 3. */
+const PODIUM: Record<
+  number,
+  {
+    badge: string
+    row: string
+    revenue: string
+    label: string
+    Icon?: React.ComponentType<{ className?: string }>
+  }
+> = {
+  0: {
+    badge: 'text-[color:var(--color-warroom-gold-bright)]',
+    row: 'bg-[color:var(--color-warroom-gold)]/[0.06]',
+    revenue: 'text-[color:var(--color-warroom-gold-bright)]',
+    label: '1st',
+    Icon: Crown,
+  },
+  1: {
+    badge: 'text-[color:var(--color-warroom-silver)]',
+    row: 'bg-[color:var(--color-warroom-silver)]/[0.04]',
+    revenue: 'text-[color:var(--color-warroom-silver)]',
+    label: '2nd',
+  },
+  2: {
+    badge: 'text-[color:var(--color-warroom-ember)]',
+    row: 'bg-[color:var(--color-warroom-ember)]/[0.04]',
+    revenue: 'text-[color:var(--color-warroom-ember)]',
+    label: '3rd',
+  },
+}
 
-const RANK_ICONS = ['1st', '2nd', '3rd']
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export function LeaderboardPanel({
   entries,
@@ -34,61 +66,160 @@ export function LeaderboardPanel({
   updatedAt,
   className,
 }: LeaderboardPanelProps) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
-    <div className={cn('flex flex-col rounded-xl border bg-card shadow-sm overflow-hidden', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/40">
-        <div className="flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-yellow-500" />
-          <span className="text-sm font-semibold">Live Leaderboard</span>
+    <div
+      className={cn(
+        'got-stone-card flex flex-col overflow-hidden',
+        className,
+      )}
+    >
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--color-warroom-ash)]/30">
+        <div className="flex items-center gap-2.5">
+          <Crown
+            className="h-4 w-4 text-[color:var(--color-warroom-gold)]"
+            aria-hidden
+          />
+          <span
+            className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[color:var(--color-warroom-ivory)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Iron Rankings
+          </span>
         </div>
-        <div className={cn('flex items-center gap-1 text-xs', connected ? 'text-green-600' : 'text-muted-foreground')}>
-          {connected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-          {connected ? 'Live' : 'Offline'}
+        <div className="flex items-center gap-1.5">
+          <span
+            className={cn(
+              'w-1.5 h-1.5 rounded-full',
+              connected
+                ? 'bg-[color:var(--color-warroom-verdant)] animate-pulse'
+                : 'bg-[color:var(--color-warroom-ash)]',
+            )}
+          />
+          <span
+            className={cn(
+              'text-[10px] uppercase tracking-[0.14em]',
+              connected
+                ? 'text-[color:var(--color-warroom-verdant)]'
+                : 'text-[color:var(--color-warroom-smoke)]',
+            )}
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {connected ? 'Live' : 'Offline'}
+          </span>
         </div>
       </div>
 
-      {/* Entries */}
-      <div className="flex-1 overflow-y-auto divide-y">
-        {entries.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            Waiting for participants...
-          </div>
-        ) : (
-          entries.map((entry, idx) => (
-            <div
-              key={entry.userId}
-              className={cn(
-                'flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
-                entry.userId === currentUserId && 'bg-primary/5 font-medium',
-                idx === 0 && 'bg-yellow-50/50 dark:bg-yellow-900/10'
-              )}
+      {/* ── Entries ── */}
+      <div className="flex-1 overflow-y-auto">
+        <AnimatePresence mode="popLayout">
+          {entries.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-12 gap-3"
             >
-              {/* Rank */}
-              <div className={cn('w-6 text-center font-bold', RANK_COLORS[idx] || 'text-muted-foreground')}>
-                {idx < 3 ? RANK_ICONS[idx] : `#${idx + 1}`}
-              </div>
+              <Crown className="h-8 w-8 text-[color:var(--color-warroom-ash)]" />
+              <p
+                className="text-xs text-[color:var(--color-warroom-smoke)] uppercase tracking-[0.14em]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Waiting for participants…
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              variants={staggerContainer}
+              initial={prefersReducedMotion ? false : 'hidden'}
+              animate="show"
+              className="divide-y divide-[color:var(--color-warroom-ash)]/20"
+            >
+              {entries.map((entry, idx) => {
+                const podium = PODIUM[idx]
+                const isMe = entry.userId === currentUserId
 
-              {/* Name */}
-              <div className="flex-1 truncate">
-                {entry.name}
-                {entry.userId === currentUserId && (
-                  <span className="ml-1 text-xs text-primary">(you)</span>
-                )}
-              </div>
+                return (
+                  <motion.div
+                    key={entry.userId}
+                    variants={staggerItem}
+                    layout
+                    className={cn(
+                      'flex items-center gap-3 px-5 py-3 text-sm transition-colors',
+                      podium?.row,
+                      isMe &&
+                        'border-l-2 border-l-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/[0.04]',
+                    )}
+                  >
+                    {/* Rank badge */}
+                    <div
+                      className={cn(
+                        'w-10 flex items-center gap-1 font-bold shrink-0',
+                        podium?.badge ||
+                          'text-[color:var(--color-warroom-smoke)]',
+                      )}
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {podium?.Icon && (
+                        <podium.Icon
+                          className="h-3.5 w-3.5 shrink-0"
+                          aria-hidden
+                        />
+                      )}
+                      <span className="text-xs tracking-[0.06em]">
+                        {podium?.label ?? `#${idx + 1}`}
+                      </span>
+                    </div>
 
-              {/* Revenue */}
-              <div className={cn('font-mono font-semibold tabular-nums', RANK_COLORS[idx] || '')}>
-                {formatRevenue(entry.revenueProjection)}
-              </div>
-            </div>
-          ))
-        )}
+                    {/* Name */}
+                    <div
+                      className={cn(
+                        'flex-1 truncate tracking-[0.03em]',
+                        isMe
+                          ? 'text-[color:var(--color-warroom-gold)] font-semibold'
+                          : 'text-[color:var(--color-warroom-ivory)]',
+                      )}
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {entry.name}
+                      {isMe && (
+                        <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-gold)]/70">
+                          (you)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Revenue */}
+                    <div
+                      className={cn(
+                        'font-semibold tabular-nums shrink-0',
+                        podium?.revenue ||
+                          'text-[color:var(--color-warroom-ivory)]',
+                      )}
+                      style={{
+                        fontFamily: 'var(--font-data, var(--font-mono))',
+                      }}
+                    >
+                      {formatRevenue(entry.revenueProjection)}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       {updatedAt && (
-        <div className="px-4 py-2 text-[10px] text-muted-foreground border-t bg-muted/20 text-right">
+        <div
+          className="px-5 py-2 text-[10px] tracking-[0.08em] text-[color:var(--color-warroom-smoke)] border-t border-[color:var(--color-warroom-ash)]/20 text-right"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
           Updated {new Date(updatedAt).toLocaleTimeString()}
         </div>
       )}

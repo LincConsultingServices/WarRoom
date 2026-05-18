@@ -3,12 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import api from '@/src/lib/api'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowLeft,
   CheckCircle2,
@@ -23,14 +18,28 @@ import {
   Star,
   Zap,
 } from 'lucide-react'
+import api from '@/src/lib/api'
 import { cn } from '@/lib/utils'
+import { Progress } from '@/components/ui/progress'
+import {
+  StoneCard,
+  WarRoomCTA,
+  GoldDivider,
+  SigilBadge,
+} from '@/src/components/primitives'
+import { StatTile } from '@/src/components/dashboard/StatTile'
+import {
+  staggerContainer,
+  staggerItem,
+  easeDramatic,
+} from '@/lib/animations/variants'
 import type {
   AssessmentState,
   CompetencyScore,
   EvaluationReport,
 } from '@/src/types'
 
-// ---- Stage display names ----
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const STAGE_LABELS: Record<string, string> = {
   STAGE_NEG2_IDEATION: 'Ideation',
@@ -44,21 +53,48 @@ const STAGE_LABELS: Record<string, string> = {
   STAGE_4_WARROOM: 'War Room',
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  NATURAL_DOMINANT: 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-950/40',
-  STRONG: 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-950/40',
-  FUNCTIONAL: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-950/40',
-  DEVELOPMENT_REQUIRED: 'text-amber-600 bg-amber-100 dark:text-amber-400 dark:bg-amber-950/40',
-  HIGH_RISK: 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-950/40',
+const CATEGORY_TONES: Record<string, { label: string; text: string; bg: string; border: string }> = {
+  NATURAL_DOMINANT: {
+    label: 'Natural Dominant',
+    text: 'text-[color:var(--color-warroom-gold-bright)]',
+    bg: 'bg-[color:var(--color-warroom-gold)]/[0.08]',
+    border: 'border-[color:var(--color-warroom-gold)]/30',
+  },
+  STRONG: {
+    label: 'Strong',
+    text: 'text-[color:var(--color-warroom-verdant)]',
+    bg: 'bg-[color:var(--color-warroom-verdant)]/[0.10]',
+    border: 'border-[color:var(--color-warroom-verdant)]/30',
+  },
+  FUNCTIONAL: {
+    label: 'Functional',
+    text: 'text-[color:var(--color-warroom-silver)]',
+    bg: 'bg-[color:var(--color-warroom-silver)]/[0.08]',
+    border: 'border-[color:var(--color-warroom-silver)]/30',
+  },
+  DEVELOPMENT_REQUIRED: {
+    label: 'Development',
+    text: 'text-[color:var(--color-warroom-ember)]',
+    bg: 'bg-[color:var(--color-warroom-ember)]/[0.08]',
+    border: 'border-[color:var(--color-warroom-ember)]/30',
+  },
+  HIGH_RISK: {
+    label: 'High Risk',
+    text: 'text-[color:var(--color-warroom-crimson-bright)]',
+    bg: 'bg-[color:var(--color-warroom-crimson)]/[0.08]',
+    border: 'border-[color:var(--color-warroom-crimson)]/30',
+  },
 }
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
+const PROGRESS_CLASSES =
+  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+
+// ─── Page ───────────────────────────────────────────────────────────────────
 
 export default function SimulationResultPage() {
   const params = useParams()
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
   const assessmentId = params?.assessmentId as string
 
   const [state, setState] = useState<AssessmentState | null>(null)
@@ -72,19 +108,19 @@ export default function SimulationResultPage() {
       const assessmentData = await api.assessments.get(assessmentId)
       setState(assessmentData)
 
-      // Try to load report if simulation is completed or in progress
       try {
         const reportData = await api.assessments.getReport(assessmentId)
         setReport(reportData)
       } catch {
-        // Report may not be ready yet - that's okay
+        // Report may not be ready yet
       }
-    } catch (err: any) {
-      if (err.message?.includes('Unauthorized') || err.message?.includes('401')) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('Unauthorized') || msg.includes('401')) {
         router.push('/login')
         return
       }
-      setError(err.message || 'Failed to load simulation results')
+      setError(msg || 'Failed to load simulation results')
     } finally {
       setLoading(false)
     }
@@ -94,376 +130,614 @@ export default function SimulationResultPage() {
     load()
   }, [load])
 
+  // ── Loading ──
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading simulation results...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-[color:var(--color-warroom-gold)]" />
+        <p
+          className="text-xs uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Loading simulation results…
+        </p>
       </div>
     )
   }
+
+  // ── Error ──
 
   if (error || !state) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
-        <p className="text-destructive text-lg">{error || 'Simulation not found'}</p>
-        <Button onClick={() => router.push('/dashboard')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
+      <div className="flex flex-col items-center justify-center py-24 gap-5">
+        <p
+          className="text-sm text-[color:var(--color-warroom-crimson-bright)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {error || 'Simulation not found'}
+        </p>
+        <WarRoomCTA
+          size="sm"
+          variant="ghost"
+          icon={ArrowLeft}
+          onClick={() => router.push('/dashboard')}
+        >
           Back to Dashboard
-        </Button>
+        </WarRoomCTA>
       </div>
     )
   }
 
-  const simulation = (state as any).simulation ?? state.assessment
-  const { competencies, progress } = state
-  const isCompleted = simulation.status === 'COMPLETED'
-  const isInProgress = simulation.status === 'IN_PROGRESS'
+  // ── Derived data ──
 
-  // Compute stats
-  const avgScore = competencies && competencies.length > 0
-    ? Math.round(competencies.reduce((sum: number, c: CompetencyScore) => sum + (c.weightedAverage || 0), 0) / competencies.length)
-    : 0
-  const strengths = competencies?.filter((c: CompetencyScore) => c.category === 'NATURAL_DOMINANT' || c.category === 'STRONG') || []
-  const weaknesses = competencies?.filter((c: CompetencyScore) => c.category === 'HIGH_RISK' || c.category === 'DEVELOPMENT_REQUIRED') || []
-  const revenueProjection = (simulation as any).revenueProjection || 0
+  const simulation = (state as unknown as Record<string, unknown>).simulation ?? (state as unknown as Record<string, unknown>).assessment ?? state
+  const sim = simulation as Record<string, unknown>
+  const { competencies, progress } = state
+  const isCompleted = sim.status === 'COMPLETED'
+  const isInProgress = sim.status === 'IN_PROGRESS'
+
+  const avgScore =
+    competencies && competencies.length > 0
+      ? Math.round(
+          competencies.reduce(
+            (sum: number, c: CompetencyScore) =>
+              sum + (c.weightedAverage || 0),
+            0,
+          ) / competencies.length,
+        )
+      : 0
+
+  const revenueProjection = (sim.revenueProjection as number) || 0
+
+  function formatRev(n: number): string {
+    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
+    if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`
+    return `$${n}`
+  }
+
+  // ── Render ──
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="py-6 max-w-5xl mx-auto px-2 sm:px-0 w-full space-y-8">
       {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-30">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-1" />
-                  Dashboard
-                </Button>
-              </Link>
-              <Separator orientation="vertical" className="h-6" />
-              <div>
-                <h1 className="text-xl font-bold">Simulation Results</h1>
-                <p className="text-sm text-muted-foreground">
-                  {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : simulation.status}
-                  {simulation.startedAt && ` - Started ${new Date(simulation.startedAt).toLocaleDateString()}`}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge variant={isCompleted ? 'default' : 'outline'} className="text-sm px-3 py-1">
-                {isCompleted ? (
-                  <><CheckCircle2 className="h-4 w-4 mr-1" /> Completed</>
-                ) : (
-                  <><Clock className="h-4 w-4 mr-1" /> {simulation.status?.replace(/_/g, ' ')}</>
-                )}
-              </Badge>
-              {isInProgress && (
-                <Link href={`/assessment/${assessmentId}`}>
-                  <Button size="sm">
-                    <Play className="h-4 w-4 mr-1" /> Continue
-                  </Button>
-                </Link>
-              )}
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: easeDramatic }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <BarChart3
+              className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+              aria-hidden
+            />
+            <div>
+              <h1
+                className="text-xl font-semibold tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Simulation Results
+              </h1>
+              <p
+                className="text-xs text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-body, serif)' }}
+              >
+                {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : String((sim.status as string) || '')}
+                {sim.startedAt
+                  ? ` — Started ${new Date(sim.startedAt as string).toLocaleDateString()}`
+                  : null}
+              </p>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+            <SigilBadge
+              tone={isCompleted ? 'gold' : 'crimson'}
+              icon={isCompleted ? CheckCircle2 : Clock}
+            >
+              {isCompleted ? 'Complete' : String(sim.status || 'Active').replace(/_/g, ' ')}
+            </SigilBadge>
+            {isInProgress && (
+              <Link href={`/assessment/${assessmentId}`}>
+                <WarRoomCTA size="sm" variant="primary" icon={Play}>
+                  Continue
+                </WarRoomCTA>
+              </Link>
+            )}
+          </div>
         </div>
-      </header>
+        <GoldDivider variant="line" />
+      </motion.div>
 
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Overview Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <Trophy className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-              <div className="text-3xl font-bold">{avgScore}</div>
-              <div className="text-xs text-muted-foreground">Avg Competency Score</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-500" />
-              <div className="text-3xl font-bold">
-                {revenueProjection >= 1000000
-                  ? `${(revenueProjection / 1000000).toFixed(1)}M`
-                  : revenueProjection >= 1000
-                    ? `${(revenueProjection / 1000).toFixed(0)}K`
-                    : revenueProjection}
+      {/* ── Overview Tiles ── */}
+      <motion.div
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+        variants={staggerContainer}
+        initial={prefersReducedMotion ? false : 'hidden'}
+        animate="show"
+      >
+        <motion.div variants={staggerItem}>
+          <StatTile
+            label="Avg Competency"
+            value={avgScore}
+            icon={Trophy}
+            accent="var(--color-warroom-gold)"
+          />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <StatTile
+            label="Revenue Projection"
+            value={formatRev(revenueProjection)}
+            icon={TrendingUp}
+            accent="var(--color-warroom-verdant)"
+          />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <StatTile
+            label="Progress"
+            value={`${progress?.percentComplete || 0}%`}
+            icon={Target}
+            accent="var(--color-warroom-electrum)"
+          />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <StatTile
+            label="Questions"
+            value={progress?.answeredQuestions || 0}
+            icon={BarChart3}
+            accent="var(--color-warroom-amethyst)"
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* ── Stage Progress ── */}
+      <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+        <div className="flex items-center gap-2 mb-5">
+          <Zap className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+          <h2
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Stage Progress
+          </h2>
+        </div>
+        <div className="grid grid-cols-3 md:grid-cols-9 gap-1.5 mb-5">
+          {Object.entries(STAGE_LABELS).map(([stageId, label]) => {
+            const stagesOrder = Object.keys(STAGE_LABELS)
+            const currentIdx = stagesOrder.indexOf(
+              sim.currentStage as string,
+            )
+            const thisIdx = stagesOrder.indexOf(stageId)
+            const isActive = stageId === sim.currentStage
+            const isDone = thisIdx < currentIdx || isCompleted
+
+            return (
+              <div
+                key={stageId}
+                className={cn(
+                  'text-center py-2.5 px-1 rounded-[3px] text-[10px] border transition-colors',
+                  isDone &&
+                    'bg-[color:var(--color-warroom-gold)]/[0.08] border-[color:var(--color-warroom-gold)]/30',
+                  isActive &&
+                    !isCompleted &&
+                    'bg-[color:var(--color-warroom-ember)]/[0.08] border-[color:var(--color-warroom-ember)]/40 ring-1 ring-[color:var(--color-warroom-ember)]/25',
+                  !isDone &&
+                    !isActive &&
+                    'bg-[color:var(--color-warroom-rampart)]/40 border-[color:var(--color-warroom-ash)]/20',
+                )}
+              >
+                <div
+                  className={cn(
+                    'font-semibold truncate',
+                    isDone && 'text-[color:var(--color-warroom-gold)]',
+                    isActive &&
+                      !isCompleted &&
+                      'text-[color:var(--color-warroom-ember)]',
+                    !isDone &&
+                      !isActive &&
+                      'text-[color:var(--color-warroom-smoke)]',
+                  )}
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {label}
+                </div>
+                <div className="text-[color:var(--color-warroom-smoke)]/70 mt-0.5">
+                  {isDone ? (
+                    <CheckCircle2 className="h-3 w-3 mx-auto text-[color:var(--color-warroom-gold)]" />
+                  ) : isActive ? (
+                    '…'
+                  ) : (
+                    '—'
+                  )}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">Revenue Projection</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <Target className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-              <div className="text-3xl font-bold">{progress?.percentComplete || 0}%</div>
-              <div className="text-xs text-muted-foreground">Progress</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <BarChart3 className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-              <div className="text-3xl font-bold">{progress?.answeredQuestions || 0}</div>
-              <div className="text-xs text-muted-foreground">Questions Answered</div>
-            </CardContent>
-          </Card>
+            )
+          })}
         </div>
+        <Progress
+          value={progress?.percentComplete || 0}
+          className={PROGRESS_CLASSES}
+        />
+      </StoneCard>
 
-        {/* Current Stage */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              Stage Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 md:grid-cols-9 gap-2">
-              {Object.entries(STAGE_LABELS).map(([stageId, label]) => {
-                const stagesCompleted = Object.keys(STAGE_LABELS)
-                const currentIdx = stagesCompleted.indexOf(simulation.currentStage)
-                const thisIdx = stagesCompleted.indexOf(stageId)
-                const isActive = stageId === simulation.currentStage
-                const isDone = thisIdx < currentIdx || isCompleted
-
+      {/* ── Competency Scores ── */}
+      {competencies && competencies.length > 0 && (
+        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+          <div className="flex items-center gap-2 mb-1">
+            <Award className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+            <h2
+              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Competency Scores
+            </h2>
+          </div>
+          <p
+            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
+          >
+            Your performance across all 8 entrepreneurial competencies.
+          </p>
+          <div className="space-y-3">
+            {[...competencies]
+              .sort(
+                (a, b) =>
+                  (b.weightedAverage || 0) - (a.weightedAverage || 0),
+              )
+              .map((comp, i) => {
+                const tone = CATEGORY_TONES[comp.category]
                 return (
-                  <div
-                    key={stageId}
-                    className={cn(
-                      'text-center p-2 rounded-lg text-xs border transition-colors',
-                      isDone && 'bg-green-100 dark:bg-green-950/30 border-green-300 dark:border-green-800',
-                      isActive && !isCompleted && 'bg-blue-100 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800 ring-2 ring-blue-500/30',
-                      !isDone && !isActive && 'bg-muted/30 border-border'
-                    )}
-                  >
-                    <div className="font-semibold truncate">{label}</div>
-                    <div className="text-muted-foreground mt-0.5">
-                      {isDone ? <CheckCircle2 className="h-3 w-3 mx-auto text-green-600" /> : isActive ? '...' : '-'}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="mt-4">
-              <Progress value={progress?.percentComplete || 0} className="h-2" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Competency Scores */}
-        {competencies && competencies.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                Competency Scores
-              </CardTitle>
-              <CardDescription>
-                Your performance across all 8 entrepreneurial competencies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[...competencies]
-                .sort((a, b) => (b.weightedAverage || 0) - (a.weightedAverage || 0))
-                .map((comp, i) => (
                   <div key={comp.competencyCode} className="flex items-center gap-3">
-                    <span className="text-sm font-mono text-muted-foreground w-6">{i + 1}</span>
+                    <span
+                      className="text-[10px] w-5 text-[color:var(--color-warroom-smoke)] shrink-0"
+                      style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                    >
+                      {i + 1}
+                    </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium truncate">{comp.competencyName}</span>
-                        <Badge
-                          variant="outline"
-                          className={cn('text-xs', CATEGORY_COLORS[comp.category] || '')}
+                        <span
+                          className="text-xs font-medium text-[color:var(--color-warroom-ivory)] truncate"
+                          style={{ fontFamily: 'var(--font-display)' }}
                         >
-                          {comp.category?.replace(/_/g, ' ')}
-                        </Badge>
+                          {comp.competencyName}
+                        </span>
+                        <span
+                          className={cn(
+                            'text-[9px] px-2 py-0.5 rounded-[2px] border uppercase tracking-[0.08em] shrink-0',
+                            tone?.text,
+                            tone?.bg,
+                            tone?.border,
+                          )}
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {tone?.label || comp.category?.replace(/_/g, ' ')}
+                        </span>
                       </div>
                       <Progress
-                        value={Math.min(((comp.weightedAverage || 0) / 3) * 100, 100)}
-                        className="h-2"
+                        value={Math.min(
+                          ((comp.weightedAverage || 0) / 3) * 100,
+                          100,
+                        )}
+                        className={PROGRESS_CLASSES}
                       />
                     </div>
-                    <span className="text-sm font-mono font-bold w-10 text-right">
+                    <span
+                      className="text-xs font-bold w-10 text-right text-[color:var(--color-warroom-ivory)] shrink-0"
+                      style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                    >
                       {(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)}
                     </span>
                   </div>
-                ))}
-            </CardContent>
-          </Card>
-        )}
+                )
+              })}
+          </div>
+        </StoneCard>
+      )}
 
-        {/* Report section */}
-        {report && (
-          <>
-            {/* Entrepreneur Type */}
-            {report.entrepreneurType && (
-              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
-                <CardContent className="pt-6 text-center space-y-3">
-                  <Star className="h-12 w-12 mx-auto text-primary" />
-                  <h2 className="text-2xl font-bold">{report.entrepreneurType}</h2>
-                  {report.organizationalRole && (
-                    <p className="text-muted-foreground">Best Organizational Role: {report.organizationalRole}</p>
-                  )}
-                  {report.archetypeNarrative && (
-                    <p className="text-sm text-muted-foreground max-w-2xl mx-auto mt-2">
-                      {report.archetypeNarrative}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+      {/* ── Entrepreneur Type (from report) ── */}
+      {report?.entrepreneurType && (
+        <StoneCard
+          accent="var(--color-warroom-gold)"
+          padding="lg"
+          className="text-center"
+        >
+          <Star className="h-10 w-10 mx-auto mb-3 text-[color:var(--color-warroom-gold)]" />
+          <h2
+            className="text-2xl font-bold tracking-[0.04em] mb-2"
+            style={{
+              fontFamily: 'var(--font-display)',
+              background:
+                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            {report.entrepreneurType}
+          </h2>
+          {report.organizationalRole && (
+            <p
+              className="text-sm text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Best Organisational Role: {report.organizationalRole}
+            </p>
+          )}
+          {report.archetypeNarrative && (
+            <p
+              className="text-xs text-[color:var(--color-warroom-smoke)]/80 max-w-2xl mx-auto mt-3 leading-relaxed"
+              style={{ fontFamily: 'var(--font-body, serif)' }}
+            >
+              {report.archetypeNarrative}
+            </p>
+          )}
+        </StoneCard>
+      )}
 
-            {/* Action Plan */}
-            {report.actionPlan && report.actionPlan.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Action Plan</CardTitle>
-                  <CardDescription>Recommended actions to improve your entrepreneurial skills</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {report.actionPlan.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
-                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
-                          {i + 1}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium">{item.competency}</div>
-                          <p className="text-sm text-muted-foreground mt-0.5">{item.action}</p>
-                        </div>
-                      </div>
-                    ))}
+      {/* ── Action Plan ── */}
+      {report?.actionPlan && report.actionPlan.length > 0 && (
+        <StoneCard accent="var(--color-warroom-verdant)" padding="lg">
+          <h2
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] mb-1"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Action Plan
+          </h2>
+          <p
+            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
+          >
+            Recommended actions to improve your entrepreneurial skills.
+          </p>
+          <div className="space-y-3">
+            {report.actionPlan.map((item, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 p-3 rounded-[3px] bg-[color:var(--color-warroom-rampart)]/40 border border-[color:var(--color-warroom-ash)]/20"
+              >
+                <div
+                  className="h-6 w-6 rounded-full bg-[color:var(--color-warroom-gold)]/[0.12] flex items-center justify-center text-[10px] font-bold text-[color:var(--color-warroom-gold)] shrink-0"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {i + 1}
+                </div>
+                <div className="min-w-0">
+                  <div
+                    className="text-xs font-semibold text-[color:var(--color-warroom-ivory)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {item.competency}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <p
+                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5 leading-relaxed"
+                    style={{ fontFamily: 'var(--font-body, serif)' }}
+                  >
+                    {item.action}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </StoneCard>
+      )}
 
-            {/* Stage Narrations */}
-            {report.stageNarrations && report.stageNarrations.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Stage-by-Stage Breakdown</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {report.stageNarrations.map((narration, i) => (
-                      <div key={i} className="p-4 rounded-lg border bg-card">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline">{STAGE_LABELS[narration.stage] || narration.stage}</Badge>
-                          <span className="text-xs text-muted-foreground">{narration.questionsAnswered} questions</span>
-                        </div>
-                        {narration.decisions && narration.decisions.length > 0 && (
-                          <div className="mt-2">
-                            <h5 className="text-xs font-semibold text-muted-foreground mb-1">Key Decisions</h5>
-                            <ul className="text-sm space-y-1">
-                              {narration.decisions.map((d, j) => (
-                                <li key={j} className="text-muted-foreground">- {d}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {narration.scoringRationale && (
-                          <p className="text-sm text-muted-foreground mt-2">{narration.scoringRationale}</p>
-                        )}
-                      </div>
-                    ))}
+      {/* ── Stage Narrations ── */}
+      {report?.stageNarrations && report.stageNarrations.length > 0 && (
+        <StoneCard accent="var(--color-warroom-ash)" padding="lg">
+          <h2
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] mb-5"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Stage-by-Stage Breakdown
+          </h2>
+          <div className="space-y-3">
+            {report.stageNarrations.map((narration, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/25 bg-[color:var(--color-warroom-rampart)]/30"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <SigilBadge tone="gold">
+                    {STAGE_LABELS[narration.stage] || narration.stage}
+                  </SigilBadge>
+                  <span
+                    className="text-[10px] text-[color:var(--color-warroom-smoke)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {narration.questionsAnswered} questions
+                  </span>
+                </div>
+                {narration.decisions && narration.decisions.length > 0 && (
+                  <div className="mt-2">
+                    <h5
+                      className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)] mb-1"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      Key Decisions
+                    </h5>
+                    <ul className="space-y-0.5">
+                      {narration.decisions.map(
+                        (d: string, j: number) => (
+                          <li
+                            key={j}
+                            className="text-xs text-[color:var(--color-warroom-smoke)]/80 leading-relaxed"
+                            style={{ fontFamily: 'var(--font-body, serif)' }}
+                          >
+                            — {d}
+                          </li>
+                        ),
+                      )}
+                    </ul>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
+                )}
+                {narration.scoringRationale && (
+                  <p
+                    className="text-xs text-[color:var(--color-warroom-smoke)]/70 mt-2 leading-relaxed"
+                    style={{ fontFamily: 'var(--font-body, serif)' }}
+                  >
+                    {narration.scoringRationale}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </StoneCard>
+      )}
 
-        {/* Detailed Competency Breakdown */}
-        {competencies && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Competency Analysis
-              </CardTitle>
-              <CardDescription>
-                Detailed breakdown of your performance across the 8 core competencies.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {competencies.slice().sort((a: CompetencyScore, b: CompetencyScore) => (b.weightedAverage || 0) - (a.weightedAverage || 0)).map((comp: CompetencyScore) => (
-                  <div key={comp.competencyCode} className="space-y-3 p-4 rounded-xl border bg-card/50">
+      {/* ── Competency Analysis (detailed) ── */}
+      {competencies && competencies.length > 0 && (
+        <StoneCard accent="var(--color-warroom-amethyst)" padding="lg">
+          <div className="flex items-center gap-2 mb-1">
+            <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-amethyst)]" />
+            <h2
+              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Competency Analysis
+            </h2>
+          </div>
+          <p
+            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            style={{ fontFamily: 'var(--font-body, serif)' }}
+          >
+            Detailed breakdown of your performance across the 8 core competencies.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...competencies]
+              .sort(
+                (a: CompetencyScore, b: CompetencyScore) =>
+                  (b.weightedAverage || 0) - (a.weightedAverage || 0),
+              )
+              .map((comp: CompetencyScore) => {
+                const tone = CATEGORY_TONES[comp.category]
+                const ext = comp as unknown as Record<string, unknown>
+                const strengths = (ext.strengths as string[]) || []
+                const weaknesses = (ext.weaknesses as string[]) || []
+                return (
+                  <div
+                    key={comp.competencyCode}
+                    className="space-y-3 p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/20 bg-[color:var(--color-warroom-rampart)]/30"
+                  >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-bold text-sm tracking-tight">{comp.competencyName}</h4>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">{comp.competencyCode}</span>
+                        <h4
+                          className="font-semibold text-xs text-[color:var(--color-warroom-ivory)]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {comp.competencyName}
+                        </h4>
+                        <span
+                          className="text-[9px] text-[color:var(--color-warroom-smoke)] uppercase"
+                          style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                        >
+                          {comp.competencyCode}
+                        </span>
                       </div>
-                      <Badge variant="outline" className={cn("text-[10px] px-2 py-0", CATEGORY_COLORS[comp.category] || '')}>
-                        {comp.category}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Proficiency</span>
-                        <span className="font-mono">{(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)} / 10.0</span>
-                      </div>
-                      <Progress value={((comp.weightedAverage || 0) / 3) * 100} className="h-1.5" />
+                      <span
+                        className={cn(
+                          'text-[9px] px-2 py-0.5 rounded-[2px] border uppercase tracking-[0.06em]',
+                          tone?.text,
+                          tone?.bg,
+                          tone?.border,
+                        )}
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {tone?.label || comp.category}
+                      </span>
                     </div>
 
-                    {(comp as any).strengths?.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-[color:var(--color-warroom-smoke)]">
+                          Proficiency
+                        </span>
+                        <span
+                          className="text-[color:var(--color-warroom-ivory)]"
+                          style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                        >
+                          {(((comp.weightedAverage || 0) / 3) * 10).toFixed(
+                            1,
+                          )}{' '}
+                          / 10.0
+                        </span>
+                      </div>
+                      <Progress
+                        value={
+                          ((comp.weightedAverage || 0) / 3) * 100
+                        }
+                        className={PROGRESS_CLASSES}
+                      />
+                    </div>
+
+                    {strengths.length > 0 && (
                       <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase">Positive Signals</span>
-                        <ul className="text-[11px] space-y-0.5">
-                          {(comp as any).strengths.slice(0, 2).map((s: string, i: number) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <span className="text-green-500 mt-0.5">•</span>
-                              <span className="text-muted-foreground leading-tight">{s}</span>
+                        <span
+                          className="text-[9px] font-bold text-[color:var(--color-warroom-verdant)] uppercase tracking-[0.08em]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          Positive Signals
+                        </span>
+                        <ul className="text-[10px] space-y-0.5">
+                          {strengths.slice(0, 2).map((s, si) => (
+                            <li
+                              key={si}
+                              className="flex items-start gap-1.5 text-[color:var(--color-warroom-smoke)] leading-tight"
+                            >
+                              <span className="text-[color:var(--color-warroom-verdant)] mt-0.5">
+                                +
+                              </span>
+                              {s}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
 
-                    {(comp as any).weaknesses?.length > 0 && (
+                    {weaknesses.length > 0 && (
                       <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">Development Areas</span>
-                        <ul className="text-[11px] space-y-0.5">
-                          {(comp as any).weaknesses.slice(0, 2).map((w: string, i: number) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <span className="text-amber-500 mt-0.5">•</span>
-                              <span className="text-muted-foreground leading-tight">{w}</span>
+                        <span
+                          className="text-[9px] font-bold text-[color:var(--color-warroom-ember)] uppercase tracking-[0.08em]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          Development Areas
+                        </span>
+                        <ul className="text-[10px] space-y-0.5">
+                          {weaknesses.slice(0, 2).map((w, wi) => (
+                            <li
+                              key={wi}
+                              className="flex items-start gap-1.5 text-[color:var(--color-warroom-smoke)] leading-tight"
+                            >
+                              <span className="text-[color:var(--color-warroom-ember)] mt-0.5">
+                                -
+                              </span>
+                              {w}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                )
+              })}
+          </div>
+        </StoneCard>
+      )}
 
-        {/* Previous sections... */}
-
-        {/* Bottom Actions */}
-        <div className="flex justify-center gap-4 pb-8">
-          <Link href="/dashboard">
-            <Button variant="outline" size="lg">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
+      {/* ── Bottom Actions ── */}
+      <div className="flex justify-center gap-4 pb-6">
+        <Link href="/dashboard">
+          <WarRoomCTA size="sm" variant="ghost" icon={ArrowLeft}>
+            The Great Hall
+          </WarRoomCTA>
+        </Link>
+        {isInProgress && (
+          <Link href={`/assessment/${assessmentId}`}>
+            <WarRoomCTA size="sm" variant="primary" icon={Play}>
+              Continue Simulation
+            </WarRoomCTA>
           </Link>
-          {isInProgress && (
-            <Link href={`/assessment/${assessmentId}`}>
-              <Button size="lg">
-                <Play className="h-4 w-4 mr-2" />
-                Continue Simulation
-              </Button>
-            </Link>
-          )}
-        </div>
-      </main>
+        )}
+      </div>
     </div>
   )
 }
