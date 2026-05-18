@@ -3,15 +3,15 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
-  ShieldCheck, 
+import {
+  Castle,
+  Swords,
+  ScrollText,
+  Trophy,
+  Crown,
+  LogOut,
   User,
-  Zap,
-  HelpCircle
+  HelpCircle,
 } from 'lucide-react'
 
 import {
@@ -25,17 +25,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { WarRoomCrest } from '@/src/components/primitives'
 
 interface AppSidebarProps {
   user?: {
@@ -60,37 +60,44 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
     }
   }, [userProp])
 
+  // "House Banners" — premium GOT-flavored navigation labels.
   const navMain = [
     {
-      title: 'Dashboard',
+      title: 'The Great Hall',
       url: '/dashboard',
-      icon: LayoutDashboard,
+      icon: Castle,
       isActive: pathname === '/dashboard',
     },
     {
-      title: 'Results',
-      url: '/results',
-      icon: BarChart3,
-      isActive: pathname === '/results',
+      title: 'The Trial',
+      url: '/assessment/start',
+      icon: Swords,
+      isActive: pathname.startsWith('/assessment'),
     },
     {
-      title: 'Simulation',
-      url: '/assessment/start',
-      icon: Zap,
-      isActive: pathname.startsWith('/simulation'),
+      title: 'The Legacy Scroll',
+      url: '/results',
+      icon: ScrollText,
+      isActive: pathname.startsWith('/results'),
+    },
+    {
+      title: 'The Iron Rankings',
+      url: '/leaderboard',
+      icon: Trophy,
+      isActive: pathname.startsWith('/leaderboard'),
     },
   ]
 
   const navSecondary = [
     {
-      title: 'Support',
+      title: "The Maester's Hall",
       url: '/support',
       icon: HelpCircle,
     },
     {
-      title: 'Settings',
+      title: 'The Citadel',
       url: '/settings',
-      icon: Settings,
+      icon: Crown,
     },
   ]
 
@@ -108,12 +115,22 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <ShieldCheck className="size-4" />
+                <div className="flex aspect-square size-9 items-center justify-center rounded-sm">
+                  <WarRoomCrest size={32} staticRender />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">War Room</span>
-                  <span className="truncate text-xs">Entrepreneurial Simulation</span>
+                  <span
+                    className="truncate font-semibold tracking-[0.08em] text-[color:var(--color-warroom-gold)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    War Room
+                  </span>
+                  <span
+                    className="truncate text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-warroom-smoke)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Forge Your Legacy
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -122,14 +139,28 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel
+            className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-warroom-smoke)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            House Banners
+          </SidebarGroupLabel>
           <SidebarMenu>
             {navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.title}>
-                  <Link href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
+                <SidebarMenuButton
+                  asChild
+                  isActive={item.isActive}
+                  tooltip={item.title}
+                  className={
+                    item.isActive
+                      ? 'border-l-2 border-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-gold-bright)] data-[active=true]:bg-[color:var(--color-warroom-gold)]/[0.08] data-[active=true]:text-[color:var(--color-warroom-gold-bright)]'
+                      : 'hover:text-[color:var(--color-warroom-gold)]'
+                  }
+                >
+                  <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
+                    <item.icon className={item.isActive ? 'text-[color:var(--color-warroom-gold-bright)]' : ''} />
+                    <span className="tracking-[0.06em]">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -141,10 +172,14 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
             <SidebarMenu>
               {navSecondary.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild size="sm">
-                    <Link href={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    size="sm"
+                    className="hover:text-[color:var(--color-warroom-gold)]"
+                  >
+                    <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="tracking-[0.06em]">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

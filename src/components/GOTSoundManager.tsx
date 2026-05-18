@@ -223,6 +223,11 @@ export function useGOTSound() {
 }
 
 // ---- Standalone play utility (for non-hook contexts) ----
+/**
+ * @deprecated Prefer `audioManager.playSfx` from `lib/audio/audioManager.ts`
+ * for new code. This function remains as the synth fallback target for
+ * legacy SFX aliases when MP3 files are missing — do not delete.
+ */
 export function playGOTSound(event: SoundEvent, volume = 0.6) {
   if (typeof window === 'undefined') return
   // Same mute gate as the hook — respects the persisted MuteToggle preference.

@@ -1,36 +1,54 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
 import { StartSimulationDialog } from '@/src/components/StartSimulationDialog'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
-import { Play, ArrowRight, CheckCircle2, Clock, Plus, Trophy, Target, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Plus,
+  Sparkles,
+  Swords,
+  Crown,
+  Coins,
+  Award,
+  ScrollText,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import api from '@/src/lib/api'
 import type { Assessment } from '@/src/types'
-import { FadeInUp, ScaleOnHover, CountUp, AnimatedGradientText, Floating } from '@/src/components/AnimatedComponents'
+import { STAGE_NARRATIVES } from '@/src/lib/constants'
+import { FadeInUp } from '@/src/components/AnimatedComponents'
+import {
+  WarRoomCTA,
+  StoneCard,
+  GoldDivider,
+  SigilBadge,
+} from '@/src/components/primitives'
+import { CampaignMap } from '@/src/components/dashboard/CampaignMap'
+import { StatTile } from '@/src/components/dashboard/StatTile'
+import { audioManager } from '@/lib/audio/audioManager'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 
-function stageLabel(stageName: string): string {
-  return stageName
-    .replace('STAGE_', '')
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+interface AssessmentWithRevenue extends Assessment {
+  revenueProjection?: number
 }
 
-function statusBadgeVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-  switch (status) {
-    case 'COMPLETED': return 'default'
-    case 'IN_PROGRESS': return 'outline'
-    default: return 'secondary'
-  }
+function stageLabel(stageName: string): string {
+  return (
+    STAGE_NARRATIVES[stageName]?.title ??
+    stageName
+      .replace('STAGE_', '')
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  )
 }
 
 function formatRevenue(amount: number): string {
@@ -41,13 +59,19 @@ function formatRevenue(amount: number): string {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [simulations, setSimulations] = useState<Assessment[]>([])
+  const [simulations, setSimulations] = useState<AssessmentWithRevenue[]>([])
   const [loading, setLoading] = useState(true)
   const [startDialogOpen, setStartDialogOpen] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string; batchCode?: string; id?: string } | null>(null)
+  const [user, setUser] = useState<{
+    name: string
+    email: string
+    batchCode?: string
+    id?: string
+  } | null>(null)
   const [batch, setBatch] = useState<{ code: string; name: string } | null>(null)
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
+  useNarratorOnboarding('dashboard', { delayMs: 1800 })
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
@@ -61,7 +85,7 @@ export default function DashboardPage() {
 
     api.assessments
       .list()
-      .then(setSimulations)
+      .then((list) => setSimulations(list as AssessmentWithRevenue[]))
       .catch(() => setSimulations([]))
       .finally(() => setLoading(false))
   }, [router])
@@ -78,201 +102,388 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
-  const activeAssessments = simulations.filter(
-    (a) => a.status === 'IN_PROGRESS' || a.status === 'NOT_STARTED'
+  const activeAssessments = useMemo(
+    () =>
+      simulations.filter(
+        (a) => a.status === 'IN_PROGRESS' || a.status === 'NOT_STARTED',
+      ),
+    [simulations],
   )
-  const completedAssessments = simulations.filter((a) => a.status === 'COMPLETED')
+  const completedAssessments = useMemo(
+    () => simulations.filter((a) => a.status === 'COMPLETED'),
+    [simulations],
+  )
+
+  const currentSim = activeAssessments[0]
+
+  const stats = useMemo(() => {
+    const completed = completedAssessments.length
+    const bestRevenue = simulations.reduce(
+      (acc, a) => Math.max(acc, a.revenueProjection ?? 0),
+      0,
+    )
+    const myRankEntry = entries.find((e) => e.isCurrentUser)
+    return {
+      completed,
+      bestRevenue,
+      rank: myRankEntry?.rank ?? null,
+      attempts: simulations.length,
+    }
+  }, [completedAssessments, simulations, entries])
+
+  const firstName = user?.name?.split(' ')[0] ?? 'Lord'
+  const primaryCtaLabel = currentSim
+    ? currentSim.status === 'IN_PROGRESS'
+      ? 'Resume Your Trial'
+      : 'Begin Your Trial'
+    : 'Begin the Trial'
+
+  const handlePrimaryCta = () => {
+    audioManager.playSfx('nav.door-open')
+    if (currentSim) {
+      router.push(`/assessment/${currentSim.id}`)
+    } else {
+      setStartDialogOpen(true)
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative bg-[color:var(--color-warroom-void)]">
+      {/* Soft torch glow overhead */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-96 opacity-60"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,162,39,0.07), transparent 70%)',
+        }}
+      />
+
       {/* Header */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-40 border-b bg-card/80 backdrop-blur-md"
+        className="sticky top-0 z-40 border-b backdrop-blur-md"
+        style={{
+          borderColor: 'rgba(201,162,39,0.12)',
+          background: 'rgba(10,8,5,0.78)',
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm"
+            <div className="h-8 w-8 rounded-sm flex items-center justify-center text-[10px] font-bold tracking-wider"
+              style={{
+                background: 'linear-gradient(135deg, #8b6914, #c9a227, #8b6914)',
+                color: '#0a0805',
+                fontFamily: 'var(--font-display)',
+                boxShadow: '0 0 14px rgba(201,162,39,0.3)',
+              }}
             >
-              KK
-            </motion.div>
-            <div>
-              <span className="font-semibold text-sm">{user?.name || 'Loading...'}</span>
+              {user?.name?.substring(0, 2).toUpperCase() || 'KK'}
+            </div>
+            <div className="leading-tight">
+              <div
+                className="font-semibold text-sm text-[color:var(--color-warroom-ghost)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {user?.name || 'Loading...'}
+              </div>
               {batch && (
-                <Badge variant="outline" className="ml-2 text-xs">
-                  {batch.code}
-                </Badge>
+                <div className="flex items-center gap-2 -mt-0.5">
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] uppercase tracking-[0.18em] h-5 px-1.5 border-[color:var(--color-warroom-gold)]/30 text-[color:var(--color-warroom-gold)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {batch.code}
+                  </Badge>
+                </div>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/leaderboard">
-              <Button variant="ghost" size="sm">
-                <Trophy className="h-4 w-4 mr-1" /> Leaderboard
-              </Button>
+              <button
+                type="button"
+                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Iron Rankings
+              </button>
             </Link>
             <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Sign out
-            </Button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)] transition-colors"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </motion.header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Welcome + Start CTA */}
+          <div className="lg:col-span-2 space-y-10">
+            {/* Welcome banner */}
             <FadeInUp>
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h1 className="text-2xl font-bold">
-                    Welcome back,{' '}
-                    <AnimatedGradientText from="#6366f1" via="#f59e0b" to="#ef4444">
-                      {user?.name?.split(' ')[0] || 'User'}
-                    </AnimatedGradientText>
-                    !
-                  </h1>
-                  <p className="text-muted-foreground mt-1">
-                    {batch
-                      ? `Batch: ${batch.name || batch.code}`
-                      : 'Ready to assess your entrepreneurial skills?'}
-                  </p>
+              <div className="space-y-5">
+                <SigilBadge icon={Sparkles} tone="gold">
+                  The Great Hall
+                </SigilBadge>
+                <h1
+                  className="text-3xl sm:text-4xl font-bold tracking-[0.02em] text-[color:var(--color-warroom-ghost)]"
+                  style={{ fontFamily: 'var(--font-display)', lineHeight: 1.1 }}
+                >
+                  Welcome back, Lord{' '}
+                  <span
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #c9a227, #f0c040, #c9a227)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    {firstName}
+                  </span>
+                </h1>
+                <p
+                  className="text-[color:var(--color-warroom-smoke)] max-w-xl"
+                  style={{
+                    fontFamily: 'var(--font-body, var(--font-display))',
+                    fontSize: '1rem',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {batch
+                    ? `The ${batch.name || batch.code} council awaits your next move.`
+                    : 'The realm is quiet. When you are ready, the trial begins.'}
+                </p>
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <div id="dashboard-begin-cta">
+                    <WarRoomCTA
+                      size="lg"
+                      variant="primary"
+                      icon={Swords}
+                      iconRight={ArrowRight}
+                      sfxKey="nav.door-open"
+                      onClick={handlePrimaryCta}
+                    >
+                      {primaryCtaLabel}
+                    </WarRoomCTA>
+                  </div>
+                  {currentSim && (
+                    <span
+                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      Currently at: {stageLabel(currentSim.currentStage)}
+                    </span>
+                  )}
                 </div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                  <Button onClick={() => setStartDialogOpen(true)} size="lg" className="flex-shrink-0 glow-button">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Start New Simulation
-                  </Button>
-                </motion.div>
               </div>
             </FadeInUp>
 
-            {/* Active Simulations */}
-            {loading ? (
+            {/* Stat tiles */}
+            <FadeInUp delay={0.1}>
+              <div className="grid grid-cols-2 gap-4">
+                <StatTile
+                  label="Trials Complete"
+                  value={stats.completed}
+                  icon={CheckCircle2}
+                  accent="var(--color-warroom-verdant)"
+                  hint={stats.attempts > 0 ? `${stats.attempts} attempt${stats.attempts === 1 ? '' : 's'}` : 'No attempts yet'}
+                />
+                <StatTile
+                  label="Best Projection"
+                  value={stats.bestRevenue > 0 ? formatRevenue(stats.bestRevenue) : '—'}
+                  icon={Coins}
+                  accent="var(--color-warroom-gold)"
+                  hint={stats.bestRevenue > 0 ? 'Annual revenue' : 'Finish a trial to record'}
+                />
+                <StatTile
+                  label="Rank in the Realm"
+                  value={stats.rank ? `#${stats.rank}` : '—'}
+                  icon={Award}
+                  accent={stats.rank && stats.rank <= 3 ? 'var(--color-warroom-crimson-bright)' : 'var(--color-warroom-gold)'}
+                  hint={batch ? batch.code : 'Join a batch to rank'}
+                />
+                <StatTile
+                  label="Archetype"
+                  value={
+                    <span
+                      className="text-base tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {stats.completed > 0 ? 'Unrevealed' : '—'}
+                    </span>
+                  }
+                  icon={Crown}
+                  accent="var(--color-warroom-amethyst)"
+                  hint="Forged at trial's end"
+                />
+              </div>
+            </FadeInUp>
+
+            {/* Campaign map (only when a trial is in motion) */}
+            {currentSim && (
+              <FadeInUp delay={0.15}>
+                <StoneCard padding="md">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <SigilBadge tone="crimson">Active Campaign</SigilBadge>
+                    <span
+                      className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {STAGE_NARRATIVES[currentSim.currentStage]?.month ?? ''}
+                    </span>
+                  </div>
+                  <CampaignMap currentStage={currentSim.currentStage} />
+                </StoneCard>
+              </FadeInUp>
+            )}
+
+            {/* Other in-progress assessments (excluding the primary one shown above) */}
+            {!loading && activeAssessments.length > 1 && (
+              <FadeInUp delay={0.2}>
+                <div className="space-y-3">
+                  <SigilBadge tone="gold">Other Campaigns in Motion</SigilBadge>
+                  {activeAssessments.slice(1).map((a) => (
+                    <StoneCard key={a.id} padding="md" interactive>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className="text-sm font-semibold text-[color:var(--color-warroom-ghost)]"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {stageLabel(a.currentStage)}
+                          </div>
+                          <div
+                            className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                            style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+                          >
+                            Began {new Date(a.createdAt).toLocaleDateString()}
+                            {a.revenueProjection && a.revenueProjection > 0 ? (
+                              <>
+                                {' • '}
+                                <span className="text-[color:var(--color-warroom-verdant)]">
+                                  {formatRevenue(a.revenueProjection)} projected
+                                </span>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                        <WarRoomCTA
+                          size="sm"
+                          variant="ghost"
+                          iconRight={ArrowRight}
+                          sfxKey="ui.click"
+                          onClick={() => router.push(`/assessment/${a.id}`)}
+                        >
+                          {a.status === 'IN_PROGRESS' ? 'Continue' : 'Begin'}
+                        </WarRoomCTA>
+                      </div>
+                    </StoneCard>
+                  ))}
+                </div>
+              </FadeInUp>
+            )}
+
+            {/* Loading skeleton */}
+            {loading && (
               <div className="space-y-3">
                 {[1, 2].map((i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    animate={{ opacity: [0.25, 0.5, 0.25] }}
                     transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
-                    className="h-24 rounded-xl bg-muted"
+                    className="h-24 rounded-sm border border-[color:var(--color-warroom-slate)]/40 bg-[color:var(--color-warroom-stone)]/40"
                   />
                 ))}
               </div>
-            ) : activeAssessments.length > 0 ? (
-              <div className="space-y-4">
-                <FadeInUp delay={0.1}>
-                  <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-                    Active Simulations
-                  </h2>
-                </FadeInUp>
-                {activeAssessments.map((a, idx) => (
-                  <FadeInUp key={a.id} delay={0.15 + idx * 0.08}>
-                    <ScaleOnHover>
-                      <Card className="hover:shadow-lg transition-shadow border-border/50">
-                        <CardContent className="pt-4 pb-4">
-                          <div className="flex items-center gap-4">
-                            <motion.div
-                              whileHover={{ rotate: 15 }}
-                              className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"
-                            >
-                              <Play className="h-5 w-5 text-primary" />
-                            </motion.div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-medium">Simulation</span>
-                                <Badge variant={statusBadgeVariant(a.status)} className="text-xs">
-                                  {a.status === 'IN_PROGRESS' ? 'In Progress' : 'Not Started'}
-                                </Badge>
-                              </div>
-                              <div className="text-sm text-muted-foreground mt-0.5">
-                                Stage: {stageLabel(a.currentStage)} •{' '}
-                                Started {new Date(a.createdAt).toLocaleDateString()}
-                              </div>
-                              {(a as any).revenueProjection > 0 && (
-                                <div className="text-sm font-medium text-green-600 mt-0.5">
-                                  {formatRevenue((a as any).revenueProjection)} projected
-                                </div>
-                              )}
-                            </div>
-                            <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
-                              <Button
-                                onClick={() => router.push(`/assessment/${a.id}`)}
-                                size="sm"
-                                variant={a.status === 'IN_PROGRESS' ? 'default' : 'outline'}
-                              >
-                                {a.status === 'IN_PROGRESS' ? 'Continue' : 'Start'}
-                                <ArrowRight className="h-4 w-4 ml-1" />
-                              </Button>
-                            </motion.div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </ScaleOnHover>
-                  </FadeInUp>
-                ))}
-              </div>
-            ) : (
+            )}
+
+            {/* Empty state */}
+            {!loading && activeAssessments.length === 0 && completedAssessments.length === 0 && (
               <FadeInUp delay={0.2}>
-                <Card className="border-dashed">
-                  <CardContent className="py-12 text-center">
-                    <Floating duration={3} y={8}>
-                      <Target className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                    </Floating>
-                    <h3 className="font-semibold mb-2">No Active Simulations</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Start your first simulation to begin your entrepreneurial journey.
-                    </p>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
-                      <Button onClick={() => setStartDialogOpen(true)}>
-                        <Plus className="h-4 w-4 mr-2" /> Start Simulation
-                      </Button>
-                    </motion.div>
-                  </CardContent>
-                </Card>
+                <StoneCard className="py-12 text-center">
+                  <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-sm border border-[color:var(--color-warroom-gold)]/30 bg-[color:var(--color-warroom-gold)]/[0.06]">
+                    <Swords className="h-6 w-6 text-[color:var(--color-warroom-gold)]" aria-hidden />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold mb-2 text-[color:var(--color-warroom-ghost)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    No Trials Begun
+                  </h3>
+                  <p
+                    className="text-sm text-[color:var(--color-warroom-smoke)] mb-5 max-w-md mx-auto"
+                    style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+                  >
+                    Your war record is empty. Step into the chamber and stake your claim.
+                  </p>
+                  <WarRoomCTA
+                    size="md"
+                    variant="primary"
+                    icon={Plus}
+                    sfxKey="nav.door-open"
+                    onClick={() => setStartDialogOpen(true)}
+                  >
+                    Start Your First Trial
+                  </WarRoomCTA>
+                </StoneCard>
               </FadeInUp>
             )}
 
             {/* Completed Simulations */}
             {completedAssessments.length > 0 && (
               <div className="space-y-4">
+                <GoldDivider variant="line" />
                 <FadeInUp delay={0.3}>
-                  <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-                    Completed ({completedAssessments.length})
-                  </h2>
+                  <div className="flex items-center justify-between gap-3">
+                    <SigilBadge icon={ScrollText} tone="gold">
+                      Past Verdicts ({completedAssessments.length})
+                    </SigilBadge>
+                  </div>
                 </FadeInUp>
                 <div className="space-y-3">
                   {completedAssessments.map((a, idx) => (
-                    <FadeInUp key={a.id} delay={0.35 + idx * 0.06}>
-                      <Card className="bg-muted/30 hover:bg-muted/50 transition-colors">
-                        <CardContent className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium">
-                                Completed {new Date(a.completedAt || a.createdAt).toLocaleDateString()}
-                              </div>
-                              {(a as any).revenueProjection > 0 && (
-                                <div className="text-xs text-muted-foreground">
-                                  Final ARR: {formatRevenue((a as any).revenueProjection)}
-                                </div>
-                              )}
+                    <FadeInUp key={a.id} delay={0.35 + idx * 0.05}>
+                      <StoneCard padding="md" interactive>
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="h-4 w-4 text-[color:var(--color-warroom-verdant)] flex-shrink-0" aria-hidden />
+                          <div className="flex-1 min-w-0">
+                            <div
+                              className="text-sm font-medium text-[color:var(--color-warroom-ivory)]"
+                              style={{ fontFamily: 'var(--font-display)' }}
+                            >
+                              Trial sealed {new Date(a.completedAt || a.createdAt).toLocaleDateString()}
                             </div>
-                            <Link href={`/results/${a.id}`}>
-                              <Button variant="ghost" size="sm" className="text-xs">
-                                View Report
-                              </Button>
-                            </Link>
+                            {a.revenueProjection && a.revenueProjection > 0 ? (
+                              <div
+                                className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                                style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+                              >
+                                Final ARR: {formatRevenue(a.revenueProjection)}
+                              </div>
+                            ) : null}
                           </div>
-                        </CardContent>
-                      </Card>
+                          <Link href={`/results/${a.id}`} className="shrink-0">
+                            <span
+                              className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                              style={{ fontFamily: 'var(--font-display)' }}
+                            >
+                              View Verdict →
+                            </span>
+                          </Link>
+                        </div>
+                      </StoneCard>
                     </FadeInUp>
                   ))}
                 </div>
@@ -280,27 +491,36 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Sidebar: Live Leaderboard */}
+          {/* Side rail: Iron Rankings */}
           <div className="space-y-6">
             <FadeInUp delay={0.2}>
-              <div>
-                <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-3">
-                  Batch Leaderboard
-                </h2>
+              <div id="dashboard-leaderboard" className="space-y-4">
+                <SigilBadge icon={ScrollText} tone="gold">
+                  Iron Rankings
+                </SigilBadge>
                 {batch ? (
                   <LeaderboardPanel
                     entries={entries}
                     currentUserId={user?.id}
                     connected={connected}
                     updatedAt={updatedAt}
-                    className="h-[500px]"
+                    className={cn('h-[520px]')}
                   />
                 ) : (
-                  <Card className="border-dashed">
-                    <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                      Sign in with a batch code to see live leaderboard
-                    </CardContent>
-                  </Card>
+                  <StoneCard className="py-10 text-center">
+                    <p
+                      className="text-sm text-[color:var(--color-warroom-smoke)] mb-1"
+                      style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+                    >
+                      The Rankings are sealed.
+                    </p>
+                    <p
+                      className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]/70"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      Enter a batch code at sign-in to reveal the standings.
+                    </p>
+                  </StoneCard>
                 )}
               </div>
             </FadeInUp>

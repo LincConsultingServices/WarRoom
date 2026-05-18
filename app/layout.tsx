@@ -1,8 +1,9 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Cinzel } from 'next/font/google'
+import { Geist, Geist_Mono, Cinzel, Cinzel_Decorative, EB_Garamond, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
+import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -12,6 +13,29 @@ const cinzel = Cinzel({
   variable: '--font-got',
   weight: ['400', '600', '700', '900'],
   display: 'swap',
+})
+
+// Premium font stack — Iron Throne overhaul
+const cinzelDecorative = Cinzel_Decorative({
+  subsets: ['latin'],
+  variable: '--font-cinzel-decorative',
+  weight: ['400', '700'],
+  display: 'swap',
+})
+
+const ebGaramond = EB_Garamond({
+  subsets: ['latin'],
+  variable: '--font-body-serif',
+  weight: ['400', '500'],
+  display: 'swap',
+})
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-data-mono',
+  weight: ['400', '500'],
+  display: 'swap',
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -35,7 +59,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} font-sans antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${cinzelDecorative.variable} ${ebGaramond.variable} ${jetBrainsMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -43,6 +67,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <NarratorOrb />
           <Toaster />
         </ThemeProvider>
       </body>

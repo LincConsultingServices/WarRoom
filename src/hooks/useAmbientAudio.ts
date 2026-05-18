@@ -66,7 +66,7 @@ interface AmbientState {
   unlocked: boolean
 }
 
-class AmbientAudioStore {
+export class AmbientAudioStore {
   private listeners = new Set<() => void>()
   private state: AmbientState = { scene: null, isMuted: false, unlocked: false }
   private ctx: AudioContext | null = null
@@ -251,6 +251,15 @@ let storeSingleton: AmbientAudioStore | null = null
 function getStore(): AmbientAudioStore {
   if (!storeSingleton) storeSingleton = new AmbientAudioStore()
   return storeSingleton
+}
+
+/**
+ * Internal: accessor for the AmbientAudioStore singleton, used by
+ * non-hook contexts (e.g. `lib/audio/audioManager.ts`). Prefer the
+ * `useAmbientAudio()` hook for React components.
+ */
+export function getAmbientStore(): AmbientAudioStore {
+  return getStore()
 }
 
 const noopSubscribe = () => () => {}

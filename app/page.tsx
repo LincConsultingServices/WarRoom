@@ -1,16 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef } from 'react'
 import { ArrowRight, Sword, Shield, Crown, Flame, Star, Users, Target, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { motion, AnimatePresence } from 'framer-motion'
-import { FadeInUp, GlowCard, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } from '@/src/components/AnimatedComponents'
-import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { motion } from 'framer-motion'
+import { FadeInUp, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } from '@/src/components/AnimatedComponents'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
 import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
-
-const EMBER_COUNT = 18
+import {
+  WarRoomCTA,
+  WarRoomCrest,
+  GoldDivider,
+  SigilBadge,
+  StoneCard,
+} from '@/src/components/primitives'
+import { audioManager } from '@/lib/audio/audioManager'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 
 // Stable ember positions (no Math.random in render — avoids hydration mismatch)
 const EMBER_POSITIONS = [
@@ -54,11 +60,20 @@ function EmberParticle({ left, dur, delay, dx }: { left: number; dur: number; de
 export default function HomePage() {
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
 
+  // Narrator runs first-visit script on mount; returning script otherwise.
+  useNarratorOnboarding('landing')
+
   useEffect(() => {
-    // Horn sound on load (quiet)
+    // Subtle horn cue on load (quiet); routes via audioManager → falls
+    // through to GOTSoundManager synth when the file is missing.
     const t = setTimeout(() => {
-      try { playGOTSound('horn_battle', 0.15) } catch {}
+      audioManager.playSfx('nav.page-enter', 0.18)
     }, 1200)
+
+    // Queue the ambient hall track. AmbientAudioStore will resume the
+    // audio context on the user's first interaction.
+    audioManager.setAmbientTrack('ambient.hall')
+
     return () => clearTimeout(t)
   }, [])
 
@@ -141,23 +156,9 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { try { playGOTSound('sword_clash', 0.3) } catch {} }}
-                  className="px-4 py-2 text-xs font-bold"
-                  style={{
-                    background: 'linear-gradient(135deg, #b8891e, #c9a227)',
-                    color: '#0a0806',
-                    border: '1px solid rgba(201,162,39,0.4)',
-                    borderRadius: '3px',
-                    fontFamily: "'Cinzel', Georgia, serif",
-                    letterSpacing: '0.06em',
-                    boxShadow: '0 2px 12px rgba(201,162,39,0.25)',
-                  }}
-                >
+                <WarRoomCTA size="sm" sfxKey="ui.click">
                   Claim Seat
-                </motion.button>
+                </WarRoomCTA>
               </Link>
             </div>
           </div>
@@ -183,20 +184,16 @@ export default function HomePage() {
         </div>
 
         <div className="mx-auto max-w-4xl text-center relative z-10">
-          <FadeInUp delay={0.1}>
-            <div className="inline-flex items-center gap-2 px-5 py-2 mb-8 text-xs font-bold tracking-widest uppercase"
-              style={{
-                color: '#c9a227',
-                border: '1px solid rgba(201,162,39,0.3)',
-                background: 'rgba(201,162,39,0.06)',
-                borderRadius: '2px',
-                fontFamily: "'Cinzel', Georgia, serif",
-                letterSpacing: '0.18em',
-              }}>
-              <Flame className="h-3.5 w-3.5 animate-torch-glow" />
-              The Ultimate Founder Trial
-              <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+          <FadeInUp delay={0.05}>
+            <div className="flex justify-center mb-6">
+              <WarRoomCrest size={132} />
             </div>
+          </FadeInUp>
+          <FadeInUp delay={0.1}>
+            <SigilBadge icon={Flame} tone="gold" className="mb-8">
+              The Ultimate Founder Trial
+              <Star className="h-3 w-3 fill-amber-500 text-amber-500 ml-1" />
+            </SigilBadge>
           </FadeInUp>
 
           <FadeInUp delay={0.25}>
@@ -218,61 +215,27 @@ export default function HomePage() {
 
           {/* Decorative divider */}
           <FadeInUp delay={0.5}>
-            <div className="my-8 flex items-center gap-4 max-w-xs mx-auto">
-              <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.3))' }} />
-              <span style={{ color: 'rgba(201,162,39,0.5)', fontSize: '0.9rem' }}>⚔</span>
-              <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(201,162,39,0.3), transparent)' }} />
+            <div className="my-8">
+              <GoldDivider variant="sword" width="max-w-xs" />
             </div>
           </FadeInUp>
 
           <FadeInUp delay={0.55}>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/dashboard">
-                <motion.button
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { try { playGOTSound('horn_battle', 0.4) } catch {} }}
-                  className="group px-8 py-4 w-full sm:w-auto relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #b8891e, #c9a227, #e8c84a, #b8891e)',
-                    backgroundSize: '200% 100%',
-                    color: '#0a0806',
-                    border: '1px solid rgba(201,162,39,0.6)',
-                    borderRadius: '3px',
-                    fontFamily: "'Cinzel', Georgia, serif",
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    boxShadow: '0 4px 24px rgba(201,162,39,0.35), inset 0 1px 0 rgba(255,230,120,0.3)',
-                    transition: 'all 0.3s ease',
-                  }}
+                <WarRoomCTA
+                  size="md"
+                  variant="primary"
+                  icon={Sword}
+                  iconRight={ArrowRight}
+                  sfxKey="nav.page-enter"
                 >
-                  <span className="flex items-center gap-2 justify-center">
-                    <Sword className="h-4 w-4" />
-                    Enter the War Room
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </motion.button>
+                  Enter the War Room
+                </WarRoomCTA>
               </Link>
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="px-8 py-4 text-sm"
-                style={{
-                  background: 'rgba(201,162,39,0.06)',
-                  border: '1px solid rgba(201,162,39,0.2)',
-                  color: '#c9a227',
-                  borderRadius: '3px',
-                  fontFamily: "'Cinzel', Georgia, serif",
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                }}
-              >
+              <WarRoomCTA size="md" variant="ghost" sfxKey="ui.hover">
                 Watch the Trial
-              </motion.button>
+              </WarRoomCTA>
             </div>
             <p className="mt-5 text-xs" style={{ color: 'rgba(140,128,117,0.6)', letterSpacing: '0.06em' }}>
               By entering, you swear to the{' '}
@@ -325,7 +288,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl relative">
           <FadeInUp>
             <div className="text-center mb-16">
-              <div className="got-house-badge mx-auto mb-4 w-fit">The Trial</div>
+              <SigilBadge tone="gold" className="mb-4">The Trial</SigilBadge>
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
                 Three Trials to the Throne
               </h2>
@@ -340,7 +303,12 @@ export default function HomePage() {
               const Icon = stage.icon
               return (
                 <ScaleOnHover key={stage.num}>
-                  <div className="relative p-7 got-stone-card transition-all duration-300 group">
+                  <StoneCard
+                    interactive
+                    accent={stage.accent}
+                    sigilWatermark={<span>{stage.sigil}</span>}
+                    className="group"
+                  >
                     <div className="absolute -top-4 left-6 w-8 h-8 rounded-sm flex items-center justify-center font-bold text-sm"
                       style={{
                         background: stage.accent,
@@ -350,14 +318,12 @@ export default function HomePage() {
                       }}>
                       {stage.num}
                     </div>
-                    <div className="mb-4 mt-2 text-3xl">{stage.sigil}</div>
+                    <div className="mb-4 mt-2 text-3xl"><Icon className="h-6 w-6 inline mr-2" style={{ color: stage.accent }} aria-hidden /> {stage.sigil}</div>
                     <h3 className="font-semibold text-lg mb-2" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
                       {stage.title}
                     </h3>
                     <p className="text-sm leading-relaxed" style={{ color: '#8c8075' }}>{stage.desc}</p>
-                    <div className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ background: `linear-gradient(90deg, transparent, ${stage.accent}60, transparent)` }} />
-                  </div>
+                  </StoneCard>
                 </ScaleOnHover>
               )
             })}
@@ -374,7 +340,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl relative z-10">
           <FadeInUp>
             <div className="text-center mb-16">
-              <div className="got-house-badge mx-auto mb-4 w-fit">The Council</div>
+              <SigilBadge tone="crimson" className="mb-4">The Council</SigilBadge>
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
                 The Great Houses of the War Room
               </h2>
@@ -388,19 +354,24 @@ export default function HomePage() {
             {houses.map((h) => {
               const Icon = h.icon
               return (
-                <GlowCard key={h.name} glowColor={`${h.color}20`} className="p-8"
-                  style={{ background: 'rgba(17,14,10,0.8)', border: `1px solid rgba(${h.name === 'Investors' ? '201,162,39' : h.name === 'Leaders' ? '59,130,246' : '168,85,247'},0.15)` }}>
+                <StoneCard
+                  key={h.name}
+                  interactive
+                  accent={h.color}
+                  sigilWatermark={<span>{h.sigil}</span>}
+                  padding="lg"
+                >
                   <motion.div
                     whileHover={{ scale: 1.15, rotate: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                     className="w-14 h-14 rounded-sm flex items-center justify-center mb-4 text-2xl"
                     style={{ background: `${h.color}15`, border: `1px solid ${h.color}30` }}
                   >
-                    {h.sigil}
+                    <Icon className="h-6 w-6" style={{ color: h.color }} aria-hidden />
                   </motion.div>
                   <h3 className="font-bold text-lg mb-2" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>{h.name}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#8c8075' }}>{h.desc}</p>
-                </GlowCard>
+                </StoneCard>
               )
             })}
           </StaggerGrid>
@@ -460,31 +431,15 @@ export default function HomePage() {
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <Link href="/dashboard">
-              <motion.button
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { try { playGOTSound('horn_battle', 0.5) } catch {} }}
-                className="group px-10 py-5 relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, #8b6914, #c9a227, #e8c84a, #c9a227, #8b6914)',
-                  backgroundSize: '200% 100%',
-                  color: '#0a0806',
-                  border: '1px solid rgba(201,162,39,0.7)',
-                  borderRadius: '3px',
-                  fontFamily: "'Cinzel', Georgia, serif",
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  boxShadow: '0 6px 32px rgba(201,162,39,0.4), inset 0 1px 0 rgba(255,230,120,0.4)',
-                }}
+              <WarRoomCTA
+                size="lg"
+                variant="primary"
+                icon={Sword}
+                iconRight={ArrowRight}
+                sfxKey="wr.door-creak"
               >
-                <span className="flex items-center gap-3 justify-center">
-                  <Sword className="h-5 w-5" />
-                  Enter the War Room
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </motion.button>
+                Enter the War Room
+              </WarRoomCTA>
             </Link>
           </FadeInUp>
         </div>
