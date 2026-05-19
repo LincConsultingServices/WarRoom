@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { EmberParticles } from '@/src/components/effects/EmberParticles'
 
 // ============================================
 // CINEMA OVERLAY — Full-screen dramatic transition
@@ -28,15 +29,7 @@ export function CinemaOverlay({ show, icon, title, subtitle }: CinemaOverlayProp
           style={{ background: 'radial-gradient(ellipse at center, rgba(10,8,6,0.97), rgba(5,4,3,0.99))' }}
         >
           {/* Ambient embers */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[0,1,2,3,4].map(i => (
-              <motion.div key={i} className="absolute w-1 h-1 rounded-full"
-                style={{ left: `${20 + i * 15}%`, bottom: '10%', background: '#ff6b00', boxShadow: '0 0 6px #ff6b00' }}
-                animate={{ y: [0, -150], opacity: [0.8, 0], scale: [1, 0] }}
-                transition={{ duration: 2 + i * 0.4, delay: i * 0.3, repeat: Infinity, ease: 'easeOut' }}
-              />
-            ))}
-          </div>
+          <EmberParticles density={12} speed={0.7} />
           {icon && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}>
               {icon}

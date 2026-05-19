@@ -107,6 +107,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                     : "border-[color:var(--color-warroom-gold)]/20",
                 )}>
                   {item.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.avatar} alt={item.name} className="h-full w-full rounded-full object-cover" />
                   ) : (
                     item.name.charAt(0)

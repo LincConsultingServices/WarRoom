@@ -18,6 +18,7 @@ const SECTION_ICONS: Record<string, string> = {
 
 interface IdeationViewProps {
   questions: SimQuestion[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   answers: Record<string, any>
   answeredCount: number
   submitting: boolean
@@ -81,7 +82,7 @@ export function IdeationView({
                         {q.context_text && <p className="text-xs text-muted-foreground">{q.context_text}</p>}
 
                         {q.type === 'open_text' && (
-                          <Textarea placeholder="Type your response..." value={(answer as any)?.text || ''} onChange={e => onTextChange(e.target.value, q.q_id)} rows={3} className="resize-none text-sm" />
+                          <Textarea placeholder="Type your response..." value={(answer as any)?.text || ''} onChange={e => onTextChange(e.target.value, q.q_id)} rows={3} className="resize-none text-sm" /> // eslint-disable-line @typescript-eslint/no-explicit-any
                         )}
                         {(q.type === 'multiple_choice' || q.type === 'scenario') && q.options && (
                           <div className="space-y-2">

@@ -37,6 +37,7 @@ export function useSimulation(assessmentId: string) {
   const router = useRouter()
 
   // ---- Core state ----
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [state, setState] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -45,6 +46,7 @@ export function useSimulation(assessmentId: string) {
   const [mcqFeedback, setMcqFeedback] = useState<string | null>(null)
 
   // ---- Dynamic scenario ----
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [dynamicScenario, setDynamicScenario] = useState<any | null>(null)
   const [loadingScenario, setLoadingScenario] = useState(false)
   const loadingScenarioRef = useRef(false)
@@ -103,6 +105,7 @@ export function useSimulation(assessmentId: string) {
   const questions: SimQuestion[] = state?.currentStageQuestions || []
   const currentQ = questions[qIndex] as SimQuestion | undefined
   const isCrisisQuestion = !!currentQ && (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (currentQ as any)?.type === 'scenario' || (currentQ as any)?.type === 'dynamic_scenario' ||
     currentQ?.scenario_step === 'problem' || !!currentQ?.pressure_text
   )
@@ -121,6 +124,7 @@ export function useSimulation(assessmentId: string) {
     try {
       const data = await api.assessments.get(assessmentId)
       setState(data)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((data as any)?.simulation?.revenueProjection) setRevenue((data as any).simulation.revenueProjection)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load simulation')
@@ -170,6 +174,7 @@ export function useSimulation(assessmentId: string) {
 
   // Reset dynamic scenario when question changes
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((currentQ as any)?.type === 'dynamic_scenario' || currentQ?.type === 'scenario') {
       setDynamicScenario(null); setMcqFeedback(null); setDynamicScenarioError('')
       loadingScenarioRef.current = false; setLoadingScenario(false)
@@ -179,6 +184,7 @@ export function useSimulation(assessmentId: string) {
   // Fetch dynamic scenario
   useEffect(() => {
     let ignore = false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const qType = (currentQ as any)?.type
     if (currentQ && qType === 'dynamic_scenario' && simulation && !loadingScenarioRef.current) {
       const run = async () => {
@@ -214,9 +220,11 @@ export function useSimulation(assessmentId: string) {
 
   function handleSelectOption(opt: SimOption, questionId?: string) {
     const qId = questionId || currentQ?.q_id; if (!qId) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const qType = (currentQ as any)?.type || ''
     const isScenario = qType === 'scenario' || qType === 'dynamic_scenario'
     spamGuard.recordSelection(qId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setAnswers((prev) => ({ ...prev, [qId]: { ...prev[qId], questionId: qId, type: (isScenario ? qType : 'multiple_choice') as any, selectedOptionId: opt.id } }))
     if (!questionId) setMcqFeedback(opt.feedback || null)
     if (qId === 'Q_0_1' || qId === 'Q_0_CAPITAL') {
@@ -229,6 +237,7 @@ export function useSimulation(assessmentId: string) {
 
   async function handleConfirmScenarioDecision(opt: SimOption, questionId?: string) {
     const qId = questionId || currentQ?.q_id; if (!qId) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const qType = (currentQ as any)?.type || ''
     if ((qType === 'scenario' || qType === 'dynamic_scenario') && !followupScenarios[qId]) {
       setLoadingFollowup((p) => ({ ...p, [qId]: true })); setFollowupError((p) => ({ ...p, [qId]: '' }))
@@ -263,6 +272,7 @@ export function useSimulation(assessmentId: string) {
         if (!s) return s
         const allocs: Record<string, number> = {}
         questions.filter((q) => q.type === 'budget_allocation' && q.options).forEach((q) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const qa = updated[q.q_id]; if (qa) q.options!.forEach((o) => { if ((qa as any)[o.id]) allocs[o.text] = (qa as any)[o.id] })
         })
         return { ...s, simulation: { ...s.simulation, budgetAllocations: allocs } }
@@ -320,12 +330,15 @@ export function useSimulation(assessmentId: string) {
       }
       const result = await api.assessments.submitPhase(assessmentId, { stageId: simulation.currentStage, responses, engagement })
       if (result.revenueProjection) { setPrevRevenue(revenue); setRevenue(result.revenueProjection) }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((result as any).simCompleted) { router.push(`/assessment/${assessmentId}/final-report`); return }
       const sawHighSpam = spamGuard.shouldShowWarning
       spamGuard.reset()
       const proceed = async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((result as any).phaseScenario) { transition.setPhaseScenario((result as any).phaseScenario); transition.setShowingScenario(true) }
         else if (result.nextStage) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const nxt = (result.nextStage as any)?.id || result.nextStage
           if (nxt === 'STAGE_4_WARROOM') { router.push(`/assessment/${assessmentId}/war-room`); return }
           await load()

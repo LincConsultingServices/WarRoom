@@ -6,7 +6,6 @@ import { ArrowRight, Sword, Shield, Crown, Flame, Star, Users, Target, MessageSq
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { FadeInUp, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } from '@/src/components/AnimatedComponents'
-import { EmberParticles } from '@/src/components/effects/EmberParticles'
 import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 import {
   WarRoomCTA,
@@ -18,44 +17,6 @@ import {
 import { audioManager } from '@/lib/audio/audioManager'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 
-// Stable ember positions (no Math.random in render — avoids hydration mismatch)
-const EMBER_POSITIONS = [
-  { left: 5, dur: 3.2, delay: 0.1, dx: 8 }, { left: 12, dur: 4.1, delay: 0.8, dx: -12 },
-  { left: 20, dur: 3.8, delay: 1.5, dx: 6 }, { left: 28, dur: 5.0, delay: 0.3, dx: -8 },
-  { left: 35, dur: 3.5, delay: 2.1, dx: 14 }, { left: 42, dur: 4.4, delay: 0.6, dx: -6 },
-  { left: 50, dur: 3.1, delay: 1.2, dx: 10 }, { left: 58, dur: 4.8, delay: 1.9, dx: -16 },
-  { left: 65, dur: 3.7, delay: 0.4, dx: 5 }, { left: 72, dur: 5.2, delay: 2.4, dx: -10 },
-  { left: 80, dur: 3.3, delay: 0.9, dx: 12 }, { left: 88, dur: 4.6, delay: 1.6, dx: -5 },
-  { left: 92, dur: 3.9, delay: 0.2, dx: 8 }, { left: 15, dur: 4.2, delay: 3.0, dx: -14 },
-  { left: 45, dur: 3.6, delay: 2.7, dx: 6 }, { left: 70, dur: 4.9, delay: 3.5, dx: -9 },
-  { left: 25, dur: 3.4, delay: 1.8, dx: 11 }, { left: 60, dur: 5.1, delay: 2.9, dx: -7 },
-]
-
-function EmberParticle({ left, dur, delay, dx }: { left: number; dur: number; delay: number; dx: number }) {
-  return (
-    <motion.div
-      className="pointer-events-none absolute w-1 h-1 rounded-full"
-      style={{
-        left: `${left}%`,
-        bottom: '0',
-        background: `radial-gradient(circle, #ff6b00, #c9a227)`,
-        boxShadow: '0 0 4px #ff6b00',
-      }}
-      animate={{
-        y: [0, -120 - dur * 20],
-        x: [0, dx],
-        opacity: [0, 0.8, 0],
-        scale: [0.5, 1.2, 0],
-      }}
-      transition={{
-        duration: dur,
-        delay,
-        repeat: Infinity,
-        ease: 'easeOut',
-      }}
-    />
-  )
-}
 
 export default function HomePage() {
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
@@ -169,11 +130,6 @@ export default function HomePage() {
       <section className="relative overflow-hidden px-4 pt-40 pb-28 sm:px-6 lg:px-8 min-h-screen flex items-center">
         {/* Fire ambiance */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute bottom-0 left-0 right-0 h-1/3">
-            {EMBER_POSITIONS.map((p, i) => (
-              <EmberParticle key={i} left={p.left} dur={p.dur} delay={p.delay} dx={p.dx} />
-            ))}
-          </div>
           {/* Vignette */}
           <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%)' }} />
           {/* Side torches glow */}
@@ -333,9 +289,6 @@ export default function HomePage() {
 
       {/* HOUSES */}
       <section className="px-4 py-24 sm:px-6 lg:px-8 relative overflow-hidden" style={{ background: '#0a0806' }}>
-        {/* Subtle atmosphere — low-density canvas embers + film grain.
-            EmberParticles renders nothing under prefers-reduced-motion. */}
-        <EmberParticles className="opacity-40" density={14} speed={0.55} />
         <NoiseOverlay opacity={0.045} />
         <div className="mx-auto max-w-6xl relative z-10">
           <FadeInUp>

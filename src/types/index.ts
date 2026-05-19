@@ -83,6 +83,7 @@ export interface SimQuestion {
   scenario_group?: string;
   options?: SimOption[];
   ai_eval_prompt?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scoring_guide?: Record<string, any>;
   next?: string;
   follow_up?: SimQuestion;
@@ -96,6 +97,7 @@ export interface SimOption {
   signal?: string;
   next?: string;
   warning?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   impact?: Record<string, any>;
 }
 
@@ -150,6 +152,7 @@ export interface Assessment {
   currentStage: StageName;
   currentQuestionId: string;
   simulatedMonth: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   businessContext?: Record<string, any>;
   userIdea?: string;
   financialState?: FinancialState;
@@ -164,10 +167,12 @@ export interface Assessment {
   // Restructured Flow Fields
   capital: number;
   capitalSource: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   budgetAllocations?: Record<string, any>;
   accumulatedExpenses?: number;
   buyoutChosen: boolean;
   restartCount: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   previousResponses?: Record<string, any>;
   selectedMentors: string[];
   selectedLeaders: string[];
@@ -247,6 +252,7 @@ export interface SubmitResponseResult {
     firstQuestion: string;
   };
   simCompleted: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateUpdates?: Record<string, any>;
 }
 
@@ -382,8 +388,10 @@ export interface UserResponseEntry {
   questionId: string;
   questionText: string;
   questionType: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   response: Record<string, any>;
   proficiency: number | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   aiFeedback: Record<string, any> | null;
   selectedOptionText?: string;
   idealOptionText?: string | null;

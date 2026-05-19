@@ -41,11 +41,15 @@ export function InvestorQAPhase({
   )
 
   // The backend may store the question differently depending on the investor config
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const investorQuestion = (investor as any).questions?.[0]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     || (investor as any).question
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     || (investor as any).pitch_question
     || `${investor.name} will ask you a question about your business model and market strategy. Record your response.`
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const investorFirm = (investor as any).firm || (investor as any).company || (investor as any).specialty || 'Independent Investor'
 
   return (

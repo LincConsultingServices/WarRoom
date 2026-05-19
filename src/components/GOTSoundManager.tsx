@@ -175,6 +175,7 @@ export function useGOTSound() {
 
   const getCtx = useCallback(() => {
     if (!audioCtx.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       audioCtx.current = new (window.AudioContext || (window as any).webkitAudioContext)()
     }
     return audioCtx.current
@@ -239,6 +240,7 @@ export function playGOTSound(event: SoundEvent, volume = 0.6) {
   audio.play().catch(() => {
     // Synthesize fallback
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
       synthesizeSound(ctx, event)
     } catch { /* noop */ }

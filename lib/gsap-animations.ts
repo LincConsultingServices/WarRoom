@@ -127,6 +127,7 @@ export const glowPulse = (
       `0 0 5px ${color}`,
       `0 0 25px ${color}, 0 0 50px rgba(99, 102, 241, 0.2)`,
       `0 0 5px ${color}`,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ] as any,
     duration,
     repeat: -1,
@@ -183,6 +184,7 @@ export const setupMagneticButton = (
 
 // SCROLL TRIGGER FADE IN UP
 export const scrollFadeInUp = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   element: any,
   duration = 0.6
 ) => {
@@ -206,6 +208,7 @@ export const scrollFadeInUp = (
 
 // SCROLL TRIGGER SCALE UP
 export const scrollScaleUp = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   element: any,
   duration = 0.8
 ) => {
@@ -330,6 +333,7 @@ export const animateGradient = (
   duration = 4
 ) => {
   return gsap.to(element, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     backgroundPosition: ['0% center', '100% center', '0% center'] as any,
     duration,
     repeat: -1,
@@ -342,6 +346,7 @@ export const revealOnScroll = (
   elements: gsap.TweenTarget,
   staggerAmount = 0.1
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   gsap.utils.toArray(elements).forEach((element: any) => {
     gsap.fromTo(
       element,

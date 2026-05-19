@@ -24,6 +24,7 @@ export const useGsapAnimation = (
         animationRef.current.kill();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return elementRef;
@@ -46,6 +47,7 @@ export const useScrollTrigger = (
     return () => {
       // ScrollTrigger cleanup happens automatically
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return elementRef;

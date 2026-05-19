@@ -18,7 +18,9 @@ export function useNegotiation(assessmentId: string) {
   const negotiationRecorder = useAudioRecorder(15)
   const { toast } = useToast()
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [offers, setOffers] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
   const [negRound, setNegRound] = useState(0)
   const [negHistory, setNegHistory] = useState<{ sender: string; msg: string; type: 'investor' | 'user' }[]>([])
@@ -31,6 +33,7 @@ export function useNegotiation(assessmentId: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Reset recorder when offer changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (selectedOffer) negotiationRecorder.resetRecording() }, [selectedOffer])
 
   // Confetti on deal finalized

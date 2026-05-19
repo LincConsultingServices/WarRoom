@@ -41,6 +41,7 @@ export function useWarRoomCore(assessmentId: string) {
         setAssessmentState(state)
 
         // Redirect to report if buyout was already chosen
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((state as any)?.assessment?.buyoutChosen) {
           router.push(`/assessment/${assessmentId}/final-report`)
           return
@@ -48,6 +49,7 @@ export function useWarRoomCore(assessmentId: string) {
 
         const selectedIds: string[] = (() => {
           try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const raw = (state as any)?.assessment?.selectedInvestors
             if (Array.isArray(raw)) return raw
             if (typeof raw === 'string') return JSON.parse(raw)

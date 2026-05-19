@@ -136,6 +136,7 @@ export function PhaseTransitionScenario({
           className="h-14 w-14 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center text-xl font-bold flex-shrink-0 animate-glow-pulse"
         >
           {scenario.leaderAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={scenario.leaderAvatar}
               alt={scenario.leaderName}

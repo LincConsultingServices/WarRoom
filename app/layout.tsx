@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
 import { CustomCursor } from '@/src/components/effects/CustomCursor'
+import { EmberParticles } from '@/src/components/effects/EmberParticles'
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -70,6 +71,7 @@ export default function RootLayout({
           {children}
           <NarratorOrb />
           <CustomCursor />
+          <EmberParticles density={30} />
           <Toaster />
         </ThemeProvider>
       </body>
