@@ -351,7 +351,7 @@ export default function RegisterPage() {
                         transition={{ duration: 0.16 }}
                       >
                         <Check
-                          className="w-3 h-3 text-[color:var(--color-warroom-void)]"
+                          className="w-3 h-3 text-primary-foreground"
                           strokeWidth={3}
                         />
                       </motion.span>

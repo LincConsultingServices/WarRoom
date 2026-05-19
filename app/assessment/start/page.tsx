@@ -264,7 +264,7 @@ export default function SimulationStartPage() {
                       className={cn(
                         'inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-[2px] border tracking-[0.14em] uppercase transition-all duration-300',
                         level === item.id
-                          ? 'text-[color:var(--color-warroom-void)] bg-[color:var(--color-warroom-gold)] border-[color:var(--color-warroom-gold)]'
+                          ? 'text-primary-foreground bg-[color:var(--color-warroom-gold)] border-[color:var(--color-warroom-gold)]'
                           : 'text-[color:var(--color-warroom-smoke)] bg-transparent border-[color:var(--color-warroom-ash)]/50',
                       )}
                       style={{ fontFamily: 'var(--font-display)' }}
@@ -462,7 +462,7 @@ export default function SimulationStartPage() {
                       transition={{ duration: 0.16 }}
                     >
                       <Check
-                        className="w-3.5 h-3.5 text-[color:var(--color-warroom-void)]"
+                        className="w-3.5 h-3.5 text-primary-foreground"
                         strokeWidth={3}
                       />
                     </motion.span>

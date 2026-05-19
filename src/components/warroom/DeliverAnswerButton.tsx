@@ -65,7 +65,7 @@ export function DeliverAnswerButton({
         'group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-sm',
         'min-h-12 px-6 py-3',
         'font-display text-sm font-bold uppercase tracking-[0.12em]',
-        'text-[color:var(--color-warroom-black)]',
+        'text-primary-foreground',
         'shadow-[0_2px_12px_rgba(201,162,39,0.32),inset_0_1px_0_rgba(255,220,100,0.35)]',
         'transition-all duration-300',
         'border border-[color:var(--color-warroom-gold)]/55',

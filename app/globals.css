@@ -68,6 +68,26 @@
   --got-parchment: #f5e6c8;
   --got-ink: #1a1208;
 
+  /* Warroom surface tokens — light (parchment / torchlit hall) */
+  --wr-void: #faf5eb;
+  --wr-black: #f5ece0;
+  --wr-obsidian: #ede4d4;
+  --wr-rampart: #e5dbc8;
+  --wr-stone: #d8ccb8;
+  --wr-slate: #c8baa5;
+  --wr-ash: #a89888;
+  --wr-smoke: #6d5e50;
+  --wr-ivory: #2a2015;
+  --wr-ghost: #1a1208;
+  --wr-electrum: #9a7b10;
+  --wr-parchment: #3d3530;
+  --wr-ink: #f5e6c8;
+  --wr-gold-glow: rgba(180, 140, 30, 0.15);
+  --wr-dragonglass: #1a2a48;
+  --wr-shadow-gold: 0 0 12px rgba(160, 120, 30, 0.2), 0 0 40px rgba(160, 120, 30, 0.08);
+  --wr-shadow-crimson: 0 0 12px rgba(139, 26, 26, 0.25);
+  --wr-shadow-deep: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  --wr-glow-ember: 0 0 20px rgba(200, 75, 15, 0.25);
 }
 
 .dark {
@@ -110,6 +130,27 @@
   --warning-foreground: oklch(0.08 0.01 50);
   --info: oklch(0.44 0.14 220);
   --info-foreground: oklch(0.95 0.02 75);
+
+  /* Warroom surface tokens — dark (Iron Throne obsidian) */
+  --wr-void: #060504;
+  --wr-black: #0a0805;
+  --wr-obsidian: #14100c;
+  --wr-rampart: #231c16;
+  --wr-stone: #2a2520;
+  --wr-slate: #2e2520;
+  --wr-ash: #4a3f38;
+  --wr-smoke: #7a6a5f;
+  --wr-ivory: #e8d5b7;
+  --wr-ghost: #f2ece0;
+  --wr-electrum: #daa520;
+  --wr-parchment: #f5e6c8;
+  --wr-ink: #1a1208;
+  --wr-gold-glow: rgba(240, 192, 64, 0.2);
+  --wr-dragonglass: #0f1a2e;
+  --wr-shadow-gold: 0 0 20px rgba(201, 150, 42, 0.3), 0 0 60px rgba(201, 150, 42, 0.1);
+  --wr-shadow-crimson: 0 0 20px rgba(139, 26, 26, 0.4);
+  --wr-shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+  --wr-glow-ember: 0 0 30px rgba(200, 75, 15, 0.5);
 }
 
 @theme inline {
@@ -121,11 +162,10 @@
   --font-data: var(--font-data-mono), 'JetBrains Mono', 'Geist Mono', monospace;
 
   /* === WAR ROOM design tokens ===
-     Self-contained on this base (no --got-* dependency). When the
-     GOT theme is merged forward, these can be re-aliased to var(--got-*). */
-  --color-warroom-black: #0a0805;
-  --color-warroom-obsidian: #14100c;
-  --color-warroom-stone: #2a2520;
+     Accent colors are fixed. Surface/text tokens are theme-responsive
+     via --wr-* variables defined in :root (light) and .dark (dark). */
+
+  /* Accent tokens (fixed across themes) */
   --color-warroom-ember: #ff6b00;
   --color-warroom-ember-bright: #ff9933;
   --color-warroom-gold: #c9a227;
@@ -134,29 +174,32 @@
   --color-warroom-crimson: #8b1a1a;
   --color-warroom-crimson-bright: #c23b3b;
   --color-warroom-silver: #a8a8a8;
-  --color-warroom-parchment: #f5e6c8;
-  --color-warroom-ink: #1a1208;
-  --color-warroom-dragonglass: #0f1a2e;
+  --color-warroom-verdant: #2d6a4f;
+  --color-warroom-sapphire: #1a3a5c;
+  --color-warroom-amethyst: #4a2060;
 
-  /* Premium token extensions — added for the Iron Throne overhaul */
-  --color-warroom-void: #060504;          /* deepest background */
-  --color-warroom-rampart: #231c16;       /* elevated surface */
-  --color-warroom-slate: #2e2520;         /* border, divider */
-  --color-warroom-ash: #4a3f38;           /* muted border */
-  --color-warroom-smoke: #7a6a5f;         /* secondary text */
-  --color-warroom-ivory: #e8d5b7;         /* primary text */
-  --color-warroom-ghost: #f2ece0;         /* headings, emphasis */
-  --color-warroom-electrum: #daa520;      /* golden text */
-  --color-warroom-gold-glow: rgba(240, 192, 64, 0.2);
-  --color-warroom-verdant: #2d6a4f;       /* success / invest */
-  --color-warroom-sapphire: #1a3a5c;      /* info / neutral */
-  --color-warroom-amethyst: #4a2060;      /* special / legendary */
+  /* Surface & text tokens (theme-responsive) */
+  --color-warroom-void: var(--wr-void);
+  --color-warroom-black: var(--wr-black);
+  --color-warroom-obsidian: var(--wr-obsidian);
+  --color-warroom-rampart: var(--wr-rampart);
+  --color-warroom-stone: var(--wr-stone);
+  --color-warroom-slate: var(--wr-slate);
+  --color-warroom-ash: var(--wr-ash);
+  --color-warroom-smoke: var(--wr-smoke);
+  --color-warroom-ivory: var(--wr-ivory);
+  --color-warroom-ghost: var(--wr-ghost);
+  --color-warroom-electrum: var(--wr-electrum);
+  --color-warroom-parchment: var(--wr-parchment);
+  --color-warroom-ink: var(--wr-ink);
+  --color-warroom-gold-glow: var(--wr-gold-glow);
+  --color-warroom-dragonglass: var(--wr-dragonglass);
 
-  /* Cinematic shadows + glows */
-  --shadow-gold: 0 0 20px rgba(201, 150, 42, 0.3), 0 0 60px rgba(201, 150, 42, 0.1);
-  --shadow-crimson: 0 0 20px rgba(139, 26, 26, 0.4);
-  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
-  --glow-ember: 0 0 30px rgba(200, 75, 15, 0.5);
+  /* Cinematic shadows + glows (theme-responsive) */
+  --shadow-gold: var(--wr-shadow-gold);
+  --shadow-crimson: var(--wr-shadow-crimson);
+  --shadow-deep: var(--wr-shadow-deep);
+  --glow-ember: var(--wr-glow-ember);
 
   /* Easing curves */
   --ease-regal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -268,15 +311,23 @@
 }
 
 @layer components {
-  /* GOT Stone Card */
+  /* GOT Stone Card — light mode defaults, dark overrides below */
   .card-base {
     @apply rounded-sm bg-card text-card-foreground shadow-sm border border-border transition-all duration-300;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(201,162,39,0.08);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(201,162,39,0.06);
   }
 
   .card-base:hover {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(201,162,39,0.06), inset 0 1px 0 rgba(201,162,39,0.12);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12), 0 0 12px rgba(201,162,39,0.04), inset 0 1px 0 rgba(201,162,39,0.1);
     @apply border-border/80;
+  }
+
+  :is(.dark) .card-base {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(201,162,39,0.08);
+  }
+
+  :is(.dark) .card-base:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(201,162,39,0.06), inset 0 1px 0 rgba(201,162,39,0.12);
   }
 
   /* GOT Stone Card — thematic card */
@@ -284,9 +335,13 @@
     background: linear-gradient(135deg, var(--card) 0%, color-mix(in oklch, var(--card), #c9a22710 100%) 100%);
     border: 1px solid color-mix(in oklch, var(--border), #c9a227 15%);
     border-radius: 4px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,162,39,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(201,162,39,0.08), inset 0 -1px 0 rgba(0,0,0,0.04);
     position: relative;
     overflow: hidden;
+  }
+
+  :is(.dark) .got-stone-card {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,162,39,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
   }
 
   .got-stone-card::before {
@@ -413,26 +468,31 @@
     cursor: none !important;
   }
 
-  /* ── Outer trailing ring ── */
+  /* ── Outer trailing ring (light mode: multiply, dark mode: screen) ── */
   .wr-cursor-ring {
     position: fixed;
     top: 0;
     left: 0;
     width: 32px;
     height: 32px;
-    border: 1.5px solid var(--color-warroom-gold);
+    border: 1.5px solid var(--color-warroom-gold-dark);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.55;
-    mix-blend-mode: screen;
+    opacity: 0.7;
+    mix-blend-mode: multiply;
     will-change: transform;
-    /* Only transition visual properties — transform is driven by JS RAF */
     transition:
       opacity 180ms ease,
       box-shadow 180ms ease,
       border-color 180ms ease,
       scale 80ms ease;
+  }
+
+  :is(.dark) .wr-cursor-ring {
+    border-color: var(--color-warroom-gold);
+    opacity: 0.55;
+    mix-blend-mode: screen;
   }
 
   .wr-cursor-ring.wr-cursor--hover {
@@ -454,19 +514,24 @@
     left: 0;
     width: 6px;
     height: 6px;
-    background: var(--color-warroom-gold);
+    background: var(--color-warroom-gold-dark);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    box-shadow: 0 0 5px var(--color-warroom-gold);
+    box-shadow: 0 0 3px var(--color-warroom-gold-dark);
     will-change: transform;
     transition:
       opacity 180ms ease,
       scale 80ms ease;
   }
 
+  :is(.dark) .wr-cursor-dot {
+    background: var(--color-warroom-gold);
+    box-shadow: 0 0 5px var(--color-warroom-gold);
+  }
+
   .wr-cursor-dot.wr-cursor--hover {
-    scale: 0.67; /* 6px → ~4px equivalent */
+    scale: 0.67;
   }
 
   .wr-cursor-dot.wr-cursor--click {

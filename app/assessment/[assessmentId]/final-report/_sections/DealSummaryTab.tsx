@@ -130,19 +130,19 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
       <style jsx>{`
         .deal-page { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .exit-banner { border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); }
+        .exit-banner { border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); }
         .exit-banner .exit-title { font-weight: 700; color: var(--color-warroom-ivory); margin-bottom: 0.2rem; font-size: 1.05rem; font-family: var(--font-display); }
         .exit-banner .exit-subtitle { color: var(--color-warroom-smoke); font-size: 0.85rem; font-family: var(--font-body, serif); }
         .exit-positive { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); }
         .exit-negative { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
         .exit-neutral { background: rgba(201,162,39,0.07); border-color: rgba(201,162,39,0.25); }
         .deal-stats { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 2rem; }
-        .stat-card { background: var(--color-warroom-rampart); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem 3rem; text-align: center; }
+        .stat-card { background: var(--color-warroom-rampart); border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 16px; padding: 2rem 3rem; text-align: center; }
         .stat-card.highlight { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
         .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--color-warroom-ivory); font-family: var(--font-display); }
         .stat-label { font-size: 0.85rem; color: var(--color-warroom-smoke); margin-top: 0.3rem; font-family: var(--font-body, serif); }
         .investor-results h3 { color: var(--color-warroom-ivory); margin-bottom: 1rem; font-family: var(--font-display); }
-        .scorecard { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1.2rem; margin-bottom: 0.8rem; }
+        .scorecard { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; padding: 1.2rem; margin-bottom: 0.8rem; }
         .sc-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
         .sc-header strong { color: var(--color-warroom-ivory); font-family: var(--font-display); }
         .deal-badge { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 6px; font-family: var(--font-display); }
@@ -151,18 +151,18 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
         .sc-scores { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--color-warroom-smoke); margin-bottom: 0.5rem; }
         .red-flag { color: var(--color-warroom-crimson); font-weight: 600; }
         blockquote { background: var(--color-warroom-rampart); border-left: 2px solid var(--color-warroom-gold)/30; padding: 0.6rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; color: var(--color-warroom-smoke); font-size: 0.9rem; margin: 0; font-family: var(--font-body, serif); }
-        .engagement-section { margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; }
+        .engagement-section { margin-top: 2rem; padding: 1.5rem; background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; }
         .engagement-section h3 { color: var(--color-warroom-ivory); margin: 0 0 0.4rem 0; font-family: var(--font-display); }
         .engagement-blurb { color: var(--color-warroom-smoke); font-size: 0.85rem; margin: 0 0 1rem 0; font-family: var(--font-body, serif); }
         .engagement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; }
-        .engagement-card { padding: 0.9rem; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+        .engagement-card { padding: 0.9rem; border-radius: 10px; background: color-mix(in srgb, var(--foreground) 4%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); }
         .engagement-stage { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-warroom-smoke); margin-bottom: 0.3rem; font-family: var(--font-display); }
         .engagement-value { font-size: 1.6rem; font-weight: 800; color: var(--color-warroom-ivory); font-family: var(--font-display); }
         .engagement-meta { font-size: 0.7rem; color: var(--color-warroom-smoke); margin-top: 0.2rem; }
         .engagement-low { border-color: rgba(16,185,129,0.25); }
         .engagement-low .engagement-value { color: var(--color-warroom-verdant); }
         .engagement-mid { border-color: rgba(245,158,11,0.3); }
-        .engagement-mid .engagement-value { color: #f59e0b; }
+        .engagement-mid .engagement-value { color: var(--color-warroom-gold-bright); }
         .engagement-high { border-color: rgba(239,68,68,0.35); }
         .engagement-high .engagement-value { color: var(--color-warroom-crimson); }
       `}</style>

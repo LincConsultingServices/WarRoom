@@ -79,7 +79,7 @@ export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
           'border rounded-[3px] overflow-visible',
           SIZE_CLASSES[size],
           variant === 'primary' && [
-            'text-warroom-black',
+            'text-primary-foreground',
             'border-[color:var(--color-warroom-gold)]/60',
             'shadow-[0_4px_24px_rgba(201,150,42,0.35),inset_0_1px_0_rgba(255,230,120,0.3)]',
           ],

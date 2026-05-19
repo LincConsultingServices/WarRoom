@@ -82,7 +82,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                     className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[color:var(--color-warroom-gold)] flex items-center justify-center shadow-[0_0_12px_rgba(201,162,39,0.55)]"
                   >
-                    <Check className="h-3 w-3 text-[color:var(--color-warroom-black)]" />
+                    <Check className="h-3 w-3 text-primary-foreground" />
                   </motion.div>
                 )}
               </AnimatePresence>

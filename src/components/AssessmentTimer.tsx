@@ -122,7 +122,7 @@ export default function AssessmentTimer({
           background: rgba(0, 0, 0, 0.2);
           padding: 0.6rem 1.2rem;
           border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
           margin-top: 0.8rem;
         }
         .global-timer {

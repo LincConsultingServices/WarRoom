@@ -73,7 +73,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/admin/cohorts">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-void)]">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[color:var(--color-warroom-gold)] text-primary-foreground">
                   <ShieldCheck className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">

@@ -93,35 +93,35 @@ export function CompetencyTab({ report }: { report: EvaluationReport }) {
         .comp-page { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .archetype-section { text-align: center; margin-bottom: 2.5rem; }
-        .archetype-badge { display: inline-block; background: linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright)); color: var(--color-warroom-void); padding: 0.6rem 2rem; border-radius: 12px; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; font-family: var(--font-display); }
+        .archetype-badge { display: inline-block; background: linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright)); color: var(--primary-foreground); padding: 0.6rem 2rem; border-radius: 12px; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; font-family: var(--font-display); }
         .archetype-role { color: var(--color-warroom-smoke); font-size: 1rem; margin-bottom: 1rem; font-family: var(--font-body, serif); }
         .archetype-role strong { color: var(--color-warroom-gold); }
-        .archetype-narrative { color: #d1d5db; line-height: 1.6; max-width: 700px; margin: 0 auto; font-size: 0.95rem; font-family: var(--font-body, serif); }
-        .spider-chart { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; }
+        .archetype-narrative { color: var(--color-warroom-smoke); line-height: 1.6; max-width: 700px; margin: 0 auto; font-size: 0.95rem; font-family: var(--font-body, serif); }
+        .spider-chart { background: var(--color-warroom-rampart); border: 1px solid var(--color-warroom-ash); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; opacity: 0.6; }
         .spider-chart h3, .role-fit h3, .action-plan h3 { color: var(--color-warroom-ivory); font-size: 1.1rem; margin-bottom: 1rem; font-family: var(--font-display); }
         .bar-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.7rem; }
         .bar-label { width: 200px; display: flex; gap: 0.5rem; align-items: center; }
         .comp-code { font-weight: 700; font-size: 0.85rem; width: 28px; font-family: var(--font-display); }
-        .comp-name { font-size: 0.8rem; color: #d1d5db; font-family: var(--font-body, serif); }
-        .bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+        .comp-name { font-size: 0.8rem; color: var(--muted-foreground); font-family: var(--font-body, serif); }
+        .bar-track { flex: 1; height: 8px; background: color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 4px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
         .bar-value { width: 40px; text-align: right; font-weight: 600; font-size: 0.85rem; color: var(--color-warroom-ivory); font-family: var(--font-data, monospace); }
         .cat-badge { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 600; white-space: nowrap; width: 130px; text-align: center; font-family: var(--font-display); }
         .cat-natural-dominant { background: rgba(16,185,129,0.12); color: var(--color-warroom-verdant); }
-        .cat-strong { background: rgba(59,130,246,0.12); color: #60a5fa; }
-        .cat-functional { background: rgba(245,158,11,0.12); color: #fbbf24; }
+        .cat-strong { background: rgba(59,130,246,0.12); color: var(--color-warroom-sapphire); }
+        .cat-functional { background: rgba(245,158,11,0.12); color: var(--color-warroom-gold-bright); }
         .cat-development-required { background: rgba(239,68,68,0.12); color: var(--color-warroom-crimson); }
         .cat-high-risk { background: rgba(239,68,68,0.2); color: var(--color-warroom-crimson); }
         .role-fit { margin-bottom: 2rem; }
-        .role-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1.5rem; }
+        .role-card { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; padding: 1.5rem; }
         .role-name { font-size: 1.2rem; font-weight: 700; color: var(--color-warroom-gold); margin-bottom: 0.5rem; font-family: var(--font-display); }
         .role-card p { color: var(--color-warroom-smoke); font-size: 0.9rem; margin-bottom: 0.8rem; font-family: var(--font-body, serif); }
         .dominant-comps { display: flex; gap: 0.4rem; }
         .dom-comp { border: 1px solid; padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-warroom-smoke); font-family: var(--font-display); }
         .action-plan { margin-bottom: 2rem; }
-        .action-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; }
+        .action-item { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; }
         .action-comp { font-weight: 600; color: var(--color-warroom-gold); font-size: 0.85rem; margin-bottom: 0.3rem; font-family: var(--font-display); }
-        .action-item p { color: #d1d5db; font-size: 0.9rem; margin: 0 0 0.3rem 0; font-family: var(--font-body, serif); }
+        .action-item p { color: var(--muted-foreground); font-size: 0.9rem; margin: 0 0 0.3rem 0; font-family: var(--font-body, serif); }
         .target { font-size: 0.75rem; color: var(--color-warroom-smoke); font-family: var(--font-data, monospace); }
         @media (max-width: 768px) { .bar-label { width: 120px; } .cat-badge { display: none; } }
       `}</style>

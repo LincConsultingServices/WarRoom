@@ -121,8 +121,8 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         .response-count { font-size: 0.8rem; color: var(--color-warroom-smoke); }
 
         .response-accordion :global(.response-item) {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: color-mix(in srgb, var(--foreground) 3%, transparent);
+          border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent);
           border-radius: 12px;
           margin-bottom: 0.6rem;
           padding: 0 1.1rem;
@@ -144,14 +144,14 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         .answer-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
         @media (min-width: 640px) { .answer-grid { grid-template-columns: 1fr 1fr; } }
 
-        .answer-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.8rem 1rem; }
-        .answer-card.single-card { background: rgba(255,255,255,0.02); }
+        .answer-card { background: color-mix(in srgb, var(--foreground) 2%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 10px; padding: 0.8rem 1rem; }
+        .answer-card.single-card { background: color-mix(in srgb, var(--foreground) 2%, transparent); }
         .answer-card.is-match { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.04); }
         .answer-card.ideal-card { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
 
         .answer-label { font-size: 0.7rem; font-weight: 600; color: var(--color-warroom-smoke); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-display); }
         .ideal-label { color: var(--color-warroom-verdant); }
-        .answer-card p { color: #d1d5db; font-size: 0.88rem; margin: 0.3rem 0 0 0; line-height: 1.5; font-family: var(--font-body, serif); }
+        .answer-card p { color: var(--muted-foreground); font-size: 0.88rem; margin: 0.3rem 0 0 0; line-height: 1.5; font-family: var(--font-body, serif); }
         .ai-tip { font-size: 0.78rem; color: var(--color-warroom-smoke); font-style: italic; margin-top: 0.5rem !important; }
         .no-ideal-note { font-size: 0.74rem; color: var(--color-warroom-smoke); font-style: italic; margin-top: 0.6rem !important; }
         .no-data { color: var(--color-warroom-smoke); text-align: center; padding: 3rem; font-family: var(--font-body, serif); }

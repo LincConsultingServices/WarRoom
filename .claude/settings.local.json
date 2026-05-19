@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npx next *)",
       "Bash(npm run *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(cd \"/c/Users/santh/programming/proj/War Room/WarRoom\" && cat package.json | grep -A 20 \"dependencies\")",
+      "mcp__Claude_in_Chrome__list_connected_browsers"
     ]
   }
 }
