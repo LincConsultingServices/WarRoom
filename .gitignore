@@ -36,6 +36,8 @@ next-env.d.ts
 
 # Documentation
 *.md
+!README.md
+
 
 # SQL files
 *.sql
