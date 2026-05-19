@@ -18,7 +18,7 @@ interface AdminRankedCompetency {
   weaknesses?: string[]
 }
 import { CompetencyRadarChart } from '@/components/competency-radar-chart'
-import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
+import { StoneCard, GoldDivider, SigilBadge } from '@/src/components/primitives'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
 const LEVEL_TONES: Record<string, 'verdant' | 'gold' | 'crimson'> = {
