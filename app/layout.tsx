@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Cinzel, Cinzel_Decorative, EB_Garamond, JetBrains_Mo
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
+import { CustomCursor } from '@/src/components/effects/CustomCursor'
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -68,6 +69,7 @@ export default function RootLayout({
         >
           {children}
           <NarratorOrb />
+          <CustomCursor />
           <Toaster />
         </ThemeProvider>
       </body>

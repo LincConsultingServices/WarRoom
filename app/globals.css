@@ -403,3 +403,74 @@
   .animate-torch-glow,
   .animate-narrator-caret { animation: none; }
 }
+
+/* ── Custom cursor (fine-pointer / mouse only) ──────────────────────────── */
+@media (pointer: fine) {
+  /* Hide the native cursor everywhere — CustomCursor.tsx renders our own */
+  *,
+  *::before,
+  *::after {
+    cursor: none !important;
+  }
+
+  /* ── Outer trailing ring ── */
+  .wr-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--color-warroom-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    will-change: transform;
+    /* Only transition visual properties — transform is driven by JS RAF */
+    transition:
+      opacity 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease,
+      scale 80ms ease;
+  }
+
+  .wr-cursor-ring.wr-cursor--hover {
+    opacity: 0.9;
+    border-color: var(--color-warroom-electrum);
+    box-shadow:
+      0 0 10px color-mix(in srgb, var(--color-warroom-gold) 60%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-warroom-gold) 28%, transparent);
+  }
+
+  .wr-cursor-ring.wr-cursor--click {
+    scale: 0.78;
+  }
+
+  /* ── Inner precision dot ── */
+  .wr-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--color-warroom-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 5px var(--color-warroom-gold);
+    will-change: transform;
+    transition:
+      opacity 180ms ease,
+      scale 80ms ease;
+  }
+
+  .wr-cursor-dot.wr-cursor--hover {
+    scale: 0.67; /* 6px → ~4px equivalent */
+  }
+
+  .wr-cursor-dot.wr-cursor--click {
+    opacity: 0.45;
+    scale: 0.5;
+  }
+}
