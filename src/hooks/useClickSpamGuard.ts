@@ -38,6 +38,7 @@ export function useClickSpamGuard() {
     spamPercent: 0,
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const recordSelection = useCallback((_questionId?: string) => {
     const now = Date.now()
     timestampsRef.current.push(now)

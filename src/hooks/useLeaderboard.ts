@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LeaderboardEntry } from '@/src/types'
 
 const WS_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api').replace(/^http/, 'ws')
@@ -68,7 +68,7 @@ export function useLeaderboard(batchCode: string | null | undefined): Leaderboar
             setConnected(false)
           }
         }
-      } catch (e) {
+      } catch {
         setError('Failed to connect to leaderboard')
       }
     }

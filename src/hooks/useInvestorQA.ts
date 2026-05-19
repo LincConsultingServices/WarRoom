@@ -74,8 +74,8 @@ export function useInvestorQA(assessmentId: string) {
         setCurrentInvestorReaction(result.scorecard.investorReaction || `${investor.name} has considered your response.`)
         if (result.audioBase64) playAudioBase64(result.audioBase64)
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to analyze response')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to analyze response')
     } finally {
       setIsAnalyzing(false); setIsSubmitting(false)
     }
@@ -94,8 +94,8 @@ export function useInvestorQA(assessmentId: string) {
       setFollowupActive(false)
       responseRecorder.resetRecording()
       if (result.audioBase64) playAudioBase64(result.audioBase64)
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit follow-up response')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit follow-up response')
     } finally {
       setIsAnalyzing(false); setIsSubmitting(false)
     }

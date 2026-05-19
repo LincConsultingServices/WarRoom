@@ -17,15 +17,16 @@ export function useMentorLifeline(assessmentId: string) {
   const [mentorLoading, setMentorLoading] = useState(false)
   const [mentorResult, setMentorResult] = useState<MentorLifelineResult | null>(null)
 
-  async function handleUseMentor(mentors: Mentor[]) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async function handleUseMentor(_mentors: Mentor[]) {
     if (!selectedMentorId) return
     setMentorLoading(true)
     try {
       const result = await api.assessments.useMentorLifeline(assessmentId, selectedMentorId, mentorQuestion)
       setMentorResult(result)
       return result
-    } catch (err: any) {
-      setMentorResult({ mentorId: selectedMentorId, mentorName: '', guidance: `Error: ${err.message}`, lifelinesLeft: 0 })
+    } catch (err: unknown) {
+      setMentorResult({ mentorId: selectedMentorId, mentorName: '', guidance: `Error: ${err instanceof Error ? err.message : 'Unknown error'}`, lifelinesLeft: 0 })
     } finally {
       setMentorLoading(false)
     }

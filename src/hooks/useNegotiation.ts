@@ -39,7 +39,7 @@ export function useNegotiation(assessmentId: string) {
     const end = Date.now() + 3000
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 }
     const rnd = (min: number, max: number) => Math.random() * (max - min) + min
-    const interval: any = setInterval(() => {
+    const interval: ReturnType<typeof setInterval> = setInterval(() => {
       const left = end - Date.now(); if (left <= 0) return clearInterval(interval)
       const n = 50 * (left / 3000)
       confetti({ ...defaults, particleCount: n, origin: { x: rnd(0.1, 0.3), y: Math.random() - 0.2 } })
@@ -48,7 +48,7 @@ export function useNegotiation(assessmentId: string) {
     return () => clearInterval(interval)
   }, [dealFinalized])
 
-  function handleSelectOffer(offer: any) {
+  function handleSelectOffer(offer: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     setSelectedOffer(offer)
     setNegRound(0)
     setNegHistory([{ sender: offer.investorName, msg: offer.message, type: 'investor' }])
@@ -100,8 +100,8 @@ export function useNegotiation(assessmentId: string) {
         }
       }
       negotiationRecorder.resetRecording()
-    } catch (err: any) {
-      const msg = err?.message || 'Failed to negotiate'
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to negotiate'
       setError(msg)
       toast({
         variant: 'destructive',
@@ -113,7 +113,7 @@ export function useNegotiation(assessmentId: string) {
     }
   }
 
-  async function handleAcceptDeal(offer: any) {
+  async function handleAcceptDeal(offer: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     try {
       setAcceptedDealTerms({ capital: offer.capital, equity: offer.equity, investorName: offer.investorName })
       await api.assessments.acceptDeal(assessmentId, offer.investorId, offer.capital, offer.equity)
