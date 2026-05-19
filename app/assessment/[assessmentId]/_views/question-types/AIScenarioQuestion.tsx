@@ -16,7 +16,7 @@ interface AIScenarioQuestionProps {
   contextText?: string
   questionId: string
   text: string
-  currentAnswer?: any
+  currentAnswer?: { text?: string; selectedOptionId?: string }
   buyoutCompany: string
   buyoutAmount: string
   submitError?: string
@@ -29,7 +29,7 @@ interface AIScenarioQuestionProps {
 }
 
 export function AIScenarioQuestion({
-  scenarioStep, scenarioGroup, contextText, questionId, text,
+  scenarioStep, scenarioGroup, contextText, questionId,
   currentAnswer, buyoutCompany, buyoutAmount, submitError, submitting,
   onTextChange, onBuyoutCompanyChange, onBuyoutAmountChange, onBuyoutSubmit, onAcknowledge,
 }: AIScenarioQuestionProps) {

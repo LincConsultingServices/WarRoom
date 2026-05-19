@@ -29,7 +29,7 @@ interface IdeationViewProps {
 }
 
 export function IdeationView({
-  questions, answers, answeredCount, submitting, submitError, accent,
+  questions, answers, submitting, submitError, accent,
   onTextChange, onSelectOption, onSubmitPhase,
 }: IdeationViewProps) {
   // Group by section

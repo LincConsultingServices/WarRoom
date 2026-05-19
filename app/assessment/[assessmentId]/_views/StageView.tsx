@@ -14,14 +14,14 @@ import { BudgetQuestion } from './question-types/BudgetQuestion'
 import { AIScenarioQuestion } from './question-types/AIScenarioQuestion'
 import { InfoQuestion } from './question-types/InfoQuestion'
 import { getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from '@/src/lib/helpers'
-import type { SimQuestion, SimOption } from '@/src/types'
+import type { SimQuestion, SimOption, PhaseResponse } from '@/src/types'
 
 interface StageViewProps {
   questions: SimQuestion[]
   qIndex: number
   currentQ: SimQuestion | undefined
-  currentAnswer: any
-  answers: Record<string, any>
+  currentAnswer: PhaseResponse | undefined
+  answers: Record<string, PhaseResponse | undefined>
   isCrisisQuestion: boolean
   submitting: boolean
   submitError: string
@@ -29,7 +29,7 @@ interface StageViewProps {
   isFirstQuestion: boolean
   answeredCount: number
   // dynamic scenario
-  dynamicScenario: any
+  dynamicScenario: { questionText: string; options: SimOption[] | string; [key: string]: unknown } | null
   loadingScenario: boolean
   dynamicScenarioError: string
   loadingFollowup: Record<string, boolean>
@@ -64,16 +64,15 @@ interface StageViewProps {
 
 export function StageView({
   questions, qIndex, currentQ, currentAnswer, answers, isCrisisQuestion,
-  submitting, submitError, isLastQuestion, isFirstQuestion, answeredCount,
+  submitting, submitError, isLastQuestion, isFirstQuestion,
   dynamicScenario, loadingScenario, dynamicScenarioError,
   loadingFollowup, followupScenarios, followupError, mcqFeedback,
-  capital, budgetAllocations, buyoutCompany, buyoutAmount, accent, stageNarration,
+  capital, budgetAllocations, buyoutCompany, buyoutAmount, accent,
   onGoBack, onGoNext, onSelectOption, onConfirmScenarioDecision, onTextChange,
   onBudgetAllocation, onSubmitPhase, onBuyoutCompanyChange, onBuyoutAmountChange,
   onBuyoutSubmit, onRetryScenario, onAcknowledge, setQIndex, setMcqFeedback,
 }: StageViewProps) {
-  const pct = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0
-  const qType = (currentQ as any)?.type
+  const qType: string = ((currentQ as unknown as Record<string, unknown>)?.type as string) || ''
 
   function renderQuestionContent() {
     if (!currentQ) return <div className="text-muted-foreground text-sm">No questions available</div>

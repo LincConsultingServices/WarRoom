@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, AlertTriangle, CheckCircle2, Sword } from 'lucide-react'
+import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { PhaseTransitionScenario } from '@/src/components/PhaseTransitionScenario'
 import type { PhaseScenarioOut, LeaderboardEntry } from '@/src/types'
