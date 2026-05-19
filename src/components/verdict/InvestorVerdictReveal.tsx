@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { audioManager } from '@/lib/audio/audioManager'
 import { useTypewriterReveal } from '@/src/hooks/useTypewriterReveal'
 import type { Investor, InvestorScorecard, DealDecision } from '@/src/types'
 
@@ -14,7 +14,7 @@ import type { Investor, InvestorScorecard, DealDecision } from '@/src/types'
 //   1. Portrait slides in (from alternating sides).
 //   2. 1-2 sentence verdict types out (typewriter reveal).
 //   3. Big stamped verdict label drops in: INVEST / CONDITIONAL / PASS.
-//   4. `playGOTSound('coin_drop')` + brief flash on the stamp.
+//   4. `audioManager.playSfx('wr.vote-lock')` + brief flash on the stamp.
 //   5. After `holdMs`, calls onComplete().
 //
 // dealDecision mapping:
@@ -110,7 +110,7 @@ export function InvestorVerdictReveal({
       if (cancelled) return
       setShowStamp(true)
       setStampFlash(true)
-      playGOTSound('coin_drop', 0.55)
+      audioManager.playSfx('wr.vote-lock', 0.55)
       window.setTimeout(() => {
         if (cancelled) return
         setStampFlash(false)

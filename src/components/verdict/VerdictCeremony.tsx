@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { audioManager } from '@/lib/audio/audioManager'
 import type { EvaluationReport, Investor, InvestorScorecard } from '@/src/types'
 import { EmberDriftBackdrop } from './EmberDriftBackdrop'
 import { InvestorVerdictReveal } from './InvestorVerdictReveal'
@@ -79,7 +79,7 @@ export function VerdictCeremony({
 
   // Fire ravens_wings on opening curtain
   useEffect(() => {
-    playGOTSound('ravens_wings', 0.5)
+    audioManager.playSfx('sim.mentor-enter', 0.5)
   }, [])
 
   // Advance through the acts as each completes
@@ -109,7 +109,7 @@ export function VerdictCeremony({
   useEffect(() => {
     if (currentAct !== 'score') return
     // Final fanfare on the score tablet appearing.
-    playGOTSound('triumph_fanfare', 0.55)
+    audioManager.playSfx('wr.invest', 0.55)
     const t = window.setTimeout(() => setCurrentAct('share'), 2400)
     return () => window.clearTimeout(t)
   }, [currentAct])

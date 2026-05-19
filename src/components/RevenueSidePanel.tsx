@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface RevenueSidePanelProps {

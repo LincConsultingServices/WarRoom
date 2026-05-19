@@ -1,7 +1,6 @@
 'use client'
 
-import { Progress } from '@/components/ui/progress'
-import { Clock, Sword } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StageTimerResult } from '@/src/hooks/useStageTimer'
 

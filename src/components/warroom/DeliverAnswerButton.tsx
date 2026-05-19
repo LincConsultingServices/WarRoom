@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { audioManager } from '@/lib/audio/audioManager'
 
 // ============================================================
 // <DeliverAnswerButton /> — the "submit" CTA. Styled as a forged
@@ -46,10 +46,9 @@ export function DeliverAnswerButton({
     } else if (onPress) {
       onPress()
     } else {
-      // Default: sword-unsheath flourish. playGOTSound honours the
-      // shared mute toggle and falls back to Web Audio synthesis if
-      // the MP3 file isn't on disk — so this is safe with no assets.
-      playGOTSound('sword_clash', 0.45)
+      // Default: sword-unsheath flourish. audioManager routes through
+      // LEGACY_SFX_ALIASES to the Web Audio synth when no MP3 is on disk.
+      audioManager.playSfx('sim.answer-submit', 0.45)
     }
     onClick?.()
   }, [disabled, isPending, onPress, onClick])

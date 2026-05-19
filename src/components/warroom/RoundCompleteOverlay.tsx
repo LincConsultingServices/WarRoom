@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { playGOTSound } from '@/src/components/GOTSoundManager'
+import { audioManager } from '@/lib/audio/audioManager'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
 
 // ============================================================
@@ -19,8 +19,8 @@ import { EmberParticles } from '@/src/components/effects/EmberParticles'
 //   • Latest score ≥ 60 → triumph_fanfare
 //   • Otherwise          → chains
 //
-// `playGOTSound` falls back to Web Audio synthesis if the file
-// doesn't exist on disk, so audio works without any asset drops.
+// `audioManager.playSfx` routes through LEGACY_SFX_ALIASES to
+// the Web Audio synth when no MP3 is on disk.
 // ============================================================
 
 interface RoundCompleteOverlayProps {
@@ -57,7 +57,7 @@ export function RoundCompleteOverlay({
   // Fire SFX on mount of the overlay (not on every re-render)
   useEffect(() => {
     if (!open) return
-    playGOTSound(survived ? 'triumph_fanfare' : 'chains', survived ? 0.55 : 0.5)
+    audioManager.playSfx(survived ? 'sim.stage-clear' : 'ui.error', survived ? 0.55 : 0.5)
   }, [open, survived])
 
   const verdict = message ?? (survived ? 'Round survived.' : 'The council is unmoved.')

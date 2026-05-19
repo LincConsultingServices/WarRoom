@@ -14,9 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
-import { CharacterPicker } from './CharacterPicker'
 import api from '@/src/lib/api'
-import type { Mentor, Leader, Investor } from '@/src/types'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 interface StartSimulationDialogProps {
@@ -94,8 +92,8 @@ export function StartSimulationDialog({
 
       reset()
       onCreated(simulation.id)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create simulation')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create simulation')
     } finally {
       setCreating(false)
     }

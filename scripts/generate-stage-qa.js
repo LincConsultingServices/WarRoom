@@ -28,7 +28,7 @@ function renderAnswerText(resp, qDef) {
     return opt ? opt.text : rd.selectedOptionId
   }
   // Fallback to JSON
-  try { return JSON.stringify(rd) } catch (e) { return String(rd) }
+  try { return JSON.stringify(rd) } catch { return String(rd) }
 }
 
 async function generate(assessmentId) {
