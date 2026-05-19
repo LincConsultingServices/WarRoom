@@ -22,7 +22,6 @@ import type {
   CharactersState,
   PhaseSubmitRequest,
   PhaseSubmitResult,
-  PhaseScenarioOut,
   AdminBatch,
   AdminBatchDetail,
   BatchParticipant,
@@ -80,13 +79,13 @@ async function request<T>(
 export const api = {
   auth: {
     register: (data: { email: string; password: string; name: string; batchCode: string }) =>
-      request<{ token: string; user: any }>('/auth/register', {
+      request<{ token: string; user: Record<string, unknown> }>('/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     login: (data: { email: string; password: string; batchCode?: string }) =>
-      request<{ token: string; user: any; batch?: BatchInfo }>('/auth/login', {
+      request<{ token: string; user: Record<string, unknown>; batch?: BatchInfo }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -184,7 +183,7 @@ export const api = {
 
     // War Room
     submitPitch: (id: string, pitchText: string) =>
-      request<{ pitchReceived: boolean; investors: any[]; message: string }>(
+      request<{ pitchReceived: boolean; investors: Record<string, unknown>[]; message: string }>(
         `/assessments/${id}/warroom/pitch`,
         {
           method: 'POST',
@@ -202,22 +201,22 @@ export const api = {
       request<InvestorScorecard[]>(`/assessments/${id}/warroom/scorecard`),
 
     getWarRoomOffers: (id: string) =>
-      request<any[]>(`/assessments/${id}/warroom/offers`),
+      request<Record<string, unknown>[]>(`/assessments/${id}/warroom/offers`),
 
     counterNegotiate: (id: string, investorId: string, capital: number, equity: number) =>
-      request<any>(`/assessments/${id}/warroom/counter`, {
+      request<{ message: string; accepted: boolean; capital: number; equity: number }>(`/assessments/${id}/warroom/counter`, {
         method: 'POST',
         body: JSON.stringify({ investorId, capital, equity }),
       }),
 
     acceptDeal: (id: string, investorId: string, capital: number, equity: number) =>
-      request<any>(`/assessments/${id}/warroom/accept-deal`, {
+      request<{ message: string }>(`/assessments/${id}/warroom/accept-deal`, {
         method: 'POST',
         body: JSON.stringify({ investorId, capital, equity }),
       }),
 
     rejectOffer: (id: string, offerId: string) =>
-      request<any>(`/assessments/${id}/warroom/reject-offer`, {
+      request<Record<string, unknown>>(`/assessments/${id}/warroom/reject-offer`, {
         method: 'POST',
         body: JSON.stringify({ offerId }),
       }),
@@ -255,8 +254,8 @@ export const api = {
           throw new Error('Negotiator returned an empty response')
         }
         return data
-      } catch (err: any) {
-        if (err?.name === 'AbortError') {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') {
           throw new Error('Negotiator timed out — please try again')
         }
         throw err
@@ -283,7 +282,7 @@ export const api = {
       }
       return res.json() as Promise<{
         pitchReceived: boolean
-        investors: any[]
+        investors: Record<string, unknown>[]
         message: string
         analysis: {
           transcription: string
@@ -358,10 +357,10 @@ export const api = {
 
     // Dynamic Scenario
     getDynamicScenario: (id: string, stageId: string, questionId: string) =>
-      request<any>(`/assessments/${id}/dynamic-scenario?stageId=${stageId}&questionId=${questionId}`),
+      request<Record<string, unknown>>(`/assessments/${id}/dynamic-scenario?stageId=${stageId}&questionId=${questionId}`),
 
     getStageDynamicScenarios: (id: string, stageId: string) =>
-      request<any[]>(`/assessments/${id}/stage/${stageId}/dynamic-scenarios`),
+      request<Record<string, unknown>[]>(`/assessments/${id}/stage/${stageId}/dynamic-scenarios`),
 
     submitDynamicScenario: (id: string, scenarioId: string, selectedOptionId: string) =>
       request<SubmitResponseResult>(`/assessments/${id}/dynamic-scenario/submit`, {

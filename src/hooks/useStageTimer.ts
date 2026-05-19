@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { STAGE_DURATIONS } from '@/src/lib/constants'
+// STAGE_DURATIONS imported by callers; not needed here
 
 // ---- Key helpers ----
 

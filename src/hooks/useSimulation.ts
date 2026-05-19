@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/src/lib/api'
 import { STAGE_ORDER, STAGE_DURATIONS } from '@/src/lib/constants'
@@ -122,8 +122,8 @@ export function useSimulation(assessmentId: string) {
       const data = await api.assessments.get(assessmentId)
       setState(data)
       if ((data as any)?.simulation?.revenueProjection) setRevenue((data as any).simulation.revenueProjection)
-    } catch (err: any) {
-      setError(err.message || 'Failed to load simulation')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load simulation')
     } finally { setLoading(false) }
   }
   // Keep loadRef in sync
@@ -183,7 +183,7 @@ export function useSimulation(assessmentId: string) {
     if (currentQ && qType === 'dynamic_scenario' && simulation && !loadingScenarioRef.current) {
       const run = async () => {
         loadingScenarioRef.current = true; setLoadingScenario(true)
-        let ds: any = null; let err: any = null; let attempts = 0
+        let ds: any = null; let err: any = null; let attempts = 0 // eslint-disable-line @typescript-eslint/no-explicit-any
         while (attempts < 3 && !ignore && !ds) {
           try {
             ds = await api.assessments.getDynamicScenario(assessmentId, simulation.currentStage, currentQ.q_id)
@@ -220,6 +220,7 @@ export function useSimulation(assessmentId: string) {
     setAnswers((prev) => ({ ...prev, [qId]: { ...prev[qId], questionId: qId, type: (isScenario ? qType : 'multiple_choice') as any, selectedOptionId: opt.id } }))
     if (!questionId) setMcqFeedback(opt.feedback || null)
     if (qId === 'Q_0_1' || qId === 'Q_0_CAPITAL') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setState((p: any) => p ? { ...p, simulation: { ...p.simulation, capital: 50000 } } : p)
       setPrevRevenue(revenue); setRevenue(50000)
       setShowCapitalAnimation(true); setTimeout(() => setShowCapitalAnimation(false), 3000)
@@ -236,10 +237,10 @@ export function useSimulation(assessmentId: string) {
           introduction: simulation?.userIdea || 'Building a business.',
           originalQuestion: (qType === 'dynamic_scenario' && dynamicScenario) ? dynamicScenario.questionText : (currentQ?.text || ''),
           selectedOptionText: opt.text, selectedOptionFeedback: opt.feedback || opt.signal || '',
-          roundNumber: questions.findIndex((q: any) => q.q_id === qId) + 1,
+          roundNumber: questions.findIndex((q: any) => q.q_id === qId) + 1, // eslint-disable-line @typescript-eslint/no-explicit-any
         })
         if (result?.question) setFollowupScenarios((p) => ({ ...p, [qId]: { question: result.question } }))
-      } catch (e: any) { setFollowupError((p) => ({ ...p, [qId]: e.message || 'Failed' })) }
+      } catch (e: unknown) { setFollowupError((p) => ({ ...p, [qId]: e instanceof Error ? e.message : 'Failed' })) }
       finally { setLoadingFollowup((p) => ({ ...p, [qId]: false })) }
     }
   }
@@ -257,6 +258,7 @@ export function useSimulation(assessmentId: string) {
       const q = { ...(prev[questionId] || {}), [optionId]: value }
       const updated = { ...prev, [questionId]: q }
       setAnswers((a) => ({ ...a, [questionId]: { questionId, type: 'budget_allocation', allocations: q } }))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setState((s: any) => {
         if (!s) return s
         const allocs: Record<string, number> = {}
@@ -277,7 +279,7 @@ export function useSimulation(assessmentId: string) {
     // checkpoint. Open the confirm modal — the actual restart fires from
     // confirmRestart() once the user accepts.
     const chosePickRestart = Object.values(answers).some(
-      (a: any) => a?.selectedOptionId === RESTART_OPTION_ID
+      (a: any) => a?.selectedOptionId === RESTART_OPTION_ID // eslint-disable-line @typescript-eslint/no-explicit-any
     )
     if (chosePickRestart) {
       setShowRestartConfirm(true)
@@ -289,7 +291,7 @@ export function useSimulation(assessmentId: string) {
     // CurrentStage = STAGE_3_SCALE (the report shows the exit point). Call
     // chooseBuyout with placeholder deal details, then jump to the report.
     const choseBuyout = Object.values(answers).some(
-      (a: any) => a?.selectedOptionId === BUYOUT_OPTION_ID
+      (a: any) => a?.selectedOptionId === BUYOUT_OPTION_ID // eslint-disable-line @typescript-eslint/no-explicit-any
     )
     if (choseBuyout) {
       transition.setSubmitting(true)
@@ -298,8 +300,8 @@ export function useSimulation(assessmentId: string) {
         const amount = Math.max(revenue || 0, 1_000_000)
         await api.assessments.chooseBuyout(assessmentId, 'Strategic Buyer', amount)
         transition.triggerBuyoutLockout('Strategic Buyer', amount)
-      } catch (err: any) {
-        transition.setSubmitError(err.message || 'Failed to finalise buyout')
+      } catch (err: unknown) {
+        transition.setSubmitError(err instanceof Error ? err.message : 'Failed to finalise buyout')
       } finally {
         transition.setSubmitting(false)
       }
@@ -335,7 +337,7 @@ export function useSimulation(assessmentId: string) {
       } else {
         setShowSnapshot(true)
       }
-    } catch (err: any) { transition.setSubmitError(err.message || 'Failed to submit phase') }
+    } catch (err: unknown) { transition.setSubmitError(err instanceof Error ? err.message : 'Failed to submit phase') }
     finally { transition.setSubmitting(false) }
   }
 
@@ -362,7 +364,7 @@ export function useSimulation(assessmentId: string) {
       await api.assessments.setCharacters(assessmentId, { selectedMentors: selected.mentors, selectedLeaders: selected.leaders, selectedInvestors: selected.investors })
       setShowPanelSelection(false)
       await load()
-    } catch (err: any) { transition.setSubmitError(err.message || 'Failed') }
+    } catch (err: unknown) { transition.setSubmitError(err instanceof Error ? err.message : 'Failed') }
     finally { setSettingCharacters(false) }
   }
 
@@ -376,6 +378,7 @@ export function useSimulation(assessmentId: string) {
   async function handleUseMentor() {
     const result = await mentor.handleUseMentor(mentors)
     if (result) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setState((p: any) => p ? {
         ...p,
         simulation: { ...p.simulation, mentorLifelinesRemaining: result.lifelinesLeft },

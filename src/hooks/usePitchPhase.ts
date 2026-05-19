@@ -26,6 +26,7 @@ export function usePitchPhase(assessmentId: string) {
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function handleSubmitPitchAudio(_leadInvestor?: Investor) {
     if (!pitchRecorder.audioBlob) { setError('Please record your pitch first'); return }
     setIsAnalyzing(true); setIsSubmitting(true); setError('')
@@ -33,8 +34,8 @@ export function usePitchPhase(assessmentId: string) {
       const result = await api.assessments.submitPitchAudio(assessmentId, pitchRecorder.audioBlob)
       setPitchAnalysis(result.analysis)
       setPitchText(result.analysis.transcription)
-    } catch (err: any) {
-      setError(err.message || 'Failed to analyze pitch')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to analyze pitch')
     } finally {
       setIsAnalyzing(false); setIsSubmitting(false)
     }

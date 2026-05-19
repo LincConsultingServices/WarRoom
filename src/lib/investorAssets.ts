@@ -87,7 +87,6 @@ export function getInvestorAssetUrl(
   const promise = (async (): Promise<ResolvedInvestorAsset> => {
     for (const v of variants) {
       const url = `/investors/${id}/${key}.${v.ext}`
-      // eslint-disable-next-line no-await-in-loop -- intentional sequential probing
       const ok = await probe(url)
       if (ok) return { url, kind: v.kind }
     }

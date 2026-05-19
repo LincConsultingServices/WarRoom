@@ -74,8 +74,8 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
       setShowRestartCheckpoint(false)
       onClear()
       await load()
-    } catch (err: any) {
-      setSubmitError(err.message || 'Failed to restart')
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to restart')
     } finally {
       setSubmitting(false)
     }
@@ -93,8 +93,8 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
       await api.assessments.chooseBuyout(assessmentId, buyoutCompany, n)
       setBuyoutContext({ company: buyoutCompany.trim(), amount: n })
       setShowBuyoutLockout(true)
-    } catch (err: any) {
-      setSubmitError(err.message || 'Failed')
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed')
     } finally {
       setSubmitting(false)
     }
