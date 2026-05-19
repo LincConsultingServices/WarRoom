@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import type { PhaseScenarioOut, LeaderboardEntry } from '@/src/types'
-import { RevenueSidePanel } from './RevenueSidePanel'
 import { LeaderboardPanel } from './LeaderboardPanel'
 
 interface PhaseTransitionScenarioProps {

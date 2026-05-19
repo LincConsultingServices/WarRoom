@@ -410,7 +410,8 @@ interface StageNarrationOverlayProps {
   onDismiss: () => void
 }
 
-export function StageNarrationOverlay({ show, data, stageIndex, totalStages, stageLabels, accentColor = '#c9a227', onDismiss }: StageNarrationOverlayProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function StageNarrationOverlay({ show, data, stageIndex, totalStages: _totalStages, stageLabels, accentColor = '#c9a227', onDismiss }: StageNarrationOverlayProps) {
   useEffect(() => {
     if (!show) return
     const timer = setTimeout(onDismiss, 6000)

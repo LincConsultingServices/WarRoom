@@ -223,6 +223,7 @@ export function unlockAudio(): void {
   getAmbientStore().unlock()
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function setAmbientTrack(key: AmbientKey | null, _fadeMs?: number): void {
   if (typeof window === 'undefined') return
   const scene: AmbientScene = key ? AMBIENT_TRACKS[key] : null

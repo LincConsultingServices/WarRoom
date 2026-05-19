@@ -141,8 +141,8 @@ export const setupMagneticButton = (
 ) => {
   let mouseX = 0;
   let mouseY = 0;
-  let elementX = 0;
-  let elementY = 0;
+  const elementX = 0;
+  const elementY = 0;
 
   element.addEventListener('mousemove', (e) => {
     const rect = element.getBoundingClientRect();
