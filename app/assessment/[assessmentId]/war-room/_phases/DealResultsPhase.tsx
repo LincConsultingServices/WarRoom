@@ -5,9 +5,17 @@ import { Mic, MicOff, Loader2, RefreshCw, CheckCircle2, TrendingUp, X } from 'lu
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+interface DealOffer {
+  investorName: string
+  capital: number
+  equity: number
+  message?: string
+  [key: string]: unknown
+}
+
 interface DealResultsPhaseProps {
-  offers: any[]
-  selectedOffer: any | null
+  offers: DealOffer[]
+  selectedOffer: DealOffer | null
   negRound: number
   negHistory: { sender: string; msg: string; type: 'investor' | 'user' }[]
   maxNegRounds: number
@@ -17,9 +25,9 @@ interface DealResultsPhaseProps {
   isNegVoiceSubmitting: boolean
   error: string
   negotiationRecorder: ReturnType<typeof import('@/src/hooks/useAudioRecorder').useAudioRecorder>
-  onSelectOffer: (offer: any) => void
+  onSelectOffer: (offer: DealOffer) => void
   onNegotiateAudio: () => void
-  onAcceptDeal: (offer: any) => void
+  onAcceptDeal: (offer: DealOffer) => void
   onRejectDeal: () => void
   onEndSimulation: () => void
 }
@@ -82,7 +90,7 @@ export function DealResultsPhase({
               <Button onClick={onEndSimulation} variant="outline" className="border-gray-700 text-gray-300">End Simulation</Button>
             </div>
           ) : (
-            offers.map((offer: any, i) => (
+            offers.map((offer, i) => (
               <motion.button key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                 onClick={() => onSelectOffer(offer)}
                 className="w-full text-left p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 transition-all space-y-2"

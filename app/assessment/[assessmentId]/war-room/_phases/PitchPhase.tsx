@@ -6,11 +6,19 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { Investor } from '@/src/types'
 
+interface PitchAnalysis {
+  clarity: number
+  confidence: number
+  persuasion: number
+  feedback: string
+  [key: string]: unknown
+}
+
 interface PitchPhaseProps {
   leadInvestor: Investor | undefined
   preparedPitch: string
   pitchText: string
-  pitchAnalysis: any | null
+  pitchAnalysis: PitchAnalysis | null
   isAnalyzing: boolean
   isSubmitting: boolean
   error: string
@@ -20,7 +28,7 @@ interface PitchPhaseProps {
   onContinue: () => void
 }
 
-function RecordingButton({ recorder }: { recorder: any }) {
+function RecordingButton({ recorder }: { recorder: ReturnType<typeof import('@/src/hooks/useAudioRecorder').useAudioRecorder> }) {
   return (
     <div className="flex flex-col items-center gap-4">
       {recorder.isRecording ? (

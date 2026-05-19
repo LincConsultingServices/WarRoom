@@ -215,7 +215,6 @@ export default function WarRoomSimulation() {
 
     // Investor Q&A
     const [currentInvestorIndex, setCurrentInvestorIndex] = useState(0)
-    const [investorResponse, setInvestorResponse] = useState('')
     const [scorecards, setScorecards] = useState<InvestorScorecard[]>([])
     const [currentInvestorReaction, setCurrentInvestorReaction] = useState('')
     const [responseSubmitted, setResponseSubmitted] = useState(false)
@@ -233,8 +232,6 @@ export default function WarRoomSimulation() {
     const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
     const [negRound, setNegRound] = useState(0)
     const [negHistory, setNegHistory] = useState<{sender: string, msg: string, type: 'investor'|'user'}[]>([])
-    const [negInputCap, setNegInputCap] = useState<string>('')
-    const [negInputEq, setNegInputEq] = useState<string>('')
     const [dealFinalized, setDealFinalized] = useState(false)
     const [isNegVoiceSubmitting, setIsNegVoiceSubmitting] = useState(false)
     const [acceptedDealTerms, setAcceptedDealTerms] = useState<{capital: number, equity: number, investorName: string} | null>(null)
@@ -248,7 +245,6 @@ export default function WarRoomSimulation() {
     }, [selectedOffer])
 
     // Timer (15 min war room)
-    const [timeRemaining, setTimeRemaining] = useState(15 * 60); /* Disabled countdown logic */ // 15 minutes in seconds
 
     // -- Negotiation Logic --
     const handleSelectOffer = (offer: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -257,8 +253,6 @@ export default function WarRoomSimulation() {
         setNegHistory([
             { sender: offer.investorName, msg: offer.message, type: 'investor' }
         ])
-        setNegInputCap(offer.capital.toString())
-        setNegInputEq(offer.equity.toString())
     }
 
     const handleNegotiateAudio = async () => {
@@ -282,10 +276,8 @@ export default function WarRoomSimulation() {
                 negotiationRecorder.audioBlob
             )
 
-            // Detect walk-away intent from transcription
-            // Detect walk-away intent from transcription - disabled per user request to remove hardcoded walkout triggers
-            const walkAwayPhrases = ['walk away', "i'm out", 'no deal', 'reject', 'i walk', 'walking away', 'walk out']
-            const isWalkAway = false // walkAwayPhrases.some(p => result.transcription?.toLowerCase().includes(p))
+            // Walk-away detection disabled per user request to remove hardcoded walkout triggers
+            const isWalkAway = false
 
             if (isWalkAway && !result.accepted) {
                 // User wants to walk away ΓÇö reject this offer
@@ -355,8 +347,6 @@ export default function WarRoomSimulation() {
                     equity: result.equity 
                 }
                 setSelectedOffer(updatedOffer)
-                setNegInputCap(result.capital.toString())
-                setNegInputEq(result.equity.toString())
 
                 if (nextRound >= MAX_NEG_ROUNDS) {
                     // Max rounds exhausted without acceptance ΓÇö auto-reject this offer
@@ -376,20 +366,6 @@ export default function WarRoomSimulation() {
             setError(err instanceof Error ? err.message : 'Failed to negotiate via voice')
         } finally {
             setIsNegVoiceSubmitting(false)
-        }
-    }
-
-    const handleAcceptDeal = async (offer: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-        try {
-            setAcceptedDealTerms({
-                capital: offer.capital,
-                equity: offer.equity,
-                investorName: offer.investorName
-            })
-            await api.assessments.acceptDeal(assessmentId, offer.investorId, offer.capital, offer.equity)
-            setDealFinalized(true)
-        } catch (e) {
-            console.error(e)
         }
     }
 
@@ -504,12 +480,6 @@ export default function WarRoomSimulation() {
             return () => clearInterval(interval)
         }
     }, [dealFinalized])
-
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60)
-        const s = seconds % 60
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
-    }
 
     // ============================================
     // PITCH SUBMISSION (AUDIO)
@@ -817,7 +787,6 @@ export default function WarRoomSimulation() {
     }, [assessmentId, router])
 
     const currentInvestor = investors[currentInvestorIndex]
-    const isTimeLow = timeRemaining < 120 // < 2 minutes
     const preparedPitch = getPreparedPitchFromState(assessmentState)
 
     // Use the investor's voice filename directly so each question resolves to the

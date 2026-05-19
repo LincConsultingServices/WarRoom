@@ -7,9 +7,15 @@ import { cn } from '@/lib/utils'
 import { FadeInUp } from '@/src/components/AnimatedComponents'
 import type { SimOption } from '@/src/types'
 
+interface DynamicScenarioData {
+  questionText: string
+  options: SimOption[] | string
+  [key: string]: unknown
+}
+
 interface DynamicScenarioQuestionProps {
   loadingScenario: boolean
-  dynamicScenario: any | null
+  dynamicScenario: DynamicScenarioData | null
   dynamicScenarioError: string
   selectedOptionId?: string
   loadingFollowup?: boolean
@@ -27,7 +33,7 @@ interface DynamicScenarioQuestionProps {
 export function DynamicScenarioQuestion({
   loadingScenario, dynamicScenario, dynamicScenarioError, selectedOptionId,
   loadingFollowup, followupScenario, followupError, followupText,
-  onSelect, onConfirmDecision, onTextChange, onRetryScenario, onRetryFollowup, questionId,
+  onSelect, onConfirmDecision, onTextChange, onRetryScenario, onRetryFollowup,
 }: DynamicScenarioQuestionProps) {
   if (loadingScenario) {
     return (
