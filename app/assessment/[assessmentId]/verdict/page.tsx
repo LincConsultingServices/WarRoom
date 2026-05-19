@@ -6,6 +6,7 @@ import api from '@/src/lib/api'
 import type { AssessmentState, EvaluationReport, Investor, InvestorScorecard } from '@/src/types'
 import { VerdictCeremony } from '@/src/components/verdict/VerdictCeremony'
 import { EmberDriftBackdrop } from '@/src/components/verdict/EmberDriftBackdrop'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 
 // ============================================================
 // /assessment/[id]/verdict
@@ -36,6 +37,9 @@ export default function VerdictPage() {
   const params = useParams()
   const assessmentId = params?.assessmentId as string
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
+
+  // ── Narrator — verdict ceremony onboarding ──
+  useNarratorOnboarding('verdict')
 
   useEffect(() => {
     if (!assessmentId) return

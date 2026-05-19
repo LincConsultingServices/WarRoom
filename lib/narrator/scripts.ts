@@ -224,4 +224,316 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
+
+  // ===================================================================
+  // STAGE SCRIPTS — one per assessment stage
+  // ===================================================================
+
+  'stage.ideation.first-visit': [
+    {
+      text: 'The Spark, lord. Every empire begins with a single dangerous idea.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Tell the Council what problem burns in your gut — and why you alone can solve it.',
+      mood: 'speaking',
+      duration: 3600,
+    },
+    {
+      text: 'Speak plainly. The investors sense weakness in vague words.',
+      mood: 'warning',
+      duration: 0,
+    },
+  ],
+  'stage.ideation.returning': [
+    { text: 'Back to the forge of ideas, lord. Has the spark grown brighter?', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.vision.first-visit': [
+    {
+      text: 'Vision, lord. The Council must see the world you intend to build.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'A founder without vision is a ship without a star.',
+      mood: 'speaking',
+      duration: 3000,
+    },
+    {
+      text: 'Paint the future plainly — these lords are not impressed by mere dreams.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.vision.returning': [
+    { text: 'Your vision awaits refinement, lord.', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.commitment.first-visit': [
+    {
+      text: 'The Commitment, lord. Here you stake your oath to this venture.',
+      mood: 'warning',
+      duration: 3200,
+    },
+    {
+      text: 'The Council watches for hesitation. They invest in certainty.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Show them this is not a passing fancy — but a blood oath.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.commitment.returning': [
+    { text: 'The oath was taken, lord. Does your resolve hold?', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.validation.first-visit': [
+    {
+      text: 'Market Validation, lord. Dreams are cheap — the Council demands proof.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Show them the hunger in the market. Numbers do not lie.',
+      mood: 'speaking',
+      duration: 3000,
+    },
+    {
+      text: 'A founder who knows their market is a founder worth funding.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.validation.returning': [
+    { text: 'The market evidence awaits your hand, lord.', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.growth.first-visit': [
+    {
+      text: 'Initial Growth, lord. The seed is planted — now it must break ground.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'The Council watches for traction. Early signs of life.',
+      mood: 'speaking',
+      duration: 3000,
+    },
+    {
+      text: 'Show them the curve bends upward.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.growth.returning': [
+    { text: 'Growth pauses for no one, lord. The numbers are waiting.', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.expansion.first-visit': [
+    {
+      text: 'Expansion, lord. The realm grows — but so do the threats.',
+      mood: 'warning',
+      duration: 3200,
+    },
+    {
+      text: 'Churn is the silent killer. The Council knows this well.',
+      mood: 'speaking',
+      duration: 3000,
+    },
+    {
+      text: 'Prove you can hold what you have while reaching for more.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.expansion.returning': [
+    { text: 'The expansion questions remain, lord. Press forward.', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.scale.first-visit': [
+    {
+      text: 'Scaling Up, lord. The final trial before the War Room gates.',
+      mood: 'speaking',
+      duration: 3400,
+    },
+    {
+      text: 'Can your venture bear the weight of ten thousand users? A million?',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'The Council must believe your walls will hold.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.scale.returning': [
+    { text: 'Scale waits for no one, lord. Complete your testimony.', mood: 'idle', duration: 0 },
+  ],
+
+  'stage.warroom-prep.first-visit': [
+    {
+      text: 'Pitch Prep, lord. The final chance to sharpen your sword before the gate.',
+      mood: 'warning',
+      duration: 3400,
+    },
+    {
+      text: 'Beyond this point, you face the Council directly. Prepare well.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Review your answers. Tighten your story. The lords are merciless.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+  'stage.warroom-prep.returning': [
+    { text: 'Still sharpening the blade, lord? The War Room draws near.', mood: 'idle', duration: 0 },
+  ],
+
+  // ===================================================================
+  // WAR ROOM PHASE SCRIPTS
+  // ===================================================================
+
+  'warroom.pitch.first-visit': [
+    {
+      text: 'The Pitch, lord. You have sixty seconds to seize their attention.',
+      mood: 'warning',
+      duration: 3200,
+    },
+    {
+      text: 'Speak your truth with fire. The Council respects conviction above all.',
+      mood: 'speaking',
+      duration: 0,
+    },
+  ],
+  'warroom.pitch.returning': [
+    { text: 'The stage is yours again, lord. Make it count.', mood: 'idle', duration: 0 },
+  ],
+
+  'warroom.qa.first-visit': [
+    {
+      text: 'The Inquisition begins, lord. Each investor will probe your weaknesses.',
+      mood: 'warning',
+      duration: 3400,
+    },
+    {
+      text: 'Answer with precision. Rambling is the mark of an unprepared founder.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'The Oracle cannot help you here — only your preparation can.',
+      mood: 'whispering',
+      duration: 0,
+    },
+  ],
+  'warroom.qa.returning': [
+    { text: 'The Council’s questions resume, lord.', mood: 'idle', duration: 0 },
+  ],
+
+  'warroom.deal.first-visit': [
+    {
+      text: 'The Offers, lord. The investors have spoken — now choose wisely.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'More capital comes at a price. Guard your equity with care.',
+      mood: 'warning',
+      duration: 3200,
+    },
+    {
+      text: 'Not every offer is generous. Read between the terms.',
+      mood: 'whispering',
+      duration: 0,
+    },
+  ],
+  'warroom.deal.returning': [
+    { text: 'The offers remain on the table, lord.', mood: 'idle', duration: 0 },
+  ],
+
+  'warroom.complete.first-visit': [
+    {
+      text: 'It is done, lord. The War Room has spoken.',
+      mood: 'celebrating',
+      duration: 3000,
+    },
+    {
+      text: 'Proceed to the Verdict Chamber to learn your fate.',
+      mood: 'pointing',
+      duration: 0,
+    },
+  ],
+  'warroom.complete.returning': [
+    { text: 'The War Room is concluded. Onward to the Verdict.', mood: 'idle', duration: 0 },
+  ],
+
+  // ===================================================================
+  // VERDICT CEREMONY SCRIPTS
+  // ===================================================================
+
+  'verdict.first-visit': [
+    {
+      text: 'The Verdict Chamber, lord. Here, all is revealed.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Each investor will render their judgment. Watch carefully.',
+      mood: 'speaking',
+      duration: 3200,
+    },
+    {
+      text: 'Your legacy score will be etched into the Iron Rankings for all to see.',
+      mood: 'warning',
+      duration: 3400,
+    },
+    {
+      text: 'Whatever the outcome — you dared the gauntlet. That alone is worthy.',
+      mood: 'celebrating',
+      duration: 0,
+    },
+  ],
+  'verdict.returning': [
+    { text: 'Revisiting the verdict, lord? The judgments do not change.', mood: 'idle', duration: 0 },
+  ],
+}
+
+// ===================================================================
+// MAPPING HELPERS — translate runtime identifiers to narrator phase keys
+// ===================================================================
+
+/** Map StageName (e.g. 'STAGE_NEG2_IDEATION') → narrator phase key (e.g. 'stage.ideation'). */
+const STAGE_TO_NARRATOR: Record<string, string> = {
+  STAGE_NEG2_IDEATION: 'stage.ideation',
+  STAGE_NEG1_VISION: 'stage.vision',
+  STAGE_0_COMMITMENT: 'stage.commitment',
+  STAGE_1_VALIDATION: 'stage.validation',
+  STAGE_2A_GROWTH: 'stage.growth',
+  STAGE_2B_EXPANSION: 'stage.expansion',
+  STAGE_3_SCALE: 'stage.scale',
+  STAGE_WARROOM_PREP: 'stage.warroom-prep',
+}
+
+export function narratorPhaseForStage(stageName: string): string | null {
+  return STAGE_TO_NARRATOR[stageName] ?? null
+}
+
+/** Map WarRoomPhase → narrator phase key. Returns null for LOADING (too brief). */
+const WARROOM_TO_NARRATOR: Record<string, string> = {
+  PITCH: 'warroom.pitch',
+  INVESTOR_QA: 'warroom.qa',
+  DEAL_RESULTS: 'warroom.deal',
+  COMPLETE: 'warroom.complete',
+}
+
+export function narratorPhaseForWarRoom(phase: string): string | null {
+  return WARROOM_TO_NARRATOR[phase] ?? null
 }

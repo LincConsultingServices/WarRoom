@@ -18,6 +18,8 @@ import { BuyoutLockoutDialog } from './_views/BuyoutLockoutDialog'
 import { useSimulation } from '@/src/hooks/useSimulation'
 import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATION_STAGE_LABELS } from '@/src/lib/constants'
 import { stageLabel } from '@/src/lib/helpers'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { narratorPhaseForStage } from '@/lib/narrator/scripts'
 import type { StageName } from '@/src/types'
 
 export default function SimulationPage() {
@@ -50,6 +52,10 @@ export default function SimulationPage() {
     handleRestart, handleContinue, handleUseMentor, closeMentorPanel,
     handleBuyoutSubmit, handleScenarioSubmit, retryScenario, acknowledgeInfo,
   } = sim
+
+  // ── Narrator — stage-specific onboarding lines ──
+  const narratorPhase = simulation ? narratorPhaseForStage(simulation.currentStage) : null
+  useNarratorOnboarding(narratorPhase ?? '', { enabled: !!narratorPhase })
 
   // ---- Loading / Error ----
   if (loading) return (

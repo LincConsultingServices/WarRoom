@@ -29,6 +29,8 @@ import { CouncilRoster } from '@/src/components/warroom/CouncilRoster'
 import { CouncilDeliberatesLoader } from '@/src/components/warroom/CouncilDeliberatesLoader'
 import { useCouncilMoods } from '@/src/hooks/useCouncilMoods'
 import { useFeedbackSentiment } from '@/src/hooks/useFeedbackSentiment'
+import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { narratorPhaseForWarRoom } from '@/lib/narrator/scripts'
 
 // ============================================
 // WAR ROOM ΓÇô Investor Pitch Simulation
@@ -189,6 +191,11 @@ export default function WarRoomSimulation() {
 
     // State
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
+
+    // ── Narrator — war-room phase-specific onboarding lines ──
+    const narratorPhase = narratorPhaseForWarRoom(phase)
+    useNarratorOnboarding(narratorPhase ?? '', { enabled: !!narratorPhase })
+
     // Cinematic entrance overlay — shown until the door video / fallback completes.
     const [showEntrance, setShowEntrance] = useState(true)
     // Cinematic exit overlay — shown briefly before pushing to the verdict ceremony,
