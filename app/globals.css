@@ -528,8 +528,7 @@
     transition:
       opacity 120ms ease,
       box-shadow 120ms ease,
-      border-color 120ms ease,
-      scale 80ms ease;
+      border-color 120ms ease;
   }
 
   :is(.dark) .wr-cursor-ring {
@@ -546,10 +545,6 @@
       0 0 24px color-mix(in srgb, var(--color-warroom-gold) 28%, transparent);
   }
 
-  .wr-cursor-ring.wr-cursor--click {
-    scale: 0.78;
-  }
-
   /* ── Inner precision dot ── */
   .wr-cursor-dot {
     position: fixed;
@@ -564,17 +559,12 @@
     box-shadow: 0 0 3px var(--color-warroom-gold-dark);
     will-change: transform;
     transition:
-      opacity 180ms ease,
-      scale 80ms ease;
+      opacity 180ms ease;
   }
 
   :is(.dark) .wr-cursor-dot {
     background: var(--color-warroom-gold);
     box-shadow: 0 0 5px var(--color-warroom-gold);
-  }
-
-  .wr-cursor-dot.wr-cursor--hover {
-    scale: 0.67;
   }
 
   /* Intentionally NO .wr-cursor-dot.wr-cursor--click rule.
