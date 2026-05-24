@@ -3,13 +3,14 @@
 /**
  * audioStore — Zustand facade over `lib/audio/audioManager.ts`.
  *
- * Mirrors the unified mute / unlock / ambient state into a React-
- * subscribable store so components can react to changes without
- * threading the audio manager through props.
+ * Mirrors the unified mute / unlock / ambient / volume state into
+ * a React-subscribable store so components can react to changes
+ * without threading the audio manager through props.
  *
  * Source of truth is still the AmbientAudioStore singleton in
  * `src/hooks/useAmbientAudio.ts` — this store subscribes to it
- * and forwards updates. Writes delegate to audioManager.
+ * and forwards updates. Writes delegate to that singleton too,
+ * so settings persisted in localStorage win on reload.
  */
 
 import { create } from 'zustand'
@@ -20,6 +21,8 @@ import {
 } from '@/lib/audio/audioManager'
 import {
   getAmbientStore,
+  getAmbientVolumeMultiplier,
+  getSfxVolumeMultiplier,
   isWarRoomAudioMuted,
 } from '@/src/hooks/useAmbientAudio'
 
@@ -37,6 +40,7 @@ interface AudioState {
   setAmbientTrack: (key: AmbientKey | null, fadeMs?: number) => void
   playSfx: (key: SfxKey, volumeOverride?: number) => void
   toggleMasterMute: () => void
+  setMasterMuted: (muted: boolean) => void
   setVolume: (channel: Channel, value: number) => void
 }
 
@@ -44,8 +48,8 @@ const initial = {
   isMasterMuted: typeof window === 'undefined' ? false : isWarRoomAudioMuted(),
   isAudioUnlocked: false,
   currentAmbientTrack: null as AmbientKey | null,
-  ambientVolume: 0.55,
-  sfxVolume: 0.6,
+  ambientVolume: typeof window === 'undefined' ? 1 : getAmbientVolumeMultiplier(),
+  sfxVolume: typeof window === 'undefined' ? 1 : getSfxVolumeMultiplier(),
   voiceVolume: 0.7,
 }
 
@@ -72,10 +76,23 @@ export const useAudioStore = create<AudioState>((set) => ({
     set({ isMasterMuted: store.getSnapshot().isMuted })
   },
 
+  setMasterMuted: (muted) => {
+    if (typeof window === 'undefined') return
+    const store = getAmbientStore()
+    store.setMuted(muted)
+    set({ isMasterMuted: store.getSnapshot().isMuted })
+  },
+
   setVolume: (channel, value) => {
     const clamped = Math.max(0, Math.min(1, value))
-    if (channel === 'ambient') set({ ambientVolume: clamped })
-    if (channel === 'sfx') set({ sfxVolume: clamped })
+    if (channel === 'ambient') {
+      if (typeof window !== 'undefined') getAmbientStore().setAmbientVolume(clamped)
+      set({ ambientVolume: clamped })
+    }
+    if (channel === 'sfx') {
+      if (typeof window !== 'undefined') getAmbientStore().setSfxVolume(clamped)
+      set({ sfxVolume: clamped })
+    }
     if (channel === 'voice') set({ voiceVolume: clamped })
   },
 }))
@@ -92,12 +109,16 @@ if (typeof window !== 'undefined') {
   useAudioStore.setState({
     isMasterMuted: seed.isMuted,
     isAudioUnlocked: seed.unlocked,
+    ambientVolume: seed.ambientVolume,
+    sfxVolume: seed.sfxVolume,
   })
   store.subscribe(() => {
     const snap = store.getSnapshot()
     useAudioStore.setState({
       isMasterMuted: snap.isMuted,
       isAudioUnlocked: snap.unlocked,
+      ambientVolume: snap.ambientVolume,
+      sfxVolume: snap.sfxVolume,
     })
   })
 }

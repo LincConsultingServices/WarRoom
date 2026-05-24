@@ -18,7 +18,11 @@
 
 import { Howl } from 'howler'
 import { playGOTSound } from '@/src/components/GOTSoundManager'
-import { isWarRoomAudioMuted, type AmbientScene } from '@/src/hooks/useAmbientAudio'
+import {
+  getSfxVolumeMultiplier,
+  isWarRoomAudioMuted,
+  type AmbientScene,
+} from '@/src/hooks/useAmbientAudio'
 
 // ============================================================
 // SFX manifest — paths follow the blueprint convention.
@@ -234,22 +238,26 @@ export function playSfx(key: SfxKey, volumeOverride?: number): void {
   if (typeof window === 'undefined') return
   if (isWarRoomAudioMuted()) return
 
+  const baseVolume = volumeOverride ?? DEFAULT_VOLUMES[key]
+  const finalVolume = baseVolume * getSfxVolumeMultiplier()
+
   const pooled = getOrCreateHowl(key)
   if (!pooled) return
 
   // If a previous play/load fired the fallback, skip Howler and route
-  // straight to the synth — repeated 404s are a waste.
+  // straight to the synth — repeated 404s are a waste. The synth path
+  // applies the SFX volume multiplier internally, so pass the base.
   if (pooled.fallbackFired) {
-    playGOTSound(LEGACY_SFX_ALIASES[key], volumeOverride ?? DEFAULT_VOLUMES[key])
+    playGOTSound(LEGACY_SFX_ALIASES[key], baseVolume)
     return
   }
 
   try {
-    if (volumeOverride !== undefined) pooled.howl.volume(volumeOverride)
+    pooled.howl.volume(finalVolume)
     pooled.howl.play()
   } catch {
     pooled.fallbackFired = true
-    playGOTSound(LEGACY_SFX_ALIASES[key], volumeOverride ?? DEFAULT_VOLUMES[key])
+    playGOTSound(LEGACY_SFX_ALIASES[key], baseVolume)
   }
 }
 

@@ -461,10 +461,14 @@
 
 /* ── Custom cursor (fine-pointer / mouse only) ──────────────────────────── */
 @media (pointer: fine) {
-  /* Hide the native cursor everywhere — CustomCursor.tsx renders our own */
-  *,
-  *::before,
-  *::after {
+  /* Hide the native cursor ONLY when our cursor is actually rendering.
+     CustomCursor.tsx adds `wr-cursor-active` to <body> on mount. If JS
+     fails or the user disabled the custom cursor, the native cursor
+     stays visible. */
+  body.wr-cursor-active,
+  body.wr-cursor-active *,
+  body.wr-cursor-active *::before,
+  body.wr-cursor-active *::after {
     cursor: none !important;
   }
 
@@ -534,8 +538,10 @@
     scale: 0.67;
   }
 
-  .wr-cursor-dot.wr-cursor--click {
-    opacity: 0.45;
-    scale: 0.5;
-  }
+  /* Intentionally NO .wr-cursor-dot.wr-cursor--click rule.
+     The dot is the precision indicator — it MUST stay full-size and
+     fully opaque during a click. Shrinking or fading it on mousedown
+     made the cursor feel like it was "moving away" the moment you
+     tried to click something. The ring's scale-down already provides
+     plenty of tactile feedback. */
 }

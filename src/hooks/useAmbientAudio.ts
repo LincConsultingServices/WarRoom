@@ -1,15 +1,23 @@
 'use client'
 
 import { useEffect, useSyncExternalStore } from 'react'
+import {
+  ProceduralAmbientEngine,
+  type ProceduralScene,
+} from '@/lib/audio/proceduralAmbient'
 
 // ============================================================
 // useAmbientAudio — singleton crossfading ambient layer.
 //   - One AudioContext, one master gain.
 //   - HTMLAudioElement per scene (lazy-loaded, preload="none").
 //   - Crossfade between scenes via per-scene GainNodes.
+//   - When an MP3 is missing, the procedural ambient engine
+//     (lib/audio/proceduralAmbient.ts) generates a GoT-flavored
+//     bed in its place — so the war room is never silent.
 //   - Respects browser autoplay policy: AudioContext is created
 //     but only resumed on first user gesture.
-//   - Persists mute preference in localStorage.
+//   - Persists mute + per-channel volume preferences in
+//     localStorage.
 //   - Fails soft when an audio file is missing — never throws,
 //     never blocks the UI.
 // ============================================================
@@ -39,6 +47,8 @@ const SCENE_TARGET_VOLUME: Record<Exclude<AmbientScene, null>, number> = {
 // ambient layer AND one-shot SFX. Exported so non-hook code can read the
 // flag without instantiating the hook.
 export const MUTE_STORAGE_KEY = 'warroom_audio_muted'
+export const AMBIENT_VOL_STORAGE_KEY = 'warroom_ambient_volume'
+export const SFX_VOL_STORAGE_KEY = 'warroom_sfx_volume'
 
 /** Cheap synchronous read of the persisted mute preference.
  *  Safe to call from anywhere (SSR-safe; defaults to false). */
@@ -48,6 +58,32 @@ export function isWarRoomAudioMuted(): boolean {
     return window.localStorage.getItem(MUTE_STORAGE_KEY) === 'true'
   } catch {
     return false
+  }
+}
+
+/** Read the persisted SFX volume multiplier (0..1). */
+export function getSfxVolumeMultiplier(): number {
+  if (typeof window === 'undefined') return 1
+  try {
+    const v = window.localStorage.getItem(SFX_VOL_STORAGE_KEY)
+    if (v === null) return 1
+    const parsed = parseFloat(v)
+    return Number.isFinite(parsed) ? Math.max(0, Math.min(1, parsed)) : 1
+  } catch {
+    return 1
+  }
+}
+
+/** Read the persisted ambient volume multiplier (0..1). */
+export function getAmbientVolumeMultiplier(): number {
+  if (typeof window === 'undefined') return 1
+  try {
+    const v = window.localStorage.getItem(AMBIENT_VOL_STORAGE_KEY)
+    if (v === null) return 1
+    const parsed = parseFloat(v)
+    return Number.isFinite(parsed) ? Math.max(0, Math.min(1, parsed)) : 1
+  } catch {
+    return 1
   }
 }
 
@@ -64,14 +100,29 @@ interface AmbientState {
   scene: AmbientScene
   isMuted: boolean
   unlocked: boolean
+  ambientVolume: number
+  sfxVolume: number
 }
 
 export class AmbientAudioStore {
   private listeners = new Set<() => void>()
-  private state: AmbientState = { scene: null, isMuted: false, unlocked: false }
+  private state: AmbientState = {
+    scene: null,
+    isMuted: false,
+    unlocked: false,
+    ambientVolume: 1,
+    sfxVolume: 1,
+  }
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
+  /** Dedicated bus for SFX synth — sits between SFX and master so
+   *  ambient volume changes don't affect SFX. */
+  private sfxBus: GainNode | null = null
+  /** Dedicated bus for ambient (MP3 + procedural) — separate gain
+   *  so ambient volume slider only attenuates ambient. */
+  private ambientBus: GainNode | null = null
   private tracks = new Map<Exclude<AmbientScene, null>, SceneTrack>()
+  private procedural: ProceduralAmbientEngine | null = null
   private pendingScene: AmbientScene = null
   private unlockHandler: (() => void) | null = null
 
@@ -79,9 +130,16 @@ export class AmbientAudioStore {
     if (typeof window !== 'undefined') {
       try {
         const stored = window.localStorage.getItem(MUTE_STORAGE_KEY)
-        this.state = { ...this.state, isMuted: stored === 'true' }
+        const a = window.localStorage.getItem(AMBIENT_VOL_STORAGE_KEY)
+        const s = window.localStorage.getItem(SFX_VOL_STORAGE_KEY)
+        this.state = {
+          ...this.state,
+          isMuted: stored === 'true',
+          ambientVolume: a !== null ? clamp01(parseFloat(a)) : 1,
+          sfxVolume: s !== null ? clamp01(parseFloat(s)) : 1,
+        }
       } catch {
-        // localStorage may be unavailable (private mode, etc.) — keep default
+        // localStorage may be unavailable — keep defaults
       }
     }
   }
@@ -116,11 +174,32 @@ export class AmbientAudioStore {
       this.master = this.ctx.createGain()
       this.master.gain.value = this.state.isMuted ? 0 : 1
       this.master.connect(this.ctx.destination)
+
+      this.sfxBus = this.ctx.createGain()
+      this.sfxBus.gain.value = 1
+      this.sfxBus.connect(this.master)
+
+      this.ambientBus = this.ctx.createGain()
+      this.ambientBus.gain.value = this.state.ambientVolume
+      this.ambientBus.connect(this.master)
     } catch {
       this.ctx = null
       this.master = null
+      this.sfxBus = null
+      this.ambientBus = null
     }
     return this.ctx
+  }
+
+  /** Public accessor for the AudioContext (used by synth SFX). */
+  getOrCreateContext(): AudioContext | null {
+    return this.ensureContext()
+  }
+
+  /** Public accessor for the SFX bus (where synth SFX should connect). */
+  getSynthBus(): GainNode | null {
+    this.ensureContext()
+    return this.sfxBus
   }
 
   installUnlockListener() {
@@ -147,15 +226,20 @@ export class AmbientAudioStore {
       this.update({ unlocked: true })
     }
     if (this.pendingScene) {
+      // Important: a pendingScene was stored BEFORE unlock and state.scene
+      // already equals it, so calling setScene(pendingScene) would short-
+      // circuit on the equality guard. Reset state.scene first so the
+      // actual playback path runs.
       const next = this.pendingScene
       this.pendingScene = null
+      this.state = { ...this.state, scene: null }
       this.setScene(next)
     }
   }
 
   private getOrCreateTrack(scene: Exclude<AmbientScene, null>): SceneTrack | null {
     const ctx = this.ensureContext()
-    if (!ctx || !this.master) return null
+    if (!ctx || !this.ambientBus) return null
     const existing = this.tracks.get(scene)
     if (existing) return existing
 
@@ -172,11 +256,27 @@ export class AmbientAudioStore {
       unavailable: false,
     }
     track.gain.gain.value = 0
-    track.gain.connect(this.master)
+    track.gain.connect(this.ambientBus)
+
+    // Probe the file with HEAD ahead of time — gives us a reliable signal
+    // (the HTMLAudio 'error' event is flaky for some missing-file scenarios
+    // when the server returns HTML instead of audio bytes).
+    void fetch(SCENE_FILES[scene], { method: 'HEAD' })
+      .then((r) => {
+        if (!r.ok) throw new Error('missing')
+        const ct = r.headers.get('content-type') || ''
+        if (!ct.startsWith('audio/')) throw new Error('not-audio')
+      })
+      .catch(() => {
+        track.unavailable = true
+        track.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.05)
+        this.activateProcedural(scene)
+      })
 
     audio.addEventListener('error', () => {
       track.unavailable = true
       track.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.05)
+      this.activateProcedural(scene)
     })
 
     try {
@@ -188,6 +288,20 @@ export class AmbientAudioStore {
 
     this.tracks.set(scene, track)
     return track
+  }
+
+  private ensureProcedural(): ProceduralAmbientEngine | null {
+    const ctx = this.ensureContext()
+    if (!ctx || !this.ambientBus) return null
+    if (this.procedural) return this.procedural
+    this.procedural = new ProceduralAmbientEngine(ctx, this.ambientBus)
+    return this.procedural
+  }
+
+  private activateProcedural(scene: Exclude<AmbientScene, null>): void {
+    const engine = this.ensureProcedural()
+    if (!engine) return
+    engine.setScene(scene as ProceduralScene)
   }
 
   setScene = (scene: AmbientScene): void => {
@@ -221,7 +335,15 @@ export class AmbientAudioStore {
         })
         track.gain.gain.cancelScheduledValues(now)
         track.gain.gain.setTargetAtTime(target, now, CROSSFADE_MS / 4000)
+        // If procedural was running for a prior unavailable scene, fade
+        // it out to avoid doubling the ambient bed.
+        if (this.procedural) this.procedural.setScene(null)
+      } else {
+        // No file available for this scene yet → use procedural
+        this.activateProcedural(scene)
       }
+    } else if (this.procedural) {
+      this.procedural.setScene(null)
     }
 
     this.update({ scene })
@@ -245,6 +367,41 @@ export class AmbientAudioStore {
   toggleMute = (): void => {
     this.setMuted(!this.state.isMuted)
   }
+
+  setAmbientVolume = (value: number): void => {
+    const v = clamp01(value)
+    try {
+      window.localStorage.setItem(AMBIENT_VOL_STORAGE_KEY, String(v))
+    } catch {
+      /* ignore */
+    }
+    if (this.ambientBus && this.ctx) {
+      const now = this.ctx.currentTime
+      this.ambientBus.gain.cancelScheduledValues(now)
+      this.ambientBus.gain.setTargetAtTime(v, now, 0.12)
+    }
+    this.update({ ambientVolume: v })
+  }
+
+  setSfxVolume = (value: number): void => {
+    const v = clamp01(value)
+    try {
+      window.localStorage.setItem(SFX_VOL_STORAGE_KEY, String(v))
+    } catch {
+      /* ignore */
+    }
+    if (this.sfxBus && this.ctx) {
+      const now = this.ctx.currentTime
+      this.sfxBus.gain.cancelScheduledValues(now)
+      this.sfxBus.gain.setTargetAtTime(v, now, 0.12)
+    }
+    this.update({ sfxVolume: v })
+  }
+}
+
+function clamp01(v: number): number {
+  if (!Number.isFinite(v)) return 1
+  return Math.max(0, Math.min(1, v))
 }
 
 let storeSingleton: AmbientAudioStore | null = null
@@ -263,7 +420,17 @@ export function getAmbientStore(): AmbientAudioStore {
 }
 
 const noopSubscribe = () => () => {}
-const noopSnapshot = (): AmbientState => ({ scene: null, isMuted: false, unlocked: false })
+// Stable identity is required — useSyncExternalStore detects equality
+// via reference and will warn / loop if a fresh object is returned each
+// call.
+const NOOP_SNAPSHOT: AmbientState = Object.freeze({
+  scene: null,
+  isMuted: false,
+  unlocked: false,
+  ambientVolume: 1,
+  sfxVolume: 1,
+}) as AmbientState
+const noopSnapshot = (): AmbientState => NOOP_SNAPSHOT
 
 export function useAmbientAudio() {
   const store = typeof window === 'undefined' ? null : getStore()
@@ -283,9 +450,13 @@ export function useAmbientAudio() {
     scene: state.scene,
     isMuted: state.isMuted,
     unlocked: state.unlocked,
+    ambientVolume: state.ambientVolume,
+    sfxVolume: state.sfxVolume,
     setScene: store ? store.setScene : () => {},
     setMuted: store ? store.setMuted : () => {},
     toggleMute: store ? store.toggleMute : () => {},
     unlock: store ? store.unlock : () => {},
+    setAmbientVolume: store ? store.setAmbientVolume : () => {},
+    setSfxVolume: store ? store.setSfxVolume : () => {},
   }
 }

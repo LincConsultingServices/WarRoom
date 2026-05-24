@@ -3,26 +3,49 @@
 /**
  * CustomCursor — gold-ring + precision-dot cursor overlay.
  *
- * Only activates on fine-pointer (mouse) devices.
- * The outer ring follows with a lerp lag for a "magnetic" luxury feel.
- * The inner dot snaps to the exact pointer position.
+ * Only activates on fine-pointer (mouse) devices, and only when the
+ * user hasn't explicitly disabled it via Settings → Appearance.
+ *
+ * The outer ring follows with a small lerp lag for a "magnetic" feel
+ * (kept small — too much lag makes clicking feel imprecise).
+ * The inner dot snaps to the exact pointer position and stays
+ * exactly there during clicks — it is the precision indicator.
  *
  * Visual states:
  *   default   — gold ring at 55% opacity
  *   --hover   — expanded glow ring when over interactive elements
- *   --click   — ring + dot scale down on mousedown
+ *   --click   — ring scales down for tactile feedback; dot stays put
  *
  * Respects prefers-reduced-motion: sets LERP = 1 (instant snap, no lag).
  * SSR-safe: returns null until effect confirms mouse device.
+ *
+ * Importantly: this component toggles `body.wr-cursor-active` so the
+ * native cursor is hidden ONLY when our cursor is actually rendering.
+ * If this component is disabled or unmounted, the OS cursor returns.
  */
 
 import { useEffect, useRef, useState } from 'react'
 
-const LERP_NORMAL = 0.12
+// A more responsive lag — the previous 0.12 felt like 500ms to catch
+// up which made the cursor look like it was still moving when you
+// clicked. 0.35 keeps a hint of trail without losing precision.
+const LERP_NORMAL = 0.35
 const LERP_REDUCED = 1
 
 const INTERACTIVE_SELECTOR =
   'a, button, [role="button"], input, textarea, select, label, [data-interactive]'
+
+export const CURSOR_DISABLED_STORAGE_KEY = 'warroom_cursor_disabled'
+
+/** Cheap synchronous read of the user's cursor preference. */
+function isCursorDisabled(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem(CURSOR_DISABLED_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null)
@@ -33,7 +56,11 @@ export function CustomCursor() {
     // Don't activate on touch / stylus / non-mouse devices
     if (!window.matchMedia('(pointer: fine)').matches) return
 
+    // User explicitly disabled the custom cursor
+    if (isCursorDisabled()) return
+
     setRender(true)
+    document.body.classList.add('wr-cursor-active')
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const LERP = reducedMotion ? LERP_REDUCED : LERP_NORMAL
@@ -99,14 +126,27 @@ export function CustomCursor() {
     document.documentElement.addEventListener('mouseleave', onDocLeave)
     document.documentElement.addEventListener('mouseenter', onDocEnter)
 
+    // Listen for cross-tab / settings changes to the disabled preference
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === CURSOR_DISABLED_STORAGE_KEY && e.newValue === 'true') {
+        // Tear down — easiest is to ask the user to reload, but we can
+        // just stop rendering the visuals and restore the native cursor.
+        setRender(false)
+        document.body.classList.remove('wr-cursor-active')
+      }
+    }
+    window.addEventListener('storage', onStorage)
+
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseover', onOver)
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('mouseup', onUp)
+      window.removeEventListener('storage', onStorage)
       document.documentElement.removeEventListener('mouseleave', onDocLeave)
       document.documentElement.removeEventListener('mouseenter', onDocEnter)
+      document.body.classList.remove('wr-cursor-active')
     }
   }, [])
 
