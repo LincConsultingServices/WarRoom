@@ -26,13 +26,8 @@
 
 import { useEffect, useRef } from 'react'
 
-// No lag at all. The trailing ring was the source of "phantom" cursor
-// motion — the ring would visibly drift behind the actual click target
-// after fast moves, making it look like the cursor was still moving
-// when the user tried to click. LERP = 1 = instant snap, matching the
-// precision dot. The hover/click scale transitions still provide
-// tactile feedback.
-const LERP_NORMAL = 1
+// Dot snaps instantly to cursor; ring lerps for a flowing trailing feel.
+const LERP_NORMAL = 0.1
 const LERP_REDUCED = 1
 
 const INTERACTIVE_SELECTOR =

@@ -509,68 +509,91 @@
     cursor: none !important;
   }
 
-  /* ── Outer ring (instant tracking, decorative only) ── */
+  /* ── Outer ring (flows behind dot with lerp trail) ── */
   .wr-cursor-ring {
     position: fixed;
     top: 0;
     left: 0;
-    width: 24px;
-    height: 24px;
-    border: 1px solid var(--color-warroom-gold-dark);
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--color-warroom-gold-dark);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.55;
+    opacity: 0.5;
     mix-blend-mode: multiply;
     will-change: transform;
-    /* No transform/translate transition — must snap to position. Only
-       the visual STATE (opacity, glow, scale) transitions. */
+    /* transform is intentionally excluded — position is driven by JS lerp.
+       Only visual properties transition so the ring never jumps on state change. */
     transition:
-      opacity 120ms ease,
-      box-shadow 120ms ease,
-      border-color 120ms ease;
+      opacity 200ms ease,
+      box-shadow 200ms ease,
+      border-color 200ms ease,
+      border-width 200ms ease;
   }
 
   :is(.dark) .wr-cursor-ring {
     border-color: var(--color-warroom-gold);
-    opacity: 0.55;
+    opacity: 0.5;
     mix-blend-mode: screen;
   }
 
   .wr-cursor-ring.wr-cursor--hover {
-    opacity: 0.9;
+    opacity: 1;
     border-color: var(--color-warroom-electrum);
+    border-width: 2px;
     box-shadow:
-      0 0 10px color-mix(in srgb, var(--color-warroom-gold) 60%, transparent),
-      0 0 24px color-mix(in srgb, var(--color-warroom-gold) 28%, transparent);
+      0 0 12px color-mix(in srgb, var(--color-warroom-gold) 70%, transparent),
+      0 0 30px color-mix(in srgb, var(--color-warroom-gold) 35%, transparent),
+      inset 0 0 6px color-mix(in srgb, var(--color-warroom-gold) 15%, transparent);
   }
 
-  /* ── Inner precision dot ── */
+  .wr-cursor-ring.wr-cursor--click {
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--color-warroom-electrum) 90%, white);
+    border-width: 2px;
+    box-shadow:
+      0 0 18px color-mix(in srgb, var(--color-warroom-gold) 90%, transparent),
+      0 0 40px color-mix(in srgb, var(--color-warroom-gold) 50%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--color-warroom-gold) 25%, transparent);
+  }
+
+  /* ── Inner precision dot (snaps instantly to cursor position) ── */
   .wr-cursor-dot {
     position: fixed;
     top: 0;
     left: 0;
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     background: var(--color-warroom-gold-dark);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    box-shadow: 0 0 3px var(--color-warroom-gold-dark);
+    box-shadow: 0 0 4px var(--color-warroom-gold-dark);
     will-change: transform;
+    /* transform excluded — snaps directly. Only visual properties animate. */
     transition:
-      opacity 180ms ease;
+      opacity 180ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease;
   }
 
   :is(.dark) .wr-cursor-dot {
     background: var(--color-warroom-gold);
-    box-shadow: 0 0 5px var(--color-warroom-gold);
+    box-shadow: 0 0 6px var(--color-warroom-gold);
   }
 
-  /* Intentionally NO .wr-cursor-dot.wr-cursor--click rule.
-     The dot is the precision indicator — it MUST stay full-size and
-     fully opaque during a click. Shrinking or fading it on mousedown
-     made the cursor feel like it was "moving away" the moment you
-     tried to click something. The ring's scale-down already provides
-     plenty of tactile feedback. */
+  .wr-cursor-dot.wr-cursor--hover {
+    background: var(--color-warroom-electrum);
+    box-shadow:
+      0 0 8px var(--color-warroom-gold),
+      0 0 16px color-mix(in srgb, var(--color-warroom-gold) 50%, transparent);
+  }
+
+  .wr-cursor-dot.wr-cursor--click {
+    background: color-mix(in srgb, var(--color-warroom-electrum) 80%, white);
+    box-shadow:
+      0 0 12px var(--color-warroom-gold),
+      0 0 24px color-mix(in srgb, var(--color-warroom-gold) 70%, transparent);
+  }
 }
