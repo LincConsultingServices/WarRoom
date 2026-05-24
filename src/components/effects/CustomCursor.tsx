@@ -24,12 +24,15 @@
  * If this component is disabled or unmounted, the OS cursor returns.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-// A more responsive lag — the previous 0.12 felt like 500ms to catch
-// up which made the cursor look like it was still moving when you
-// clicked. 0.35 keeps a hint of trail without losing precision.
-const LERP_NORMAL = 0.35
+// No lag at all. The trailing ring was the source of "phantom" cursor
+// motion — the ring would visibly drift behind the actual click target
+// after fast moves, making it look like the cursor was still moving
+// when the user tried to click. LERP = 1 = instant snap, matching the
+// precision dot. The hover/click scale transitions still provide
+// tactile feedback.
+const LERP_NORMAL = 1
 const LERP_REDUCED = 1
 
 const INTERACTIVE_SELECTOR =
@@ -50,7 +53,6 @@ function isCursorDisabled(): boolean {
 export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
-  const [render, setRender] = useState(false)
 
   useEffect(() => {
     // Don't activate on touch / stylus / non-mouse devices
@@ -59,7 +61,6 @@ export function CustomCursor() {
     // User explicitly disabled the custom cursor
     if (isCursorDisabled()) return
 
-    setRender(true)
     document.body.classList.add('wr-cursor-active')
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -80,13 +81,13 @@ export function CustomCursor() {
       }
     }
 
-    // ── RAF loop: ring follows with lag ───────────────────────
+    // ── RAF loop: ring tracks exactly (LERP = 1 by default) ────
     const tick = () => {
       lagged.x += (exact.x - lagged.x) * LERP
       lagged.y += (exact.y - lagged.y) * LERP
-      // Ring is 32px → center offset 16px
+      // Ring is 24px → center offset 12px
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${lagged.x - 16}px, ${lagged.y - 16}px)`
+        ringRef.current.style.transform = `translate(${lagged.x - 12}px, ${lagged.y - 12}px)`
       }
       raf = requestAnimationFrame(tick)
     }
@@ -129,9 +130,9 @@ export function CustomCursor() {
     // Listen for cross-tab / settings changes to the disabled preference
     const onStorage = (e: StorageEvent) => {
       if (e.key === CURSOR_DISABLED_STORAGE_KEY && e.newValue === 'true') {
-        // Tear down — easiest is to ask the user to reload, but we can
-        // just stop rendering the visuals and restore the native cursor.
-        setRender(false)
+        // Tear down — hide visuals + restore the native cursor.
+        if (ringRef.current) ringRef.current.style.display = 'none'
+        if (dotRef.current) dotRef.current.style.display = 'none'
         document.body.classList.remove('wr-cursor-active')
       }
     }
@@ -150,14 +151,27 @@ export function CustomCursor() {
     }
   }, [])
 
-  if (!render) return null
+  // Always render the divs (no state guard — that race-conditioned
+  // ringRef.current to null in React StrictMode). The effect above
+  // gates whether they're actually wired up. CSS only makes them
+  // visible on fine-pointer devices anyway; the body.wr-cursor-active
+  // class controls native cursor hiding.
+  const initialStyle = { transform: 'translate(-100px, -100px)' } as const
 
   return (
     <>
-      {/* Outer trailing ring — laggy, decorative */}
-      <div ref={ringRef} className="wr-cursor-ring" aria-hidden="true" />
-      {/* Inner precision dot — snaps instantly */}
-      <div ref={dotRef} className="wr-cursor-dot" aria-hidden="true" />
+      <div
+        ref={ringRef}
+        className="wr-cursor-ring"
+        aria-hidden="true"
+        style={initialStyle}
+      />
+      <div
+        ref={dotRef}
+        className="wr-cursor-dot"
+        aria-hidden="true"
+        style={initialStyle}
+      />
     </>
   )
 }

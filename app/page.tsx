@@ -264,21 +264,49 @@ export default function HomePage() {
                     accent={stage.accent}
                     sigilWatermark={<span>{stage.sigil}</span>}
                     className="group"
+                    style={{
+                      background:
+                        'linear-gradient(160deg, rgba(20,16,12,0.92) 0%, rgba(14,11,9,0.96) 100%)',
+                    }}
                   >
-                    <div className="absolute -top-4 left-6 w-8 h-8 rounded-sm flex items-center justify-center font-bold text-sm"
-                      style={{
-                        background: stage.accent,
-                        color: '#0a0806',
-                        fontFamily: "'Cinzel', Georgia, serif",
-                        boxShadow: `0 0 16px ${stage.accent}60`,
-                      }}>
-                      {stage.num}
+                    {/* Stage-number seal — a single bold marker, no
+                        competing emoji row below it. */}
+                    <div
+                      className="mb-5 flex items-center gap-3"
+                    >
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-sm font-bold text-base shrink-0"
+                        style={{
+                          background: stage.accent,
+                          color: '#0a0806',
+                          fontFamily: "'Cinzel', Georgia, serif",
+                          boxShadow: `0 0 18px ${stage.accent}55, inset 0 1px 0 rgba(255,255,255,0.25)`,
+                        }}
+                      >
+                        {stage.num}
+                      </div>
+                      <Icon
+                        className="h-5 w-5"
+                        style={{ color: stage.accent, opacity: 0.85 }}
+                        aria-hidden
+                      />
                     </div>
-                    <div className="mb-4 mt-2 text-3xl"><Icon className="h-6 w-6 inline mr-2" style={{ color: stage.accent }} aria-hidden /> {stage.sigil}</div>
-                    <h3 className="font-semibold text-lg mb-2" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
+                    <h3
+                      className="font-semibold text-lg mb-2"
+                      style={{
+                        fontFamily: "'Cinzel', Georgia, serif",
+                        color: '#f3ead7',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
                       {stage.title}
                     </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#8c8075' }}>{stage.desc}</p>
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: '#c2b6a5' }}
+                    >
+                      {stage.desc}
+                    </p>
                   </StoneCard>
                 </ScaleOnHover>
               )

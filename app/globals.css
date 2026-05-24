@@ -443,6 +443,43 @@
   letter-spacing: 0.04em;
 }
 
+/* ─ Animated gold→amber→crimson hero gradient (Council of Lords) ────────
+   The landing page's <span class="gradient-text-animate"> relies on this.
+   Without it, -webkit-text-fill-color: transparent would leave the text
+   invisible against the dark hero background. */
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+.gradient-text-animate {
+  background: linear-gradient(
+    90deg,
+    #c9a227 0%,
+    #e8c84a 18%,
+    #ff6b00 38%,
+    #8b1a1a 58%,
+    #e8c84a 80%,
+    #c9a227 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradient-shift 6s linear infinite;
+  /* A faint warm glow so the text still reads against dark bg even before
+     the animation kicks in (and for users with reduced motion). */
+  filter: drop-shadow(0 0 14px rgba(201, 162, 39, 0.32));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text-animate {
+    animation: none;
+    background-position: 30% 50%;
+  }
+}
+
 /* Narrator typewriter caret */
 @keyframes narrator-caret-blink {
   0%, 50% { opacity: 1; }
@@ -472,24 +509,26 @@
     cursor: none !important;
   }
 
-  /* ── Outer trailing ring (light mode: multiply, dark mode: screen) ── */
+  /* ── Outer ring (instant tracking, decorative only) ── */
   .wr-cursor-ring {
     position: fixed;
     top: 0;
     left: 0;
-    width: 32px;
-    height: 32px;
-    border: 1.5px solid var(--color-warroom-gold-dark);
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-warroom-gold-dark);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.7;
+    opacity: 0.55;
     mix-blend-mode: multiply;
     will-change: transform;
+    /* No transform/translate transition — must snap to position. Only
+       the visual STATE (opacity, glow, scale) transitions. */
     transition:
-      opacity 180ms ease,
-      box-shadow 180ms ease,
-      border-color 180ms ease,
+      opacity 120ms ease,
+      box-shadow 120ms ease,
+      border-color 120ms ease,
       scale 80ms ease;
   }
 
