@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import type { Investor } from '@/src/types'
 import { InvestorPortraitMedia } from './InvestorPortraitMedia'
 import { DispositionMeter } from './DispositionMeter'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import {
   useInvestorPortraitState,
   type Sentiment,
@@ -71,17 +72,29 @@ export function ActiveInvestor({
   return (
     <aside
       className={cn(
-        'flex h-full flex-col gap-4 rounded-md border border-border/60 bg-card/70 p-5 backdrop-blur-sm',
+        'relative flex h-full flex-col gap-4 rounded-md border border-border/60 bg-card/70 p-5 backdrop-blur-sm',
         className,
       )}
     >
+      {/* Heraldic sigil watermark — top-right corner of the panel. The image
+          tag self-hides if the file is missing, so older investors without a
+          generated sigil simply render without it. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/investors/${investor.id}/sigil.webp`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute right-3 top-3 z-10 h-9 w-9 opacity-70 mix-blend-screen"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+      />
+
       <InvestorPortraitMedia
         investorId={investor.id}
         name={investor.name}
         state={portrait.state}
         assetKey={portrait.assetKey}
         sentiment={portrait.sentiment}
-        portraitOverrideUrl={investor.avatar || null}
+        portraitOverrideUrl={investorPortraitSrc(investor)}
       />
 
       <div className="flex flex-col gap-1.5">

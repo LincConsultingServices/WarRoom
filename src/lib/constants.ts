@@ -76,26 +76,26 @@ export const NARRATION_STAGE_LABELS = ['Idea', 'Vision', 'Commit', 'Validate', '
 
 // Investor voice filename overrides, keyed by investor id (stable across rename)
 export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
-  kevin_oleary: 'kevin_oleary',
-  daymond_john: 'daymond_john',
-  barbara_corcoran: 'barbara_corcoran',
-  mark_cuban: 'mark_cuban',
-  lori_greiner: 'lori_greiner',
-  robert_herjavec: 'robert_herjavec',
-  steven_bartlett: 'steven_bartlett',
+  master_coin: 'master_coin',
+  lord_hustle: 'lord_hustle',
+  mother_instinct: 'mother_instinct',
+  hand_execution: 'hand_execution',
+  spider_strategy: 'spider_strategy',
+  warden_trust: 'warden_trust',
+  mirror_identity: 'mirror_identity',
 }
 
 // Maps the public display title back to the stable investor id.
 // Investor panel context_text shows the title; we resolve it here to look up
 // voice assets and other id-keyed resources.
 export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
-  'The Mirror of Identity': 'steven_bartlett',
-  'The Master of Coin': 'kevin_oleary',
-  'The Lord of Hustle': 'daymond_john',
-  'The Mother of Instinct': 'barbara_corcoran',
-  'The Hand of Execution': 'mark_cuban',
-  'The Spider of Strategy': 'lori_greiner',
-  'The Warden of Trust': 'robert_herjavec',
+  'The Mirror of Identity': 'mirror_identity',
+  'The Master of Coin': 'master_coin',
+  'The Lord of Hustle': 'lord_hustle',
+  'The Mother of Instinct': 'mother_instinct',
+  'The Hand of Execution': 'hand_execution',
+  'The Spider of Strategy': 'spider_strategy',
+  'The Warden of Trust': 'warden_trust',
 }
 
 // Scenario step styling

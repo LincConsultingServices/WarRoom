@@ -37,16 +37,33 @@ export interface ResolvedInvestorAsset {
 }
 
 // Extension preference order per kind. The first match wins.
+// Order is tuned to what actually exists on disk so the resolver
+// usually succeeds on the first probe and avoids 404 noise.
 const VARIANTS: Record<InvestorAssetKey, { ext: string; kind: InvestorAssetKind }[]> = {
-  portrait:           [{ ext: 'webp', kind: 'image' }, { ext: 'jpg', kind: 'image' }, { ext: 'png', kind: 'image' }],
+  portrait:           [{ ext: 'webp', kind: 'image' }, { ext: 'jpg',  kind: 'image' }, { ext: 'png', kind: 'image' }],
   speaking:           [{ ext: 'webm', kind: 'video' }, { ext: 'mp4',  kind: 'video' }, { ext: 'gif', kind: 'gif' }],
   thinking:           [{ ext: 'webm', kind: 'video' }, { ext: 'mp4',  kind: 'video' }, { ext: 'gif', kind: 'gif' }],
   impressed:          [{ ext: 'webm', kind: 'video' }, { ext: 'mp4',  kind: 'video' }, { ext: 'gif', kind: 'gif' }],
   skeptical:          [{ ext: 'webm', kind: 'video' }, { ext: 'mp4',  kind: 'video' }, { ext: 'gif', kind: 'gif' }],
   ambient:            [{ ext: 'webm', kind: 'video' }, { ext: 'mp4',  kind: 'video' }],
-  sigil:              [{ ext: 'svg',  kind: 'svg' }, { ext: 'png', kind: 'image' }],
+  sigil:              [{ ext: 'webp', kind: 'image' }, { ext: 'png',  kind: 'image' }, { ext: 'svg', kind: 'svg' }],
   'question-ambient': [{ ext: 'mp3',  kind: 'audio' }, { ext: 'ogg', kind: 'audio' }],
 }
+
+/**
+ * Asset keys whose files have not been generated yet. The resolver
+ * short-circuits to FALLBACK for these without making any HEAD requests,
+ * which keeps the dev console quiet. Remove a key from this set once
+ * the matching files are dropped on disk.
+ */
+const KNOWN_MISSING_KEYS = new Set<InvestorAssetKey>([
+  'speaking',
+  'thinking',
+  'impressed',
+  'skeptical',
+  'ambient',
+  'question-ambient',
+])
 
 const FALLBACK: ResolvedInvestorAsset = { url: null, kind: 'fallback' }
 
@@ -60,11 +77,29 @@ function cacheKey(investorId: string, key: InvestorAssetKey): string {
 
 async function probe(url: string): Promise<boolean> {
   try {
-    const res = await fetch(url, { method: 'HEAD', cache: 'force-cache' })
+    // `cache: 'no-store'` so that 404s captured before the asset existed
+    // (e.g. during earlier dev iterations) don't get replayed forever and
+    // mask now-present files. The module-level Promise cache below still
+    // dedupes within a single page load.
+    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' })
     return res.ok
   } catch {
     return false
   }
+}
+
+/**
+ * Synchronous resolver used by direct `<img src=...>` consumers.
+ *
+ * Backends sometimes return `investor.avatar = '/avatars/<id>.png'` which
+ * isn't a real file on disk — we serve our generated portraits from
+ * `/investors/<id>/portrait.webp` instead. This helper returns that path
+ * if the investor has an id; otherwise it falls back to the avatar URL
+ * the backend provided.
+ */
+export function investorPortraitSrc(investor: { id?: string; avatar?: string | null }): string {
+  if (investor?.id) return `/investors/${sanitizeId(investor.id)}/portrait.webp`
+  return investor?.avatar || ''
 }
 
 /**
@@ -78,6 +113,12 @@ export function getInvestorAssetUrl(
   key: InvestorAssetKey,
 ): Promise<ResolvedInvestorAsset> {
   if (!investorId) return Promise.resolve(FALLBACK)
+
+  // Short-circuit for asset kinds we know aren't generated yet — keeps the
+  // dev console clean. Remove the key from KNOWN_MISSING_KEYS once files
+  // are dropped on disk.
+  if (KNOWN_MISSING_KEYS.has(key)) return Promise.resolve(FALLBACK)
+
   const id = sanitizeId(investorId)
   const k = cacheKey(id, key)
   const existing = cache.get(k)

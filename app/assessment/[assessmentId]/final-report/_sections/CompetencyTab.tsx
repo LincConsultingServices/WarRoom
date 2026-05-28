@@ -97,7 +97,7 @@ export function CompetencyTab({ report }: { report: EvaluationReport }) {
         .archetype-role { color: var(--color-warroom-smoke); font-size: 1rem; margin-bottom: 1rem; font-family: var(--font-body, serif); }
         .archetype-role strong { color: var(--color-warroom-gold); }
         .archetype-narrative { color: var(--color-warroom-smoke); line-height: 1.6; max-width: 700px; margin: 0 auto; font-size: 0.95rem; font-family: var(--font-body, serif); }
-        .spider-chart { background: var(--color-warroom-rampart); border: 1px solid var(--color-warroom-ash); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; opacity: 0.6; }
+        .spider-chart { background: var(--color-warroom-rampart); border: 1px solid var(--color-warroom-ash); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; }
         .spider-chart h3, .role-fit h3, .action-plan h3 { color: var(--color-warroom-ivory); font-size: 1.1rem; margin-bottom: 1rem; font-family: var(--font-display); }
         .bar-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.7rem; }
         .bar-label { width: 200px; display: flex; gap: 0.5rem; align-items: center; }

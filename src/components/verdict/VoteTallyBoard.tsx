@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor, InvestorScorecard, DealDecision } from '@/src/types'
 import type { VerdictLabel } from './InvestorVerdictReveal'
 
@@ -80,9 +81,14 @@ export function VoteTallyBoard({
             )}
           >
             <div className="h-10 w-10 overflow-hidden rounded-full border border-[color:var(--color-warroom-gold)]/30 bg-muted">
-              {inv.avatar ? (
+              {inv.id || inv.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={inv.avatar} alt={inv.name} className="h-full w-full object-cover" />
+                <img
+                  src={investorPortraitSrc(inv)}
+                  alt={inv.name}
+                  className="h-full w-full object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                />
               ) : (
                 <span className="flex h-full w-full items-center justify-center font-display text-xs text-foreground/60">
                   {inv.name

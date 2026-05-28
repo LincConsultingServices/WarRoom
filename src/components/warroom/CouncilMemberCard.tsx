@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor } from '@/src/types'
 
 // ============================================================
@@ -117,12 +118,13 @@ export function CouncilMemberCard({
           isActive && 'ring-1 ring-amber-300/60',
         )}
       >
-        {investor.avatar ? (
+        {investor.id || investor.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={investor.avatar}
+            src={investorPortraitSrc(investor)}
             alt={investor.name}
             className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-semibold text-foreground/60">
@@ -149,7 +151,7 @@ export function CouncilMemberCard({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
           aria-label={`${investor.name} — view bio`}
         >
           {card}

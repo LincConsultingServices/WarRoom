@@ -51,3 +51,18 @@ test-gemini-*.js
 # Config (if not needed for run, but package.json etc are needed)
 # Keeping package.json, next.config.mjs, etc.
 #deployment commit 5
+
+# Claude Code metadata
+.claude/
+
+# Generated assets (textures, webp conversions)
+# Uncomment if you don't want to track generated images:
+# public/assets/images/textures/*.webp
+# public/investors/*/portrait.webp
+
+# Generated script output (not source code)
+scripts/compression-results.json
+
+# OS
+Thumbs.db
+desktop.ini

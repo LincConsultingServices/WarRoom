@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor, InvestorScorecard } from '@/src/types'
 
 // ============================================================
@@ -161,9 +162,14 @@ export function CouncilWhispers({
             style={{ boxShadow: '0 6px 24px rgba(0,0,0,0.5)' }}
           >
             <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-[color:var(--color-warroom-gold)]/30 bg-muted">
-              {w.investor.avatar ? (
+              {w.investor.id || w.investor.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={w.investor.avatar} alt={w.investor.name} className="absolute inset-0 h-full w-full object-cover" />
+                <img
+                  src={investorPortraitSrc(w.investor)}
+                  alt={w.investor.name}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                />
               ) : (
                 <span className="absolute inset-0 flex items-center justify-center font-display text-xs font-semibold text-foreground/60">
                   {initialsOf(w.investor.name)}

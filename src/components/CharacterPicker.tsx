@@ -167,7 +167,7 @@ export function CharacterPicker({
     }
   }
 
-  const isComplete = selMentors.length === 2 && selLeaders.length === 2 && selInvestors.length === 4
+  const isComplete = selMentors.length === 2 && selLeaders.length === 2 && selInvestors.length === 7
 
   return (
     <motion.div
@@ -205,8 +205,8 @@ export function CharacterPicker({
         subtitle="They will evaluate your pitch in the War Room"
         items={investors}
         selected={selInvestors}
-        maxSelect={4}
-        onToggle={(id) => toggle(selInvestors, setSelInvestors, 4, id)}
+        maxSelect={7}
+        onToggle={(id) => toggle(selInvestors, setSelInvestors, 7, id)}
         renderBadge={(i) => i.primary_lens}
         renderMeta={(i) => i.bio?.slice(0, 60) + (i.bio?.length > 60 ? '…' : '') || ''}
         accentColor="#10b981"
@@ -227,7 +227,7 @@ export function CharacterPicker({
             ? 'Setting up...'
             : isComplete
             ? 'Confirm Characters & Start'
-            : `Select 2 Mentors, 2 Leaders, 4 Investors (${selMentors.length + selLeaders.length + selInvestors.length}/8)`}
+            : `Select 2 Mentors, 2 Leaders, 7 Investors (${selMentors.length + selLeaders.length + selInvestors.length}/11)`}
         </Button>
       </motion.div>
     </motion.div>

@@ -16,6 +16,7 @@ import type {
 } from '@/src/types'
 import { Volume2, VolumeX } from 'lucide-react'
 import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
+import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
 import { MuteToggle } from '@/src/components/warroom/MuteToggle'
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
@@ -33,7 +34,7 @@ import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { narratorPhaseForWarRoom } from '@/lib/narrator/scripts'
 
 // ============================================
-// WAR ROOM ΓÇô Investor Pitch Simulation
+// WAR ROOM – Investor Pitch Simulation
 // SOP: 15 minutes, all C1-C8 integrated
 // ============================================
 
@@ -294,7 +295,7 @@ export default function WarRoomSimulation() {
             const isWalkAway = false
 
             if (isWalkAway && !result.accepted) {
-                // User wants to walk away ΓÇö reject this offer
+                // User wants to walk away — reject this offer
                 setWalkedAwayInvestor(selectedOffer.investorName)
                 try {
                     await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
@@ -363,7 +364,7 @@ export default function WarRoomSimulation() {
                 setSelectedOffer(updatedOffer)
 
                 if (nextRound >= MAX_NEG_ROUNDS) {
-                    // Max rounds exhausted without acceptance ΓÇö auto-reject this offer
+                    // Max rounds exhausted without acceptance — auto-reject this offer
                     try {
                         await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
                         setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
@@ -409,7 +410,7 @@ export default function WarRoomSimulation() {
         }
     }, [])
 
-    // Load assessment state and investors ΓÇö filter to only selected investor IDs
+    // Load assessment state and investors — filter to only selected investor IDs
     useEffect(() => {
         const load = async () => {
             try {
@@ -438,12 +439,18 @@ export default function WarRoomSimulation() {
                     return
                 }
 
+                // War Room always faces the full Council (all 7 investors).
+                // Older assessments that captured only a 4-investor subset are
+                // augmented up to the full list so the chamber renders correctly.
+                const FULL_COUNCIL_SIZE = 7
                 const filtered = selectedIds.length > 0
                     ? investorList.filter(inv => selectedIds.includes(inv.id))
                     : investorList
 
-                // Fallback: if ID matching yielded nothing, use the full list
-                setInvestors(filtered.length > 0 ? filtered : investorList)
+                const finalList = filtered.length >= FULL_COUNCIL_SIZE
+                    ? filtered
+                    : investorList // legacy assessments → show everyone
+                setInvestors(finalList)
                 setPhase('PITCH')
             } catch (err: unknown) {
                 setError(err instanceof Error ? err.message : 'Failed to load War Room data')
@@ -525,90 +532,7 @@ export default function WarRoomSimulation() {
 
     // Follow-up flow now lives inside the Investor Q&A phase (see handleSubmitInvestorFollowupAudio).
 
-    // ============================================
-    // TEXT FALLBACK HANDLERS (when mic permission was denied / declined)
-    // ============================================
-    const [textPitchInput, setTextPitchInput] = useState('')
-    const [textResponseInput, setTextResponseInput] = useState('')
-    const [textNegCapital, setTextNegCapital] = useState('')
-    const [textNegEquity, setTextNegEquity] = useState('')
-
-    const handleSubmitPitchText = async () => {
-        const trimmed = textPitchInput.trim()
-        if (!trimmed) { setError('Please type your pitch before submitting'); return }
-        setIsAnalyzing(true); setIsSubmitting(true); setError('')
-        try {
-            await api.assessments.submitPitch(assessmentId, trimmed)
-            setPitchAnalysis({
-                transcription: trimmed,
-                feedback: 'Text pitch received. The investors will read it before the next round.',
-                strengths: [], weaknesses: [],
-                overallScore: 0, clarity: 0, confidence: 0, persuasion: 0,
-            })
-            setPitchText(trimmed)
-            setTextPitchInput('')
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Failed to submit pitch')
-        } finally {
-            setIsAnalyzing(false); setIsSubmitting(false)
-        }
-    }
-
-    const handleRespondToInvestorText = async () => {
-        const investor = investors[currentInvestorIndex]
-        const trimmed = textResponseInput.trim()
-        if (!investor) return
-        if (!trimmed) { setError('Please type your response'); return }
-        setIsAnalyzing(true); setIsSubmitting(true); setError('')
-        try {
-            const scorecard = await api.assessments.respondToInvestor(assessmentId, investor.id, trimmed)
-            setScorecards(prev => [...prev, scorecard])
-            setResponseTranscription(trimmed)
-            setCurrentInvestorReaction(scorecard.investorReaction || `${investor.name} has considered your response.`)
-            setResponseSubmitted(true)
-            setTextResponseInput('')
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Failed to submit response')
-        } finally {
-            setIsAnalyzing(false); setIsSubmitting(false)
-        }
-    }
-
-    const handleNegotiateText = async () => {
-        if (!selectedOffer) return
-        const capital = parseFloat(textNegCapital)
-        const equity = parseFloat(textNegEquity)
-        if (!Number.isFinite(capital) || capital <= 0 || !Number.isFinite(equity) || equity <= 0) {
-            setError('Enter valid capital and equity values'); return
-        }
-        const nextRound = negRound + 1
-        if (nextRound > MAX_NEG_ROUNDS) { setError('Maximum rounds reached.'); return }
-        setIsNegVoiceSubmitting(true); setError('')
-        try {
-            const result = await api.assessments.counterNegotiate(assessmentId, selectedOffer.investorId, capital, equity)
-            const newHistory = [
-                ...negHistory,
-                { sender: 'You', msg: `Counter: $${capital} for ${equity}% equity`, type: 'user' as const },
-                { sender: selectedOffer.investorName, msg: result.message || 'Response received', type: 'investor' as const },
-            ]
-            setNegHistory(newHistory)
-            setNegRound(nextRound)
-            if (result.accepted) {
-                const finalCapital = result.capital || capital
-                const finalEquity = result.equity || equity
-                setAcceptedDealTerms({ capital: finalCapital, equity: finalEquity, investorName: selectedOffer.investorName })
-                try { await api.assessments.acceptDeal(assessmentId, selectedOffer.investorId, finalCapital, finalEquity) } catch { }
-                setDealFinalized(true)
-            } else {
-                setSelectedOffer({ ...selectedOffer, capital: result.capital ?? capital, equity: result.equity ?? equity })
-            }
-            setTextNegCapital(''); setTextNegEquity('')
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Failed to submit counter-offer')
-        } finally {
-            setIsNegVoiceSubmitting(false)
-        }
-    }
+    // Text fallback handlers removed — war room is voice-only.
 
     const handleContinueFromPitch = () => {
         resetPitchFollowupState()
@@ -651,29 +575,36 @@ export default function WarRoomSimulation() {
                 console.warn("TTS Generation Warning:", result.ttsError)
             }
 
-            try {
-                const followup = await api.assessments.generateInvestorFollowupAudio(
-                    assessmentId,
-                    investor.id,
-                    responseBlob
-                )
-                const question = followup.followup_question || followup.followupQuestion
-                if (question) {
-                    setFollowupQuestion(question)
-                    setFollowupPhase('followup_pending')
-                    if (followup.audioBase64) {
-                        if (audioRef.current) audioRef.current.pause()
-                        const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
-                        audioRef.current = audio
-                        audio.onplay = () => setIsPlayingAudio(true)
-                        audio.onended = () => setIsPlayingAudio(false)
-                        audio.onerror = () => setIsPlayingAudio(false)
-                        audio.play().catch(() => setIsPlayingAudio(false))
+            // Only attempt a follow-up if the initial response actually
+            // transcribed to something. An empty transcription would leave
+            // the user stranded on the follow-up phase with no way to submit.
+            if (result.transcription && result.transcription.trim().length > 0) {
+                try {
+                    const followup = await api.assessments.generateInvestorFollowupAudio(
+                        assessmentId,
+                        investor.id,
+                        responseBlob
+                    )
+                    const question = followup.followup_question || followup.followupQuestion
+                    if (question) {
+                        setFollowupQuestion(question)
+                        setFollowupPhase('followup_pending')
+                        if (followup.audioBase64) {
+                            if (audioRef.current) audioRef.current.pause()
+                            const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
+                            audioRef.current = audio
+                            audio.onplay = () => setIsPlayingAudio(true)
+                            audio.onended = () => setIsPlayingAudio(false)
+                            audio.onerror = () => setIsPlayingAudio(false)
+                            audio.play().catch(() => setIsPlayingAudio(false))
+                        }
+                        return
                     }
-                    return
+                } catch (followupErr) {
+                    console.warn('[war-room] follow-up generation failed, skipping', followupErr)
                 }
-            } catch (followupErr) {
-                console.warn('[war-room] follow-up generation failed, skipping', followupErr)
+            } else {
+                console.warn('[war-room] empty initial transcription, skipping follow-up')
             }
 
             // No follow-up — show immediate reaction
@@ -873,6 +804,10 @@ export default function WarRoomSimulation() {
 
     return (
         <div className="warroom-page warroom-shell">
+            {/* Side wave accents */}
+            <div className="warroom-wave-left" aria-hidden />
+            <div className="warroom-wave-right" aria-hidden />
+            <RouteBackground bg="warroom" brightness={0.08} />
             <AnimatePresence>
                 {showEntrance && (
                     <WarRoomEntrance
@@ -910,7 +845,8 @@ export default function WarRoomSimulation() {
             <MicPermissionDialog
                 open={mic.needsPrompt && phase !== 'LOADING' && !showEntrance}
                 onAllow={() => mic.grant()}
-                onUseText={() => mic.useText()}
+                onUseText={() => mic.grant()}
+                hideTextOption
             />
             {/* Top Bar */}
             <header className="warroom-header">
@@ -964,7 +900,7 @@ export default function WarRoomSimulation() {
                 )}
 
                 {/* ============================================ */}
-                {/* PITCH PHASE ΓÇö AUDIO RECORDING */}
+                {/* PITCH PHASE — AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'PITCH' && (
                     <motion.div
@@ -973,7 +909,7 @@ export default function WarRoomSimulation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 ΓÇö YOUR PITCH</motion.div>
+                        <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 — YOUR PITCH</motion.div>
                         <motion.h2 className="phase-title" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                             Record Your 1-Minute War Room Pitch
                         </motion.h2>
@@ -1004,26 +940,8 @@ export default function WarRoomSimulation() {
                             </div>
                         </motion.details>
 
-                        {/* Text fallback when mic permission was declined */}
-                        {!pitchAnalysis && !isAnalyzing && mic.isText && (
-                            <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-                                <textarea
-                                    value={textPitchInput}
-                                    onChange={(e) => setTextPitchInput(e.target.value)}
-                                    placeholder="Type your 60-second pitch here..."
-                                    rows={6}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
-                                />
-                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
-                                    <button onClick={handleSubmitPitchText} disabled={isSubmitting} className="respond-btn" style={{ flex: 1 }}>
-                                        {isSubmitting ? 'Submitting...' : 'Submit Pitch (Text)'}
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-
                         {/* Recording UI */}
-                        {!pitchAnalysis && !isAnalyzing && !mic.isText && (
+                        {!pitchAnalysis && !isAnalyzing && (
                             <motion.div className="recording-zone" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                                 <div className={`mic-button-wrapper ${pitchRecorder.isRecording ? 'recording' : ''}`}>
                                     {pitchRecorder.isRecording && (
@@ -1036,10 +954,11 @@ export default function WarRoomSimulation() {
                                     <motion.button
                                         className={`mic-button ${pitchRecorder.isRecording ? 'active' : ''} ${pitchRecorder.audioBlob ? 'done' : ''}`}
                                         onClick={pitchRecorder.isRecording ? pitchRecorder.stopRecording : pitchRecorder.startRecording}
+                                        disabled={pitchRecorder.isStarting}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                     >
-                                        {pitchRecorder.isRecording ? 'Stop Recording' : pitchRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                        {pitchRecorder.isStarting ? 'Connecting Mic...' : pitchRecorder.isRecording ? 'Stop Recording' : pitchRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
                                     </motion.button>
                                 </div>
 
@@ -1050,7 +969,7 @@ export default function WarRoomSimulation() {
                                             <span className="rec-text">Recording... {Math.max(0, 60 - pitchRecorder.recordingTime)}s left</span>
                                         </>
                                     ) : pitchRecorder.audioBlob ? (
-                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) ΓÇö Select Record Again to re-record</span>
+                                        <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) — Select Record Again to re-record</span>
                                     ) : (
                                         <span className="rec-hint">Select Start Recording to begin your pitch</span>
                                     )}
@@ -1158,11 +1077,11 @@ export default function WarRoomSimulation() {
                 )}
 
                 {/* ============================================ */}
-                {/* INVESTOR Q&A PHASE ΓÇö AUDIO RECORDING */}
+                {/* INVESTOR Q&A PHASE — AUDIO RECORDING */}
                 {/* ============================================ */}
                 {phase === 'INVESTOR_QA' && currentInvestor && (
                     <motion.div className="investor-qa-phase" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                        <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 ΓÇö INVESTOR QUESTIONS</motion.div>
+                        <motion.div className="phase-badge" initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>PHASE 2 — INVESTOR QUESTIONS</motion.div>
                         <div className="investor-counter">Investor {currentInvestorIndex + 1} of {investors.length}</div>
 
                         {/* Chamber: active investor (left) · conversation (center) · roster (right) */}
@@ -1293,31 +1212,8 @@ export default function WarRoomSimulation() {
                         )}
                         </AnimatePresence>
 
-                        {/* Text fallback for Q&A response */}
-                        {!currentInvestorReaction && !isAnalyzing && mic.isText && followupPhase !== 'followup_pending' && (
-                            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-                                <div className="recording-zone" style={{ marginBottom: '1rem' }}>
-                                    <textarea
-                                        value={textResponseInput}
-                                        onChange={(e) => setTextResponseInput(e.target.value)}
-                                        placeholder={`Type your answer to ${currentInvestor.name}...`}
-                                        rows={5}
-                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit', fontSize: '0.95rem' }}
-                                    />
-                                    <button
-                                        onClick={handleRespondToInvestorText}
-                                        disabled={isSubmitting || isAnalyzing || responseSubmitted}
-                                        className="respond-btn"
-                                        style={{ marginTop: '0.75rem', width: '100%' }}
-                                    >
-                                        {isSubmitting ? 'Submitting...' : 'Submit Response (Text)'}
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-
                         {/* Audio Recording for Response */}
-                        {!currentInvestorReaction && !isAnalyzing && !mic.isText && (
+                        {!currentInvestorReaction && !isAnalyzing && (
                             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
                                 <div className="recording-zone" style={{ marginBottom: '1rem' }}>
                                     <div className={`mic-button-wrapper ${responseRecorder.isRecording ? 'recording' : ''}`}>
@@ -1331,11 +1227,13 @@ export default function WarRoomSimulation() {
                                          <motion.button
                                              className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
                                              onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
-                                             disabled={(responseSubmitted && followupPhase !== 'followup_pending') || isSubmitting || isAnalyzing}
+                                             disabled={(responseSubmitted && followupPhase !== 'followup_pending') || isSubmitting || isAnalyzing || responseRecorder.isStarting}
                                              whileHover={{ scale: 1.05 }}
                                              whileTap={{ scale: 0.95 }}
                                          >
-                                             {responseSubmitted && followupPhase !== 'followup_pending'
+                                             {responseRecorder.isStarting
+                                                 ? 'Connecting Mic...'
+                                                 : responseSubmitted && followupPhase !== 'followup_pending'
                                                  ? 'Response Submitted'
                                                  : responseRecorder.isRecording
                                                      ? 'Stop Recording'
@@ -1362,7 +1260,39 @@ export default function WarRoomSimulation() {
                                     )}
                                 </div>
 
-                                {error && <div className="error-msg">{error}</div>}
+                                {error && (
+                                    <div className="error-msg" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <span>{error}</span>
+                                        {/* If the user is stranded in follow-up state with broken context, give them an exit */}
+                                        {error === 'Follow-up context not ready' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setError('')
+                                                    setFollowupPhase('initial')
+                                                    setFollowupQuestion('')
+                                                    setInitialTranscription('')
+                                                    setResponseSubmitted(false)
+                                                    setResponseTranscription('')
+                                                    setCurrentInvestorReaction('')
+                                                    responseRecorder.resetRecording()
+                                                }}
+                                                style={{
+                                                    alignSelf: 'flex-start',
+                                                    padding: '0.4rem 0.85rem',
+                                                    borderRadius: '4px',
+                                                    border: '1px solid rgba(201,162,39,0.5)',
+                                                    background: 'rgba(201,162,39,0.12)',
+                                                    color: '#c9a227',
+                                                    fontSize: '0.85rem',
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                Reset and re-record initial response
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
 
                                 {responseRecorder.audioBlob && (followupPhase === 'followup_pending' || !responseSubmitted) && (
                                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -1419,7 +1349,7 @@ export default function WarRoomSimulation() {
                             initial={{ scale: 0.8 }}
                             animate={{ scale: 1 }}
                             transition={{ type: 'spring' }}
-                        >PHASE 3 ΓÇö INVESTOR OFFERS</motion.div>
+                        >PHASE 3 — INVESTOR OFFERS</motion.div>
                         <motion.h2
                             className="phase-title"
                             initial={{ y: 10, opacity: 0 }}
@@ -1466,7 +1396,7 @@ export default function WarRoomSimulation() {
                                             <p>"{offer.message}"</p>
                                         </div>
                                         <div style={{ marginTop: '1rem', textAlign: 'center', color: '#10b981', fontWeight: 'bold' }}>
-                                            Click to Negotiate ΓåÆ
+                                            Click to Negotiate →
                                         </div>
                                     </motion.div>
                                 ))}
@@ -1542,42 +1472,10 @@ export default function WarRoomSimulation() {
                                 )}
 
                                 <div className="neg-controls" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem', width: '100%' }}>
-                                    {mic.isText && negRound < MAX_NEG_ROUNDS && (
-                                        <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', marginBottom: '1rem' }}>
-                                            <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '0.75rem' }}>
-                                                Enter your counter offer (capital in $ and equity %).
-                                            </p>
-                                            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                                                <input
-                                                    type="number"
-                                                    placeholder="Capital ($)"
-                                                    value={textNegCapital}
-                                                    onChange={(e) => setTextNegCapital(e.target.value)}
-                                                    style={{ flex: 2, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
-                                                />
-                                                <input
-                                                    type="number"
-                                                    placeholder="Equity (%)"
-                                                    value={textNegEquity}
-                                                    onChange={(e) => setTextNegEquity(e.target.value)}
-                                                    style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e0e0e0', fontFamily: 'inherit' }}
-                                                />
-                                            </div>
-                                            <button
-                                                onClick={handleNegotiateText}
-                                                disabled={isNegVoiceSubmitting}
-                                                className="respond-btn"
-                                                style={{ width: '100%' }}
-                                            >
-                                                {isNegVoiceSubmitting ? 'Submitting...' : 'Submit Counter (Text)'}
-                                            </button>
-                                        </div>
-                                    )}
-                                    {!mic.isText && (
                                     <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
                                         <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
                                             {negRound >= MAX_NEG_ROUNDS - 1
-                                                ? 'This is your final round ΓÇö say "I accept this deal" or "I walk away"'
+                                                ? 'This is your final round — say "I accept this deal" or "I walk away"'
                                                 : 'Speak your counter offer (e.g., "I\'d like $1.2M for 25% equity because...")'
                                             }
                                         </p>
@@ -1590,14 +1488,14 @@ export default function WarRoomSimulation() {
                                                     <div className="pulse-ring ring-3" />
                                                 </>
                                             )}
-                                            <motion.button 
+                                            <motion.button
                                                 className={`mic-button ${negotiationRecorder.isRecording ? 'active' : ''} ${negotiationRecorder.audioBlob ? 'done' : ''}`}
                                                 onClick={negotiationRecorder.isRecording ? negotiationRecorder.stopRecording : negotiationRecorder.startRecording}
-                                                disabled={isNegVoiceSubmitting || negRound >= MAX_NEG_ROUNDS}
+                                                disabled={isNegVoiceSubmitting || negRound >= MAX_NEG_ROUNDS || negotiationRecorder.isStarting}
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                             >
-                                                {negotiationRecorder.isRecording ? 'Stop Recording' : negotiationRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
+                                                {negotiationRecorder.isStarting ? 'Connecting Mic...' : negotiationRecorder.isRecording ? 'Stop Recording' : negotiationRecorder.audioBlob ? 'Record Again' : 'Start Recording'}
                                             </motion.button>
                                         </div>
 
@@ -1612,7 +1510,7 @@ export default function WarRoomSimulation() {
                                             </div>
                                         ) : negRound >= MAX_NEG_ROUNDS ? (
                                             <div className="recording-status">
-                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted ΓÇö offer expired</span>
+                                                <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted — offer expired</span>
                                             </div>
                                         ) : (
                                             <div className="recording-status">
@@ -1655,7 +1553,6 @@ export default function WarRoomSimulation() {
                                             </div>
                                         )}
                                     </div>
-                                    )}
 
                                     {/* Walk Away Button */}
                                     <motion.button
@@ -1750,38 +1647,51 @@ export default function WarRoomSimulation() {
                 .warroom-shell::before {
                     content: '';
                     position: fixed;
-                    inset: 0;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
                     pointer-events: none;
-                    border: 2px solid rgba(239, 68, 68, 0.24);
-                    border-radius: 28px;
-                    margin: 14px;
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(239,68,68,0.5) 15%,
+                        rgba(201,162,39,0.4) 30%,
+                        rgba(239,68,68,0.6) 50%,
+                        rgba(201,162,39,0.4) 70%,
+                        rgba(239,68,68,0.5) 85%,
+                        transparent 100%
+                    );
+                    background-size: 200% 100%;
+                    animation: warroomWaveTop 3s ease-in-out infinite;
                     box-shadow:
-                        0 0 0 1px rgba(239,68,68,0.08) inset,
-                        0 0 24px rgba(239,68,68,0.16),
-                        0 0 50px rgba(239,68,68,0.08) inset;
-                    animation: warroomPulse 2.8s ease-in-out infinite;
-                    z-index: 0;
+                        0 0 20px rgba(239,68,68,0.35),
+                        0 0 60px rgba(239,68,68,0.15);
+                    z-index: 100;
                 }
 
                 .warroom-shell::after {
                     content: '';
                     position: fixed;
-                    inset: 8px;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
                     pointer-events: none;
-                    border-radius: 30px;
-                    background:
-                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top left / 100% 2px no-repeat,
-                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) top right / 2px 100% no-repeat,
-                        linear-gradient(90deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom right / 100% 2px no-repeat,
-                        linear-gradient(180deg, transparent 0%, rgba(239,68,68,0.3) 50%, transparent 100%) bottom left / 2px 100% no-repeat;
-                    mask:
-                        radial-gradient(circle at top left, transparent 0 24px, #000 24px),
-                        radial-gradient(circle at top right, transparent 0 24px, #000 24px),
-                        radial-gradient(circle at bottom right, transparent 0 24px, #000 24px),
-                        radial-gradient(circle at bottom left, transparent 0 24px, #000 24px);
-                    animation: cornerWave 2.2s linear infinite;
-                    mix-blend-mode: screen;
-                    z-index: 0;
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(239,68,68,0.5) 15%,
+                        rgba(201,162,39,0.4) 30%,
+                        rgba(239,68,68,0.6) 50%,
+                        rgba(201,162,39,0.4) 70%,
+                        rgba(239,68,68,0.5) 85%,
+                        transparent 100%
+                    );
+                    background-size: 200% 100%;
+                    animation: warroomWaveBottom 3s ease-in-out infinite;
+                    box-shadow:
+                        0 0 20px rgba(239,68,68,0.35),
+                        0 0 60px rgba(239,68,68,0.15);
+                    z-index: 100;
                 }
 
                 .warroom-shell > * {
@@ -1789,15 +1699,16 @@ export default function WarRoomSimulation() {
                     z-index: 1;
                 }
 
-                @keyframes warroomPulse {
-                    0%, 100% { opacity: 0.55; transform: scale(1); }
-                    50% { opacity: 1; transform: scale(1.002); }
+                @keyframes warroomWaveTop {
+                    0% { background-position: 0% 0%; }
+                    50% { background-position: 100% 0%; }
+                    100% { background-position: 0% 0%; }
                 }
 
-                @keyframes cornerWave {
-                    0% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
-                    50% { filter: drop-shadow(0 0 10px rgba(239,68,68,0.4)); }
-                    100% { filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+                @keyframes warroomWaveBottom {
+                    0% { background-position: 100% 0%; }
+                    50% { background-position: 0% 0%; }
+                    100% { background-position: 100% 0%; }
                 }
             `}</style>
 

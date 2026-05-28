@@ -12,6 +12,8 @@ export interface StoneCardProps extends HTMLAttributes<HTMLDivElement> {
   interactive?: boolean
   /** Inner padding shortcut. Defaults to 'lg' (p-7). */
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  /** Subtle physical material grain layered behind the content. Off by default. */
+  texture?: 'parchment' | 'leather' | 'stone'
 }
 
 const PADDING_CLASSES: Record<NonNullable<StoneCardProps['padding']>, string> = {
@@ -19,6 +21,13 @@ const PADDING_CLASSES: Record<NonNullable<StoneCardProps['padding']>, string> = 
   sm: 'p-4',
   md: 'p-5',
   lg: 'p-7',
+}
+
+// Per-material opacity — leather/parchment read stronger than near-black stone.
+const TEXTURE_OPACITY: Record<NonNullable<StoneCardProps['texture']>, number> = {
+  parchment: 0.13,
+  leather: 0.16,
+  stone: 0.1,
 }
 
 /**
@@ -36,6 +45,7 @@ export const StoneCard = forwardRef<HTMLDivElement, StoneCardProps>(
       accent,
       interactive = false,
       padding = 'lg',
+      texture,
       className,
       style,
       children,
@@ -63,6 +73,19 @@ export const StoneCard = forwardRef<HTMLDivElement, StoneCardProps>(
         }
         {...rest}
       >
+        {texture && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `url("/assets/images/textures/${texture}.webp")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: TEXTURE_OPACITY[texture],
+              mixBlendMode: 'overlay',
+            }}
+          />
+        )}
         {accent && (
           <span
             aria-hidden

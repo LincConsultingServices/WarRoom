@@ -65,11 +65,13 @@ export function InvestorPortraitMedia({
   portraitOverrideUrl,
 }: InvestorPortraitMediaProps) {
   const [resolved, setResolved] = useState<ResolvedPair>(EMPTY_PAIR)
+  const [portraitFailed, setPortraitFailed] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Resolve the active asset + the portrait still in parallel.
   useEffect(() => {
+    setPortraitFailed(false)
     let cancelled = false
     Promise.all([
       getInvestorAssetUrl(investorId, assetKey),
@@ -139,12 +141,13 @@ export function InvestorPortraitMedia({
           alt={`${name}, ${describeState(state, sentiment)}`}
           className="absolute inset-0 h-full w-full object-cover"
         />
-      ) : portraitUrl ? (
+      ) : portraitUrl && !portraitFailed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={portraitUrl}
           alt={name}
           className="absolute inset-0 h-full w-full object-cover"
+          onError={() => setPortraitFailed(true)}
         />
       ) : (
         <>

@@ -32,6 +32,9 @@ export interface NarratorLine {
   sfx?: string
   /** ms to wait before this line starts (after the prior one ends). */
   delay?: number
+  /** Pre-recorded voiceover MP3 path (e.g. `/audio/narrator/landing-first-visit-01-idle.mp3`). When set, it
+   *  is played in addition to the appear SFX so the Oracle actually speaks. */
+  voiceUrl?: string
 }
 
 interface NarratorState {
@@ -83,6 +86,40 @@ function loadNarratorMuted(): boolean {
   }
 }
 
+// Shared HTMLAudioElement for narrator voiceovers. One instance so a new line
+// instantly cancels any in-flight playback (no overlapping voices).
+let narratorAudio: HTMLAudioElement | null = null
+
+function playNarratorVoice(url: string | undefined): void {
+  if (!url || typeof window === 'undefined') return
+  try {
+    if (narratorAudio) {
+      narratorAudio.pause()
+      narratorAudio.currentTime = 0
+    } else {
+      narratorAudio = new Audio()
+      narratorAudio.preload = 'auto'
+    }
+    narratorAudio.src = url
+    narratorAudio.volume = 0.85
+    // Autoplay can be rejected before the first user gesture — fail silently.
+    void narratorAudio.play().catch(() => { /* gated by browser */ })
+  } catch {
+    /* never throw from the store */
+  }
+}
+
+function stopNarratorVoice(): void {
+  if (narratorAudio) {
+    try {
+      narratorAudio.pause()
+      narratorAudio.currentTime = 0
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 export const useNarratorStore = create<NarratorState>((set, get) => ({
   isVisible: false,
   isAnimating: false,
@@ -99,6 +136,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
     const [first, ...rest] = incoming
     if (!get().isMuted) {
       audioManager.playSfx((first.sfx as never) ?? 'narrator.appear')
+      playNarratorVoice(first.voiceUrl)
     }
     set({
       isVisible: true,
@@ -123,6 +161,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   nextLine: () => {
     const { queue, isMuted } = get()
     if (queue.length === 0) {
+      stopNarratorVoice()
       set({
         currentDialogue: null,
         currentMood: 'idle',
@@ -134,6 +173,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
     const [next, ...rest] = queue
     if (!isMuted) {
       audioManager.playSfx((next.sfx as never) ?? 'narrator.appear')
+      playNarratorVoice(next.voiceUrl)
     }
     set({
       isVisible: true,
@@ -160,6 +200,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   },
 
   dismiss: () => {
+    stopNarratorVoice()
     if (!get().isMuted) {
       audioManager.playSfx('narrator.dismiss')
     }

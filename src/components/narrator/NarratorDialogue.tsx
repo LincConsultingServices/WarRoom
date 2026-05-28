@@ -117,20 +117,23 @@ export function NarratorDialogue() {
             }}
           />
 
-          {/* Parchment-noise overlay for tactility */}
+          {/* Parchment texture overlay — procedural SVG fractalNoise pattern */}
           <span
             aria-hidden
-            className="absolute inset-0 pointer-events-none opacity-[0.08] mix-blend-overlay"
+            className="absolute inset-0 pointer-events-none opacity-[0.18] mix-blend-overlay"
             style={{
               backgroundImage:
                 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'140\' height=\'140\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix values=\'0 0 0 0 0.79 0 0 0 0 0.64 0 0 0 0 0.16 0 0 0 0.7 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+              backgroundSize: '140px 140px',
             }}
           />
 
-          {/* Wax-seal style corner ornament */}
-          <span
-            aria-hidden
-            className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[0.6rem] font-bold select-none"
+          {/* Close button — wax-seal style */}
+          <button
+            type="button"
+            onClick={() => dismiss()}
+            aria-label="Close narrator"
+            className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[0.6rem] font-bold select-none cursor-pointer transition-transform hover:scale-110 active:scale-95 z-10"
             style={{
               background:
                 'radial-gradient(circle at 35% 35%, #c23b3b, #6e1010 70%, #2a0808)',
@@ -140,8 +143,8 @@ export function NarratorDialogue() {
               boxShadow: '0 0 8px rgba(139,26,26,0.6)',
             }}
           >
-            ⚔
-          </span>
+            ✕
+          </button>
 
           {/* Voice equalizer chip */}
           <span

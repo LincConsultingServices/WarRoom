@@ -142,7 +142,8 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
         .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--color-warroom-ivory); font-family: var(--font-display); }
         .stat-label { font-size: 0.85rem; color: var(--color-warroom-smoke); margin-top: 0.3rem; font-family: var(--font-body, serif); }
         .investor-results h3 { color: var(--color-warroom-ivory); margin-bottom: 1rem; font-family: var(--font-display); }
-        .scorecard { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; padding: 1.2rem; margin-bottom: 0.8rem; }
+        .scorecard { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; padding: 1.2rem; margin-bottom: 0.8rem; position: relative; overflow: hidden; }
+        .scorecard::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0px, transparent 2px, rgba(201,162,39,0.03) 2px, rgba(201,162,39,0.03) 4px); mix-blend-mode: overlay; pointer-events: none; }
         .sc-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
         .sc-header strong { color: var(--color-warroom-ivory); font-family: var(--font-display); }
         .deal-badge { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 6px; font-family: var(--font-display); }

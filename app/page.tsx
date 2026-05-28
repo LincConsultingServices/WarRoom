@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { FadeInUp, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } from '@/src/components/AnimatedComponents'
 import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
+import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import {
   WarRoomCTA,
   WarRoomCrest,
@@ -76,6 +77,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a0806 0%, #110e0a 40%, #0d0b09 100%)' }}>
+      <RouteBackground bg="landing" />
 
       {/* NAV */}
       <motion.nav

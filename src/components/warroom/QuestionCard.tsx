@@ -66,6 +66,14 @@ export function QuestionCard({
         'noise-overlay',
         className,
       )}
+      style={{
+        // Parchment-on-stone slab: aged vellum grain under a warm-dark wash that
+        // keeps gold + ivory copy fully legible.
+        backgroundImage:
+          'linear-gradient(rgba(16,14,10,0.82), rgba(16,14,10,0.86)), url("/assets/images/textures/parchment.webp")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
       aria-label={label ? `${label} ${questionText}` : questionText}
     >
       {/* Top-edge shimmer accent */}

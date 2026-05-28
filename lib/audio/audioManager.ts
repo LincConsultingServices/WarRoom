@@ -162,6 +162,15 @@ const DEFAULT_VOLUMES: Record<SfxKey, number> = {
 // attempting Howl playback that will never succeed.
 // ============================================================
 
+/**
+ * Master switch — when true, every playSfx() routes directly to the
+ * GOTSoundManager synth fallback and Howler is never asked to load an
+ * MP3. The real /assets/audio/sfx/*.mp3 files have not been generated
+ * yet (Gemini cannot synthesise SFX); flipping this to false makes
+ * Howler try MP3s again once they are dropped on disk.
+ */
+const SKIP_MP3_LOOKUP = true
+
 interface PooledHowl {
   howl: Howl
   fallbackFired: boolean
@@ -239,6 +248,14 @@ export function playSfx(key: SfxKey, volumeOverride?: number): void {
   if (isWarRoomAudioMuted()) return
 
   const baseVolume = volumeOverride ?? DEFAULT_VOLUMES[key]
+
+  // Skip MP3 lookup entirely while real SFX files don't exist on disk.
+  // Synth fallback handles the SFX volume multiplier internally.
+  if (SKIP_MP3_LOOKUP) {
+    playGOTSound(LEGACY_SFX_ALIASES[key], baseVolume)
+    return
+  }
+
   const finalVolume = baseVolume * getSfxVolumeMultiplier()
 
   const pooled = getOrCreateHowl(key)
@@ -263,6 +280,8 @@ export function playSfx(key: SfxKey, volumeOverride?: number): void {
 
 export function preloadSfx(keys: SfxKey[]): void {
   if (typeof window === 'undefined') return
+  // Nothing to preload when MP3 lookup is disabled — synth has no buffer step.
+  if (SKIP_MP3_LOOKUP) return
   for (const key of keys) {
     const pooled = getOrCreateHowl(key)
     if (pooled && !pooled.fallbackFired) {

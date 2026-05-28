@@ -57,12 +57,18 @@ export function useWarRoomCore(assessmentId: string) {
           } catch { return [] }
         })()
 
+        // War Room always faces the full Council (all 7 investors).
+        // Older assessments that captured only a 4-investor subset are
+        // augmented up to the full list so the chamber renders correctly.
+        const FULL_COUNCIL_SIZE = 7
         const filtered = selectedIds.length > 0
           ? investorList.filter((inv) => selectedIds.includes(inv.id))
           : investorList
 
-        // Fallback: if ID matching yielded nothing, use the full list
-        setInvestors(filtered.length > 0 ? filtered : investorList)
+        const finalList = filtered.length >= FULL_COUNCIL_SIZE
+          ? filtered
+          : investorList // legacy assessments → show everyone
+        setInvestors(finalList)
         setPhase('PITCH')
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load War Room')

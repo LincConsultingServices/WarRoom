@@ -10,28 +10,29 @@
 
 export const ASSET_REGISTRY = {
   narrator: {
-    idle:        '/assets/images/narrator/narrator-idle.webm',
-    speaking:    '/assets/images/narrator/narrator-speaking.webm',
-    pointing:    '/assets/images/narrator/narrator-pointing.webm',
-    celebrating: '/assets/images/narrator/narrator-celebrating.webm',
-    warning:     '/assets/images/narrator/narrator-warning.webm',
-    whispering:  '/assets/images/narrator/narrator-whispering.webm',
+    // Stills (Imagen) — animated WebMs are an aspirational upgrade per ASSETS_REQUIRED.md §3.
+    idle:        '/assets/images/narrator/narrator-idle.webp',
+    speaking:    '/assets/images/narrator/narrator-speaking.webp',
+    pointing:    '/assets/images/narrator/narrator-pointing.webp',
+    celebrating: '/assets/images/narrator/narrator-celebrating.webp',
+    warning:     '/assets/images/narrator/narrator-warning.webp',
+    whispering:  '/assets/images/narrator/narrator-whispering.webp',
   },
 
   backgrounds: {
-    landing:    '/assets/images/bg/landing-hall.jpg',
-    dashboard:  '/assets/images/bg/dashboard-chamber.jpg',
-    simulation: '/assets/images/bg/simulation-stone.jpg',
-    warroom:    '/assets/images/bg/warroom-throne.jpg',
-    verdict:    '/assets/images/bg/verdict-hall.jpg',
+    landing:    '/assets/images/bg/landing-hall.webp',
+    dashboard:  '/assets/images/bg/dashboard-chamber.webp',
+    simulation: '/assets/images/bg/simulation-stone.webp',
+    warroom:    '/assets/images/bg/warroom-throne.webp',
+    verdict:    '/assets/images/bg/verdict-hall.webp',
   },
 
   textures: {
-    noise:     '/assets/images/textures/noise.png',
-    parchment: '/assets/images/textures/parchment.jpg',
-    stone:     '/assets/images/textures/stone.jpg',
-    leather:   '/assets/images/textures/leather.jpg',
-    vignette:  '/assets/images/textures/vignette.png',
+    noise:     '/assets/images/textures/noise.webp',
+    parchment: '/assets/images/textures/parchment.webp',
+    stone:     '/assets/images/textures/stone.webp',
+    leather:   '/assets/images/textures/leather.webp',
+    vignette:  '/assets/images/textures/vignette.webp',
   },
 
   door: {

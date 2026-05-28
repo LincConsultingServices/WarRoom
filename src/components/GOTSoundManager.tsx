@@ -29,8 +29,18 @@ const GOT_AUDIO_MAP: Record<SoundEvent, string> = {
 // Re-export so legacy callers that imported the type still resolve
 export type { SoundEvent }
 
-/** Track which file paths have already 404'd so we don't keep retrying. */
-const knownMissing = new Set<SoundEvent>()
+/**
+ * Track which file paths have already 404'd so we don't keep retrying.
+ *
+ * Pre-seeded with every event because the legacy /audio/got/*.mp3 files
+ * have not been generated yet — the synthesised fallback is the intended
+ * source of audio for now. To restore MP3-first behaviour later (after
+ * dropping real files at /audio/got/*.mp3), remove the initial entries.
+ */
+const knownMissing = new Set<SoundEvent>([
+  'dragon_roar', 'sword_clash', 'horn_battle', 'coin_drop', 'chains',
+  'ravens_wings', 'triumph_fanfare', 'fire_crackle', 'throne_settle', 'scroll_open',
+])
 
 /**
  * Synthesize a sound through the AmbientAudioStore's master gain

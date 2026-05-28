@@ -1,8 +1,10 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { easeDramatic } from '@/lib/animations/variants'
+import { ASSET_REGISTRY } from '@/lib/assets/assetRegistry'
 
 export interface WarRoomCrestProps {
   size?: number
@@ -10,6 +12,8 @@ export interface WarRoomCrestProps {
   /** Disable mount animation. */
   staticRender?: boolean
 }
+
+const CREST_SRC = ASSET_REGISTRY.crests.warroom
 
 /**
  * <WarRoomCrest /> — the inline SVG sigil for the WarRoom brand.
@@ -25,6 +29,34 @@ export function WarRoomCrest({
 }: WarRoomCrestProps) {
   const prefersReducedMotion = useReducedMotion()
   const animate = !staticRender && !prefersReducedMotion
+
+  // Probe the on-disk crest SVG; when present, render it instead of the inline
+  // placeholder. Falls back automatically if the file is missing.
+  const [crestLoaded, setCrestLoaded] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    let cancelled = false
+    const img = new Image()
+    img.onload = () => { if (!cancelled) setCrestLoaded(true) }
+    img.onerror = () => { if (!cancelled) setCrestLoaded(false) }
+    img.src = CREST_SRC
+    return () => { cancelled = true }
+  }, [])
+
+  if (crestLoaded) {
+    return (
+      <motion.img
+        src={CREST_SRC}
+        alt="WarRoom crest"
+        width={size}
+        height={size}
+        className={cn('inline-block select-none', className)}
+        initial={animate ? { opacity: 0, y: -8, scale: 0.92 } : false}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.7, ease: easeDramatic }}
+      />
+    )
+  }
 
   return (
     <motion.svg

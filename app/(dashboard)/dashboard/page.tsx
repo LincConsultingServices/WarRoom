@@ -333,7 +333,7 @@ export default function DashboardPage() {
             {/* Campaign map (only when a trial is in motion) */}
             {currentSim && (
               <FadeInUp delay={0.15}>
-                <StoneCard padding="md">
+                <StoneCard padding="md" texture="leather">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <SigilBadge tone="crimson">Active Campaign</SigilBadge>
                     <span

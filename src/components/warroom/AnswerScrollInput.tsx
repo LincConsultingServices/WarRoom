@@ -58,6 +58,14 @@ export function AnswerScrollInput({
         disabled && 'opacity-60',
         className,
       )}
+      style={{
+        // Aged war-scroll: parchment grain beneath a warm-dark wash so the
+        // mono dispatch text stays crisp.
+        backgroundImage:
+          'linear-gradient(rgba(14,12,9,0.80), rgba(14,12,9,0.85)), url("/assets/images/textures/parchment.webp")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
       {/* Top accent — gold tape across the top edge */}
       <div

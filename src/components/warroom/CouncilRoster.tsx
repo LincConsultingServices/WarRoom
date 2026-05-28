@@ -51,7 +51,7 @@ export function CouncilRoster({
   return (
     <aside
       className={cn(
-        'flex h-full flex-col rounded-md border border-border/60 bg-card/50 p-3 backdrop-blur-sm',
+        'flex h-full flex-col overflow-hidden rounded-md border border-border/60 bg-card/50 p-3 backdrop-blur-sm',
         className,
       )}
       aria-label="War council roster"

@@ -36,6 +36,21 @@ const SCENE_FILES: Record<Exclude<AmbientScene, null>, string> = {
   'verdict-ceremony': '/sfx/ambient-verdict.mp3',
 }
 
+/**
+ * Master switch — when true, skip the network probe for ambient MP3s
+ * entirely. The real /sfx/*.mp3 files have not been generated yet
+ * (Gemini cannot synthesise music). Flip to false when real MP3s exist.
+ */
+const SKIP_AMBIENT_MP3_LOOKUP = true
+
+/**
+ * Master switch — when true, the procedural Web-Audio ambient engine
+ * is never started, so the chamber is silent (apart from SFX one-shots).
+ * Set to false to let the procedural engine generate a GoT-flavoured
+ * ambient bed when MP3 files are missing.
+ */
+const DISABLE_PROCEDURAL_AMBIENT = true
+
 const SCENE_TARGET_VOLUME: Record<Exclude<AmbientScene, null>, number> = {
   'warroom-lobby': 0.12,
   'warroom-active': 0.18,
@@ -243,6 +258,23 @@ export class AmbientAudioStore {
     const existing = this.tracks.get(scene)
     if (existing) return existing
 
+    // Short-circuit when MP3 lookup is disabled: register a stub "unavailable"
+    // track and let the procedural engine drive the scene. Avoids 404s.
+    if (SKIP_AMBIENT_MP3_LOOKUP) {
+      const audio = new Audio() // no .src — never makes a network request
+      const track: SceneTrack = {
+        audio,
+        source: null,
+        gain: ctx.createGain(),
+        unavailable: true,
+      }
+      track.gain.gain.value = 0
+      track.gain.connect(this.ambientBus)
+      this.tracks.set(scene, track)
+      this.activateProcedural(scene)
+      return track
+    }
+
     const audio = new Audio()
     audio.src = SCENE_FILES[scene]
     audio.loop = true
@@ -299,6 +331,7 @@ export class AmbientAudioStore {
   }
 
   private activateProcedural(scene: Exclude<AmbientScene, null>): void {
+    if (DISABLE_PROCEDURAL_AMBIENT) return
     const engine = this.ensureProcedural()
     if (!engine) return
     engine.setScene(scene as ProceduralScene)

@@ -5,6 +5,7 @@ import { toast } from '@/hooks/use-toast'
 
 interface UseAudioRecorderReturn {
     isRecording: boolean
+    isStarting: boolean
     audioBlob: Blob | null
     recordingTime: number
     maxDuration: number
@@ -17,6 +18,7 @@ interface UseAudioRecorderReturn {
 
 export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderReturn {
     const [isRecording, setIsRecording] = useState(false)
+    const [isStarting, setIsStarting] = useState(false)
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const [isSupported, setIsSupported] = useState(true)
@@ -47,6 +49,8 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
     }, [])
 
     const startRecording = useCallback(async () => {
+        if (isStarting || isRecording) return
+        setIsStarting(true)
         try {
             chunksRef.current = []
             setAudioBlob(null)
@@ -124,6 +128,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
 
             mediaRecorder.start() // Do not pass timeSlice to avoid instant termination issues
             setIsRecording(true)
+            setIsStarting(false)
 
             // Start countdown timer
             const startTime = Date.now()
@@ -158,25 +163,59 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
             console.error('Failed to start recording:', err)
             setError(errorMessage)
             setIsRecording(false)
+            setIsStarting(false)
             toast({ variant: 'destructive', title: toastTitle, description: errorMessage })
         }
-    }, [maxDurationSec])
+    }, [maxDurationSec, isStarting, isRecording])
+
+    // Force-clear all recording-related side effects (timer, stream, mic LED, refs).
+    // Idempotent and safe to call from any state. Separates teardown logic from
+    // stopRecording/resetRecording so both can use it.
+    const teardown = useCallback(() => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current)
+            timerRef.current = null
+        }
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop())
+            streamRef.current = null
+        }
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            try { mediaRecorderRef.current.stop() } catch { /* already stopping */ }
+        }
+        setIsRecording(false)
+        setIsStarting(false)
+    }, [])
 
     const stopRecording = useCallback(() => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.stop()
-        }
+        const target = mediaRecorderRef.current
+        if (!target || target.state !== 'recording') return
+        target.stop()
+        // Defensive: if `onstop` never fires for THIS recorder, force teardown
+        // after 2s. We bind to a specific MediaRecorder reference so that a
+        // brand-new recording started in the interim is NOT affected.
+        window.setTimeout(() => {
+            if (mediaRecorderRef.current === target && target.state !== 'inactive') {
+                setIsRecording(false)
+                if (timerRef.current) {
+                    clearInterval(timerRef.current)
+                    timerRef.current = null
+                }
+            }
+        }, 2000)
     }, [])
 
     const resetRecording = useCallback(() => {
+        teardown()
         setAudioBlob(null)
         setRecordingTime(0)
         setError(null)
         chunksRef.current = []
-    }, [])
+    }, [teardown])
 
     return {
         isRecording,
+        isStarting,
         audioBlob,
         recordingTime,
         maxDuration: maxDurationSec,

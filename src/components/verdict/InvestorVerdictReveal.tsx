@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { audioManager } from '@/lib/audio/audioManager'
 import { useTypewriterReveal } from '@/src/hooks/useTypewriterReveal'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor, InvestorScorecard, DealDecision } from '@/src/types'
 
 // ============================================================
@@ -150,12 +151,13 @@ export function InvestorVerdictReveal({
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.55)' }}
     >
       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-[color:var(--color-warroom-gold)]/40 bg-muted sm:h-24 sm:w-24">
-        {investor.avatar ? (
+        {investor.id || investor.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={investor.avatar}
+            src={investorPortraitSrc(investor)}
             alt={investor.name}
             className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center font-display text-2xl font-bold text-foreground/60">

@@ -20,6 +20,7 @@ import { AIAnalysisTab } from './_sections/AIAnalysisTab'
 import { ResponsesTab } from './_sections/ResponsesTab'
 import { GoldDivider } from '@/src/components/primitives'
 import { easeDramatic } from '@/lib/animations/variants'
+import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 
 // ============================================
 // Final Report — thin orchestrator shell
@@ -91,7 +92,20 @@ export default function FinalReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-warroom-void)]">
+    <div className="min-h-screen bg-[color:var(--color-warroom-void)] relative">
+      {/* Stone texture backdrop */}
+      <div
+        aria-hidden
+        className="fixed inset-0 pointer-events-none -z-10"
+        style={{
+          backgroundImage: 'url("/assets/images/textures/stone.webp")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.08,
+          mixBlendMode: 'overlay',
+        }}
+      />
+      <NoiseOverlay opacity={0.04} />
       {/* Atmospheric glow */}
       <div
         className="fixed inset-0 pointer-events-none"

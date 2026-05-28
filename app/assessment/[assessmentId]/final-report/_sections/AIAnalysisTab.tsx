@@ -3,6 +3,23 @@
 import type React from 'react'
 import type { EvaluationReport } from '@/src/types'
 
+function inlineMd(raw: string): React.ReactNode {
+  const parts: React.ReactNode[] = []
+  let remaining = raw
+  let i = 0
+  while (remaining.length > 0) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/)
+    if (!boldMatch || boldMatch.index === undefined) {
+      parts.push(remaining)
+      break
+    }
+    if (boldMatch.index > 0) parts.push(remaining.slice(0, boldMatch.index))
+    parts.push(<strong key={`b${i++}`}>{boldMatch[1]}</strong>)
+    remaining = remaining.slice(boldMatch.index + boldMatch[0].length)
+  }
+  return parts.length === 1 ? parts[0] : <>{parts}</>
+}
+
 function renderAnalysis(text: string): React.ReactNode {
   if (!text) return <p className="no-data">No detailed analysis available.</p>
 
@@ -15,16 +32,18 @@ function renderAnalysis(text: string): React.ReactNode {
     if (!trimmed) {
       elements.push(<br key={key++} />)
     } else if (trimmed.startsWith('## ')) {
-      elements.push(<h3 key={key++} className="analysis-heading">{trimmed.replace('## ', '')}</h3>)
-    } else if (trimmed.startsWith('- ')) {
+      elements.push(<h3 key={key++} className="analysis-heading">{inlineMd(trimmed.slice(3))}</h3>)
+    } else if (trimmed.startsWith('### ')) {
+      elements.push(<h3 key={key++} className="analysis-heading">{inlineMd(trimmed.slice(4))}</h3>)
+    } else if (/^[-*] /.test(trimmed)) {
       elements.push(
         <div key={key++} className="analysis-bullet">
           <span className="bullet">&bull;</span>
-          <span>{trimmed.replace('- ', '')}</span>
+          <span>{inlineMd(trimmed.slice(2))}</span>
         </div>
       )
     } else {
-      elements.push(<p key={key++} className="analysis-text">{trimmed}</p>)
+      elements.push(<p key={key++} className="analysis-text">{inlineMd(trimmed)}</p>)
     }
   }
   return <>{elements}</>

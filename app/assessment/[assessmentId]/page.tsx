@@ -20,6 +20,7 @@ import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATI
 import { stageLabel } from '@/src/lib/helpers'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { narratorPhaseForStage } from '@/lib/narrator/scripts'
+import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import type { StageName } from '@/src/types'
 
 export default function SimulationPage() {
@@ -248,7 +249,7 @@ export default function SimulationPage() {
     return (
       <>
         {sharedOverlays}
-        <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, var(--color-warroom-void) 0%, var(--color-warroom-black) 100%)' }}>
+        <div className="h-screen flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, var(--color-warroom-void) 0%, var(--color-warroom-black) 100%)' }}>
           <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warroom-gold) 20%, transparent), transparent)', zIndex: 40 }} />
           <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council weighs your idea..." subtitle="Forging your founder assessment" />
           <SimulationHeader
@@ -259,7 +260,7 @@ export default function SimulationPage() {
             showTimer={shouldRunTimer}
             accent={accent}
           />
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[200px_1fr_220px] gap-6 max-w-7xl mx-auto w-full px-4 py-6">
+          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[200px_1fr_220px] gap-6 max-w-7xl mx-auto w-full px-4 py-6 overflow-y-auto overflow-x-hidden">
             {sidebar.left}
             <IdeationView
               questions={questions}
@@ -284,8 +285,9 @@ export default function SimulationPage() {
 
   return (
     <>
+      <RouteBackground bg="simulation" />
       {sharedOverlays}
-      <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, var(--color-warroom-void) 0%, var(--color-warroom-black) 100%)' }}>
+      <div className="h-screen flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, var(--color-warroom-void) 0%, var(--color-warroom-black) 100%)' }}>
         <div className="fixed inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warroom-gold) 15%, transparent), transparent)', zIndex: 31 }} />
         <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council deliberates..." subtitle="Your answers are being judged" />
         {isCrisisQuestion && <div className="crisis-vignette" />}
@@ -298,7 +300,7 @@ export default function SimulationPage() {
           isCrisis={isCrisisQuestion}
           accent={accent}
         />
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[200px_1fr_220px] gap-6 max-w-7xl mx-auto w-full px-4 py-6">
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[200px_1fr_220px] gap-6 max-w-7xl mx-auto w-full px-4 py-6 overflow-y-auto overflow-x-hidden">
           {sidebar.left}
           <StageView
             questions={questions}

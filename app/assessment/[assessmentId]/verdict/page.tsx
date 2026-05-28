@@ -7,6 +7,7 @@ import type { AssessmentState, EvaluationReport, Investor, InvestorScorecard } f
 import { VerdictCeremony } from '@/src/components/verdict/VerdictCeremony'
 import { EmberDriftBackdrop } from '@/src/components/verdict/EmberDriftBackdrop'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { RouteBackground } from '@/src/components/effects/RouteBackground'
 
 // ============================================================
 // /assessment/[id]/verdict
@@ -47,31 +48,42 @@ export default function VerdictPage() {
 
     const load = async () => {
       try {
-        const [assessmentState, allInvestors, scorecards] = await Promise.all([
-          api.assessments.get(assessmentId) as Promise<AssessmentState>,
-          api.config.getInvestors() as Promise<Investor[]>,
-          api.assessments.getScorecard(assessmentId) as Promise<InvestorScorecard[]>,
-        ])
+        // Only the assessment + investors fetches are load-bearing for rendering
+        // the ceremony shell. Scorecards and report are best-effort: if either
+        // backend call fails (e.g. the war-room session never persisted
+        // scorecards because of empty transcriptions), we still let the
+        // ceremony render with an empty array / null report rather than
+        // showing a hard "chamber refused entry" wall.
+        const [assessmentState, allInvestors, scorecardsResult, reportResult] =
+          await Promise.all([
+            api.assessments.get(assessmentId) as Promise<AssessmentState>,
+            api.config.getInvestors() as Promise<Investor[]>,
+            (api.assessments.getScorecard(assessmentId) as Promise<InvestorScorecard[]>)
+              .catch((err) => {
+                console.warn('[verdict] scorecard fetch failed, using empty list:', err)
+                return [] as InvestorScorecard[]
+              }),
+            (api.assessments.getReport(assessmentId) as Promise<EvaluationReport>)
+              .catch(() => null),
+          ])
 
         const selectedIds: string[] = assessmentState?.assessment?.selectedInvestors ?? []
-        const selected = selectedIds.length > 0
+        const FULL_COUNCIL_SIZE = 7
+        const selectedFromAssessment = selectedIds.length > 0
           ? allInvestors.filter((inv) => selectedIds.includes(inv.id))
           : allInvestors
-
-        // Report is optional — don't block the ceremony if it 404s.
-        let report: EvaluationReport | null = null
-        try {
-          report = (await api.assessments.getReport(assessmentId)) as EvaluationReport
-        } catch {
-          report = null
-        }
+        // Same legacy-assessment safety net as the war-room page:
+        // if fewer than 7 were captured, show the full council.
+        const selected = selectedFromAssessment.length >= FULL_COUNCIL_SIZE
+          ? selectedFromAssessment
+          : allInvestors
 
         if (cancelled) return
         setState({
           kind: 'ready',
           investors: selected,
-          scorecards,
-          report,
+          scorecards: scorecardsResult,
+          report: reportResult,
         })
       } catch (err) {
         if (cancelled) return
@@ -101,12 +113,15 @@ export default function VerdictPage() {
   }
 
   return (
-    <VerdictCeremony
-      investors={state.investors}
-      scorecards={state.scorecards}
-      report={state.report}
-      onContinue={handleContinue}
-    />
+    <>
+      <RouteBackground bg="verdict" />
+      <VerdictCeremony
+        investors={state.investors}
+        scorecards={state.scorecards}
+        report={state.report}
+        onContinue={handleContinue}
+      />
+    </>
   )
 }
 

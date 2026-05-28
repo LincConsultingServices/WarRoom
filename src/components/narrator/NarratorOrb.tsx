@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useNarratorStore } from '@/src/state/narratorStore'
+import { ASSET_REGISTRY } from '@/lib/assets/assetRegistry'
 import { NarratorDialogue } from './NarratorDialogue'
 import { NarratorSpotlight } from './NarratorSpotlight'
 
 const ORB_SIZE = 64
+
+// Probe each narrator mood PNG once at module load; the orb overlays the
+// matching image when present, falling back to the CSS gradient orb otherwise.
+// (Stills only — animated WebMs are an aspirational upgrade per spec.)
+type NarratorMood = keyof typeof ASSET_REGISTRY.narrator
+const narratorMoodSrc: Record<NarratorMood, string> = ASSET_REGISTRY.narrator
 
 /**
  * <NarratorOrb /> — the persistent floating Oracle.
@@ -32,6 +39,22 @@ export function NarratorOrb() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Probe the mood-specific portrait. When it loads, we overlay it on top
+  // of the gradient orb; otherwise the orb renders bare (existing CSS look).
+  const [portraitLoaded, setPortraitLoaded] = useState(false)
+  const moodKey: NarratorMood = (currentMood ?? 'idle') as NarratorMood
+  const portraitSrc = narratorMoodSrc[moodKey] ?? narratorMoodSrc.idle
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    let cancelled = false
+    setPortraitLoaded(false)
+    const img = new Image()
+    img.onload = () => { if (!cancelled) setPortraitLoaded(true) }
+    img.onerror = () => { if (!cancelled) setPortraitLoaded(false) }
+    img.src = portraitSrc
+    return () => { cancelled = true }
+  }, [portraitSrc])
 
   if (!mounted) return null
   if (!isVisible && !currentDialogue) return null
@@ -120,17 +143,31 @@ export function NarratorOrb() {
               }}
             />
 
-            {/* Sigil */}
-            <span
-              className="absolute inset-0 flex items-center justify-center text-[1.6rem] select-none"
-              style={{
-                color: '#0a0805',
-                textShadow: '0 0 6px rgba(240,192,64,0.85)',
-                fontFamily: 'var(--font-display-decorative, var(--font-display))',
-              }}
-            >
-              ⚜
-            </span>
+            {/* Mood-specific portrait overlay (PNG) — when the file loads, it
+                replaces the bare sigil; otherwise the sigil glyph stays. */}
+            {portraitLoaded ? (
+              <span
+                className="absolute inset-0 overflow-hidden rounded-full"
+                style={{
+                  backgroundImage: `url("${portraitSrc}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  mixBlendMode: 'screen',
+                  opacity: 0.92,
+                }}
+              />
+            ) : (
+              <span
+                className="absolute inset-0 flex items-center justify-center text-[1.6rem] select-none"
+                style={{
+                  color: '#0a0805',
+                  textShadow: '0 0 6px rgba(240,192,64,0.85)',
+                  fontFamily: 'var(--font-display-decorative, var(--font-display))',
+                }}
+              >
+                ⚜
+              </span>
+            )}
 
             {/* Celebrating particle burst */}
             <AnimatePresence>

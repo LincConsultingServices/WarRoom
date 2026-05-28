@@ -47,7 +47,12 @@ export function DynamicScenarioQuestion({
   if (!dynamicScenario) {
     return (
       <div className="text-center py-8 space-y-3">
-        <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">{dynamicScenarioError || 'Failed to generate scenario.'}</div>
+        <div className="dynamic-scenario-border rounded-xl">
+          <div className="p-5 text-sm text-center">
+            <AlertTriangle className="h-5 w-5 mx-auto mb-2 text-[color:var(--color-warroom-crimson-bright,#c23b3b)]" />
+            <p className="text-[color:var(--color-warroom-crimson-bright,#c23b3b)]">{dynamicScenarioError || 'Failed to generate scenario.'}</p>
+          </div>
+        </div>
         <Button variant="outline" onClick={onRetryScenario}>Retry scenario generation</Button>
       </div>
     )
@@ -58,8 +63,10 @@ export function DynamicScenarioQuestion({
 
   return (
     <FadeInUp className="space-y-4">
-      <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 text-sm leading-relaxed whitespace-pre-line font-medium italic">
-        &ldquo;{dynamicScenario.questionText}&rdquo;
+      <div className="dynamic-scenario-border rounded-xl">
+        <div className="p-5 text-sm leading-relaxed whitespace-pre-line font-medium italic text-foreground/90">
+          &ldquo;{dynamicScenario.questionText}&rdquo;
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-3">
         {options.map((opt: SimOption) => {
@@ -68,7 +75,12 @@ export function DynamicScenarioQuestion({
             <button
               key={opt.id}
               onClick={() => { onSelect(opt) }}
-              className={cn('w-full text-left px-4 py-3 rounded-xl border-2 transition-all text-sm', isSelected ? 'border-primary bg-primary/5 font-bold' : 'border-border hover:border-primary/40 hover:bg-muted/30')}
+              className={cn(
+                'w-full text-left px-4 py-3 rounded-xl border transition-all text-sm',
+                isSelected
+                  ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/5 font-bold shadow-[0_0_12px_rgba(201,162,39,0.15)]'
+                  : 'border-[color:var(--color-warroom-gold)]/20 hover:border-[color:var(--color-warroom-gold)]/50 hover:bg-[color:var(--color-warroom-gold)]/5',
+              )}
             >
               {opt.text}
             </button>
@@ -90,11 +102,13 @@ export function DynamicScenarioQuestion({
             </div>
           ) : followupError ? (
             <div className="space-y-3">
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-900 dark:text-red-100">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-red-600" /><span className="font-bold">Follow-up Scenario Failed</span></div>
-                {followupError}
+              <div className="dynamic-scenario-border rounded-xl">
+                <div className="p-4 text-sm">
+                  <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-[color:var(--color-warroom-crimson-bright,#c23b3b)]" /><span className="font-bold text-[color:var(--color-warroom-crimson-bright,#c23b3b)]">Follow-up Scenario Failed</span></div>
+                  <p className="text-foreground/80">{followupError}</p>
+                </div>
               </div>
-              <Button variant="outline" onClick={() => selectedOpt && onRetryFollowup(selectedOpt)} className="w-full text-red-600 hover:bg-red-50">Retry Generating Consequence</Button>
+              <Button variant="outline" onClick={() => selectedOpt && onRetryFollowup(selectedOpt)} className="w-full">Retry Generating Consequence</Button>
             </div>
           ) : followupScenario && (
             <div className="space-y-3">
