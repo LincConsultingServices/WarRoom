@@ -74,3 +74,7 @@ desktop.ini# Local IDE, cache, and environment files (unnecessary to track)
 logs/
 
 # Local IDE, cache, and environment files (unnecessary to track)
+
+# Auto-added frontend ignore entries
+.next/
+node_modules/
