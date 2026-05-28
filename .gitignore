@@ -65,4 +65,12 @@ scripts/compression-results.json
 
 # OS
 Thumbs.db
-desktop.ini
+desktop.ini# Local IDE, cache, and environment files (unnecessary to track)
+.vscode/
+.idea/
+.venv/
+.cache/
+*.log
+logs/
+
+# Local IDE, cache, and environment files (unnecessary to track)
