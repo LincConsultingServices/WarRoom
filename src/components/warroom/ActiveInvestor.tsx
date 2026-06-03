@@ -72,22 +72,12 @@ export function ActiveInvestor({
   return (
     <aside
       className={cn(
-        'relative flex h-full flex-col gap-4 rounded-md border border-border/60 bg-card/70 p-5 backdrop-blur-sm',
+        'relative flex h-full min-h-[420px] flex-col overflow-hidden rounded-md border border-border/60 bg-card/70 backdrop-blur-sm',
         className,
       )}
     >
-      {/* Heraldic sigil watermark — top-right corner of the panel. The image
-          tag self-hides if the file is missing, so older investors without a
-          generated sigil simply render without it. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/investors/${investor.id}/sigil.webp`}
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute right-3 top-3 z-10 h-9 w-9 opacity-70 mix-blend-screen"
-        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-      />
-
+      {/* Full-bleed portrait fills the whole panel — the investor dominates
+          the left of the chamber. */}
       <InvestorPortraitMedia
         investorId={investor.id}
         name={investor.name}
@@ -95,28 +85,44 @@ export function ActiveInvestor({
         assetKey={portrait.assetKey}
         sentiment={portrait.sentiment}
         portraitOverrideUrl={investorPortraitSrc(investor)}
+        fill
+        className="!absolute inset-0 !rounded-none !border-0"
       />
 
-      <div className="flex flex-col gap-1.5">
-        <h2 className="font-display text-xl font-semibold leading-tight tracking-wide text-foreground">
+      {/* Heraldic sigil watermark — top-right, above the portrait. Self-hides
+          when the file is missing. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/investors/${investor.id}/sigil.webp`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute right-3 top-3 z-20 h-10 w-10 opacity-80 mix-blend-screen"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+      />
+
+      {/* Metadata + disposition overlaid on a bottom scrim so the image stays full-height. */}
+      <div
+        className="relative z-10 mt-auto flex flex-col gap-2 px-4 pb-4 pt-12"
+        style={{ background: 'linear-gradient(to top, rgba(8,6,4,0.92) 35%, rgba(8,6,4,0.55) 70%, transparent)' }}
+      >
+        <h2 className="font-display text-2xl font-semibold leading-tight tracking-wide text-foreground drop-shadow">
           {investor.name}
         </h2>
-        {investor.primary_lens && (
-          <span className="inline-block w-fit rounded-sm border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-amber-300">
-            {investor.primary_lens}
-          </span>
-        )}
-        {investor.bias_trait_name && (
-          <p className="text-xs italic text-foreground/65">
-            <span className="font-semibold not-italic uppercase tracking-wider text-foreground/40">
-              Bias:&nbsp;
+        <div className="flex flex-wrap items-center gap-2">
+          {investor.primary_lens && (
+            <span className="inline-block w-fit rounded-sm border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-amber-300">
+              {investor.primary_lens}
             </span>
-            {investor.bias_trait_name}
-          </p>
-        )}
+          )}
+          {investor.bias_trait_name && (
+            <span className="text-xs italic text-foreground/70">
+              <span className="font-semibold not-italic uppercase tracking-wider text-foreground/45">Bias:&nbsp;</span>
+              {investor.bias_trait_name}
+            </span>
+          )}
+        </div>
+        <DispositionMeter value={dispoTarget} className="mt-1" />
       </div>
-
-      <DispositionMeter value={dispoTarget} className="mt-auto" />
     </aside>
   )
 }

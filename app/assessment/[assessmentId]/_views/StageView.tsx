@@ -14,6 +14,7 @@ import { BudgetQuestion } from './question-types/BudgetQuestion'
 import { AIScenarioQuestion } from './question-types/AIScenarioQuestion'
 import { InfoQuestion } from './question-types/InfoQuestion'
 import { getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from '@/src/lib/helpers'
+import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 import type { SimQuestion, SimOption, PhaseResponse } from '@/src/types'
 
 interface StageViewProps {
@@ -72,6 +73,7 @@ export function StageView({
   onBudgetAllocation, onSubmitPhase, onBuyoutCompanyChange, onBuyoutAmountChange,
   onBuyoutSubmit, onRetryScenario, onAcknowledge, setQIndex, setMcqFeedback,
 }: StageViewProps) {
+  const submitIntro = useFeatureIntro('stage-submit')
   const qType: string = ((currentQ as unknown as Record<string, unknown>)?.type as string) || ''
 
   function renderQuestionContent() {
@@ -199,7 +201,7 @@ export function StageView({
                 ))}
               </div>
               {isLastQuestion ? (
-                <Button onClick={onSubmitPhase} disabled={submitting} size="sm" style={{ backgroundColor: accent }}>
+                <Button {...submitIntro} onClick={onSubmitPhase} disabled={submitting} size="sm" style={{ backgroundColor: accent }}>
                   {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Evaluating...</> : <><Send className="h-4 w-4 mr-2" />Submit Phase</>}
                 </Button>
               ) : (

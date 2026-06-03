@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { RevenueSidePanel } from '@/src/components/RevenueSidePanel'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
 import { CharacterPicker } from '@/src/components/CharacterPicker'
-import { CinemaOverlay, StageNarrationOverlay, SnapshotDashboard, MentorTipPopup } from '@/src/components/AnimatedComponents'
-import { MentorLifelinesCard, MentorOverlay } from '@/src/components/MentorComponents'
+import { CinemaOverlay, StageNarrationOverlay, SnapshotDashboard } from '@/src/components/AnimatedComponents'
+import { MentorBlock, MentorOverlay } from '@/src/components/MentorComponents'
 import { SimulationHeader } from '@/src/components/SimulationHeader'
 import { IdeationView } from './_views/IdeationView'
 import { StageView } from './_views/StageView'
@@ -37,7 +37,7 @@ export default function SimulationPage() {
     revenue, prevRevenue, userId, batchCode, budgetAllocations,
     mentors, loadingConfig, showMentorPanel, selectedMentorId, mentorQuestion, mentorLoading, mentorResult,
     showPanelSelection, settingCharacters, showCapitalAnimation,
-    showStageNarration, showSnapshot, showMentorTip,
+    showStageNarration, showSnapshot,
     stageTimer, shouldRunTimer, isCrisisQuestion,
     entries, connected, updatedAt, snapshotContinueRef,
     showRestartConfirm, setShowRestartConfirm, confirmRestart,
@@ -80,6 +80,12 @@ export default function SimulationPage() {
   const narration = STAGE_NARRATIVES[simulation.currentStage]
   const mentorTip = STAGE_MENTOR_TIPS[simulation.currentStage]
   const stageIdx = STAGE_ORDER.indexOf(simulation.currentStage as StageName)
+  // The snapshot's middle column previews the stage the founder is about to enter.
+  const nextStageName = STAGE_ORDER[stageIdx + 1]
+  const nextStageNarr = nextStageName ? STAGE_NARRATIVES[nextStageName] : undefined
+  const nextStageData = nextStageNarr
+    ? { ...nextStageNarr, voiceUrl: `/audio/narrator/snapshot-${nextStageName.toLowerCase()}-01-speaking.mp3` }
+    : undefined
 
   // ---- Panel Selection ----
   if (showPanelSelection) {
@@ -184,16 +190,11 @@ export default function SimulationPage() {
         previousRevenue={prevRevenue}
         leaderboardEntries={entries.map(e => ({ name: e.name || e.userId, score: e.revenueProjection || 0, isUser: e.userId === userId }))}
         stageName={stageLabel(simulation.currentStage)}
+        nextStage={nextStageData}
+        budgetAllocations={simulation.budgetAllocations}
+        capital={simulation.capital}
         onContinue={() => snapshotContinueRef.current?.()}
       />
-      {mentorTip && (
-        <MentorTipPopup
-          show={showMentorTip}
-          message={mentorTip}
-          onDismiss={() => { /* handled in hook */ }}
-          onAskMentor={() => { setMentorResult(null); setShowMentorPanel(true) }}
-        />
-      )}
       {/* Capital animation */}
       <AnimatePresence>
         {showCapitalAnimation && (
@@ -206,9 +207,10 @@ export default function SimulationPage() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Mentor button */}
-      <div className="fixed bottom-6 right-6 z-40 group">
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowMentorPanel(true)}
+      {/* Mobile-only mentor entry point (the full Mentor's Counsel block
+          lives in the desktop sidebar, which is hidden below lg). */}
+      <div className="fixed bottom-6 right-6 z-40 lg:hidden">
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => { setMentorResult(null); setShowMentorPanel(true) }}
           className="flex items-center gap-2"
           style={{ background: 'color-mix(in srgb, var(--color-warroom-black) 90%, transparent)', border: `1px solid ${accent}40`, borderRadius: '24px', padding: '8px 16px 8px 8px', boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 20px ${accent}20`, backdropFilter: 'blur(8px)' }}
         >
@@ -234,7 +236,7 @@ export default function SimulationPage() {
     ),
     right: (
       <div className="hidden lg:flex flex-col gap-4">
-        <MentorLifelinesCard lifelinesLeft={lifelinesLeft} onOpen={() => { setMentorResult(null); setShowMentorPanel(true) }} />
+        <MentorBlock lifelinesLeft={lifelinesLeft} tip={mentorTip} onOpen={() => { setMentorResult(null); setShowMentorPanel(true) }} />
         {batchCode ? (
           <LeaderboardPanel entries={entries} currentUserId={userId} connected={connected} updatedAt={updatedAt} className="flex-1 max-h-[500px]" />
         ) : (

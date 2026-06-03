@@ -35,6 +35,7 @@ import { CampaignMap } from '@/src/components/dashboard/CampaignMap'
 import { StatTile } from '@/src/components/dashboard/StatTile'
 import { audioManager } from '@/lib/audio/audioManager'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 
 interface AssessmentWithRevenue extends Assessment {
   revenueProjection?: number
@@ -72,6 +73,7 @@ export default function DashboardPage() {
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
   useNarratorOnboarding('dashboard', { delayMs: 1800 })
+  const beginIntro = useFeatureIntro('dashboard-begin', { elementId: 'dashboard-begin-cta' })
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
@@ -265,7 +267,7 @@ export default function DashboardPage() {
                     : 'The realm is quiet. When you are ready, the trial begins.'}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-3">
-                  <div id="dashboard-begin-cta">
+                  <div {...beginIntro}>
                     <WarRoomCTA
                       size="lg"
                       variant="primary"

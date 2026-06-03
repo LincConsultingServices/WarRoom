@@ -32,6 +32,8 @@ import { useCouncilMoods } from '@/src/hooks/useCouncilMoods'
 import { useFeedbackSentiment } from '@/src/hooks/useFeedbackSentiment'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { narratorPhaseForWarRoom } from '@/lib/narrator/scripts'
+import { investorPortraitSrc } from '@/src/lib/investorAssets'
+import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 
 // ============================================
 // WAR ROOM – Investor Pitch Simulation
@@ -200,6 +202,11 @@ export default function WarRoomSimulation() {
     // ── Narrator — war-room phase-specific onboarding lines ──
     const narratorPhase = narratorPhaseForWarRoom(phase)
     useNarratorOnboarding(narratorPhase ?? '', { enabled: !!narratorPhase })
+
+    // ── First-hover Oracle intros for the War Room's key controls ──
+    const offerIntro = useFeatureIntro('negotiation-offer')
+    const pitchRecordIntro = useFeatureIntro('warroom-pitch-record')
+    const investorMicIntro = useFeatureIntro('warroom-investor-mic')
 
     // Cinematic entrance overlay — shown until the door video / fallback completes.
     const [showEntrance, setShowEntrance] = useState(true)
@@ -952,6 +959,7 @@ export default function WarRoomSimulation() {
                                         </>
                                     )}
                                     <motion.button
+                                        {...pitchRecordIntro}
                                         className={`mic-button ${pitchRecorder.isRecording ? 'active' : ''} ${pitchRecorder.audioBlob ? 'done' : ''}`}
                                         onClick={pitchRecorder.isRecording ? pitchRecorder.stopRecording : pitchRecorder.startRecording}
                                         disabled={pitchRecorder.isStarting}
@@ -1225,6 +1233,7 @@ export default function WarRoomSimulation() {
                                             </>
                                         )}
                                          <motion.button
+                                             {...investorMicIntro}
                                              className={`mic-button ${responseRecorder.isRecording ? 'active' : ''} ${responseRecorder.audioBlob ? 'done' : ''}`}
                                              onClick={responseRecorder.isRecording ? responseRecorder.stopRecording : responseRecorder.startRecording}
                                              disabled={(responseSubmitted && followupPhase !== 'followup_pending') || isSubmitting || isAnalyzing || responseRecorder.isStarting}
@@ -1364,39 +1373,37 @@ export default function WarRoomSimulation() {
                                 {offers.map((offer, i) => (
                                     <motion.div
                                         key={i}
-                                        className="scorecard"
-                                        style={{ borderColor: '#10b98144', cursor: 'pointer' }}
-                                        initial={{ opacity: 0, y: 30, rotateX: -10 }}
-                                        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                        {...(i === 0 ? offerIntro : {})}
+                                        className="offer-card"
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
                                         onClick={() => handleSelectOffer(offer)}
                                     >
-                                        <div className="sc-header">
-                                            <motion.div
-                                                className="sc-avatar"
-                                                style={{ borderColor: '#10b981' }}
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                transition={{ delay: 0.5 + i * 0.15, type: 'spring', stiffness: 300 }}
-                                            >
-                                                {offer.investorName.charAt(0)}
-                                            </motion.div>
-                                            <div>
-                                                <h3 className="sc-name">{offer.investorName}</h3>
-                                                <span className="sc-decision" style={{ color: '#10b981' }}>
-                                                    OFFER RECEIVED
-                                                </span>
+                                        {/* Photo on top */}
+                                        <div className="offer-portrait">
+                                            <span className="offer-portrait-fallback" aria-hidden>{offer.investorName?.charAt(0) ?? '?'}</span>
+                                            {offer.investorId && (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img
+                                                    src={investorPortraitSrc({ id: offer.investorId })}
+                                                    alt={offer.investorName}
+                                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                                                />
+                                            )}
+                                            <span className="offer-tag">Offer Received</span>
+                                        </div>
+                                        {/* Offer below */}
+                                        <div className="offer-body">
+                                            <h3 className="offer-name">{offer.investorName}</h3>
+                                            <div className="offer-deal">
+                                                <span>${(offer.capital || 0).toLocaleString()}</span>
+                                                <span>{offer.equity}% equity</span>
                                             </div>
-                                        </div>
-                                        <div className="sc-deal">
-                                            <span>Offer: ${(offer.capital || 0).toLocaleString()}</span>
-                                            <span>For {offer.equity}% equity</span>
-                                        </div>
-                                        <div className="sc-investor-reaction">
-                                            <p>"{offer.message}"</p>
-                                        </div>
-                                        <div style={{ marginTop: '1rem', textAlign: 'center', color: '#10b981', fontWeight: 'bold' }}>
-                                            Click to Negotiate →
+                                            <div className="offer-quote">
+                                                <p>&ldquo;{offer.message}&rdquo;</p>
+                                            </div>
+                                            <div className="offer-cta">Click to Negotiate →</div>
                                         </div>
                                     </motion.div>
                                 ))}

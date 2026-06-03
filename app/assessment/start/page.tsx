@@ -25,6 +25,7 @@ import {
   WarRoomCrest,
 } from '@/src/components/primitives'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 import { audioManager } from '@/lib/audio/audioManager'
 import {
   staggerContainer,
@@ -103,6 +104,7 @@ export default function SimulationStartPage() {
 
   // Narrator onboarding for this phase
   useNarratorOnboarding('assessment', { delayMs: 1200 })
+  const startIntro = useFeatureIntro('assessment-start', { elementId: 'assessment-start-cta' })
 
   const handleStart = async () => {
     if (!acceptedTerms) {
@@ -521,7 +523,7 @@ export default function SimulationStartPage() {
           </AnimatePresence>
 
           {/* Start CTA */}
-          <div id="assessment-start-cta" className="flex flex-col items-stretch gap-3">
+          <div {...startIntro} className="flex flex-col items-stretch gap-3">
             <WarRoomCTA
               size="lg"
               variant="primary"

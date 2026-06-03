@@ -510,93 +510,48 @@
     cursor: none !important;
   }
 
-  /* ── Outer ring (flows behind dot with lerp trail) ── */
-  .wr-cursor-ring {
+  /* ── Golden arrow cursor + flame embers (single translated container) ── */
+  .wr-cursor {
     position: fixed;
     top: 0;
     left: 0;
-    width: 28px;
-    height: 28px;
-    border: 1.5px solid var(--color-warroom-gold-dark);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.5;
-    mix-blend-mode: multiply;
-    will-change: transform;
-    /* transform is intentionally excluded — position is driven by JS lerp.
-       Only visual properties transition so the ring never jumps on state change. */
-    transition:
-      opacity 200ms ease,
-      box-shadow 200ms ease,
-      border-color 200ms ease,
-      border-width 200ms ease;
-  }
-
-  :is(.dark) .wr-cursor-ring {
-    border-color: var(--color-warroom-gold);
-    opacity: 0.5;
-    mix-blend-mode: screen;
-  }
-
-  .wr-cursor-ring.wr-cursor--hover {
-    opacity: 1;
-    border-color: var(--color-warroom-electrum);
-    border-width: 2px;
-    box-shadow:
-      0 0 12px color-mix(in srgb, var(--color-warroom-gold) 70%, transparent),
-      0 0 30px color-mix(in srgb, var(--color-warroom-gold) 35%, transparent),
-      inset 0 0 6px color-mix(in srgb, var(--color-warroom-gold) 15%, transparent);
-  }
-
-  .wr-cursor-ring.wr-cursor--click {
-    opacity: 1;
-    border-color: color-mix(in srgb, var(--color-warroom-electrum) 90%, white);
-    border-width: 2px;
-    box-shadow:
-      0 0 18px color-mix(in srgb, var(--color-warroom-gold) 90%, transparent),
-      0 0 40px color-mix(in srgb, var(--color-warroom-gold) 50%, transparent),
-      inset 0 0 10px color-mix(in srgb, var(--color-warroom-gold) 25%, transparent);
-  }
-
-  /* ── Inner precision dot (snaps instantly to cursor position) ── */
-  .wr-cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 5px;
-    background: var(--color-warroom-gold-dark);
-    border-radius: 50%;
+    width: 0;
+    height: 0;
     pointer-events: none;
     z-index: 9999;
-    box-shadow: 0 0 4px var(--color-warroom-gold-dark);
     will-change: transform;
-    /* transform excluded — snaps directly. Only visual properties animate. */
-    transition:
-      opacity 180ms ease,
-      box-shadow 150ms ease,
-      background-color 150ms ease;
+    /* transform is JS-driven (translate); only opacity transitions here. */
+    transition: opacity 180ms ease;
   }
 
-  :is(.dark) .wr-cursor-dot {
-    background: var(--color-warroom-gold);
-    box-shadow: 0 0 6px var(--color-warroom-gold);
+  /* The arrow — anchored at its tip (top-left of the SVG box). */
+  .wr-cursor__arrow {
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    filter:
+      drop-shadow(0 0 4px rgba(201, 162, 39, 0.7))
+      drop-shadow(0 0 10px rgba(201, 162, 39, 0.4));
+    transition: transform 140ms ease, filter 180ms ease;
+    transform-origin: 0 0;
   }
 
-  .wr-cursor-dot.wr-cursor--hover {
-    background: var(--color-warroom-electrum);
-    box-shadow:
-      0 0 8px var(--color-warroom-gold),
-      0 0 16px color-mix(in srgb, var(--color-warroom-gold) 50%, transparent);
+  .wr-cursor.wr-cursor--hover .wr-cursor__arrow {
+    transform: scale(1.12);
+    filter:
+      drop-shadow(0 0 6px rgba(240, 200, 80, 0.95))
+      drop-shadow(0 0 16px rgba(201, 162, 39, 0.55));
   }
 
-  .wr-cursor-dot.wr-cursor--click {
-    background: color-mix(in srgb, var(--color-warroom-electrum) 80%, white);
-    box-shadow:
-      0 0 12px var(--color-warroom-gold),
-      0 0 24px color-mix(in srgb, var(--color-warroom-gold) 70%, transparent);
+  .wr-cursor.wr-cursor--click .wr-cursor__arrow {
+    transform: scale(0.9);
+    filter:
+      drop-shadow(0 0 9px rgba(255, 220, 120, 1))
+      drop-shadow(0 0 22px rgba(255, 140, 30, 0.65));
   }
+
+  /* Ember particles are drawn on a canvas by CustomCursor.tsx — no CSS needed here. */
 }
 
 /* ============================================================
@@ -1430,6 +1385,132 @@
   font-style: italic;
   color: color-mix(in srgb, var(--color-warroom-parchment) 85%, transparent);
   margin: 0;
+}
+
+/* Negotiation offer cards — investor photo on top, offer below */
+.offer-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
+  background:
+    linear-gradient(135deg, rgba(201, 162, 39, 0.04), transparent 70%),
+    rgba(14, 11, 8, 0.7);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(201, 162, 39, 0.08);
+  transition:
+    transform 0.3s var(--ease-regal),
+    box-shadow 0.3s var(--ease-regal),
+    border-color 0.3s var(--ease-regal);
+}
+
+.offer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), 0 0 26px rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+
+.offer-portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(201, 162, 39, 0.14), rgba(14, 11, 8, 0.85));
+  border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.offer-portrait img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+}
+
+.offer-portrait-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display-decorative), 'Cinzel Decorative', serif;
+  font-size: 3.25rem;
+  font-weight: 700;
+  color: rgba(201, 162, 39, 0.45);
+}
+
+.offer-tag {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  padding: 0.22rem 0.6rem;
+  font-family: var(--font-display), 'Cinzel', Georgia, serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #34d399;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(4px);
+}
+
+.offer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.offer-name {
+  font-family: var(--font-display), 'Cinzel', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-warroom-parchment);
+  margin: 0;
+}
+
+.offer-deal {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(201, 162, 39, 0.15);
+  border-radius: 3px;
+  font-family: var(--font-data), 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--color-warroom-gold);
+}
+
+.offer-quote {
+  padding: 0.6rem 0.85rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 3px solid var(--color-warroom-gold);
+  border-radius: 0 3px 3px 0;
+}
+
+.offer-quote p {
+  font-family: var(--font-body), serif;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-warroom-parchment) 85%, transparent);
+  margin: 0;
+}
+
+.offer-cta {
+  text-align: center;
+  font-family: var(--font-display), 'Cinzel', Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #34d399;
 }
 
 .no-scorecards {

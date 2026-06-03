@@ -132,7 +132,7 @@ export default function SettingsPage() {
     if (disabled) {
       // Immediate effect — remove the active class and stop hiding the OS cursor.
       document.body.classList.remove('wr-cursor-active')
-      document.querySelectorAll('.wr-cursor-ring, .wr-cursor-dot').forEach((el) => el.remove())
+      document.querySelectorAll('.wr-cursor').forEach((el) => el.remove())
     } else {
       // Re-enable requires re-mounting CustomCursor — easiest is a reload.
       window.location.reload()

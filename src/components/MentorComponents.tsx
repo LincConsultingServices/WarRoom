@@ -1,29 +1,77 @@
 'use client'
 
 import React from 'react'
-import { Users, MessageSquare, X, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { MessageSquare, X, Loader2, ScrollText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 import type { Mentor, MentorLifelineResult } from '@/src/types'
 
 // ============================================
-// MentorLifelinesCard — compact sidebar widget
+// MentorBlock — single unified "Mentor's Counsel" panel.
+//
+// Combines what used to be three separate affordances (the lifelines
+// card, the floating "Counsel" button, and the transient tip popup)
+// into one always-present block: the mentor delivers the stage tip as
+// a scroll, shows remaining lifelines, and offers the "Ask a Mentor"
+// action. First hover triggers the Oracle's feature intro.
 // ============================================
 
-interface MentorLifelinesCardProps {
+interface MentorBlockProps {
   lifelinesLeft: number
+  /** Stage-specific mentor tip (STAGE_MENTOR_TIPS). Hidden when absent. */
+  tip?: string
   onOpen: () => void
 }
 
-export function MentorLifelinesCard({ lifelinesLeft, onOpen }: MentorLifelinesCardProps) {
+export function MentorBlock({ lifelinesLeft, tip, onOpen }: MentorBlockProps) {
+  const intro = useFeatureIntro('mentor-block')
+
   return (
-    <div className="rounded-xl border bg-card p-4 space-y-3">
+    <div
+      {...intro}
+      className="rounded-xl border bg-card p-4 space-y-3"
+      style={{
+        borderColor: 'rgba(201,162,39,0.28)',
+        background:
+          'linear-gradient(135deg, rgba(201,162,39,0.05), transparent 60%), hsl(var(--card))',
+      }}
+    >
       <div className="flex items-center gap-2">
-        <Users className="h-4 w-4 text-primary" />
-        <span className="text-sm font-semibold">Mentor Lifelines</span>
+        <motion.span
+          animate={{ y: [0, -2.5, 0] }}
+          transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+          className="flex h-7 w-7 items-center justify-center rounded-full"
+          style={{ background: 'rgba(201,162,39,0.12)', border: '1px solid rgba(201,162,39,0.3)' }}
+        >
+          <ScrollText className="h-3.5 w-3.5" style={{ color: '#c9a227' }} />
+        </motion.span>
+        <span
+          className="text-sm font-semibold"
+          style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.06em', color: '#c9a227' }}
+        >
+          Mentor&rsquo;s Counsel
+        </span>
       </div>
+
+      {tip && (
+        <p
+          className="text-xs leading-relaxed text-foreground/80"
+          style={{
+            padding: '0.6rem 0.75rem',
+            background: 'rgba(0,0,0,0.18)',
+            borderLeft: '2px solid rgba(201,162,39,0.5)',
+            borderRadius: '0 4px 4px 0',
+            fontStyle: 'italic',
+          }}
+        >
+          {tip}
+        </p>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
@@ -33,8 +81,11 @@ export function MentorLifelinesCard({ lifelinesLeft, onOpen }: MentorLifelinesCa
             />
           ))}
         </div>
-        <span className="text-xs text-muted-foreground">{lifelinesLeft} left</span>
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          {lifelinesLeft} lifeline{lifelinesLeft !== 1 ? 's' : ''} left
+        </span>
       </div>
+
       <Button
         size="sm"
         variant="outline"

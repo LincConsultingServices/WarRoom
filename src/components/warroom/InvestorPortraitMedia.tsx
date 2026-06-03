@@ -43,6 +43,8 @@ interface InvestorPortraitMediaProps {
   className?: string
   /** Optional override for the portrait still. */
   portraitOverrideUrl?: string | null
+  /** Fill the parent's height instead of a fixed 3:4 box (cinematic full-bleed). */
+  fill?: boolean
 }
 
 interface ResolvedPair {
@@ -63,6 +65,7 @@ export function InvestorPortraitMedia({
   sentiment = 'neutral',
   className,
   portraitOverrideUrl,
+  fill = false,
 }: InvestorPortraitMediaProps) {
   const [resolved, setResolved] = useState<ResolvedPair>(EMPTY_PAIR)
   const [portraitFailed, setPortraitFailed] = useState(false)
@@ -115,7 +118,8 @@ export function InvestorPortraitMedia({
     <div
       ref={containerRef}
       className={cn(
-        'relative aspect-[3/4] w-full overflow-hidden rounded-md border border-border bg-card',
+        'relative w-full overflow-hidden rounded-md border border-border bg-card',
+        fill ? 'h-full' : 'aspect-[3/4]',
         treatmentClass,
         className,
       )}

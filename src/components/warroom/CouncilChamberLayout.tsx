@@ -47,8 +47,9 @@ export function CouncilChamberLayout({
           'grid flex-1 gap-4',
           // Below lg: roster on top, active + conversation stacked
           'grid-cols-1',
-          // lg: 3-column chamber
-          'lg:grid-cols-[minmax(260px,3fr)_minmax(360px,4fr)_minmax(260px,3fr)]',
+          // lg: 3-column chamber — left widened so the active investor's
+          // portrait fills it as a cinematic full-bleed panel.
+          'lg:grid-cols-[minmax(320px,4.5fr)_minmax(360px,4fr)_minmax(220px,2.5fr)]',
         )}
       >
         <div className="order-2 min-h-[420px] lg:order-1 lg:min-h-0">{activeInvestor}</div>
