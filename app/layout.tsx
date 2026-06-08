@@ -2,6 +2,7 @@ import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Cinzel, Cinzel_Decorative, EB_Garamond, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/src/context/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
 import { CustomCursor } from '@/src/components/effects/CustomCursor'
@@ -68,11 +69,13 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
-          <NarratorOrb />
-          <CustomCursor />
-          <EmberParticles density={30} />
-          <Toaster />
+          <AuthProvider>
+            {children}
+            <NarratorOrb />
+            <CustomCursor />
+            <EmberParticles density={30} />
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

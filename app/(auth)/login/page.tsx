@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import api from '@/src/lib/api'
+import { useAuth } from '@/src/context/AuthContext'
+import { authErrorMessage } from '@/src/lib/firebase'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import {
@@ -28,6 +30,7 @@ const INPUT_CLASSES = cn(
 
 function LoginContent() {
   const router = useRouter()
+  const { login } = useAuth()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
   const prefersReducedMotion = useReducedMotion()
@@ -68,35 +71,22 @@ function LoginContent() {
     setError('')
 
     try {
-      const loginData: { email: string; password: string; batchCode?: string } = {
+      // Authenticate against Firebase, then reconcile with the War Room backend.
+      const profile = await login(
         email,
         password,
-      }
-      if (!isAdmin) {
-        loginData.batchCode = batchCode.trim().toUpperCase()
-      }
+        isAdmin ? undefined : batchCode.trim().toUpperCase(),
+      )
 
-      const response = await api.auth.login(loginData)
+      audioManager.playSfx('wr.door-creak')
 
-      if (response.token) {
-        localStorage.setItem('token', response.token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        if (response.batch) {
-          localStorage.setItem('batch', JSON.stringify(response.batch))
-        }
-
-        audioManager.playSfx('wr.door-creak')
-
-        if (response.user?.role === 'admin') {
-          router.push('/admin/cohorts')
-        } else {
-          router.push('/dashboard')
-        }
+      if (profile.role === 'admin') {
+        router.push('/admin/cohorts')
       } else {
-        setError('Invalid credentials')
+        router.push('/dashboard')
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Invalid email or password')
+      setError(authErrorMessage(err))
     } finally {
       setLoading(false)
     }

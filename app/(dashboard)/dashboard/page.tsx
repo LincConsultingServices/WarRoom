@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import api from '@/src/lib/api'
+import { signOutUser } from '@/src/lib/firebase'
 import type { Assessment } from '@/src/types'
 import { STAGE_NARRATIVES } from '@/src/lib/constants'
 import { FadeInUp } from '@/src/components/AnimatedComponents'
@@ -97,10 +98,8 @@ export default function DashboardPage() {
     router.push(`/assessment/${assessmentId}`)
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    localStorage.removeItem('batch')
+  const handleLogout = async () => {
+    await signOutUser()
     router.push('/login')
   }
 

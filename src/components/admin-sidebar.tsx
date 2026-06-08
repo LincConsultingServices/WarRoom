@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { signOutUser } from '@/src/lib/firebase'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,10 +60,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
     },
   ]
 
-  const handleSignOut = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    localStorage.removeItem('batch')
+  const handleSignOut = async () => {
+    await signOutUser()
     router.push('/login')
   }
 

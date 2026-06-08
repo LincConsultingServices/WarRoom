@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import api from '@/src/lib/api'
+import { useAuth } from '@/src/context/AuthContext'
+import { authErrorMessage } from '@/src/lib/firebase'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import {
@@ -29,6 +31,7 @@ const INPUT_CLASSES = cn(
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { register } = useAuth()
   const prefersReducedMotion = useReducedMotion()
 
   const [name, setName] = useState('')
@@ -80,17 +83,13 @@ export default function RegisterPage() {
     setError('')
 
     try {
-      await api.auth.register({
-        name,
-        email,
-        password,
-        batchCode: batchCode.trim().toUpperCase(),
-      })
+      // Create the Firebase account, then provision the backend profile (with batch code + name).
+      await register(email, password, batchCode.trim().toUpperCase(), name)
       acceptTerms()
       audioManager.playSfx('ui.click')
-      router.push('/login?registered=true')
+      router.push('/dashboard')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      setError(authErrorMessage(err))
     } finally {
       setLoading(false)
     }

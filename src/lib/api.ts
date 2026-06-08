@@ -29,6 +29,7 @@ import type {
   CreateBatchRequest,
   UpdateBatchRequest,
 } from '@/src/types';
+import { getIdToken, signOutUser } from '@/src/lib/firebase';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -40,7 +41,7 @@ async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = await getIdToken();
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -58,11 +59,7 @@ async function request<T>(
 
   if (!res.ok) {
     if (res.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('batch');
-      }
+      await signOutUser();
       throw new Error('Unauthorized');
     }
     const errorData = await res.json().catch(() => ({}));
@@ -78,16 +75,15 @@ async function request<T>(
 
 export const api = {
   auth: {
-    register: (data: { email: string; password: string; name: string; batchCode: string }) =>
-      request<{ token: string; user: Record<string, unknown> }>('/auth/register', {
+    // Reconcile the Firebase identity with the backend. Called after Firebase
+    // sign-in/sign-up; the Firebase ID token is attached automatically by request().
+    sync: (batchCode?: string, name?: string) =>
+      request<{ user: Record<string, unknown>; batch?: BatchInfo }>('/auth/sync', {
         method: 'POST',
-        body: JSON.stringify(data),
-      }),
-
-    login: (data: { email: string; password: string; batchCode?: string }) =>
-      request<{ token: string; user: Record<string, unknown>; batch?: BatchInfo }>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...(batchCode ? { batchCode } : {}),
+          ...(name ? { name } : {}),
+        }),
       }),
 
     me: () => request<{ id: string; email: string; name: string; batchCode: string; role: string }>('/auth/me'),
@@ -222,7 +218,7 @@ export const api = {
       }),
 
     counterNegotiateAudio: async (id: string, investorId: string, audioBlob: Blob) => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const token = await getIdToken()
       const formData = new FormData()
       formData.append('audio', audioBlob, 'counter.webm')
       formData.append('investorId', investorId)
@@ -266,7 +262,7 @@ export const api = {
 
     // War Room Audio
     submitPitchAudio: async (id: string, audioBlob: Blob) => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const token = await getIdToken()
       const formData = new FormData()
       formData.append('audio', audioBlob, 'pitch.webm')
       const headers: Record<string, string> = {}
@@ -298,7 +294,7 @@ export const api = {
     },
 
     generateInvestorFollowupAudio: async (id: string, investorId: string, audioBlob: Blob) => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+        const token = await getIdToken()
         const formData = new FormData()
         formData.append('audio', audioBlob, 'response.webm')
         formData.append('investorId', investorId)
@@ -314,7 +310,7 @@ export const api = {
     },
 
     respondToInvestorFinalAudio: async (id: string, investorId: string, initialTranscription: string, followupQuestion: string, audioBlob: Blob) => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+        const token = await getIdToken()
         const formData = new FormData()
         formData.append('audio', audioBlob, 'final_response.webm')
         formData.append('investorId', investorId)
@@ -332,7 +328,7 @@ export const api = {
     },
 
     respondToInvestorAudio: async (id: string, investorId: string, audioBlob: Blob) => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const token = await getIdToken()
       const formData = new FormData()
       formData.append('audio', audioBlob, 'response.webm')
       formData.append('investorId', investorId)
