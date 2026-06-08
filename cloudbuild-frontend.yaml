@@ -63,7 +63,7 @@ substitutions:
   # Real backend Cloud Run URL (project warroom-498513). Override per-trigger via
   # substitutions if you ever rename/redeploy the backend service.
   _NEXT_PUBLIC_API_URL: 'https://warroom-backend-git-262374983592.us-central1.run.app/api'
-  # ── Firebase web config (fill these from the Firebase console) ──────────────
+  # ── Firebase web config (fill these from the Firebase console) ─────────────
   _NEXT_PUBLIC_FIREBASE_API_KEY: ''
   _NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'warroom-498513.firebaseapp.com'
   _NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'warroom-498513'
