@@ -60,10 +60,9 @@ images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:latest'
 
 substitutions:
-  # After the first backend deploy, replace this with the actual Cloud Run URL from
-  # `gcloud run services describe warroom-backend --region us-central1 --format='value(status.url)'`
-  # and override per-trigger via substitutions — same shape: https://<service>-<hash>.us-central1.run.app/api
-  _NEXT_PUBLIC_API_URL: 'https://warroom-backend-PLACEHOLDER.us-central1.run.app/api'
+  # Real backend Cloud Run URL (project warroom-498513). Override per-trigger via
+  # substitutions if you ever rename/redeploy the backend service.
+  _NEXT_PUBLIC_API_URL: 'https://warroom-backend-git-262374983592.us-central1.run.app/api'
   # ── Firebase web config (fill these from the Firebase console) ──────────────
   _NEXT_PUBLIC_FIREBASE_API_KEY: ''
   _NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'warroom-498513.firebaseapp.com'
