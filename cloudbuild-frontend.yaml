@@ -47,7 +47,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'warroom-frontend'
+      - 'warroom-git'
       - '--image'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:$COMMIT_SHA'
       - '--region'
