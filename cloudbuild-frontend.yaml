@@ -1,10 +1,15 @@
 # War Room Frontend — Cloud Build → Cloud Run (project: warroom-498513)
 #
-# NEXT_PUBLIC_* values are inlined into the bundle at build time, so they are
-# passed as Docker --build-arg (NOT runtime env). Set the blank ones below in the
-# Cloud Build trigger's substitution variables (or fill them in here — they are
-# public Firebase client identifiers, safe to commit). Copy them from:
-#   Firebase Console -> Project settings -> General -> Your apps -> SDK config
+# NEXT_PUBLIC_* values are inlined into the JS bundle at build time, so they
+# MUST be passed as Docker --build-arg (not runtime env). They are hardcoded
+# below as literal values — NOT substitutions — so trigger-level substitution
+# overrides physically cannot interfere. To rotate any of these (e.g. point at
+# a different backend or Firebase project) edit this file and push.
+#
+# The Firebase web config keys are PUBLIC client identifiers (they ship to the
+# browser by design) — safe to commit. The backend independently verifies every
+# ID token via the Admin SDK.
+
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
@@ -15,19 +20,19 @@ steps:
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:latest'
       - '--build-arg'
-      - 'NEXT_PUBLIC_API_URL=$_NEXT_PUBLIC_API_URL'
+      - 'NEXT_PUBLIC_API_URL=https://warroom-backend-git-262374983592.us-central1.run.app/api'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_API_KEY=$_NEXT_PUBLIC_FIREBASE_API_KEY'
+      - 'NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCsW8E4bqQWUSzuXmYZobZgZXmLG1aNkiI'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN'
+      - 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=warroom-498513.firebaseapp.com'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_PROJECT_ID=$_NEXT_PUBLIC_FIREBASE_PROJECT_ID'
+      - 'NEXT_PUBLIC_FIREBASE_PROJECT_ID=warroom-498513'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'
+      - 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=warroom-498513.firebasestorage.app'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'
+      - 'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=262374983592'
       - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_APP_ID=$_NEXT_PUBLIC_FIREBASE_APP_ID'
+      - 'NEXT_PUBLIC_FIREBASE_APP_ID=1:262374983592:web:efbc1df702a94720bc3f9d'
       - '.'
 
   # Push the container image to Artifact Registry
@@ -53,23 +58,11 @@ steps:
       - '--port'
       - '3000'
       - '--set-env-vars'
-      - 'NEXT_PUBLIC_API_URL=$_NEXT_PUBLIC_API_URL'
+      - 'NEXT_PUBLIC_API_URL=https://warroom-backend-git-262374983592.us-central1.run.app/api'
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:$COMMIT_SHA'
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:latest'
-
-substitutions:
-  # Real backend Cloud Run URL (project warroom-498513). Override per-trigger via
-  # substitutions if you ever rename/redeploy the backend service.
-  _NEXT_PUBLIC_API_URL: 'https://warroom-backend-git-262374983592.us-central1.run.app/api'
-  # ── Firebase web config (fill these from the Firebase console) ─────────────
-  _NEXT_PUBLIC_FIREBASE_API_KEY: ''
-  _NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'warroom-498513.firebaseapp.com'
-  _NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'warroom-498513'
-  _NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ''
-  _NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ''
-  _NEXT_PUBLIC_FIREBASE_APP_ID: ''
 
 options:
   logging: CLOUD_LOGGING_ONLY
