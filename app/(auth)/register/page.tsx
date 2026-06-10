@@ -324,7 +324,10 @@ export default function RegisterPage() {
                 aria-label="Accept Terms & Conditions"
                 className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-full"
                 tabIndex={0}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  toggleTerms()
+                }}
               >
                 <motion.div
                   className={cn(
