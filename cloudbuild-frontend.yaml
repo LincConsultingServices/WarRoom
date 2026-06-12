@@ -57,8 +57,9 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '3000'
-      - '--set-env-vars'
-      - 'NEXT_PUBLIC_API_URL=https://warroom-backend-git-262374983592.us-central1.run.app/api'
+      # No --set-env-vars: NEXT_PUBLIC_* are baked into the bundle at build time
+      # (see --build-arg above), so runtime env on the service is not used. Any
+      # runtime env you set on the Cloud Run service is preserved across deploys.
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/warroom-repo/frontend:$COMMIT_SHA'
