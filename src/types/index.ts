@@ -651,3 +651,73 @@ export interface UpdateBatchRequest {
   endsAt?: string;
 }
 
+// ============================================
+// V3: FOUNDER PROGRESSION (gamification)
+// ----------------------------------------------------------------
+// Additive only. Renown + earned state are server-authoritative
+// (anti-tamper for a credible cohort assessment). Until the backend
+// ships /progression/*, api.progression.me() derives this shape from
+// existing endpoints via src/lib/progressionMock.ts.
+// ============================================
+
+export type SigilTierName = 'BRONZE' | 'SILVER' | 'GOLD' | 'OBSIDIAN';
+
+export interface RankProgress {
+  tier: number;
+  title: string;
+  /** Renown accrued within the current rank. */
+  renownIntoTier: number;
+  /** Renown span of the current rank (null at the final rank). */
+  renownForNextTier: number | null;
+}
+
+export interface CompetencyMastery {
+  /** Best-ever weighted average across all trials. Scale 1.0–3.0. */
+  bestAverage: number;
+  category: CompetencyCategory;
+  /** How many trials have contributed to this competency. */
+  trials: number;
+  updatedAt: string;
+}
+
+export interface EarnedSigil {
+  id: string;
+  tier: SigilTierName;
+  earnedAt: string;
+}
+
+export interface HearthState {
+  /** Consecutive active weeks. */
+  current: number;
+  longest: number;
+  lastActiveAt: string | null;
+}
+
+export interface HouseConfig {
+  /** Crest shape id from HOUSE_SIGILS (src/lib/progression.ts). */
+  sigilId: string;
+  /** House words / motto. */
+  words: string;
+  /** Palette id from HOUSE_PALETTES. */
+  paletteId: string;
+}
+
+export interface RenownEvent {
+  date: string;
+  delta: number;
+  reason: string;
+}
+
+export interface FounderProgression {
+  userId: string;
+  /** Total Renown (our prestige "XP" — never surfaced as "XP" in-product). */
+  renown: number;
+  rank: RankProgress;
+  competencyMastery: Partial<Record<CompetencyCode, CompetencyMastery>>;
+  sigils: EarnedSigil[];
+  hearth: HearthState;
+  house: HouseConfig;
+  /** Most-recent-first renown deltas (for the profile micro-history). */
+  renownHistory: RenownEvent[];
+}
+
