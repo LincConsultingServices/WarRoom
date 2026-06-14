@@ -28,10 +28,21 @@ import type {
   BatchStats,
   CreateBatchRequest,
   UpdateBatchRequest,
+  FounderProgression,
+  HouseConfig,
 } from '@/src/types';
 import { getIdToken, signOutUser } from '@/src/lib/firebase';
+import {
+  deriveProgression,
+  readStoredHouse,
+  writeStoredHouse,
+} from '@/src/lib/progressionMock';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+
+// Progression: flip to live by setting NEXT_PUBLIC_PROGRESSION_API=live once the
+// backend ships /progression/*. Until then we derive from existing endpoints.
+const USE_LIVE_PROGRESSION = process.env.NEXT_PUBLIC_PROGRESSION_API === 'live';
 
 // ============================================
 // Helper
@@ -443,6 +454,48 @@ export const api = {
 
     getStats: (id: string) =>
       request<BatchStats>(`/admin/batches/${id}/stats`),
+  },
+
+  // ============================================
+  // PROGRESSION (v3 — gamification, additive)
+  // ============================================
+
+  progression: {
+    // Founder progression (renown, rank, mastery, sigils, hearth, house).
+    // Live: GET /progression/me. Mock: derive from existing endpoints.
+    me: async (): Promise<FounderProgression> => {
+      if (USE_LIVE_PROGRESSION) {
+        return request<FounderProgression>('/progression/me');
+      }
+      const [meRes, assessments] = await Promise.all([
+        api.auth.me().catch(() => null),
+        api.assessments.list().catch(() => [] as Assessment[]),
+      ]);
+      const completed = assessments.filter((a) => a.status === 'COMPLETED');
+      const reports = await Promise.all(
+        completed.map(async (a) => ({
+          assessmentId: a.id,
+          report: await api.assessments.getReport(a.id).catch(() => null),
+        })),
+      );
+      return deriveProgression({
+        userId: meRes?.id ?? 'me',
+        assessments,
+        reports,
+        house: readStoredHouse(),
+      });
+    },
+
+    // The one user-mutable part of progression. Live: POST /progression/house.
+    updateHouse: async (patch: Partial<HouseConfig>): Promise<HouseConfig> => {
+      if (USE_LIVE_PROGRESSION) {
+        return request<HouseConfig>('/progression/house', {
+          method: 'POST',
+          body: JSON.stringify(patch),
+        });
+      }
+      return writeStoredHouse(patch);
+    },
   },
 };
 
