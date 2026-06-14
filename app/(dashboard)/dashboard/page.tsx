@@ -19,6 +19,7 @@ import {
   Coins,
   Award,
   ScrollText,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import api from '@/src/lib/api'
@@ -37,6 +38,21 @@ import { StatTile } from '@/src/components/dashboard/StatTile'
 import { audioManager } from '@/lib/audio/audioManager'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
+import { useFounderProgression } from '@/src/hooks/useFounderProgression'
+import {
+  RenownBar,
+  HouseBanner,
+  HearthFlame,
+  CompetencyConstellation,
+  SigilCrest,
+  iconForSigil,
+} from '@/src/components/progression'
+import {
+  SIGIL_TIER_COLOR,
+  sigilById,
+  COMPETENCY_META,
+  CATEGORY_TIER,
+} from '@/src/lib/progression'
 
 interface AssessmentWithRevenue extends Assessment {
   revenueProjection?: number
@@ -73,6 +89,7 @@ export default function DashboardPage() {
   const [batch, setBatch] = useState<{ code: string; name: string } | null>(null)
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
+  const { progression } = useFounderProgression()
   useNarratorOnboarding('dashboard', { delayMs: 1800 })
   const beginIntro = useFeatureIntro('dashboard-begin', { elementId: 'dashboard-begin-cta' })
 
@@ -131,6 +148,48 @@ export default function DashboardPage() {
       attempts: simulations.length,
     }
   }, [completedAssessments, simulations, entries])
+
+  // Earned sigils, newest first.
+  const earnedSigils = useMemo(
+    () =>
+      [...(progression?.sigils ?? [])].sort(
+        (a, b) => new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime(),
+      ),
+    [progression],
+  )
+
+  // A single, clear "what to do next" recommendation (comprehension/wayfinding).
+  const nextObjective = useMemo(() => {
+    if (currentSim) {
+      return {
+        title: 'Resume your trial',
+        detail: `You stand at ${stageLabel(currentSim.currentStage)}. Return and press your advantage.`,
+      }
+    }
+    if (completedAssessments.length === 0) {
+      return {
+        title: 'Begin your first trial',
+        detail: 'Step into the chamber and light your first competency.',
+      }
+    }
+    const mastery = progression?.competencyMastery ?? {}
+    let weakestName: string | null = null
+    let lowest = Infinity
+    for (const c of COMPETENCY_META) {
+      const m = mastery[c.code]
+      const tier = m ? CATEGORY_TIER[m.category] : 0
+      if (tier < lowest) {
+        lowest = tier
+        weakestName = c.name
+      }
+    }
+    return {
+      title: 'Begin a new trial',
+      detail: weakestName
+        ? `Your thinnest banner is ${weakestName}. A fresh trial is your chance to raise it.`
+        : 'A new trial raises your Renown and sharpens your record.',
+    }
+  }, [currentSim, completedAssessments.length, progression])
 
   const firstName = user?.name?.split(' ')[0] ?? 'Lord'
   const primaryCtaLabel = currentSim
@@ -204,6 +263,15 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link href="/profile">
+              <button
+                type="button"
+                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                The Record
+              </button>
+            </Link>
             <Link href="/leaderboard">
               <button
                 type="button"
@@ -290,8 +358,78 @@ export default function DashboardPage() {
               </div>
             </FadeInUp>
 
+            {/* Founder progression banner — House, rank, renown, hearth */}
+            {progression && (
+              <FadeInUp delay={0.08}>
+                <StoneCard padding="md" texture="leather">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <HouseBanner
+                      house={progression.house}
+                      rank={progression.rank}
+                      founderName={user?.name}
+                      variant="compact"
+                    />
+                    <HearthFlame hearth={progression.hearth} />
+                  </div>
+                  <div className="my-4">
+                    <GoldDivider variant="line" />
+                  </div>
+                  <RenownBar rank={progression.rank} renown={progression.renown} />
+                </StoneCard>
+              </FadeInUp>
+            )}
+
+            {/* Constellation + next objective */}
+            {progression && (
+              <FadeInUp delay={0.12}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <StoneCard padding="md">
+                    <SigilBadge icon={Sparkles} tone="gold">
+                      Your Constellation
+                    </SigilBadge>
+                    <div className="mt-3 flex justify-center">
+                      <CompetencyConstellation
+                        mastery={progression.competencyMastery}
+                        size={240}
+                        interactive
+                      />
+                    </div>
+                  </StoneCard>
+                  <StoneCard padding="md" className="flex flex-col">
+                    <SigilBadge icon={Target} tone="crimson">
+                      Next Objective
+                    </SigilBadge>
+                    <h3
+                      className="mt-3 text-lg font-semibold text-[color:var(--color-warroom-ghost)]"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {nextObjective.title}
+                    </h3>
+                    <p
+                      className="mt-2 flex-1 text-sm leading-relaxed text-[color:var(--color-warroom-smoke)]"
+                      style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+                    >
+                      {nextObjective.detail}
+                    </p>
+                    <div className="mt-4">
+                      <WarRoomCTA
+                        size="sm"
+                        variant="primary"
+                        icon={Swords}
+                        iconRight={ArrowRight}
+                        sfxKey="nav.door-open"
+                        onClick={handlePrimaryCta}
+                      >
+                        {primaryCtaLabel}
+                      </WarRoomCTA>
+                    </div>
+                  </StoneCard>
+                </div>
+              </FadeInUp>
+            )}
+
             {/* Stat tiles */}
-            <FadeInUp delay={0.1}>
+            <FadeInUp delay={0.16}>
               <div className="grid grid-cols-2 gap-4">
                 <StatTile
                   label="Trials Complete"
@@ -315,21 +453,65 @@ export default function DashboardPage() {
                   hint={batch ? batch.code : 'Join a batch to rank'}
                 />
                 <StatTile
-                  label="Archetype"
+                  label="Founder Rank"
                   value={
                     <span
                       className="text-base tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
-                      {stats.completed > 0 ? 'Unrevealed' : '—'}
+                      {progression ? progression.rank.title : '—'}
                     </span>
                   }
                   icon={Crown}
-                  accent="var(--color-warroom-amethyst)"
-                  hint="Forged at trial's end"
+                  accent="var(--color-warroom-gold)"
+                  hint={progression ? `${progression.renown.toLocaleString()} Renown` : 'Begin to earn Renown'}
                 />
               </div>
             </FadeInUp>
+
+            {/* Recently earned sigils */}
+            {progression && earnedSigils.length > 0 && (
+              <FadeInUp delay={0.2}>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <SigilBadge icon={Award} tone="gold">
+                      Sigils Earned ({earnedSigils.length})
+                    </SigilBadge>
+                    <Link
+                      href="/profile"
+                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      The Founder&apos;s Record →
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {earnedSigils.slice(0, 6).map((s) => {
+                      const def = sigilById(s.id)
+                      const style = SIGIL_TIER_COLOR[s.tier]
+                      return (
+                        <div key={s.id} className="flex flex-col items-center gap-1" style={{ width: 64 }}>
+                          <SigilCrest
+                            icon={iconForSigil(s.id)}
+                            size={48}
+                            primary={style.base}
+                            secondary={style.bright}
+                            iconColor={style.bright}
+                            title={def ? `${def.name} — ${def.description}` : s.id}
+                          />
+                          <span
+                            className="text-center text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-warroom-smoke)]"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {def?.name ?? s.id}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </FadeInUp>
+            )}
 
             {/* Campaign map (only when a trial is in motion) */}
             {currentSim && (

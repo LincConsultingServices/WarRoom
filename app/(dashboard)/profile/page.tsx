@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/src/lib/api'
 import type { Assessment, EvaluationReport, InvestorScorecard } from '@/src/types'
+import { Award, Crown, Sparkles } from 'lucide-react'
 import { ArchetypeBadge } from '@/src/components/profile/ArchetypeBadge'
 import {
   LegacyScoreSparkline,
@@ -11,24 +12,30 @@ import {
 } from '@/src/components/profile/LegacyScoreSparkline'
 import { PastVerdictCard } from '@/src/components/profile/PastVerdictCard'
 import { EmberDriftBackdrop } from '@/src/components/verdict/EmberDriftBackdrop'
+import { StoneCard, SigilBadge } from '@/src/components/primitives'
+import {
+  HouseBanner,
+  RenownBar,
+  CompetencyConstellation,
+  SigilWall,
+  HouseCustomizer,
+  HearthFlame,
+} from '@/src/components/progression'
+import { SIGILS } from '@/src/lib/progression'
+import { useFounderProgression } from '@/src/hooks/useFounderProgression'
 
 // ============================================================
 // /profile (route: /(dashboard)/profile)
 // ----------------------------------------------------------------
-// The founder's own war record. Surfaces:
-//   • Current archetype (from the most recent completed report)
-//   • Legacy score history (sparkline across all completed runs)
-//   • Past verdicts (clickable cards → cinematic verdict page)
+// The founder's character sheet. Surfaces:
+//   • House identity (crest, rank, words) + Renown progress
+//   • Competency Constellation (best-ever mastery across all runs)
+//   • Sigil Wall (earned achievements + aspirational locked ones)
+//   • House customiser (rank-gated, earned cosmetics)
+//   • Legacy score history + past verdicts (existing)
 //
-// All data comes from existing endpoints. No new API contracts:
-//   • GET /auth/me                       → user
-//   • GET /assessments                   → Assessment[]
-//   • GET /assessments/:id/report        → EvaluationReport (best-effort, per completed run)
-//   • GET /assessments/:id/warroom/scorecard → InvestorScorecard[] (fallback score)
-//
-// Reports are fetched in parallel, best-effort. If a fetch fails
-// (e.g. report not yet generated), that run still appears in the
-// list — just without enrichment.
+// All data comes from existing endpoints + the progression adapter.
+// No existing API contracts are changed.
 // ============================================================
 
 interface EnrichedRun {
@@ -51,11 +58,9 @@ async function enrichAssessment(a: Assessment): Promise<EnrichedRun> {
   let archetypeName: string | null = null
   let legacyScore: number | null = null
 
-  // Try report first
   try {
     const report = (await api.assessments.getReport(a.id)) as EvaluationReport
     archetypeName = report.entrepreneurType?.trim() || null
-    // Composite from investorResults if available
     if (report.dealSummary?.investorResults) {
       legacyScore = computeFallbackScore(report.dealSummary.investorResults)
     }
@@ -80,13 +85,12 @@ type LoadState =
   | { kind: 'ready'; user: { name?: string } | null; runs: EnrichedRun[] }
   | { kind: 'error'; message: string }
 
-// Module-scoped stable empty array so the "not ready" branch of `readyRuns`
-// doesn't allocate a fresh array each render and re-trigger downstream useMemo.
 const EMPTY_RUNS: EnrichedRun[] = []
 
 export default function ProfilePage() {
   const router = useRouter()
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
+  const { progression, updateHouse } = useFounderProgression()
 
   useEffect(() => {
     let cancelled = false
@@ -98,12 +102,10 @@ export default function ProfilePage() {
           api.assessments.list() as Promise<Assessment[]>,
         ])
 
-        // Enrich in parallel — best-effort, never throws
         const enriched = await Promise.all(assessments.map(enrichAssessment))
 
         if (cancelled) return
 
-        // Sort newest first by completedAt || updatedAt || createdAt
         enriched.sort((a, b) => {
           const aTime = new Date(
             a.assessment.completedAt || a.assessment.updatedAt || a.assessment.createdAt,
@@ -130,7 +132,6 @@ export default function ProfilePage() {
     }
   }, [])
 
-  // Hooks must be unconditional — keep all useMemo calls before any early return.
   const readyRuns = state.kind === 'ready' ? state.runs : EMPTY_RUNS
 
   const currentArchetype = useMemo<string | null>(() => {
@@ -141,7 +142,6 @@ export default function ProfilePage() {
   }, [readyRuns])
 
   const sparklineRuns = useMemo<LegacyRun[]>(() => {
-    // Chronological order (oldest → newest), only completed with a score.
     return [...readyRuns]
       .filter((r) => r.legacyScore != null && r.assessment.status === 'COMPLETED')
       .sort((a, b) => {
@@ -175,27 +175,85 @@ export default function ProfilePage() {
       <EmberDriftBackdrop density={38} />
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-10 px-4 py-12 sm:py-16">
-        {/* Hero */}
-        <header className="flex flex-col items-center gap-4 text-center">
+        {/* Hero — House identity */}
+        <header className="flex flex-col items-center gap-5 text-center">
           <p className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/70">
             The Founder&apos;s Record
           </p>
-          {state.user?.name && (
+          {progression ? (
+            <HouseBanner
+              house={progression.house}
+              rank={progression.rank}
+              founderName={state.user?.name ?? undefined}
+              variant="hero"
+            />
+          ) : state.user?.name ? (
             <h1
               className="font-display text-3xl font-bold tracking-wider text-foreground sm:text-4xl"
               style={{ textShadow: '0 0 24px rgba(201,162,39,0.25)' }}
             >
               {state.user.name}
             </h1>
-          )}
-          {currentArchetype ? (
-            <ArchetypeBadge archetypeName={currentArchetype} variant="hero" />
-          ) : (
-            <p className="font-display text-xs uppercase tracking-[0.22em] text-foreground/45">
-              No archetype recorded yet
-            </p>
+          ) : null}
+          {currentArchetype && (
+            <ArchetypeBadge archetypeName={currentArchetype} variant="inline" />
           )}
         </header>
+
+        {/* Renown + hearth */}
+        {progression && (
+          <StoneCard padding="md">
+            <RenownBar rank={progression.rank} renown={progression.renown} />
+            <div className="mt-4 flex justify-end">
+              <HearthFlame hearth={progression.hearth} />
+            </div>
+          </StoneCard>
+        )}
+
+        {/* Competency Constellation */}
+        {progression && (
+          <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
+            <SigilBadge icon={Sparkles} tone="gold">
+              Competency Constellation
+            </SigilBadge>
+            <CompetencyConstellation
+              mastery={progression.competencyMastery}
+              size={360}
+              interactive
+            />
+          </section>
+        )}
+
+        {/* Sigil Wall */}
+        {progression && (
+          <section className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between px-1">
+              <SigilBadge icon={Award} tone="gold">
+                Sigils
+              </SigilBadge>
+              <span className="font-display text-[0.55rem] uppercase tracking-[0.18em] text-foreground/40">
+                {progression.sigils.length} / {SIGILS.length} earned
+              </span>
+            </div>
+            <SigilWall earned={progression.sigils} />
+          </section>
+        )}
+
+        {/* House decree (customiser) */}
+        {progression && (
+          <section className="flex flex-col gap-4">
+            <SigilBadge icon={Crown} tone="gold">
+              House Decree
+            </SigilBadge>
+            <StoneCard padding="md">
+              <HouseCustomizer
+                house={progression.house}
+                rankTier={progression.rank.tier}
+                onSave={updateHouse}
+              />
+            </StoneCard>
+          </section>
+        )}
 
         {/* Legacy score history */}
         <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
