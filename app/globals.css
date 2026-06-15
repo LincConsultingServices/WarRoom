@@ -1712,3 +1712,21 @@
     width: 100%;
   }
 }
+
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   Silence decorative, always-on CSS loops for users who ask for less motion.
+   Framer Motion is handled globally via <MotionConfig reducedMotion="user">.
+   Functional spinners (.animate-spin / @keyframes spin) are intentionally kept
+   so loading states still read as "in progress". Placed last so it wins by
+   source order; !important guards against later same-specificity rules. */
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar-fill,
+  .pulse-ring,
+  .rec-dot,
+  .warroom-wave-left,
+  .warroom-wave-right,
+  .dynamic-scenario-border,
+  .dynamic-scenario-border::before {
+    animation: none !important;
+  }
+}
