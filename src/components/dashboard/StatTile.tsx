@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { easeDramatic } from '@/lib/animations/variants'
 
 export interface StatTileProps {
-  label: string
+  label: ReactNode
   value: ReactNode
   icon?: LucideIcon
   /** A short subtext (e.g. "+12% vs last run"). */

@@ -7,3 +7,4 @@ export { CompetencyConstellation, type CompetencyConstellationProps } from './Co
 export { SigilWall, type SigilWallProps } from './SigilWall'
 export { HouseBanner, type HouseBannerProps } from './HouseBanner'
 export { HouseCustomizer, type HouseCustomizerProps } from './HouseCustomizer'
+export { SigilUnlockOverlay, type SigilUnlockOverlayProps } from './SigilUnlockOverlay'

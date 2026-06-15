@@ -46,13 +46,17 @@ import {
   CompetencyConstellation,
   SigilCrest,
   iconForSigil,
+  SigilUnlockOverlay,
 } from '@/src/components/progression'
+import { useNewSigils } from '@/src/hooks/useNewSigils'
 import {
   SIGIL_TIER_COLOR,
   sigilById,
   COMPETENCY_META,
   CATEGORY_TIER,
 } from '@/src/lib/progression'
+import { LoreTip } from '@/src/components/common/LoreTip'
+import { LORE } from '@/src/lib/lore'
 
 interface AssessmentWithRevenue extends Assessment {
   revenueProjection?: number
@@ -90,7 +94,8 @@ export default function DashboardPage() {
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
   const { progression } = useFounderProgression()
-  useNarratorOnboarding('dashboard', { delayMs: 1800 })
+  const { newSigils, acknowledge: acknowledgeSigils } = useNewSigils(progression?.sigils)
+  useNarratorOnboarding('great-hall', { delayMs: 1800 })
   const beginIntro = useFeatureIntro('dashboard-begin', { elementId: 'dashboard-begin-cta' })
 
   useEffect(() => {
@@ -362,7 +367,7 @@ export default function DashboardPage() {
             {progression && (
               <FadeInUp delay={0.08}>
                 <StoneCard padding="md" texture="leather">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div id="dashboard-house" className="flex flex-wrap items-center justify-between gap-4">
                     <HouseBanner
                       house={progression.house}
                       rank={progression.rank}
@@ -374,7 +379,9 @@ export default function DashboardPage() {
                   <div className="my-4">
                     <GoldDivider variant="line" />
                   </div>
-                  <RenownBar rank={progression.rank} renown={progression.renown} />
+                  <div id="dashboard-renown">
+                    <RenownBar rank={progression.rank} renown={progression.renown} />
+                  </div>
                 </StoneCard>
               </FadeInUp>
             )}
@@ -383,9 +390,9 @@ export default function DashboardPage() {
             {progression && (
               <FadeInUp delay={0.12}>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <StoneCard padding="md">
+                  <StoneCard id="dashboard-constellation" padding="md">
                     <SigilBadge icon={Sparkles} tone="gold">
-                      Your Constellation
+                      <LoreTip tip={LORE.constellation}>Your Constellation</LoreTip>
                     </SigilBadge>
                     <div className="mt-3 flex justify-center">
                       <CompetencyConstellation
@@ -446,14 +453,14 @@ export default function DashboardPage() {
                   hint={stats.bestRevenue > 0 ? 'Annual revenue' : 'Finish a trial to record'}
                 />
                 <StatTile
-                  label="Rank in the Realm"
+                  label={<LoreTip tip={LORE.ranking}>Rank in the Realm</LoreTip>}
                   value={stats.rank ? `#${stats.rank}` : '—'}
                   icon={Award}
                   accent={stats.rank && stats.rank <= 3 ? 'var(--color-warroom-crimson-bright)' : 'var(--color-warroom-gold)'}
                   hint={batch ? batch.code : 'Join a batch to rank'}
                 />
                 <StatTile
-                  label="Founder Rank"
+                  label={<LoreTip tip={LORE.founderRank}>Founder Rank</LoreTip>}
                   value={
                     <span
                       className="text-base tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
@@ -472,7 +479,7 @@ export default function DashboardPage() {
             {/* Recently earned sigils */}
             {progression && earnedSigils.length > 0 && (
               <FadeInUp delay={0.2}>
-                <div className="space-y-3">
+                <div id="dashboard-sigils" className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <SigilBadge icon={Award} tone="gold">
                       Sigils Earned ({earnedSigils.length})
@@ -679,7 +686,7 @@ export default function DashboardPage() {
             <FadeInUp delay={0.2}>
               <div id="dashboard-leaderboard" className="space-y-4">
                 <SigilBadge icon={ScrollText} tone="gold">
-                  Iron Rankings
+                  <LoreTip tip={LORE.ironRankings}>Iron Rankings</LoreTip>
                 </SigilBadge>
                 {batch ? (
                   <LeaderboardPanel
@@ -716,6 +723,10 @@ export default function DashboardPage() {
         onOpenChange={setStartDialogOpen}
         onCreated={handleSimulationCreated}
       />
+
+      {newSigils.length > 0 && (
+        <SigilUnlockOverlay sigils={newSigils} onClose={acknowledgeSigils} />
+      )}
     </div>
   )
 }
