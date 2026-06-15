@@ -41,8 +41,8 @@ export default function HomePage() {
 
   const houses = [
     { icon: Crown, name: 'Mentors', desc: 'Master strategists who forge your mindset on the field of ideas', color: '#7c5a9e', sigil: '⚜' },
-    { icon: Flame, name: 'Investors', desc: 'Dragons who demand gold and execution — or they burn your plan', color: '#c9a227', sigil: '🐉' },
-    { icon: Shield, name: 'Leaders', desc: 'Lords who push purpose and honor above all else', color: '#3d6b8e', sigil: '🛡' },
+    { icon: Flame, name: 'Investors', desc: 'Dragons who demand gold and execution — or they burn your plan', color: '#c9a227', sigil: <Flame className="h-40 w-40" /> },
+    { icon: Shield, name: 'Leaders', desc: 'Lords who push purpose and honor above all else', color: '#3d6b8e', sigil: <Shield className="h-40 w-40" /> },
   ]
 
   const panelists = [
@@ -62,13 +62,13 @@ export default function HomePage() {
       accent: '#7c5a9e', border: 'rgba(124,90,158,0.2)',
     },
     {
-      num: 2, icon: MessageSquare, sigil: '🐉',
+      num: 2, icon: MessageSquare, sigil: <Flame className="h-40 w-40" />,
       title: 'Defend Your Realm',
       desc: 'Navigate 6 brutal stages. Answer under fire. Your decisions shape your kingdom\'s fate.',
       accent: '#c9a227', border: 'rgba(201,162,39,0.2)',
     },
     {
-      num: 3, icon: Target, sigil: '👑',
+      num: 3, icon: Target, sigil: <Crown className="h-40 w-40" />,
       title: 'Claim the Throne',
       desc: 'Receive verdict from each lord. Discover your Founder archetype. Forge your legacy.',
       accent: '#ef4444', border: 'rgba(239,68,68,0.2)',
@@ -264,7 +264,7 @@ export default function HomePage() {
                   <StoneCard
                     interactive
                     accent={stage.accent}
-                    sigilWatermark={<span>{stage.sigil}</span>}
+                    sigilWatermark={stage.sigil}
                     className="group"
                     style={{
                       background:
@@ -341,7 +341,7 @@ export default function HomePage() {
                   key={h.name}
                   interactive
                   accent={h.color}
-                  sigilWatermark={<span>{h.sigil}</span>}
+                  sigilWatermark={h.sigil}
                   padding="lg"
                 >
                   <motion.div
@@ -367,7 +367,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl text-center relative z-10">
           <FadeInUp>
             <Floating duration={4} y={6}>
-              <div className="text-5xl mb-4 animate-torch-glow">🐉</div>
+              <div className="mb-4 flex justify-center animate-torch-glow"><Flame className="h-14 w-14" style={{ color: '#ff6b00' }} /></div>
             </Floating>
           </FadeInUp>
           <FadeInUp delay={0.1}>
@@ -402,7 +402,7 @@ export default function HomePage() {
         </div>
         <div className="mx-auto max-w-3xl text-center relative z-10">
           <FadeInUp>
-            <div className="text-4xl mb-4">👑</div>
+            <div className="mb-4 flex justify-center"><Crown className="h-11 w-11" style={{ color: '#e8c84a' }} /></div>
             <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
               Ready to Face the Council?
             </h2>

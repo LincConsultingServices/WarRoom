@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ScrollText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
 import { useTypewriterReveal } from '@/src/hooks/useTypewriterReveal'
@@ -453,7 +454,7 @@ export function MentorTipPopup({ show, message, emoji = 'TIP', onDismiss, onAskM
                 {emoji}
               </motion.div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#c9a227', fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.15em' }}>📜 Mentor Scroll</p>
+                <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#c9a227', fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.15em' }}><ScrollText className="h-3 w-3" />Mentor Scroll</p>
                 <p className="text-sm text-foreground/80 leading-relaxed">{message}</p>
               </div>
             </div>

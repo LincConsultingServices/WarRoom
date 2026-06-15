@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { Users } from 'lucide-react'
+import { Users, Flame, Crown, Coins } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RevenueSidePanel } from '@/src/components/RevenueSidePanel'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
@@ -62,7 +62,7 @@ export default function SimulationPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-warroom-void)' }}>
       <div className="text-center space-y-4">
-        <div className="text-4xl animate-torch-glow">🐉</div>
+        <div className="flex justify-center animate-torch-glow"><Flame className="h-9 w-9" style={{ color: 'var(--color-warroom-gold)' }} /></div>
         <div className="w-8 h-8 mx-auto" style={{ border: '2px solid color-mix(in srgb, var(--color-warroom-gold) 20%, transparent)', borderTopColor: 'var(--color-warroom-gold)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
         <p className="text-xs" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-warroom-gold)', letterSpacing: '0.15em' }}>SUMMONING THE COUNCIL...</p>
       </div>
@@ -94,7 +94,7 @@ export default function SimulationPage() {
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warroom-gold) 30%, transparent), transparent)' }} />
         <div className="w-full max-w-4xl space-y-8">
           <div className="text-center space-y-3">
-            <div className="text-3xl">👑</div>
+            <div className="flex justify-center"><Crown className="h-8 w-8" style={{ color: 'var(--color-warroom-gold)' }} /></div>
             <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-warroom-ivory)', letterSpacing: '0.06em' }}>Assemble the War Council</h1>
             <div className="h-px max-w-sm mx-auto" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warroom-gold) 40%, transparent), transparent)' }} />
             <p style={{ color: 'var(--color-warroom-smoke)', fontSize: '0.85rem', letterSpacing: '0.04em' }}>Choose wisely, Lord Commander. Their counsel will shape your fate.</p>
@@ -200,7 +200,7 @@ export default function SimulationPage() {
         {showCapitalAnimation && (
           <motion.div initial={{ opacity: 0, scale: 0.5, y: 50 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.5, y: -50 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
             <div className="text-center" style={{ background: 'color-mix(in srgb, var(--color-warroom-void) 90%, transparent)', border: '2px solid color-mix(in srgb, var(--color-warroom-gold) 60%, transparent)', borderRadius: '4px', padding: '2rem 3rem', boxShadow: 'var(--shadow-gold)' }}>
-              <div className="text-3xl mb-2">🐉</div>
+              <div className="mb-2 flex justify-center"><Coins className="h-8 w-8" style={{ color: 'var(--color-warroom-gold)' }} /></div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 900, color: 'var(--color-warroom-gold)', letterSpacing: '0.08em', textShadow: 'var(--glow-ember)' }}>+$50,000 PLEDGED!</div>
               <div style={{ fontSize: '0.7rem', color: 'var(--color-warroom-smoke)', letterSpacing: '0.15em', marginTop: '4px' }}>THE COUNCIL INVESTS IN YOUR REALM</div>
             </div>
