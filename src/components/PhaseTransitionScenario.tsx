@@ -140,6 +140,8 @@ export function PhaseTransitionScenario({
             <img
               src={scenario.leaderAvatar}
               alt={scenario.leaderName}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full rounded-full object-cover"
             />
           ) : (

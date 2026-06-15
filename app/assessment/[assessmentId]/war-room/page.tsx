@@ -1388,6 +1388,8 @@ export default function WarRoomSimulation() {
                                                 <img
                                                     src={investorPortraitSrc({ id: offer.investorId })}
                                                     alt={offer.investorName}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                                                 />
                                             )}
