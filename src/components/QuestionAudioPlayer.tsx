@@ -90,9 +90,10 @@ export function QuestionAudioPlayer({ audioKey, audioKeys, className }: Question
       size="icon"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleAudio() }}
       className={cn('flex-shrink-0 h-8 w-8 rounded-full', isPlaying ? 'text-primary bg-primary/10' : 'text-muted-foreground', className)}
-      title="Listen"
+      aria-label={isPlaying ? 'Pause question audio' : 'Play question audio'}
+      title={isPlaying ? 'Pause' : 'Listen'}
     >
-      {isPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+      {isPlaying ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
     </Button>
   )
 }
