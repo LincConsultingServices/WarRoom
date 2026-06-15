@@ -108,7 +108,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                 )}>
                   {item.avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.avatar} alt={item.name} className="h-full w-full rounded-full object-cover" />
+                    <img src={item.avatar} alt={item.name} loading="lazy" decoding="async" className="h-full w-full rounded-full object-cover" />
                   ) : (
                     item.name.charAt(0)
                   )}
