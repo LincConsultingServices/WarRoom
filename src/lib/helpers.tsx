@@ -43,12 +43,12 @@ export function getQuestionTypeIcon(type: string) {
 
 export function getQuestionTypeColor(type: string): string {
   switch (type) {
-    case 'scenario': return '#f59e0b'
-    case 'multiple_choice': return '#3b82f6'
-    case 'budget_allocation': return '#10b981'
-    case 'ai_scenario': return '#ef4444'
-    case 'info': return '#06b6d4'
-    default: return '#8b5cf6'
+    case 'scenario': return '#ff6b00'
+    case 'multiple_choice': return '#c9a227'
+    case 'budget_allocation': return '#2d6a4f'
+    case 'ai_scenario': return '#8b1a1a'
+    case 'info': return '#3d6b8e'
+    default: return '#7c5a9e'
   }
 }
 

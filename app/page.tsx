@@ -40,15 +40,15 @@ export default function HomePage() {
   }, [])
 
   const houses = [
-    { icon: Crown, name: 'Mentors', desc: 'Master strategists who forge your mindset on the field of ideas', color: '#a855f7', sigil: '⚜' },
+    { icon: Crown, name: 'Mentors', desc: 'Master strategists who forge your mindset on the field of ideas', color: '#7c5a9e', sigil: '⚜' },
     { icon: Flame, name: 'Investors', desc: 'Dragons who demand gold and execution — or they burn your plan', color: '#c9a227', sigil: '🐉' },
-    { icon: Shield, name: 'Leaders', desc: 'Lords who push purpose and honor above all else', color: '#3b82f6', sigil: '🛡' },
+    { icon: Shield, name: 'Leaders', desc: 'Lords who push purpose and honor above all else', color: '#3d6b8e', sigil: '🛡' },
   ]
 
   const panelists = [
     { name: 'The Master of Coin', avatar: 'MC', house: 'Lannister', color: '#c9a227' },
     { name: 'The Mindset Architect', avatar: 'MA', house: 'Targaryen', color: '#8b1a1a' },
-    { name: 'The Hand of Execution', avatar: 'HE', house: 'Stark', color: '#3b82f6' },
+    { name: 'The Hand of Execution', avatar: 'HE', house: 'Stark', color: '#3d6b8e' },
     { name: 'The Purpose Translator', avatar: 'PT', house: 'Baratheon', color: '#1a1a1a' },
     { name: 'The Mother of Instinct', avatar: 'MI', house: 'Tyrell', color: '#16a34a' },
     { name: 'The Institution Builder', avatar: 'IB', house: 'Martell', color: '#ea580c' },
@@ -59,7 +59,7 @@ export default function HomePage() {
       num: 1, icon: Users, sigil: '⚔',
       title: 'Assemble Your Council',
       desc: 'Choose 6 advisors: 2 mentors, 2 investors, 2 leaders. Each brings a different agenda.',
-      accent: '#a855f7', border: 'rgba(168,85,247,0.2)',
+      accent: '#7c5a9e', border: 'rgba(124,90,158,0.2)',
     },
     {
       num: 2, icon: MessageSquare, sigil: '🐉',
