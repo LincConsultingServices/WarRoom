@@ -5,7 +5,9 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { staggerContainer, staggerItem } from '@/lib/animations/variants'
-import type { LeaderboardEntry } from '@/src/types'
+import type { HouseConfig, LeaderboardEntry } from '@/src/types'
+import { paletteById } from '@/src/lib/progression'
+import { SigilCrest, iconForHouseSigil } from '@/src/components/progression/SigilCrest'
 
 // ─── Props ──────────────────────────────────────────────────────────────────
 
@@ -14,6 +16,8 @@ interface LeaderboardPanelProps {
   currentUserId?: string
   connected?: boolean
   updatedAt?: string | null
+  /** Current user's House — renders their crest on their own row. */
+  currentUserHouse?: HouseConfig
   className?: string
 }
 
@@ -64,9 +68,17 @@ export function LeaderboardPanel({
   currentUserId,
   connected = false,
   updatedAt,
+  currentUserHouse,
   className,
 }: LeaderboardPanelProps) {
   const prefersReducedMotion = useReducedMotion()
+
+  const myIndex = currentUserId
+    ? entries.findIndex((e) => e.userId === currentUserId)
+    : -1
+  // The founder one rung above — the one to overtake.
+  const rivalIndex = myIndex > 0 ? myIndex - 1 : -1
+  const housePalette = currentUserHouse ? paletteById(currentUserHouse.paletteId) : null
 
   return (
     <div
@@ -142,6 +154,12 @@ export function LeaderboardPanel({
               {entries.map((entry, idx) => {
                 const podium = PODIUM[idx]
                 const isMe = entry.userId === currentUserId
+                const isRival = idx === rivalIndex
+                // Gap from me up to the rival directly above.
+                const gapToRival =
+                  isMe && rivalIndex >= 0
+                    ? entries[rivalIndex].revenueProjection - entry.revenueProjection
+                    : null
 
                 return (
                   <motion.div
@@ -151,6 +169,7 @@ export function LeaderboardPanel({
                     className={cn(
                       'flex items-center gap-3 px-5 py-3 text-sm transition-colors',
                       podium?.row,
+                      isRival && 'bg-[color:var(--color-warroom-crimson)]/[0.05]',
                       isMe &&
                         'border-l-2 border-l-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/[0.04]',
                     )}
@@ -175,21 +194,49 @@ export function LeaderboardPanel({
                       </span>
                     </div>
 
-                    {/* Name */}
-                    <div
-                      className={cn(
-                        'flex-1 truncate tracking-[0.03em]',
-                        isMe
-                          ? 'text-[color:var(--color-warroom-gold)] font-semibold'
-                          : 'text-[color:var(--color-warroom-ivory)]',
-                      )}
-                      style={{ fontFamily: 'var(--font-display)' }}
-                    >
-                      {entry.name}
+                    {/* Current user's House crest */}
+                    {isMe && currentUserHouse && housePalette && (
+                      <SigilCrest
+                        icon={iconForHouseSigil(currentUserHouse.sigilId)}
+                        size={24}
+                        primary={housePalette.primary}
+                        secondary={housePalette.secondary}
+                        className="shrink-0"
+                      />
+                    )}
+
+                    {/* Name + rival/gap meta */}
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={cn(
+                          'truncate tracking-[0.03em]',
+                          isMe
+                            ? 'text-[color:var(--color-warroom-gold)] font-semibold'
+                            : 'text-[color:var(--color-warroom-ivory)]',
+                        )}
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {entry.name}
+                        {isMe && (
+                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-gold)]/70">
+                            (you)
+                          </span>
+                        )}
+                        {isRival && (
+                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-crimson-bright)]/80">
+                            · your rival
+                          </span>
+                        )}
+                      </div>
                       {isMe && (
-                        <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-gold)]/70">
-                          (you)
-                        </span>
+                        <div
+                          className="mt-0.5 truncate text-[10px] tracking-[0.04em] text-[color:var(--color-warroom-smoke)]"
+                          style={{ fontFamily: 'var(--font-display)' }}
+                        >
+                          {gapToRival != null && gapToRival > 0
+                            ? `↑ ${formatRevenue(gapToRival)} to overtake ${entries[rivalIndex].name}`
+                            : 'You hold the top of the realm'}
+                        </div>
                       )}
                     </div>
 
