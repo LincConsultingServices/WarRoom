@@ -504,6 +504,62 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
   'verdict.returning': [
     { text: 'Revisiting the verdict, lord? The judgments do not change.', mood: 'idle', duration: 0 },
   ],
+
+  // ===================================================================
+  // GREAT HALL — the Maester's Welcome (progression onboarding).
+  // A dedicated phase so it fires once for EVERY founder, including
+  // those who saw the older 'dashboard' intro before progression existed.
+  // ===================================================================
+
+  'great-hall.first-visit': [
+    {
+      text: 'Welcome to the Great Hall, lord — your seat of power between trials.',
+      mood: 'idle',
+      duration: 3400,
+    },
+    {
+      text: 'This is your House: your crest, your words, your name. Forge it as you please.',
+      mood: 'pointing',
+      highlight: 'dashboard-house',
+      duration: 3800,
+    },
+    {
+      text: 'Renown measures your standing. Earn it through sharp decisions and rise from Aspirant to Ruler of the Realm.',
+      mood: 'speaking',
+      highlight: 'dashboard-renown',
+      duration: 4200,
+    },
+    {
+      text: 'These eight stars are your founder competencies. Each brightens as you master it across trials.',
+      mood: 'pointing',
+      highlight: 'dashboard-constellation',
+      duration: 4000,
+    },
+    {
+      text: 'Sigils mark your great deeds — won through merit, never bought.',
+      mood: 'speaking',
+      duration: 3400,
+    },
+    {
+      text: 'When you are ready, the trial begins beyond that door.',
+      mood: 'pointing',
+      highlight: 'dashboard-begin-cta',
+      duration: 3400,
+    },
+    {
+      text: 'Choose your path, lord.',
+      mood: 'idle',
+      duration: 0,
+    },
+  ],
+
+  'great-hall.returning': [
+    {
+      text: 'The hall is quiet, lord. Your House and your campaigns await.',
+      mood: 'idle',
+      duration: 2600,
+    },
+  ],
 }
 
 // ===================================================================
