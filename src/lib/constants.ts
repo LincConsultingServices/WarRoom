@@ -2,7 +2,8 @@
 // War Room – Shared Constants
 // ============================================
 
-import type React from 'react'
+import type { LucideIcon } from 'lucide-react'
+import { Globe, AlertTriangle, Target, BarChart3 } from 'lucide-react'
 import type { StageName } from '@/src/types'
 
 
@@ -98,18 +99,10 @@ export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
   'The Warden of Trust': 'warden_trust',
 }
 
-// Scenario step styling
-export const SCENARIO_STEP_STYLES: Record<string, { icon: string; label: string; color: string; bgColor: string }> = {
-  environment: { icon: '🌍', label: 'ENVIRONMENT', color: '#3d6b8e', bgColor: 'bg-[#3d6b8e]/10 dark:bg-[#3d6b8e]/20' },
-  problem: { icon: '⚠️', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
-  decision: { icon: '🎯', label: 'YOUR DECISION', color: '#7c5a9e', bgColor: 'bg-[#7c5a9e]/10 dark:bg-[#7c5a9e]/20' },
-  consequence: { icon: '📊', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
-}
-
-// Ideation form section icons
-export const SECTION_ICONS: Record<string, React.ReactNode> = {
-  'The Idea': '💡',
-  'Market Reality': '🎯',
-  'Money & Model': '💵',
-  'Founder Fit': '🧑‍💼',
+// Scenario step styling — icons are lucide components (on-brand SVG, no emoji).
+export const SCENARIO_STEP_STYLES: Record<string, { icon: LucideIcon; label: string; color: string; bgColor: string }> = {
+  environment: { icon: Globe, label: 'ENVIRONMENT', color: '#3d6b8e', bgColor: 'bg-[#3d6b8e]/10 dark:bg-[#3d6b8e]/20' },
+  problem: { icon: AlertTriangle, label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
+  decision: { icon: Target, label: 'YOUR DECISION', color: '#7c5a9e', bgColor: 'bg-[#7c5a9e]/10 dark:bg-[#7c5a9e]/20' },
+  consequence: { icon: BarChart3, label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
 }

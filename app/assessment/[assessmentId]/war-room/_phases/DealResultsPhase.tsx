@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MicOff, Loader2, RefreshCw, CheckCircle2, TrendingUp, X } from 'lucide-react'
+import { Mic, MicOff, Loader2, RefreshCw, CheckCircle2, TrendingUp, X, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -68,7 +68,7 @@ export function DealResultsPhase({
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
           className="p-8 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/30 text-center space-y-4"
         >
-          <div className="text-4xl">🎉</div>
+          <div className="flex justify-center"><Trophy className="h-10 w-10 text-emerald-400" /></div>
           <h2 className="text-2xl font-black text-emerald-400">Deal Closed!</h2>
           <div className="text-white">
             <span className="text-3xl font-black">{formatCurrency(acceptedDealTerms.capital)}</span>

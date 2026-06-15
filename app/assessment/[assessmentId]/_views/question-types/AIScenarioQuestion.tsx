@@ -55,7 +55,7 @@ export function AIScenarioQuestion({
                   className={cn('h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-all', isCurrent ? 'ring-2 ring-offset-1' : '', isPast ? 'opacity-50' : '')}
                   style={{ backgroundColor: isCurrent ? `${s.color}20` : isPast ? `${s.color}10` : 'var(--muted)', color: (isCurrent || isPast) ? s.color : 'var(--muted-foreground)', boxShadow: isCurrent ? `0 0 0 2px ${s.color}` : 'none' }}
                 >
-                  {s.icon}
+                  <s.icon className="h-3.5 w-3.5" />
                 </div>
                 {i < 3 && <div className="w-4 h-0.5 bg-muted-foreground/20" />}
               </div>
@@ -71,7 +71,7 @@ export function AIScenarioQuestion({
           className={cn('p-4 rounded-xl border text-sm leading-relaxed', stepStyle.bgColor)}
           style={{ borderColor: `${stepStyle.color}30` }}
         >
-          <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: stepStyle.color }}>{stepStyle.icon} {stepStyle.label}</div>
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-2" style={{ color: stepStyle.color }}><stepStyle.icon className="h-3 w-3" />{stepStyle.label}</div>
           <p className="text-foreground/80 whitespace-pre-line">{contextText}</p>
         </motion.div>
       )}

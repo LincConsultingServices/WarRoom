@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CheckCircle2, Send, Loader2 } from 'lucide-react'
+import { CheckCircle2, Send, Loader2, Lightbulb, Target, Coins, UserRound, PenLine } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -12,8 +13,8 @@ import { getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from 
 import { cn } from '@/lib/utils'
 import type { SimOption, SimQuestion } from '@/src/types'
 
-const SECTION_ICONS: Record<string, string> = {
-  'The Idea': '💡', 'Market Reality': '🎯', 'Money & Model': '💵', 'Founder Fit': '🧑‍💼',
+const SECTION_ICONS: Record<string, LucideIcon> = {
+  'The Idea': Lightbulb, 'Market Reality': Target, 'Money & Model': Coins, 'Founder Fit': UserRound,
 }
 
 interface IdeationViewProps {
@@ -52,8 +53,11 @@ export function IdeationView({
         <FadeInUp key={sectionName} delay={0.1 + secIdx * 0.1}>
           <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b bg-muted/30 flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: `${accent}20` }}>
-                {SECTION_ICONS[sectionName] || '📝'}
+              <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${accent}20` }}>
+                {(() => {
+                  const SectionIcon = SECTION_ICONS[sectionName] ?? PenLine
+                  return <SectionIcon className="h-4 w-4" style={{ color: accent }} />
+                })()}
               </div>
               <div>
                 <h2 className="text-base font-semibold">{sectionName}</h2>
@@ -120,7 +124,7 @@ export function IdeationView({
       <div className="flex justify-center pb-6">
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
           <Button onClick={onSubmitPhase} disabled={submitting} size="lg" className="px-8" style={{ backgroundColor: accent }}>
-            {submitting ? <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Evaluating Ideation...</> : <><Send className="h-5 w-5 mr-2" />Submit Ideation & Enter Simulation 🎯</>}
+            {submitting ? <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Evaluating Ideation...</> : <><Send className="h-5 w-5 mr-2" />Submit Ideation & Enter Simulation</>}
           </Button>
         </motion.div>
       </div>
