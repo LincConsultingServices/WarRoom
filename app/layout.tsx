@@ -1,4 +1,5 @@
 import React from "react"
+import { MotionConfig } from 'framer-motion'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Cinzel, Cinzel_Decorative, EB_Garamond, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -70,11 +71,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
-            <NarratorOrb />
-            <CustomCursor />
-            <EmberParticles density={30} />
-            <Toaster />
+            {/* reducedMotion="user" → every Framer Motion animation respects the
+                OS "reduce motion" setting (transforms/layout become instant,
+                opacity/colour preserved). Complements the CSS rules in globals.css. */}
+            <MotionConfig reducedMotion="user">
+              {children}
+              <NarratorOrb />
+              <CustomCursor />
+              <EmberParticles density={30} />
+              <Toaster />
+            </MotionConfig>
           </AuthProvider>
         </ThemeProvider>
       </body>
