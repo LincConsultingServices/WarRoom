@@ -694,6 +694,7 @@ export default function DashboardPage() {
                     currentUserId={user?.id}
                     connected={connected}
                     updatedAt={updatedAt}
+                    currentUserHouse={progression?.house}
                     className={cn('h-[520px]')}
                   />
                 ) : (

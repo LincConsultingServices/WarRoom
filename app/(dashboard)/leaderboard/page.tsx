@@ -10,6 +10,8 @@ import { useLeaderboard } from '@/src/hooks/useLeaderboard'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { GoldDivider, SigilBadge, StoneCard } from '@/src/components/primitives'
 import { easeDramatic } from '@/lib/animations/variants'
+import { HouseBanner, RenownBar } from '@/src/components/progression'
+import { useFounderProgression } from '@/src/hooks/useFounderProgression'
 
 export default function LeaderboardPage() {
   const router = useRouter()
@@ -32,6 +34,8 @@ export default function LeaderboardPage() {
   }, [router])
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
+  const { progression } = useFounderProgression()
+  const myRank = entries.find((e) => e.userId === user?.id)?.rank
 
   useNarratorOnboarding('leaderboard', { delayMs: 1400 })
 
@@ -109,6 +113,47 @@ export default function LeaderboardPage() {
             </p>
           </motion.div>
 
+          {/* ── Your standing (House + rank + Renown) ── */}
+          {progression && (
+            <motion.div
+              className="mb-6"
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.45, ease: easeDramatic }}
+            >
+              <StoneCard padding="md" texture="leather">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <HouseBanner
+                    house={progression.house}
+                    rank={progression.rank}
+                    founderName={user?.name}
+                    variant="compact"
+                  />
+                  {myRank && (
+                    <div className="text-right">
+                      <div
+                        className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        Your Standing
+                      </div>
+                      <div
+                        className="text-2xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                        style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
+                      >
+                        #{myRank}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="my-3">
+                  <GoldDivider variant="line" />
+                </div>
+                <RenownBar rank={progression.rank} renown={progression.renown} />
+              </StoneCard>
+            </motion.div>
+          )}
+
           {/* ── Leaderboard ── */}
           <motion.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
@@ -120,6 +165,7 @@ export default function LeaderboardPage() {
               currentUserId={user?.id}
               connected={connected}
               updatedAt={updatedAt}
+              currentUserHouse={progression?.house}
               className="w-full min-h-[460px]"
             />
           </motion.div>
