@@ -207,7 +207,7 @@ export function AIScenarioQuestion({
             </div>
           ) : (
             <>
-              <div className="text-xs font-bold text-violet-600 dark:text-violet-400">How do you respond to this situation?</div>
+              <div className="text-xs font-bold text-[color:var(--color-warroom-gold)]">How do you respond to this situation?</div>
               <Textarea placeholder="Describe your decision and reasoning..." value={currentAnswer?.text || ''} onChange={e => onTextChange(e.target.value)} rows={5} className="resize-none" />
             </>
           )}

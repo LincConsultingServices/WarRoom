@@ -1547,7 +1547,7 @@ export default function WarRoomSimulation() {
                                                 </motion.button>
                                                 <motion.button 
                                                     className="respond-btn" 
-                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#3b82f6' }}
+                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#c23b3b' : '#c9a227' }}
                                                     onClick={handleNegotiateAudio} 
                                                     disabled={isNegVoiceSubmitting}
                                                     initial={{ scale: 0.9, opacity: 0 }}

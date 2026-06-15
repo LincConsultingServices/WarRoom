@@ -35,7 +35,7 @@ export function MCQQuestion({ options, selectedOptionId, mcqFeedback, onSelect }
         )
       })}
       {mcqFeedback && selectedOptionId && (
-        <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-sm text-blue-700 dark:text-blue-300">
+        <div className="mt-3 p-3 rounded-lg bg-[color:var(--color-warroom-gold)]/[0.08] border border-[color:var(--color-warroom-gold)]/30 text-sm text-[color:var(--color-warroom-ivory)]/85">
           <span className="font-medium">Mentor insight: </span>{mcqFeedback}
         </div>
       )}
