@@ -142,7 +142,7 @@ export function MentorOverlay({
             <h3 className="font-bold text-lg">Consult a Mentor</h3>
             <p className="text-xs text-muted-foreground">{lifelinesLeft} lifeline{lifelinesLeft !== 1 ? 's' : ''} remaining</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close mentor panel"><X className="h-4 w-4" aria-hidden /></Button>
         </div>
 
         {mentorResult ? (
