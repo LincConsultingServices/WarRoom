@@ -5,7 +5,16 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
 import api from '@/src/lib/api'
-import type { AdminBatchDetail, BatchParticipant, BatchStats, UpdateBatchRequest } from '@/src/types'
+import type {
+  AdminBatchDetail,
+  BatchParticipant,
+  BatchStats,
+  UpdateBatchRequest,
+  CohortProgression,
+  CompetencyCode,
+  CompetencyMastery,
+  CompetencyCategory,
+} from '@/src/types'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import {
@@ -18,8 +27,10 @@ import {
   Pencil,
   Eye,
   Trophy,
+  Sparkles,
 } from 'lucide-react'
 import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
+import { CompetencyConstellation, RankInsignia } from '@/src/components/progression'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
 const INPUT_CLASSES =
@@ -33,6 +44,33 @@ interface AdminLeaderboardEntry {
   [key: string]: unknown
 }
 
+// Map a rounded cohort-average mastery tier (0–5) back to a category so the
+// shared <CompetencyConstellation> can render the cohort's collective standing.
+const TIER_CATEGORY: Record<number, CompetencyCategory> = {
+  1: 'HIGH_RISK',
+  2: 'DEVELOPMENT_REQUIRED',
+  3: 'FUNCTIONAL',
+  4: 'STRONG',
+  5: 'NATURAL_DOMINANT',
+}
+
+function cohortMastery(
+  competencies: CohortProgression['competencies'],
+): Partial<Record<CompetencyCode, CompetencyMastery>> {
+  const out: Partial<Record<CompetencyCode, CompetencyMastery>> = {}
+  for (const c of competencies) {
+    const tier = Math.round(c.avgTier)
+    if (tier < 1) continue
+    out[c.code] = {
+      bestAverage: 0,
+      category: TIER_CATEGORY[tier],
+      trials: c.founders,
+      updatedAt: '',
+    }
+  }
+  return out
+}
+
 export default function BatchDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -43,6 +81,7 @@ export default function BatchDetailPage() {
   const [participants, setParticipants] = useState<BatchParticipant[]>([])
   const [stats, setStats] = useState<BatchStats | null>(null)
   const [leaderboard, setLeaderboard] = useState<AdminLeaderboardEntry[]>([])
+  const [cohortProgression, setCohortProgression] = useState<CohortProgression | null>(null)
   const [loading, setLoading] = useState(true)
   const [copiedCode, setCopiedCode] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
@@ -68,10 +107,19 @@ export default function BatchDetailPage() {
       } catch (e: unknown) {
         console.warn('Leaderboard fetch failed', e)
       }
+      // Cohort progression is live-only (no mock). Degrade silently if the
+      // backend endpoint isn't deployed yet — the section simply stays hidden.
+      let progressionData: CohortProgression | null = null
+      try {
+        progressionData = await api.admin.getCohortProgression(batchId)
+      } catch {
+        progressionData = null
+      }
       setBatch(batchData)
       setParticipants(participantsData)
       setStats(statsData)
       setLeaderboard(leaderboardData)
+      setCohortProgression(progressionData)
       setEditName(batchData.name)
       setEditLevel(batchData.level)
     } catch (err: unknown) {
@@ -166,6 +214,9 @@ export default function BatchDetailPage() {
       </div>
     )
   }
+
+  const nameByUser = new Map(participants.map((p) => [p.userId, p.userName]))
+  const showAscent = !!cohortProgression && cohortProgression.totalFounders > 0
 
   return (
     <div className="py-6 space-y-6">
@@ -263,6 +314,93 @@ export default function BatchDetailPage() {
             </motion.div>
           ))}
         </motion.div>
+      )}
+
+      {/* The Cohort's Ascent — authoritative progression roll-up (live-only) */}
+      {showAscent && cohortProgression && (
+        <StoneCard padding="none">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+            <Sparkles className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+            <h2
+              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              The Cohort&rsquo;s Ascent
+            </h2>
+            <span
+              className="ml-auto text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]/70"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {cohortProgression.withProgress} of {cohortProgression.totalFounders} founders rising
+            </span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 p-6">
+            {/* Aggregate constellation — the cohort's collective mastery */}
+            <div className="flex flex-col items-center">
+              <p
+                className="mb-2 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Collective Mastery
+              </p>
+              <CompetencyConstellation
+                mastery={cohortMastery(cohortProgression.competencies)}
+                size={260}
+                interactive
+              />
+            </div>
+            {/* Founder standings — renown-descending */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[color:var(--color-warroom-ash)]/20">
+                    {['Founder', 'Rank', 'Renown', 'Sigils', 'Lit'].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`py-3 px-2 font-medium text-[color:var(--color-warroom-smoke)] text-[10px] uppercase tracking-[0.14em] ${i >= 2 ? 'text-right' : 'text-left'}`}
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {cohortProgression.standings.map((s) => (
+                    <tr
+                      key={s.userId}
+                      className="border-b border-[color:var(--color-warroom-ash)]/10 last:border-0 hover:bg-[color:var(--color-warroom-gold)]/[0.02]"
+                    >
+                      <td className="py-3 px-2 font-medium text-[color:var(--color-warroom-ivory)]">
+                        {nameByUser.get(s.userId) || '—'}
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="flex items-center gap-2">
+                          <RankInsignia tier={s.rankTier} size={26} />
+                          <span
+                            className="text-xs text-[color:var(--color-warroom-smoke)]"
+                            style={{ fontFamily: 'var(--font-display)' }}
+                          >
+                            {s.rankTitle}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-2 text-right font-mono font-bold text-[color:var(--color-warroom-gold)]">
+                        {s.renown.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-2 text-right font-mono text-xs text-[color:var(--color-warroom-ivory)]">
+                        {s.sigilCount}
+                      </td>
+                      <td className="py-3 px-2 text-right font-mono text-xs text-[color:var(--color-warroom-smoke)]">
+                        {s.litCompetencies}/8
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </StoneCard>
       )}
 
       {/* Leaderboard */}

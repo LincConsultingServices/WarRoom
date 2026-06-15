@@ -30,6 +30,7 @@ import type {
   UpdateBatchRequest,
   FounderProgression,
   HouseConfig,
+  CohortProgression,
 } from '@/src/types';
 import { getIdToken, signOutUser } from '@/src/lib/firebase';
 import {
@@ -454,6 +455,11 @@ export const api = {
 
     getStats: (id: string) =>
       request<BatchStats>(`/admin/batches/${id}/stats`),
+
+    // Cohort progression roll-up (rank/renown standings + collective mastery).
+    // Live-only; callers should degrade gracefully if the backend lacks it.
+    getCohortProgression: (id: string) =>
+      request<CohortProgression>(`/admin/batches/${id}/progression`),
   },
 
   // ============================================

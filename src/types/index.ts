@@ -721,3 +721,34 @@ export interface FounderProgression {
   renownHistory: RenownEvent[];
 }
 
+// ============================================
+// COHORT PROGRESSION (admin) — "The Cohort's Ascent"
+// Authoritative roll-up across a batch's founders. Live-only
+// (GET /admin/batches/:id/progression); no mock — degrades gracefully.
+// ============================================
+
+export interface CohortFounderStanding {
+  userId: string;
+  renown: number;
+  rankTier: number;
+  rankTitle: string;
+  sigilCount: number;
+  /** Competencies at STRONG or above. */
+  litCompetencies: number;
+}
+
+export interface CohortCompetencyAggregate {
+  code: CompetencyCode;
+  /** Mean mastery tier (0–5) across founders who have data. */
+  avgTier: number;
+  founders: number;
+}
+
+export interface CohortProgression {
+  standings: CohortFounderStanding[];
+  competencies: CohortCompetencyAggregate[];
+  totalFounders: number;
+  /** Founders who have earned any renown. */
+  withProgress: number;
+}
+
