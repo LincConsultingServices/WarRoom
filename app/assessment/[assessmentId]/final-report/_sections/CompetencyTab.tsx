@@ -4,9 +4,9 @@ import { CompetencyRadarChart } from '@/components/competency-radar-chart'
 import type { EvaluationReport, RankedCompetency, CompetencyCode } from '@/src/types'
 
 const COMP_COLORS: Record<string, string> = {
-  C1: '#c9a227', C2: '#d4af37', C3: '#f59e0b', C4: '#10b981',
-  C5: '#3b82f6', C6: '#ec4899', C7: '#06b6d4', C8: '#f97316',
-  C9: '#14b8a6',
+  C1: '#c9a227', C2: '#e8c84a', C3: '#ff6b00', C4: '#2d6a4f',
+  C5: '#3d6b8e', C6: '#c23b3b', C7: '#2e7d82', C8: '#ff9933',
+  C9: '#7c5a9e',
 }
 
 export function CompetencyTab({ report }: { report: EvaluationReport }) {

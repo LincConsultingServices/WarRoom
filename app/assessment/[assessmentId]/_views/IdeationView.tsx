@@ -99,7 +99,7 @@ export function IdeationView({
                             {answer?.selectedOptionId && (() => {
                               const sel = q.options?.find(o => o.id === answer.selectedOptionId)
                               return sel?.feedback ? (
-                                <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs text-blue-700 dark:text-blue-300">
+                                <div className="p-2.5 rounded-lg bg-[color:var(--color-warroom-gold)]/[0.08] border border-[color:var(--color-warroom-gold)]/30 text-xs text-[color:var(--color-warroom-ivory)]/85">
                                   <span className="font-medium">Insight: </span>{sel.feedback}
                                 </div>
                               ) : null

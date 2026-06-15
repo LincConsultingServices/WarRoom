@@ -185,7 +185,7 @@ export function CharacterPicker({
         onToggle={(id) => toggle(selMentors, setSelMentors, 2, id)}
         renderBadge={(m) => m.specialization}
         renderMeta={(m) => m.bio?.slice(0, 60) + (m.bio?.length > 60 ? '…' : '') || ''}
-        accentColor="#a855f7"
+        accentColor="#7c5a9e"
       />
 
       <CharacterGroup
@@ -197,7 +197,7 @@ export function CharacterPicker({
         onToggle={(id) => toggle(selLeaders, setSelLeaders, 2, id)}
         renderBadge={(l) => l.specialization}
         renderMeta={(l) => l.bio?.slice(0, 60) + (l.bio?.length > 60 ? '…' : '') || ''}
-        accentColor="#3b82f6"
+        accentColor="#3d6b8e"
       />
 
       <CharacterGroup

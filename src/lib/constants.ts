@@ -100,9 +100,9 @@ export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
 
 // Scenario step styling
 export const SCENARIO_STEP_STYLES: Record<string, { icon: string; label: string; color: string; bgColor: string }> = {
-  environment: { icon: '🌍', label: 'ENVIRONMENT', color: '#3b82f6', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+  environment: { icon: '🌍', label: 'ENVIRONMENT', color: '#3d6b8e', bgColor: 'bg-[#3d6b8e]/10 dark:bg-[#3d6b8e]/20' },
   problem: { icon: '⚠️', label: 'PROBLEM', color: '#f59e0b', bgColor: 'bg-amber-50 dark:bg-amber-900/20' },
-  decision: { icon: '🎯', label: 'YOUR DECISION', color: '#8b5cf6', bgColor: 'bg-violet-50 dark:bg-violet-900/20' },
+  decision: { icon: '🎯', label: 'YOUR DECISION', color: '#7c5a9e', bgColor: 'bg-[#7c5a9e]/10 dark:bg-[#7c5a9e]/20' },
   consequence: { icon: '📊', label: 'CONSEQUENCE', color: '#10b981', bgColor: 'bg-emerald-50 dark:bg-emerald-900/20' },
 }
 
