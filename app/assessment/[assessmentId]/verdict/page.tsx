@@ -8,6 +8,9 @@ import { VerdictCeremony } from '@/src/components/verdict/VerdictCeremony'
 import { EmberDriftBackdrop } from '@/src/components/verdict/EmberDriftBackdrop'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
+import { VerdictProgressionEpilogue } from '@/src/components/verdict/VerdictProgressionEpilogue'
+import { useFounderProgression } from '@/src/hooks/useFounderProgression'
+import { useNewSigils } from '@/src/hooks/useNewSigils'
 
 // ============================================================
 // /assessment/[id]/verdict
@@ -33,6 +36,16 @@ type LoadState =
   | { kind: 'ready'; investors: Investor[]; scorecards: InvestorScorecard[]; report: EvaluationReport | null }
   | { kind: 'error'; message: string }
 
+function readFounderName(): string | undefined {
+  if (typeof window === 'undefined') return undefined
+  try {
+    const u = JSON.parse(window.localStorage.getItem('user') || 'null')
+    return u?.name || undefined
+  } catch {
+    return undefined
+  }
+}
+
 export default function VerdictPage() {
   const router = useRouter()
   const params = useParams()
@@ -41,6 +54,11 @@ export default function VerdictPage() {
 
   // ── Narrator — verdict ceremony onboarding ──
   useNarratorOnboarding('verdict')
+
+  // ── Progression epilogue (between ceremony and report) ──
+  const { progression } = useFounderProgression()
+  const { newSigils, acknowledge: acknowledgeSigils } = useNewSigils(progression?.sigils)
+  const [showEpilogue, setShowEpilogue] = useState(false)
 
   useEffect(() => {
     if (!assessmentId) return
@@ -100,8 +118,19 @@ export default function VerdictPage() {
     }
   }, [assessmentId])
 
-  const handleContinue = () => {
+  const goToReport = () => {
     router.push(`/assessment/${assessmentId}/final-report`)
+  }
+
+  const handleContinue = () => {
+    // Insert a single restrained progression beat before the report.
+    if (progression) setShowEpilogue(true)
+    else goToReport()
+  }
+
+  const finishEpilogue = () => {
+    acknowledgeSigils()
+    goToReport()
   }
 
   if (state.kind === 'loading') {
@@ -110,6 +139,17 @@ export default function VerdictPage() {
 
   if (state.kind === 'error') {
     return <VerdictError message={state.message} onRetry={() => router.refresh()} />
+  }
+
+  if (showEpilogue && progression) {
+    return (
+      <VerdictProgressionEpilogue
+        progression={progression}
+        newSigils={newSigils}
+        founderName={readFounderName()}
+        onContinue={finishEpilogue}
+      />
+    )
   }
 
   return (

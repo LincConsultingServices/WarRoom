@@ -46,7 +46,9 @@ import {
   CompetencyConstellation,
   SigilCrest,
   iconForSigil,
+  SigilUnlockOverlay,
 } from '@/src/components/progression'
+import { useNewSigils } from '@/src/hooks/useNewSigils'
 import {
   SIGIL_TIER_COLOR,
   sigilById,
@@ -92,6 +94,7 @@ export default function DashboardPage() {
 
   const { entries, connected, updatedAt } = useLeaderboard(batch?.code)
   const { progression } = useFounderProgression()
+  const { newSigils, acknowledge: acknowledgeSigils } = useNewSigils(progression?.sigils)
   useNarratorOnboarding('great-hall', { delayMs: 1800 })
   const beginIntro = useFeatureIntro('dashboard-begin', { elementId: 'dashboard-begin-cta' })
 
@@ -720,6 +723,10 @@ export default function DashboardPage() {
         onOpenChange={setStartDialogOpen}
         onCreated={handleSimulationCreated}
       />
+
+      {newSigils.length > 0 && (
+        <SigilUnlockOverlay sigils={newSigils} onClose={acknowledgeSigils} />
+      )}
     </div>
   )
 }
