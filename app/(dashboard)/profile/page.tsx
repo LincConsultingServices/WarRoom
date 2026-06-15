@@ -23,6 +23,8 @@ import {
 } from '@/src/components/progression'
 import { SIGILS } from '@/src/lib/progression'
 import { useFounderProgression } from '@/src/hooks/useFounderProgression'
+import { LoreTip } from '@/src/components/common/LoreTip'
+import { LORE } from '@/src/lib/lore'
 
 // ============================================================
 // /profile (route: /(dashboard)/profile)
@@ -214,7 +216,7 @@ export default function ProfilePage() {
         {progression && (
           <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
             <SigilBadge icon={Sparkles} tone="gold">
-              Competency Constellation
+              <LoreTip tip={LORE.constellation}>Competency Constellation</LoreTip>
             </SigilBadge>
             <CompetencyConstellation
               mastery={progression.competencyMastery}
@@ -229,7 +231,7 @@ export default function ProfilePage() {
           <section className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between px-1">
               <SigilBadge icon={Award} tone="gold">
-                Sigils
+                <LoreTip tip={LORE.sigil}>Sigils</LoreTip>
               </SigilBadge>
               <span className="font-display text-[0.55rem] uppercase tracking-[0.18em] text-foreground/40">
                 {progression.sigils.length} / {SIGILS.length} earned
@@ -243,7 +245,7 @@ export default function ProfilePage() {
         {progression && (
           <section className="flex flex-col gap-4">
             <SigilBadge icon={Crown} tone="gold">
-              House Decree
+              <LoreTip tip={LORE.house}>House Decree</LoreTip>
             </SigilBadge>
             <StoneCard padding="md">
               <HouseCustomizer
@@ -259,7 +261,7 @@ export default function ProfilePage() {
         <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
           <div className="text-center">
             <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-foreground/55">
-              Legacy Score History
+              <LoreTip tip={LORE.legacyScore}>Legacy Score History</LoreTip>
             </p>
             <p className="mt-1 font-mono text-xs text-foreground/45">
               {completedCount} completed {completedCount === 1 ? 'trial' : 'trials'}
