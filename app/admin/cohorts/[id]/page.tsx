@@ -28,9 +28,11 @@ import {
   Eye,
   Trophy,
   Sparkles,
+  Download,
 } from 'lucide-react'
 import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
 import { CompetencyConstellation, RankInsignia } from '@/src/components/progression'
+import { COMPETENCY_META, CATEGORY_LABEL } from '@/src/lib/progression'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
 const INPUT_CLASSES =
@@ -69,6 +71,40 @@ function cohortMastery(
     }
   }
   return out
+}
+
+const competencyName = (code: string) =>
+  COMPETENCY_META.find((m) => m.code === code)?.name ?? code
+
+// Build a one-row-per-founder CSV joining roster + (optional) progression.
+function buildCohortCsv(
+  participants: BatchParticipant[],
+  standings: CohortProgression['standings'],
+): string {
+  const byUser = new Map(standings.map((s) => [s.userId, s]))
+  const esc = (v: unknown) => {
+    const s = v == null ? '' : String(v)
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const headers = [
+    'Name', 'Email', 'Joined', 'Status', 'Stage', 'Revenue',
+    'Mean Spam %', 'Rank', 'Renown', 'Sigils', 'Lit Competencies',
+  ]
+  const rows = participants.map((p) => {
+    const eng = p.phaseEngagement ? Object.values(p.phaseEngagement) : []
+    const meanSpam = eng.length
+      ? Math.round(eng.reduce((a, e) => a + (e?.spamPercent || 0), 0) / eng.length)
+      : ''
+    const st = byUser.get(p.userId)
+    return [
+      p.userName, p.email, new Date(p.joinedAt).toISOString().slice(0, 10),
+      p.status ?? '', p.currentStage?.replace(/^STAGE_/, '').replace(/_/g, ' ') ?? '',
+      p.revenueProjection ?? '', meanSpam,
+      st?.rankTitle ?? '', st?.renown ?? '', st?.sigilCount ?? '',
+      st ? `${st.litCompetencies}/8` : '',
+    ].map(esc).join(',')
+  })
+  return [headers.join(','), ...rows].join('\n')
 }
 
 export default function BatchDetailPage() {
@@ -218,6 +254,30 @@ export default function BatchDetailPage() {
   const nameByUser = new Map(participants.map((p) => [p.userId, p.userName]))
   const showAscent = !!cohortProgression && cohortProgression.totalFounders > 0
 
+  const handleExportCsv = () => {
+    if (!batch) return
+    const csv = buildCohortCsv(participants, cohortProgression?.standings ?? [])
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${batch.code}-cohort-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  // Per-competency cohort breakdown — weakest first, so the focus areas surface.
+  const competencyBreakdown = cohortProgression
+    ? [...cohortProgression.competencies].sort((a, b) => {
+        if (a.founders === 0 && b.founders === 0) return 0
+        if (a.founders === 0) return 1 // no-data sinks to the bottom
+        if (b.founders === 0) return -1
+        return a.avgTier - b.avgTier
+      })
+    : []
+
   return (
     <div className="py-6 space-y-6">
       {/* Back + Header */}
@@ -271,6 +331,15 @@ export default function BatchDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <WarRoomCTA
+            variant="ghost"
+            size="sm"
+            icon={Download}
+            onClick={handleExportCsv}
+            disabled={participants.length === 0}
+          >
+            Export CSV
+          </WarRoomCTA>
           <WarRoomCTA variant="ghost" size="sm" icon={Pencil} onClick={() => setShowEdit(true)}>
             Edit
           </WarRoomCTA>
@@ -400,6 +469,61 @@ export default function BatchDetailPage() {
               </table>
             </div>
           </div>
+
+          {/* Per-competency breakdown — weakest first, so focus areas surface */}
+          {competencyBreakdown.length > 0 && (
+            <div className="border-t border-[color:var(--color-warroom-ash)]/20 px-6 py-5">
+              <p
+                className="mb-3 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Competency Breakdown — weakest first
+              </p>
+              <div className="space-y-2">
+                {competencyBreakdown.map((c, i) => {
+                  const hasData = c.founders > 0
+                  const pct = Math.max(0, Math.min(100, (c.avgTier / 5) * 100))
+                  const label = hasData
+                    ? CATEGORY_LABEL[TIER_CATEGORY[Math.max(1, Math.round(c.avgTier))]]
+                    : 'No data'
+                  const focus = hasData && i < 3
+                  return (
+                    <div key={c.code} className="flex items-center gap-3">
+                      <span className="w-40 truncate text-xs text-[color:var(--color-warroom-ivory)]">
+                        {competencyName(c.code)}
+                      </span>
+                      <div className="flex-1 h-2 overflow-hidden rounded-full bg-[color:var(--color-warroom-rampart)]">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${pct}%`,
+                            background: focus
+                              ? 'var(--color-warroom-crimson-bright)'
+                              : 'var(--color-warroom-gold)',
+                          }}
+                        />
+                      </div>
+                      <span
+                        className="w-28 text-right text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {label}
+                      </span>
+                      <span className="w-16 text-right font-mono text-[10px] text-[color:var(--color-warroom-smoke)]">
+                        {c.founders} {c.founders === 1 ? 'founder' : 'founders'}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+              <p
+                className="mt-3 text-[10px] text-[color:var(--color-warroom-smoke)]"
+                style={{ fontFamily: 'var(--font-body, serif)' }}
+              >
+                Crimson bars mark the cohort&rsquo;s three weakest competencies — likely teaching focus areas.
+              </p>
+            </div>
+          )}
         </StoneCard>
       )}
 
