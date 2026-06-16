@@ -70,7 +70,7 @@ export function QuestionCard({
         // Parchment-on-stone slab: aged vellum grain under a warm-dark wash that
         // keeps gold + ivory copy fully legible.
         backgroundImage:
-          'linear-gradient(rgba(16,14,10,0.82), rgba(16,14,10,0.86)), url("/assets/images/textures/parchment.webp")',
+          'var(--wr-parchment-wash), url("/assets/images/textures/parchment.webp")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -100,7 +100,7 @@ export function QuestionCard({
 
       <header className="mb-3 flex items-center justify-between gap-3">
         <div className="flex flex-col">
-          <span className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/70">
+          <span className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/90">
             {label ?? `${investorName} asks`}
           </span>
         </div>

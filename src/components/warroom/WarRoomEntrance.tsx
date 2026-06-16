@@ -196,7 +196,7 @@ export function WarRoomEntrance({
           <button
             type="button"
             onClick={handleSkip}
-            className="absolute right-6 top-6 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/25 bg-black/50 px-3 py-1.5 font-display text-xs tracking-[0.18em] uppercase text-[color:var(--color-warroom-parchment)]/80 backdrop-blur-md transition-all duration-200 hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-black/70 hover:text-[color:var(--color-warroom-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]"
+            className="absolute right-6 top-6 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/25 bg-black/50 px-3 py-1.5 font-display text-xs tracking-[0.18em] uppercase text-zinc-200/80 backdrop-blur-md transition-all duration-200 hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-black/70 hover:text-[color:var(--color-warroom-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]"
             aria-label="Skip cinematic"
           >
             Skip <span aria-hidden>→</span>

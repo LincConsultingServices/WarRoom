@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ASSET_REGISTRY } from '@/lib/assets/assetRegistry'
+import { useTheme } from 'next-themes'
 
 type BgKey = keyof typeof ASSET_REGISTRY.backgrounds
 
@@ -29,6 +30,12 @@ export function RouteBackground({ bg, brightness = 0.35 }: RouteBackgroundProps)
   const src = ASSET_REGISTRY.backgrounds[bg]
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -48,6 +55,20 @@ export function RouteBackground({ bg, brightness = 0.35 }: RouteBackgroundProps)
 
   if (failed || !loaded) return null
 
+  const currentBrightness = mounted && resolvedTheme === 'light' ? 0.85 : brightness
+
+  const vignetteStyle = mounted && resolvedTheme === 'light'
+    ? {
+        background:
+          'radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 50%, rgba(139,120,90,0.15) 80%, rgba(139,120,90,0.3) 100%)',
+        mixBlendMode: 'multiply' as const,
+      }
+    : {
+        background:
+          'radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 40%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.85) 100%)',
+        mixBlendMode: 'multiply' as const,
+      }
+
   return (
     <>
       <div
@@ -58,18 +79,14 @@ export function RouteBackground({ bg, brightness = 0.35 }: RouteBackgroundProps)
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: `brightness(${brightness})`,
+          filter: `brightness(${currentBrightness})`,
         }}
       />
       {/* Cinematic vignette — CSS radial gradient from transparent center to black edges */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 40%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.85) 100%)',
-          mixBlendMode: 'multiply',
-        }}
+        style={vignetteStyle}
       />
     </>
   )

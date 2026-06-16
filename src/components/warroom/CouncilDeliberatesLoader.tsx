@@ -33,10 +33,11 @@ export function CouncilDeliberatesLoader({
       aria-live="polite"
       className={cn(
         'pointer-events-none flex h-full w-full flex-col items-center justify-center gap-5 rounded-md',
-        'bg-black/55 backdrop-blur-md',
+        'backdrop-blur-md',
         className,
       )}
       style={{
+        background: 'var(--wr-overlay-bg)',
         boxShadow: 'inset 0 0 60px rgba(139,26,26,0.18)',
       }}
     >
@@ -103,7 +104,7 @@ export function CouncilDeliberatesLoader({
         />
       </div>
 
-      <p className="font-display text-base uppercase tracking-[0.22em] text-[color:var(--color-warroom-parchment)]/90">
+      <p className="font-display text-base uppercase tracking-[0.22em] text-foreground/90">
         {message}
       </p>
     </div>
