@@ -82,6 +82,11 @@
   --wr-electrum: #9a7b10;
   --wr-parchment: #3d3530;
   --wr-ink: #f5e6c8;
+  /* Theme-responsive accents — light: darker antique variants for WCAG AA on parchment */
+  --wr-gold: #6e520e;
+  --wr-gold-bright: #5c4408;
+  --wr-silver: #666666;
+  --wr-ember: #9a3d00;
   --wr-gold-glow: rgba(180, 140, 30, 0.15);
   --wr-dragonglass: #1a2a48;
   --wr-shadow-gold: 0 0 12px rgba(160, 120, 30, 0.2), 0 0 40px rgba(160, 120, 30, 0.08);
@@ -145,6 +150,11 @@
   --wr-electrum: #daa520;
   --wr-parchment: #f5e6c8;
   --wr-ink: #1a1208;
+  /* Theme-responsive accents — dark: bright values as originally tuned */
+  --wr-gold: #c9a227;
+  --wr-gold-bright: #e8c84a;
+  --wr-silver: #a8a8a8;
+  --wr-ember: #ff6b00;
   --wr-gold-glow: rgba(240, 192, 64, 0.2);
   --wr-dragonglass: #0f1a2e;
   --wr-shadow-gold: 0 0 20px rgba(201, 150, 42, 0.3), 0 0 60px rgba(201, 150, 42, 0.1);
@@ -165,15 +175,18 @@
      Accent colors are fixed. Surface/text tokens are theme-responsive
      via --wr-* variables defined in :root (light) and .dark (dark). */
 
-  /* Accent tokens (fixed across themes) */
-  --color-warroom-ember: #ff6b00;
+  /* Accent tokens. Most are fixed; the bright ones that fail WCAG on the light
+     (parchment) theme are theme-responsive via --wr-* (dark = bright as tuned;
+     light = darker AA-passing antique variants). Gold buttons use a hardcoded
+     gradient, so fills are unaffected — only token-driven text/borders adapt. */
+  --color-warroom-ember: var(--wr-ember);
   --color-warroom-ember-bright: #ff9933;
-  --color-warroom-gold: #c9a227;
-  --color-warroom-gold-bright: #e8c84a;
+  --color-warroom-gold: var(--wr-gold);
+  --color-warroom-gold-bright: var(--wr-gold-bright);
   --color-warroom-gold-dark: #8b6914;
   --color-warroom-crimson: #8b1a1a;
   --color-warroom-crimson-bright: #c23b3b;
-  --color-warroom-silver: #a8a8a8;
+  --color-warroom-silver: var(--wr-silver);
   --color-warroom-verdant: #2d6a4f;
   --color-warroom-sapphire: #1a3a5c;
   --color-warroom-amethyst: #4a2060;
