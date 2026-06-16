@@ -17,7 +17,7 @@ interface AdminRankedCompetency {
   strengths?: string[]
   weaknesses?: string[]
 }
-import { CompetencyRadarChart } from '@/components/competency-radar-chart'
+import { CompetencyRadarChart } from '@/components/competency-radar-chart-lazy'
 import { StoneCard, GoldDivider, SigilBadge } from '@/src/components/primitives'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
