@@ -26,7 +26,7 @@ import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
 const INPUT_CLASSES =
-  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]/50 focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
+  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)] focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
 
 export default function CohortsPage() {
   const prefersReducedMotion = useReducedMotion()
@@ -225,7 +225,7 @@ export default function CohortsPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-3 h-5 w-5 text-[color:var(--color-warroom-smoke)]/50" />
+        <Search className="absolute left-3 top-3 h-5 w-5 text-[color:var(--color-warroom-smoke)]" />
         <Input
           placeholder="Search batches by name or code..."
           value={searchQuery}

@@ -341,7 +341,7 @@ export default function SimulationResultPage() {
                 >
                   {label}
                 </div>
-                <div className="text-[color:var(--color-warroom-smoke)]/70 mt-0.5">
+                <div className="text-[color:var(--color-warroom-smoke)] mt-0.5">
                   {isDone ? (
                     <CheckCircle2 className="h-3 w-3 mx-auto text-[color:var(--color-warroom-gold)]" />
                   ) : isActive ? (
@@ -373,7 +373,7 @@ export default function SimulationResultPage() {
             </h2>
           </div>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Your performance across all 8 entrepreneurial competencies.
@@ -465,7 +465,7 @@ export default function SimulationResultPage() {
           )}
           {report.archetypeNarrative && (
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)]/80 max-w-2xl mx-auto mt-3 leading-relaxed"
+              className="text-xs text-[color:var(--color-warroom-smoke)] max-w-2xl mx-auto mt-3 leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               {report.archetypeNarrative}
@@ -484,7 +484,7 @@ export default function SimulationResultPage() {
             Action Plan
           </h2>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Recommended actions to improve your entrepreneurial skills.
@@ -560,7 +560,7 @@ export default function SimulationResultPage() {
                         (d: string, j: number) => (
                           <li
                             key={j}
-                            className="text-xs text-[color:var(--color-warroom-smoke)]/80 leading-relaxed"
+                            className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
                             style={{ fontFamily: 'var(--font-body, serif)' }}
                           >
                             — {d}
@@ -572,7 +572,7 @@ export default function SimulationResultPage() {
                 )}
                 {narration.scoringRationale && (
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)]/70 mt-2 leading-relaxed"
+                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-2 leading-relaxed"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     {narration.scoringRationale}
@@ -597,7 +597,7 @@ export default function SimulationResultPage() {
             </h2>
           </div>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-5"
+            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Detailed breakdown of your performance across the 8 core competencies.

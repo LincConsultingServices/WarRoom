@@ -400,7 +400,7 @@ export default function HistoryDetailPage() {
                   Session Transcript
                 </h3>
                 <span
-                  className="text-[10px] text-[color:var(--color-warroom-smoke)]/60 ml-auto"
+                  className="text-[10px] text-[color:var(--color-warroom-smoke)] ml-auto"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Every question, answer, and the Council&apos;s feedback

@@ -139,7 +139,7 @@
   --wr-stone: #2a2520;
   --wr-slate: #2e2520;
   --wr-ash: #4a3f38;
-  --wr-smoke: #7a6a5f;
+  --wr-smoke: #978878;     /* WCAG AA secondary text on dark surfaces (was #7a6a5f) */
   --wr-ivory: #e8d5b7;
   --wr-ghost: #f2ece0;
   --wr-electrum: #daa520;
