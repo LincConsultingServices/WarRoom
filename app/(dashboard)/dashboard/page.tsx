@@ -229,11 +229,7 @@ export default function DashboardPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-40 border-b backdrop-blur-md"
-        style={{
-          borderColor: 'rgba(201,162,39,0.12)',
-          background: 'rgba(10,8,5,0.78)',
-        }}
+        className="sticky top-0 z-40 border-b backdrop-blur-md bg-[color:var(--color-warroom-black)]/80 border-[color:var(--color-warroom-gold)]/15"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
