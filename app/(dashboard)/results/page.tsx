@@ -18,7 +18,7 @@ import {
 import api from '@/src/lib/api'
 import { cn } from '@/lib/utils'
 import { Progress } from '@/components/ui/progress'
-import { CompetencyRadarChart } from '@/components/competency-radar-chart'
+import { CompetencyRadarChart } from '@/components/competency-radar-chart-lazy'
 import {
   StoneCard,
   WarRoomCTA,

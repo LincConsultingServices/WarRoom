@@ -1,6 +1,6 @@
 'use client'
 
-import { CompetencyRadarChart } from '@/components/competency-radar-chart'
+import { CompetencyRadarChart } from '@/components/competency-radar-chart-lazy'
 import type { EvaluationReport, RankedCompetency, CompetencyCode } from '@/src/types'
 
 const COMP_COLORS: Record<string, string> = {

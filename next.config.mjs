@@ -1,3 +1,11 @@
+import bundleAnalyzer from '@next/bundle-analyzer'
+
+// Enable with `ANALYZE=true`. NOTE: @next/bundle-analyzer hooks webpack, so it
+// only emits the treemap on a webpack build (`ANALYZE=true next build --webpack`);
+// the default Turbopack build ignores it. For a quick per-route byte table that
+// works on any build, see scripts/analyze-bundle.mjs.
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -14,4 +22,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withBundleAnalyzer(nextConfig)
