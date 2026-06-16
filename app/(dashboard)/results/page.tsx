@@ -399,7 +399,7 @@ function SimulationCard({
                   >
                     {STAGE_NAMES[stageNum] || `S${stageNum}`}
                   </div>
-                  <div className="text-[color:var(--color-warroom-smoke)]/70 mt-0.5">
+                  <div className="text-[color:var(--color-warroom-smoke)] mt-0.5">
                     {stageResponses.length > 0
                       ? `${stageResponses.length} Q`
                       : '—'}

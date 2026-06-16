@@ -200,7 +200,7 @@ export default function HistoryPage() {
             No simulations yet
           </p>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)]/70 mb-6 max-w-sm mx-auto"
+            className="text-xs text-[color:var(--color-warroom-smoke)] mb-6 max-w-sm mx-auto"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Complete your first campaign to see your history and track your

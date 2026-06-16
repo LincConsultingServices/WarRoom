@@ -200,7 +200,7 @@ export default function LeaderboardPage() {
               No batch associated with your account.
             </p>
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)]/70"
+              className="text-xs text-[color:var(--color-warroom-smoke)]"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               Sign in with a batch code to see live rankings.

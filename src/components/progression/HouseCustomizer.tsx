@@ -162,7 +162,7 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
           className="w-full rounded-sm border border-[color:var(--color-warroom-stone)]/50 bg-[color:var(--color-warroom-black)]/60 px-3 py-2 text-sm italic text-[color:var(--color-warroom-ivory)] outline-none transition-colors focus:border-[color:var(--color-warroom-gold)]/60"
           style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
         />
-        <div className="mt-1 text-right text-[10px] text-[color:var(--color-warroom-smoke)]/60">
+        <div className="mt-1 text-right text-[10px] text-[color:var(--color-warroom-smoke)]">
           {words.length}/{HOUSE_WORDS_MAX}
         </div>
       </div>
@@ -175,7 +175,7 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
           'inline-flex items-center gap-2 rounded-sm border px-5 py-2 text-xs font-bold uppercase tracking-[0.16em] transition-all',
           dirty && !saving
             ? 'border-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-gold)]/10'
-            : 'cursor-not-allowed border-[color:var(--color-warroom-stone)]/50 text-[color:var(--color-warroom-smoke)]/50',
+            : 'cursor-not-allowed border-[color:var(--color-warroom-stone)]/50 text-[color:var(--color-warroom-smoke)]',
         )}
         style={{ fontFamily: 'var(--font-display)' }}
       >

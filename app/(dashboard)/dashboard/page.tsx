@@ -706,7 +706,7 @@ export default function DashboardPage() {
                       The Rankings are sealed.
                     </p>
                     <p
-                      className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]/70"
+                      className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Enter a batch code at sign-in to reveal the standings.

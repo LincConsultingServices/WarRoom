@@ -107,7 +107,7 @@ export function CampaignMap({
                     'absolute inset-0 grid place-items-center text-[10px] font-bold uppercase tracking-tight',
                     status === 'completed' && 'text-[color:var(--color-warroom-ghost)]',
                     status === 'current' && 'text-[color:var(--color-warroom-ghost)]',
-                    status === 'locked' && 'text-[color:var(--color-warroom-smoke)]/70',
+                    status === 'locked' && 'text-[color:var(--color-warroom-smoke)]',
                   )}
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
@@ -120,7 +120,7 @@ export function CampaignMap({
                   'text-[9px] sm:text-[10px] uppercase tracking-[0.14em] whitespace-nowrap',
                   status === 'current' && 'text-[color:var(--color-warroom-gold)] font-semibold',
                   status === 'completed' && 'text-[color:var(--color-warroom-ivory)]/80',
-                  status === 'locked' && 'text-[color:var(--color-warroom-smoke)]/60',
+                  status === 'locked' && 'text-[color:var(--color-warroom-smoke)]',
                 )}
                 style={{ fontFamily: 'var(--font-display)' }}
               >

@@ -301,7 +301,7 @@ export default function TermsAndConditionsPage() {
             </h2>
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]/60 mb-6"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Participant Agreement
@@ -331,7 +331,7 @@ export default function TermsAndConditionsPage() {
             </h2>
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]/60 mb-6"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Terms and Conditions
@@ -349,7 +349,7 @@ export default function TermsAndConditionsPage() {
         {/* Footer */}
         <footer className="text-center pt-6 border-t border-[color:var(--color-warroom-ash)]/20">
           <p
-            className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]/50"
+            className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             By entering the War Room, you accept these terms in full.
