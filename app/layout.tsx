@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { MotionConfig } from 'framer-motion'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Cinzel, Cinzel_Decorative, EB_Garamond, JetBrains_Mono } from 'next/font/google'
@@ -19,7 +19,7 @@ const cinzel = Cinzel({
   display: 'swap',
 })
 
-// Premium font stack — Iron Throne overhaul
+// Premium font stack â€” Iron Throne overhaul
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ['latin'],
   variable: '--font-cinzel-decorative',
@@ -43,7 +43,7 @@ const jetBrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "KK's War Room — Forge Your Legacy",
+  title: "KK's War Room â€” Forge Your Legacy",
   description: 'Enter the War Room. Face legendary investors, defend your vision, and forge your entrepreneurial legacy in the ultimate pressure simulation.',
   keywords: ['entrepreneurship', 'simulation', 'pitch', 'investors', 'war room', 'gamified'],
   generator: 'v0.app'
@@ -71,7 +71,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {/* reducedMotion="user" → every Framer Motion animation respects the
+            {/* reducedMotion="user" â†’ every Framer Motion animation respects the
                 OS "reduce motion" setting (transforms/layout become instant,
                 opacity/colour preserved). Complements the CSS rules in globals.css. */}
             <MotionConfig reducedMotion="user">

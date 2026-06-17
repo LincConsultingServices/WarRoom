@@ -627,12 +627,23 @@ const ROUTERS: Record<
 }
 
 /** Play the GoT-flavored synthesized version of a sound event. */
+/**
+ * Generated (synth) sound effects are disabled by request — the procedural
+ * Web-Audio effects didn't meet the bar. This is the single source for all
+ * synthesised one-shots, so disabling here silences every path that reaches
+ * them (playSfx → playGOTSound, useGOTSound, etc.). Narrator voice MP3s and
+ * ambient MP3s take separate paths and are unaffected. Flip to false to
+ * re-enable generated SFX.
+ */
+const SYNTH_SOUND_DISABLED = true
+
 export function playSynthSound(
   ctx: AudioContext,
   destination: AudioNode,
   event: SoundEvent,
   volume = 0.6,
 ) {
+  if (SYNTH_SOUND_DISABLED) return
   const router = ROUTERS[event]
   if (!router) return
   try {

@@ -80,6 +80,9 @@ function loadOnboardedPhases(): Record<string, true> {
 function loadNarratorMuted(): boolean {
   if (typeof window === 'undefined') return false
   try {
+    // Check the per-channel key first (set by AudioControls), then the legacy key.
+    const ch = window.localStorage.getItem('wr_ch_narrator_muted')
+    if (ch !== null) return ch === 'true'
     return window.localStorage.getItem(NARRATOR_MUTE_KEY) === 'true'
   } catch {
     return false

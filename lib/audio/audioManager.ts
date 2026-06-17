@@ -243,8 +243,11 @@ export function setAmbientTrack(key: AmbientKey | null, _fadeMs?: number): void 
   getAmbientStore().setScene(scene)
 }
 
+const SFX_DISABLED = false
+
 export function playSfx(key: SfxKey, volumeOverride?: number): void {
   if (typeof window === 'undefined') return
+  if (SFX_DISABLED) return
   if (isWarRoomAudioMuted()) return
 
   const baseVolume = volumeOverride ?? DEFAULT_VOLUMES[key]

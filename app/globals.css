@@ -93,6 +93,16 @@
   --wr-shadow-crimson: 0 0 12px rgba(139, 26, 26, 0.25);
   --wr-shadow-deep: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
   --wr-glow-ember: 0 0 20px rgba(200, 75, 15, 0.25);
+
+  /* Theme-responsive surface and gradient tokens */
+  --wr-page-grad-end: #d8ccb8;
+  --wr-header-bg: linear-gradient(180deg, rgba(245, 238, 224, 0.95), rgba(237, 228, 212, 0.85));
+  --wr-panel-bg: rgba(237, 228, 212, 0.65);
+  --wr-panel-bg-heavy: rgba(229, 219, 200, 0.85);
+  --wr-panel-bg-darker: rgba(216, 204, 184, 0.4);
+  --wr-offer-portrait-bg: linear-gradient(160deg, rgba(201, 162, 39, 0.15), rgba(216, 204, 184, 0.7));
+  --wr-parchment-wash: linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.92));
+  --wr-overlay-bg: rgba(245, 236, 224, 0.85);
 }
 
 .dark {
@@ -161,6 +171,16 @@
   --wr-shadow-crimson: 0 0 20px rgba(139, 26, 26, 0.4);
   --wr-shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
   --wr-glow-ember: 0 0 30px rgba(200, 75, 15, 0.5);
+
+  /* Theme-responsive surface and gradient tokens */
+  --wr-page-grad-end: #050300;
+  --wr-header-bg: linear-gradient(180deg, rgba(10, 8, 5, 0.92), rgba(10, 8, 5, 0.78));
+  --wr-panel-bg: rgba(14, 11, 8, 0.6);
+  --wr-panel-bg-heavy: rgba(14, 11, 8, 0.7);
+  --wr-panel-bg-darker: rgba(0, 0, 0, 0.35);
+  --wr-offer-portrait-bg: linear-gradient(160deg, rgba(201, 162, 39, 0.14), rgba(14, 11, 8, 0.85));
+  --wr-parchment-wash: linear-gradient(rgba(16, 14, 10, 0.82), rgba(16, 14, 10, 0.86));
+  --wr-overlay-bg: rgba(0, 0, 0, 0.65);
 }
 
 @theme inline {
@@ -207,6 +227,11 @@
   --color-warroom-ink: var(--wr-ink);
   --color-warroom-gold-glow: var(--wr-gold-glow);
   --color-warroom-dragonglass: var(--wr-dragonglass);
+  --color-warroom-page-grad-end: var(--wr-page-grad-end);
+  --color-warroom-panel-bg: var(--wr-panel-bg);
+  --color-warroom-panel-bg-heavy: var(--wr-panel-bg-heavy);
+  --color-warroom-panel-bg-darker: var(--wr-panel-bg-darker);
+  --color-warroom-overlay-bg: var(--wr-overlay-bg);
 
   /* Cinematic shadows + glows (theme-responsive) */
   --shadow-gold: var(--wr-shadow-gold);
@@ -581,7 +606,7 @@
   background:
     radial-gradient(ellipse at top, rgba(201, 162, 39, 0.06), transparent 55%),
     radial-gradient(ellipse at bottom, rgba(139, 26, 26, 0.05), transparent 60%),
-    linear-gradient(180deg, var(--background) 0%, #050300 100%);
+    linear-gradient(180deg, var(--background) 0%, var(--wr-page-grad-end) 100%);
   font-family: var(--font-body), 'EB Garamond', Georgia, serif;
 }
 
@@ -596,7 +621,7 @@
   gap: 1.5rem;
   padding: 0.9rem 1.75rem;
   backdrop-filter: blur(14px);
-  background: linear-gradient(180deg, rgba(10, 8, 5, 0.92), rgba(10, 8, 5, 0.78));
+  background: var(--wr-header-bg);
   border-bottom: 1px solid rgba(201, 162, 39, 0.22);
   box-shadow:
     0 1px 0 rgba(201, 162, 39, 0.08),
@@ -812,7 +837,7 @@
   border-radius: 4px;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.035), transparent 70%),
-    rgba(20, 16, 12, 0.55);
+    var(--wr-panel-bg);
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   backdrop-filter: blur(6px);
@@ -871,7 +896,7 @@
   line-height: 1.7;
   color: var(--color-warroom-parchment);
   padding: 1rem 1.1rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--wr-panel-bg-darker);
   border: 1px solid rgba(201, 162, 39, 0.18);
   border-radius: 4px;
 }
@@ -884,7 +909,7 @@
   border: 1px dashed rgba(201, 162, 39, 0.3);
   background:
     radial-gradient(ellipse at center, rgba(201, 162, 39, 0.04) 0%, transparent 70%),
-    rgba(14, 11, 8, 0.6);
+    var(--wr-panel-bg);
   text-align: center;
   backdrop-filter: blur(6px);
   transition: all 0.4s var(--ease-regal);
@@ -1044,7 +1069,7 @@
 .analyzing-state {
   text-align: center;
   padding: 3rem 1.5rem;
-  background: rgba(14, 11, 8, 0.6);
+  background: var(--wr-panel-bg);
   border: 1px solid rgba(201, 162, 39, 0.18);
   border-radius: 4px;
 }
@@ -1133,7 +1158,7 @@
   margin-top: 1rem;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.04), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(201, 162, 39, 0.25);
   border-radius: 4px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(201, 162, 39, 0.08);
@@ -1215,7 +1240,7 @@
 .analysis-list {
   padding: 0.85rem 1.15rem;
   margin-top: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--wr-panel-bg-darker);
   border-radius: 4px;
 }
 
@@ -1248,7 +1273,7 @@
   padding: 1.25rem 1.4rem;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.06), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(201, 162, 39, 0.2);
   border-left: 4px solid var(--color-warroom-gold);
   border-radius: 0 4px 4px 0;
@@ -1280,7 +1305,7 @@
   margin-top: 1rem;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.06), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(201, 162, 39, 0.2);
   border-left: 4px solid var(--color-warroom-ember);
   border-radius: 0 4px 4px 0;
@@ -1316,7 +1341,7 @@
   padding: 1.5rem;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.04), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(201, 162, 39, 0.22);
   border-radius: 4px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(201, 162, 39, 0.08);
@@ -1375,7 +1400,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--wr-panel-bg-darker);
   border: 1px solid rgba(201, 162, 39, 0.15);
   border-radius: 3px;
   font-family: var(--font-data), 'JetBrains Mono', monospace;
@@ -1386,7 +1411,7 @@
 
 .sc-investor-reaction {
   padding: 0.85rem 1rem;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--wr-panel-bg-darker);
   border-left: 3px solid var(--color-warroom-gold);
   border-radius: 0 3px 3px 0;
 }
@@ -1408,7 +1433,7 @@
   cursor: pointer;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.04), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(16, 185, 129, 0.28);
   border-radius: 6px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(201, 162, 39, 0.08);
@@ -1429,7 +1454,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: linear-gradient(160deg, rgba(201, 162, 39, 0.14), rgba(14, 11, 8, 0.85));
+  background: var(--wr-offer-portrait-bg);
   border-bottom: 1px solid rgba(201, 162, 39, 0.22);
 }
 
@@ -1492,7 +1517,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.7rem 0.9rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--wr-panel-bg-darker);
   border: 1px solid rgba(201, 162, 39, 0.15);
   border-radius: 3px;
   font-family: var(--font-data), 'JetBrains Mono', monospace;
@@ -1502,7 +1527,7 @@
 
 .offer-quote {
   padding: 0.6rem 0.85rem;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--wr-panel-bg-darker);
   border-left: 3px solid var(--color-warroom-gold);
   border-radius: 0 3px 3px 0;
 }
@@ -1539,7 +1564,7 @@
   padding: 1.5rem;
   background:
     linear-gradient(135deg, rgba(201, 162, 39, 0.03), transparent 70%),
-    rgba(14, 11, 8, 0.7);
+    var(--wr-panel-bg-heavy);
   border: 1px solid rgba(201, 162, 39, 0.22);
   border-radius: 4px;
 }

@@ -62,7 +62,7 @@ export function AnswerScrollInput({
         // Aged war-scroll: parchment grain beneath a warm-dark wash so the
         // mono dispatch text stays crisp.
         backgroundImage:
-          'linear-gradient(rgba(14,12,9,0.80), rgba(14,12,9,0.85)), url("/assets/images/textures/parchment.webp")',
+          'var(--wr-parchment-wash), url("/assets/images/textures/parchment.webp")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -79,7 +79,7 @@ export function AnswerScrollInput({
 
       <label
         htmlFor={id}
-        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/70"
+        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/90"
       >
         {label}
       </label>

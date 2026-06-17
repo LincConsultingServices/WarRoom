@@ -18,7 +18,8 @@ import { Volume2, VolumeX } from 'lucide-react'
 import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
-import { MuteToggle } from '@/src/components/warroom/MuteToggle'
+import { AudioControls } from '@/src/components/warroom/AudioControls'
+
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
 // the same; the chamber is a presentational shell that wraps the existing
@@ -865,7 +866,7 @@ export default function WarRoomSimulation() {
                     {/* timer removed */}
                 </div>
                 <div className="header-right">
-                    <MuteToggle />
+                    <AudioControls />
                     <button className="end-btn" onClick={handleEndSimulation}>
                         End Simulation
                     </button>

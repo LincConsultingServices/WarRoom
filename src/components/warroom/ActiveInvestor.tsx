@@ -105,7 +105,7 @@ export function ActiveInvestor({
         className="relative z-10 mt-auto flex flex-col gap-2 px-4 pb-4 pt-12"
         style={{ background: 'linear-gradient(to top, rgba(8,6,4,0.92) 35%, rgba(8,6,4,0.55) 70%, transparent)' }}
       >
-        <h2 className="font-display text-2xl font-semibold leading-tight tracking-wide text-foreground drop-shadow">
+        <h2 className="font-display text-2xl font-semibold leading-tight tracking-wide text-white drop-shadow">
           {investor.name}
         </h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -115,8 +115,8 @@ export function ActiveInvestor({
             </span>
           )}
           {investor.bias_trait_name && (
-            <span className="text-xs italic text-foreground/70">
-              <span className="font-semibold not-italic uppercase tracking-wider text-foreground/45">Bias:&nbsp;</span>
+            <span className="text-xs italic text-white/70">
+              <span className="font-semibold not-italic uppercase tracking-wider text-white/45">Bias:&nbsp;</span>
               {investor.bias_trait_name}
             </span>
           )}

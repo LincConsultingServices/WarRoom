@@ -1,51 +1,41 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 import type { EvaluationReport } from '@/src/types'
+
+function formatCurrency(n: number | undefined): string {
+  if (!n) return '—'
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`
+  return `$${n.toLocaleString()}`
+}
 
 export function DealSummaryTab({ report }: { report: EvaluationReport }) {
   const deal = report.dealSummary as Record<string, unknown> | undefined
   const exitedVia = deal?.exitedVia as string | undefined
   const exitStage = deal?.exitStage as string | undefined
   const capitalSource = deal?.capitalSource as string | undefined
-  const engagement = (report as unknown as Record<string, unknown>).phaseEngagement as
-    | Record<string, { spamPercent: number; burstEvents: number; floorEvents: number; totalSelections: number }>
-    | undefined
-  const engagementEntries = engagement ? Object.entries(engagement) : []
-  const meanSpam = engagementEntries.length
-    ? engagementEntries.reduce((acc, [, e]) => acc + (e?.spamPercent || 0), 0) / engagementEntries.length
-    : 0
-  const showEngagement = engagementEntries.length > 0 && meanSpam > 0
 
-  // Map the backend's exit reason to a human-friendly banner. Keeps the page
-  // coherent for users who never entered the war room (buyout, early exit).
+  const dealsOffered = (deal?.dealsOffered as number) || 0
+  const bestDeal = deal?.bestDeal as { capitalOffer?: number; equityAsk?: number } | undefined
+  const capitalOffer = bestDeal?.capitalOffer
+  const equityAsk = bestDeal?.equityAsk
+
+  const gotDeal = dealsOffered > 0 && !!bestDeal
+
   const exitBanner = (() => {
     if (!exitedVia) return null
     if (exitedVia === 'BUYOUT') {
-      return {
-        title: 'Exited via Buyout',
-        subtitle: capitalSource || `You accepted a buyout offer${exitStage ? ` at ${exitStage}` : ''}.`,
-        tone: 'positive' as const,
-      }
+      return { title: 'Exited via Buyout', subtitle: capitalSource || `You accepted a buyout offer${exitStage ? ` at ${exitStage}` : ''}.`, tone: 'positive' as const }
     }
     if (exitedVia === 'WALKOUT') {
-      return {
-        title: 'Walked Out of the War Room',
-        subtitle: 'You declined every investor offer and exited without a deal.',
-        tone: 'negative' as const,
-      }
+      return { title: 'Walked Out of the War Room', subtitle: 'You declined every investor offer and exited without a deal.', tone: 'negative' as const }
     }
     if (exitedVia === 'EARLY_EXIT') {
-      return {
-        title: 'Early Exit',
-        subtitle: `Simulation ended at ${exitStage || 'your current phase'} before reaching the War Room.`,
-        tone: 'neutral' as const,
-      }
+      return { title: 'Early Exit', subtitle: `Simulation ended at ${exitStage || 'your current phase'} before reaching the War Room.`, tone: 'neutral' as const }
     }
     return null
   })()
-
-  const investorResults = (deal?.investorResults ?? []) as Array<Record<string, unknown>>
 
   return (
     <div className="deal-page">
@@ -55,117 +45,59 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
           <div className="exit-subtitle">{exitBanner.subtitle}</div>
         </div>
       )}
-      <div className="deal-stats">
-        {[
-          { value: (deal?.totalInvestors as number) || 0, label: 'Investors Faced', highlight: false },
-          { value: (deal?.dealsOffered as number) || 0, label: 'Deals Offered', highlight: true },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            className={`stat-card ${stat.highlight ? 'highlight' : ''}`}
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: i * 0.15, type: 'spring', stiffness: 200 }}
-          >
-            <div className="stat-value">{stat.value}</div>
-            <div className="stat-label">{stat.label}</div>
-          </motion.div>
-        ))}
-      </div>
 
-      {showEngagement && (
-        <div className="engagement-section">
-          <h3>Focus &amp; Engagement</h3>
-          <p className="engagement-blurb">
-            We tracked how quickly and uniformly you selected options. A higher percentage means more selections looked rushed — your revenue projection was penalized accordingly.
-          </p>
-          <div className="engagement-grid">
-            {engagementEntries.map(([stage, e]) => {
-              const pct = Math.round(e?.spamPercent || 0)
-              const tone = pct >= 40 ? 'high' : pct >= 20 ? 'mid' : 'low'
-              return (
-                <div key={stage} className={`engagement-card engagement-${tone}`}>
-                  <div className="engagement-stage">{stage.replace('STAGE_', '').replace(/_/g, ' ')}</div>
-                  <div className="engagement-value">{pct}%</div>
-                  <div className="engagement-meta">
-                    {e?.totalSelections ?? 0} picks &middot; {e?.burstEvents ?? 0} burst &middot; {e?.floorEvents ?? 0} fast
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+      <motion.div
+        className={`deal-hero ${gotDeal ? 'deal-hero--success' : 'deal-hero--empty'}`}
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 180, damping: 20 }}
+      >
+        <div className="deal-hero__label">{gotDeal ? 'Deal Received' : 'No Deal'}</div>
+        <div className="deal-hero__count">
+          <span className="deal-hero__num">{dealsOffered}</span>
+          <span className="deal-hero__unit">{dealsOffered === 1 ? 'offer' : 'offers'}</span>
         </div>
-      )}
 
-      {investorResults.length > 0 && (
-        <div className="investor-results">
-          <h3>Investor Scorecards</h3>
-          {investorResults.map((sc, i) => (
-            <motion.div
-              key={i}
-              className="scorecard"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + i * 0.1 }}
-            >
-              <div className="sc-header">
-                <strong>{String(sc.investorName || sc.investor_name || 'Investor')}</strong>
-                <span className={`deal-badge ${String(sc.dealDecision || sc.deal_decision) === 'WALK_OUT' ? 'walkout' : 'deal'}`}>
-                  {String(sc.dealDecision || sc.deal_decision || '')}
-                </span>
-              </div>
-              <div className="sc-scores">
-                <span>Primary: {String(sc.primaryScore || sc.primary_score || 0)}/5</span>
-                <span>Bias Trait: {String(sc.biasTraitScore || sc.bias_trait_score || 0)}/5</span>
-                {sc.redFlag ? <span className="red-flag">Red Flag</span> : null}
-              </div>
-              {sc.investorReaction ? (
-                <blockquote>&ldquo;{String(sc.investorReaction || sc.investor_reaction)}&rdquo;</blockquote>
-              ) : null}
+        {gotDeal && (
+          <div className="deal-terms">
+            <motion.div className="deal-term" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, type: 'spring', stiffness: 200 }}>
+              <div className="deal-term__value">{formatCurrency(capitalOffer)}</div>
+              <div className="deal-term__label">Investment Received</div>
             </motion.div>
-          ))}
-        </div>
-      )}
+            <div className="deal-term__divider" aria-hidden />
+            <motion.div className="deal-term" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}>
+              <div className="deal-term__value">{equityAsk != null ? `${equityAsk}%` : '—'}</div>
+              <div className="deal-term__label">Equity Given</div>
+            </motion.div>
+          </div>
+        )}
+
+        {!gotDeal && <p className="deal-hero__empty-msg">You did not receive any deal offers this session.</p>}
+      </motion.div>
 
       <style jsx>{`
         .deal-page { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .exit-banner { border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); }
-        .exit-banner .exit-title { font-weight: 700; color: var(--color-warroom-ivory); margin-bottom: 0.2rem; font-size: 1.05rem; font-family: var(--font-display); }
-        .exit-banner .exit-subtitle { color: var(--color-warroom-smoke); font-size: 0.85rem; font-family: var(--font-body, serif); }
+        .exit-banner .exit-title { font-weight: 700; color: var(--foreground); margin-bottom: 0.2rem; font-size: 1.05rem; font-family: var(--font-display); }
+        .exit-banner .exit-subtitle { color: var(--color-warroom-smoke); font-size: 0.85rem; }
         .exit-positive { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); }
         .exit-negative { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
-        .exit-neutral { background: rgba(201,162,39,0.07); border-color: rgba(201,162,39,0.25); }
-        .deal-stats { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 2rem; }
-        .stat-card { background: var(--color-warroom-rampart); border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); border-radius: 16px; padding: 2rem 3rem; text-align: center; }
-        .stat-card.highlight { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-        .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--color-warroom-ivory); font-family: var(--font-display); }
-        .stat-label { font-size: 0.85rem; color: var(--color-warroom-smoke); margin-top: 0.3rem; font-family: var(--font-body, serif); }
-        .investor-results h3 { color: var(--color-warroom-ivory); margin-bottom: 1rem; font-family: var(--font-display); }
-        .scorecard { background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; padding: 1.2rem; margin-bottom: 0.8rem; position: relative; overflow: hidden; }
-        .scorecard::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0px, transparent 2px, rgba(201,162,39,0.03) 2px, rgba(201,162,39,0.03) 4px); mix-blend-mode: overlay; pointer-events: none; }
-        .sc-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .sc-header strong { color: var(--color-warroom-ivory); font-family: var(--font-display); }
-        .deal-badge { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 6px; font-family: var(--font-display); }
-        .deal-badge.deal { background: rgba(16,185,129,0.15); color: var(--color-warroom-verdant); }
-        .deal-badge.walkout { background: rgba(239,68,68,0.15); color: var(--color-warroom-crimson); }
-        .sc-scores { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--color-warroom-smoke); margin-bottom: 0.5rem; }
-        .red-flag { color: var(--color-warroom-crimson); font-weight: 600; }
-        blockquote { background: var(--color-warroom-rampart); border-left: 2px solid var(--color-warroom-gold)/30; padding: 0.6rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; color: var(--color-warroom-smoke); font-size: 0.9rem; margin: 0; font-family: var(--font-body, serif); }
-        .engagement-section { margin-top: 2rem; padding: 1.5rem; background: color-mix(in srgb, var(--foreground) 3%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent); border-radius: 12px; }
-        .engagement-section h3 { color: var(--color-warroom-ivory); margin: 0 0 0.4rem 0; font-family: var(--font-display); }
-        .engagement-blurb { color: var(--color-warroom-smoke); font-size: 0.85rem; margin: 0 0 1rem 0; font-family: var(--font-body, serif); }
-        .engagement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; }
-        .engagement-card { padding: 0.9rem; border-radius: 10px; background: color-mix(in srgb, var(--foreground) 4%, transparent); border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); }
-        .engagement-stage { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-warroom-smoke); margin-bottom: 0.3rem; font-family: var(--font-display); }
-        .engagement-value { font-size: 1.6rem; font-weight: 800; color: var(--color-warroom-ivory); font-family: var(--font-display); }
-        .engagement-meta { font-size: 0.7rem; color: var(--color-warroom-smoke); margin-top: 0.2rem; }
-        .engagement-low { border-color: rgba(16,185,129,0.25); }
-        .engagement-low .engagement-value { color: var(--color-warroom-verdant); }
-        .engagement-mid { border-color: rgba(245,158,11,0.3); }
-        .engagement-mid .engagement-value { color: var(--color-warroom-gold-bright); }
-        .engagement-high { border-color: rgba(239,68,68,0.35); }
-        .engagement-high .engagement-value { color: var(--color-warroom-crimson); }
+        .exit-neutral  { background: rgba(201,162,39,0.07); border-color: rgba(201,162,39,0.25); }
+        .deal-hero { border-radius: 20px; padding: 2.5rem 2rem 2.2rem; text-align: center; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); background: var(--wr-panel-bg-heavy); position: relative; overflow: hidden; }
+        .deal-hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0px, transparent 2px, rgba(201,162,39,0.03) 2px, rgba(201,162,39,0.03) 4px); pointer-events: none; }
+        .deal-hero--success { border-color: rgba(201,162,39,0.3); }
+        .deal-hero--empty   { border-color: rgba(239,68,68,0.25); }
+        .deal-hero__label { font-family: var(--font-display); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--color-warroom-gold); margin-bottom: 0.6rem; }
+        .deal-hero__count { display: flex; align-items: baseline; justify-content: center; gap: 0.4rem; margin-bottom: 1.8rem; }
+        .deal-hero__num { font-family: var(--font-display); font-size: 4.5rem; font-weight: 800; line-height: 1; color: var(--foreground); }
+        .deal-hero__unit { font-family: var(--font-display); font-size: 1rem; color: var(--color-warroom-smoke); text-transform: uppercase; letter-spacing: 0.1em; }
+        .deal-terms { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 0.2rem; }
+        .deal-term { flex: 1; max-width: 200px; padding: 1.2rem 1rem; background: color-mix(in srgb, var(--foreground) 4%, transparent); border-radius: 14px; border: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent); }
+        .deal-term__divider { width: 1.5rem; flex-shrink: 0; }
+        .deal-term__value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--color-warroom-gold-bright, var(--color-warroom-gold)); line-height: 1; margin-bottom: 0.35rem; }
+        .deal-term__label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-warroom-smoke); font-family: var(--font-display); }
+        .deal-hero__empty-msg { color: var(--color-warroom-smoke); font-size: 0.9rem; margin-top: 0.5rem; }
       `}</style>
     </div>
   )

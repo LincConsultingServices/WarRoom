@@ -41,7 +41,7 @@ const CY = ARC_RADIUS + ARC_STROKE / 2 + 4
 function describe(value: number): { label: string; tone: string } {
   if (value >= 75) return { label: 'Enthralled', tone: 'text-amber-300' }
   if (value >= 58) return { label: 'Interested', tone: 'text-amber-200' }
-  if (value >= 42) return { label: 'Neutral',    tone: 'text-foreground/80' }
+  if (value >= 42) return { label: 'Neutral',    tone: 'text-white/80' }
   if (value >= 25) return { label: 'Skeptical',  tone: 'text-orange-300' }
   return                  { label: 'Hostile',    tone: 'text-red-400' }
 }
@@ -151,7 +151,7 @@ export function DispositionMeter({
 
       {showReadout && (
         <div className="mt-1 flex flex-col items-center gap-0.5">
-          <span className="font-display text-[0.6rem] uppercase tracking-[0.2em] text-foreground/50">
+          <span className="font-display text-[0.6rem] uppercase tracking-[0.2em] text-white/50">
             {label}
           </span>
           <span className={cn('font-display text-sm font-semibold tracking-wide', desc.tone)}>

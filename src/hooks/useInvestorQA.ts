@@ -4,6 +4,8 @@ import { useRef, useState } from 'react'
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import type { Investor, InvestorScorecard } from '@/src/types'
+import { isVoiceLineMuted } from '@/src/state/audioStore'
+
 
 // ============================================
 // useInvestorQA — sequential Q&A loop across all selected investors,
@@ -36,6 +38,7 @@ export function useInvestorQA(assessmentId: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   function playAudioBase64(base64: string) {
+    if (isVoiceLineMuted()) return
     if (audioRef.current) audioRef.current.pause()
     const audio = new Audio(`data:audio/mp3;base64,${base64}`)
     audioRef.current = audio
