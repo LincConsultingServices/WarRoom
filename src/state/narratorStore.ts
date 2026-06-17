@@ -12,6 +12,7 @@
 
 import { create } from 'zustand'
 import { audioManager } from '@/lib/audio/audioManager'
+import { useAudioStore } from '@/src/state/audioStore'
 
 export type NarratorMood =
   | 'idle'
@@ -137,8 +138,11 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
     const incoming = Array.isArray(line) ? line : [line]
     if (incoming.length === 0) return
     const [first, ...rest] = incoming
+    // Narrator SFX respects the global SFX channel
+    useAudioStore.getState().playSfx((first.sfx as never) ?? 'narrator.appear')
+
+    // Narrator Voice respects the Narrator channel
     if (!get().isMuted) {
-      audioManager.playSfx((first.sfx as never) ?? 'narrator.appear')
       playNarratorVoice(first.voiceUrl)
     }
     set({
@@ -174,8 +178,8 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
       return
     }
     const [next, ...rest] = queue
+    useAudioStore.getState().playSfx((next.sfx as never) ?? 'narrator.appear')
     if (!isMuted) {
-      audioManager.playSfx((next.sfx as never) ?? 'narrator.appear')
       playNarratorVoice(next.voiceUrl)
     }
     set({
@@ -189,9 +193,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   },
 
   pointAt: (elementId, dialogue, mood = 'pointing') => {
-    if (!get().isMuted) {
-      audioManager.playSfx('narrator.appear')
-    }
+    useAudioStore.getState().playSfx('narrator.appear')
     set({
       isVisible: true,
       isAnimating: true,
@@ -203,10 +205,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   },
 
   dismiss: () => {
-    stopNarratorVoice()
-    if (!get().isMuted) {
-      audioManager.playSfx('narrator.dismiss')
-    }
+    useAudioStore.getState().playSfx('narrator.dismiss')
     set({
       isVisible: false,
       isAnimating: false,
@@ -215,6 +214,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
       targetElementId: null,
       queue: [],
     })
+    stopNarratorVoice()
   },
 
   toggleMute: () => {

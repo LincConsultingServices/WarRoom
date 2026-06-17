@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { Volume2, VolumeX, Music, Mic2, Zap, MessageSquare } from 'lucide-react'
@@ -19,7 +19,7 @@ interface ChannelConfig {
 
 const CHANNELS: ChannelConfig[] = [
   { id: 'voice',    label: 'Voice Lines',  icon: <Mic2 className="h-3.5 w-3.5" />,         mutedKey: 'isVoiceMuted',    toggleAction: 'toggleVoiceMute'    },
-  { id: 'narrator', label: 'Narrator',     icon: <MessageSquare className="h-3.5 w-3.5" />, mutedKey: 'isNarratorMuted', toggleAction: 'toggleNarratorMute' },
+  { id: 'narrator', label: 'Narrator Voice', icon: <MessageSquare className="h-3.5 w-3.5" />, mutedKey: 'isNarratorMuted', toggleAction: 'toggleNarratorMute' },
   { id: 'sfx',      label: 'SFX',          icon: <Zap className="h-3.5 w-3.5" />,           mutedKey: 'isSfxMuted',      toggleAction: 'toggleSfxMute'      },
   { id: 'ambient',  label: 'Sound Theme',  icon: <Music className="h-3.5 w-3.5" />,         mutedKey: 'isAmbientMuted',  toggleAction: 'toggleAmbientMute'  },
 ]
