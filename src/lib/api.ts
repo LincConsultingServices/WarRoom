@@ -101,6 +101,15 @@ export const api = {
     me: () => request<{ id: string; email: string; name: string; batchCode: string; role: string }>('/auth/me'),
   },
 
+  settings: {
+    getSettings: () => request<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>('/settings'),
+    updateSettings: (data: Partial<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>) => 
+      request<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>('/settings', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+  },
+
   // ============================================
   // BATCHES (v2)
   // ============================================

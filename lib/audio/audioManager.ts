@@ -243,13 +243,7 @@ export function setAmbientTrack(key: AmbientKey | null, _fadeMs?: number): void 
   getAmbientStore().setScene(scene)
 }
 
-/**
- * SFX (one-shot sound effects) are disabled by request — the synthesised
- * effects didn't meet the bar. Narrator voice lines (playNarratorVoice in
- * narratorStore) and ambient tracks are unaffected; they take separate paths.
- * Flip this to false to re-enable one-shot SFX.
- */
-const SFX_DISABLED = true
+const SFX_DISABLED = false
 
 export function playSfx(key: SfxKey, volumeOverride?: number): void {
   if (typeof window === 'undefined') return

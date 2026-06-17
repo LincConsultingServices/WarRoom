@@ -43,13 +43,7 @@ const SCENE_FILES: Record<Exclude<AmbientScene, null>, string> = {
  */
 const SKIP_AMBIENT_MP3_LOOKUP = true
 
-/**
- * Master switch — when true, the procedural Web-Audio ambient engine
- * is never started, so the chamber is silent (apart from SFX one-shots).
- * Set to false to let the procedural engine generate a GoT-flavoured
- * ambient bed when MP3 files are missing.
- */
-const DISABLE_PROCEDURAL_AMBIENT = true
+const DISABLE_PROCEDURAL_AMBIENT = false
 
 const SCENE_TARGET_VOLUME: Record<Exclude<AmbientScene, null>, number> = {
   'warroom-lobby': 0.12,

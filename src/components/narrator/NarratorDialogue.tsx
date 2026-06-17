@@ -174,8 +174,11 @@ export function NarratorDialogue() {
           {/* Content */}
           <div className="relative px-5 pt-9 pb-5">
             <p
-              className="text-[15px] leading-[1.65] text-[color:var(--color-warroom-ivory)]"
-              style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
+              className="text-[15px] leading-[1.65]"
+              style={{
+                fontFamily: 'var(--font-body, var(--font-display))',
+                color: '#f2ece0',
+              }}
             >
               {revealed}
               {!done && (
@@ -191,8 +194,8 @@ export function NarratorDialogue() {
               <button
                 type="button"
                 onClick={() => dismiss()}
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
-                style={{ fontFamily: 'var(--font-display)' }}
+                className="text-[10px] uppercase tracking-[0.18em] transition-colors hover:text-[color:var(--color-warroom-gold)]"
+                style={{ fontFamily: 'var(--font-display)', color: 'rgba(200,185,160,0.7)' }}
               >
                 ✕ Dismiss
               </button>

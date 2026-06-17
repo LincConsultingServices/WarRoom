@@ -1,16 +1,13 @@
-'use client'
+﻿'use client'
 
 /**
  * audioStore — Zustand facade over `lib/audio/audioManager.ts`.
- *
- * Mirrors the unified mute / unlock / ambient / volume state into
- * a React-subscribable store so components can react to changes
- * without threading the audio manager through props.
- *
- * Source of truth is still the AmbientAudioStore singleton in
- * `src/hooks/useAmbientAudio.ts` — this store subscribes to it
- * and forwards updates. Writes delegate to that singleton too,
- * so settings persisted in localStorage win on reload.
+ * Per-channel mute flags:
+ *   isAmbientMuted  — sound theme / background ambience
+ *   isSfxMuted      — one-shot SFX (sword clash, coin drop, etc.)
+ *   isNarratorMuted — narrator SFX cues + narrator voiceover lines
+ *   isVoiceMuted    — investor voice lines (TTS audio from backend)
+ * Default: ambient, SFX, narrator muted; voice lines ON.
  */
 
 import { create } from 'zustand'
@@ -26,6 +23,29 @@ import {
   isWarRoomAudioMuted,
 } from '@/src/hooks/useAmbientAudio'
 
+const CH_SFX_KEY      = 'wr_ch_sfx_muted'
+const CH_AMBIENT_KEY  = 'wr_ch_ambient_muted'
+const CH_NARRATOR_KEY = 'wr_ch_narrator_muted'
+const CH_VOICE_KEY    = 'wr_ch_voice_muted'
+
+function loadBool(key: string, defaultVal: boolean): boolean {
+  if (typeof window === 'undefined') return defaultVal
+  try {
+    const v = window.localStorage.getItem(key)
+    if (v === null) return defaultVal
+    return v === 'true'
+  } catch { return defaultVal }
+}
+
+function saveBool(key: string, val: boolean): void {
+  if (typeof window === 'undefined') return
+  try { window.localStorage.setItem(key, String(val)) } catch { /* ignore */ }
+}
+
+export function isVoiceLineMuted(): boolean {
+  return loadBool(CH_VOICE_KEY, false)
+}
+
 type Channel = 'ambient' | 'sfx' | 'voice'
 
 interface AudioState {
@@ -35,6 +55,10 @@ interface AudioState {
   ambientVolume: number
   sfxVolume: number
   voiceVolume: number
+  isSfxMuted: boolean
+  isAmbientMuted: boolean
+  isNarratorMuted: boolean
+  isVoiceMuted: boolean
 
   unlockAudio: () => void
   setAmbientTrack: (key: AmbientKey | null, fadeMs?: number) => void
@@ -42,23 +66,34 @@ interface AudioState {
   toggleMasterMute: () => void
   setMasterMuted: (muted: boolean) => void
   setVolume: (channel: Channel, value: number) => void
+  toggleSfxMute: () => void
+  toggleAmbientMute: () => void
+  toggleNarratorMute: () => void
+  toggleVoiceMute: () => void
 }
 
 const initial = {
-  isMasterMuted: typeof window === 'undefined' ? false : isWarRoomAudioMuted(),
+  isMasterMuted:   typeof window === 'undefined' ? false : isWarRoomAudioMuted(),
   isAudioUnlocked: false,
   currentAmbientTrack: null as AmbientKey | null,
-  ambientVolume: typeof window === 'undefined' ? 1 : getAmbientVolumeMultiplier(),
-  sfxVolume: typeof window === 'undefined' ? 1 : getSfxVolumeMultiplier(),
-  voiceVolume: 0.7,
+  ambientVolume:   typeof window === 'undefined' ? 1 : getAmbientVolumeMultiplier(),
+  sfxVolume:       typeof window === 'undefined' ? 1 : getSfxVolumeMultiplier(),
+  voiceVolume:     0.7,
+  isSfxMuted:      loadBool(CH_SFX_KEY,      true),
+  isAmbientMuted:  loadBool(CH_AMBIENT_KEY,   true),
+  isNarratorMuted: loadBool(CH_NARRATOR_KEY,  true),
+  isVoiceMuted:    loadBool(CH_VOICE_KEY,     false),
 }
 
-export const useAudioStore = create<AudioState>((set) => ({
+if (typeof window !== 'undefined') {
+  if (initial.isSfxMuted)     getAmbientStore().setSfxVolume(0)
+  if (initial.isAmbientMuted) getAmbientStore().setAmbientVolume(0)
+}
+
+export const useAudioStore = create<AudioState>((set, get) => ({
   ...initial,
 
-  unlockAudio: () => {
-    audioManager.unlockAudio()
-  },
+  unlockAudio: () => { audioManager.unlockAudio() },
 
   setAmbientTrack: (key, fadeMs) => {
     audioManager.setAmbientTrack(key, fadeMs)
@@ -66,6 +101,7 @@ export const useAudioStore = create<AudioState>((set) => ({
   },
 
   playSfx: (key, volumeOverride) => {
+    if (get().isSfxMuted) return
     audioManager.playSfx(key, volumeOverride)
   },
 
@@ -95,16 +131,43 @@ export const useAudioStore = create<AudioState>((set) => ({
     }
     if (channel === 'voice') set({ voiceVolume: clamped })
   },
+
+  toggleSfxMute: () => {
+    const next = !get().isSfxMuted
+    saveBool(CH_SFX_KEY, next)
+    if (typeof window !== 'undefined') {
+      getAmbientStore().setSfxVolume(next ? 0 : get().sfxVolume)
+    }
+    set({ isSfxMuted: next })
+  },
+
+  toggleAmbientMute: () => {
+    const next = !get().isAmbientMuted
+    saveBool(CH_AMBIENT_KEY, next)
+    if (typeof window !== 'undefined') {
+      getAmbientStore().setAmbientVolume(next ? 0 : get().ambientVolume)
+    }
+    set({ isAmbientMuted: next })
+  },
+
+  toggleNarratorMute: () => {
+    const next = !get().isNarratorMuted
+    saveBool(CH_NARRATOR_KEY, next)
+    if (typeof window !== 'undefined') {
+      try { window.localStorage.setItem('wr_narrator_muted', String(next)) } catch { /* ignore */ }
+    }
+    set({ isNarratorMuted: next })
+  },
+
+  toggleVoiceMute: () => {
+    const next = !get().isVoiceMuted
+    saveBool(CH_VOICE_KEY, next)
+    set({ isVoiceMuted: next })
+  },
 }))
 
-/**
- * Bridge the AmbientAudioStore singleton's snapshots into Zustand.
- * Runs once on first import in the browser. SSR-safe.
- */
 if (typeof window !== 'undefined') {
   const store = getAmbientStore()
-  // Seed initial state from the singleton (covers the case where the
-  // user already unlocked / muted on a prior page).
   const seed = store.getSnapshot()
   useAudioStore.setState({
     isMasterMuted: seed.isMuted,

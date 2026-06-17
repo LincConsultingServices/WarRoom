@@ -4,6 +4,13 @@ import { useCallback, useRef } from 'react'
 import { getAmbientStore, getSfxVolumeMultiplier, isWarRoomAudioMuted } from '@/src/hooks/useAmbientAudio'
 import { playSynthSound, type SoundEvent } from '@/lib/audio/synthSounds'
 
+/** Read per-channel SFX mute flag without subscribing to the store. */
+function isSfxChannelMuted(): boolean {
+  if (typeof window === 'undefined') return false
+  try { return window.localStorage.getItem('wr_ch_sfx_muted') === 'true' } catch { return false }
+}
+
+
 // ============================================================
 // GOT Sound Manager — orchestrates GoT-flavored SFX playback.
 //
@@ -64,9 +71,9 @@ export function useGOTSound() {
   const playSound = useCallback(async (event: SoundEvent, volume = 0.6) => {
     if (!enabled.current) return
     if (typeof window === 'undefined') return
-    // Honour the shared War Room mute toggle — same localStorage flag the
-    // ambient audio layer uses, so MuteToggle silences EVERYTHING.
     if (isWarRoomAudioMuted()) return
+    if (isSfxChannelMuted()) return
+
 
     // If we already know the file is missing, skip the round-trip.
     if (knownMissing.has(event)) {
@@ -113,6 +120,8 @@ export function playGOTSound(event: SoundEvent, volume = 0.6) {
   if (typeof window === 'undefined') return
   // Same mute gate as the hook — respects the persisted MuteToggle preference.
   if (isWarRoomAudioMuted()) return
+  if (isSfxChannelMuted()) return
+
 
   if (knownMissing.has(event)) {
     synthesizeSound(event, volume)
