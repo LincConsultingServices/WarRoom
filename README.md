@@ -309,9 +309,6 @@ Proprietary - KK's War Room
 
 For issues and questions:
 - Open a GitHub issue
-- Contact: support@warroom.kk
-- Docs: https://docs.warroom.kk
 
 ---
 
-**Created with v0** | Built for serious entrepreneurs
