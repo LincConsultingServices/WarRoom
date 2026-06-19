@@ -19,6 +19,7 @@ import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
 import { AudioControls } from '@/src/components/warroom/AudioControls'
+import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
 
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
@@ -334,10 +335,11 @@ export default function WarRoomSimulation() {
             setNegHistory(newHistory)
             setNegRound(nextRound)
 
-            // Play investor audio response
-            if (result.audioBase64) {
+            // Play investor audio response — respects the Voice Lines channel mute.
+            if (result.audioBase64 && !isVoiceLineMuted()) {
                 if (audioRef.current) audioRef.current.pause()
                 const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audio.volume = getVoiceLineVolume()
                 audioRef.current = audio
                 audio.play().catch(e => console.error("Auto-play failed:", e))
             }
@@ -597,9 +599,10 @@ export default function WarRoomSimulation() {
                     if (question) {
                         setFollowupQuestion(question)
                         setFollowupPhase('followup_pending')
-                        if (followup.audioBase64) {
+                        if (followup.audioBase64 && !isVoiceLineMuted()) {
                             if (audioRef.current) audioRef.current.pause()
                             const audio = new Audio(`data:audio/mp3;base64,${followup.audioBase64}`)
+                            audio.volume = getVoiceLineVolume()
                             audioRef.current = audio
                             audio.onplay = () => setIsPlayingAudio(true)
                             audio.onended = () => setIsPlayingAudio(false)
@@ -619,9 +622,10 @@ export default function WarRoomSimulation() {
             setCurrentInvestorReaction(
                 result.scorecard.investorReaction || `${investor.name} has considered your response.`
             )
-            if (result.audioBase64) {
+            if (result.audioBase64 && !isVoiceLineMuted()) {
                 if (audioRef.current) audioRef.current.pause()
                 const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audio.volume = getVoiceLineVolume()
                 audioRef.current = audio
                 audio.onplay = () => setIsPlayingAudio(true)
                 audio.onended = () => setIsPlayingAudio(false)
@@ -666,9 +670,10 @@ export default function WarRoomSimulation() {
             setResponseTranscription(result.transcription)
             setFollowupPhase('followup_answered')
             responseRecorder.resetRecording()
-            if (result.audioBase64) {
+            if (result.audioBase64 && !isVoiceLineMuted()) {
                 if (audioRef.current) audioRef.current.pause()
                 const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
+                audio.volume = getVoiceLineVolume()
                 audioRef.current = audio
                 audio.onplay = () => setIsPlayingAudio(true)
                 audio.onended = () => setIsPlayingAudio(false)

@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
 import { CustomCursor } from '@/src/components/effects/CustomCursor'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
+import { AudioSettingsLoader } from '@/src/components/AudioSettingsLoader'
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -75,6 +76,10 @@ export default function RootLayout({
                 OS "reduce motion" setting (transforms/layout become instant,
                 opacity/colour preserved). Complements the CSS rules in globals.css. */}
             <MotionConfig reducedMotion="user">
+              {/* Headless: syncs audio channel mutes with the backend Settings
+                  API (load on login, debounced push on change). Inside
+                  AuthProvider so useAuth() resolves. */}
+              <AudioSettingsLoader />
               {children}
               <NarratorOrb />
               <CustomCursor />

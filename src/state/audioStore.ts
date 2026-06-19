@@ -27,6 +27,9 @@ const CH_SFX_KEY      = 'wr_ch_sfx_muted'
 const CH_AMBIENT_KEY  = 'wr_ch_ambient_muted'
 const CH_NARRATOR_KEY = 'wr_ch_narrator_muted'
 const CH_VOICE_KEY    = 'wr_ch_voice_muted'
+const VOICE_VOL_KEY   = 'wr_voice_volume'
+
+const DEFAULT_VOICE_VOLUME = 0.7
 
 function loadBool(key: string, defaultVal: boolean): boolean {
   if (typeof window === 'undefined') return defaultVal
@@ -42,8 +45,26 @@ function saveBool(key: string, val: boolean): void {
   try { window.localStorage.setItem(key, String(val)) } catch { /* ignore */ }
 }
 
+function loadFloat(key: string, defaultVal: number): number {
+  if (typeof window === 'undefined') return defaultVal
+  try {
+    const v = window.localStorage.getItem(key)
+    if (v === null) return defaultVal
+    const parsed = parseFloat(v)
+    return Number.isFinite(parsed) ? Math.max(0, Math.min(1, parsed)) : defaultVal
+  } catch { return defaultVal }
+}
+
 export function isVoiceLineMuted(): boolean {
   return loadBool(CH_VOICE_KEY, false)
+}
+
+/** Cheap synchronous read of the persisted voice-line volume (0..1).
+ *  Returns 0 when the voice channel is muted, so callers can use it as a
+ *  single effective-gain value. Safe to call from non-hook contexts. */
+export function getVoiceLineVolume(): number {
+  if (isVoiceLineMuted()) return 0
+  return loadFloat(VOICE_VOL_KEY, DEFAULT_VOICE_VOLUME)
 }
 
 type Channel = 'ambient' | 'sfx' | 'voice'
@@ -78,7 +99,7 @@ const initial = {
   currentAmbientTrack: null as AmbientKey | null,
   ambientVolume:   typeof window === 'undefined' ? 1 : getAmbientVolumeMultiplier(),
   sfxVolume:       typeof window === 'undefined' ? 1 : getSfxVolumeMultiplier(),
-  voiceVolume:     0.7,
+  voiceVolume:     loadFloat(VOICE_VOL_KEY, DEFAULT_VOICE_VOLUME),
   isSfxMuted:      loadBool(CH_SFX_KEY,      true),
   isAmbientMuted:  loadBool(CH_AMBIENT_KEY,   true),
   isNarratorMuted: loadBool(CH_NARRATOR_KEY,  true),
@@ -129,7 +150,12 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       if (typeof window !== 'undefined') getAmbientStore().setSfxVolume(clamped)
       set({ sfxVolume: clamped })
     }
-    if (channel === 'voice') set({ voiceVolume: clamped })
+    if (channel === 'voice') {
+      if (typeof window !== 'undefined') {
+        try { window.localStorage.setItem(VOICE_VOL_KEY, String(clamped)) } catch { /* ignore */ }
+      }
+      set({ voiceVolume: clamped })
+    }
   },
 
   toggleSfxMute: () => {

@@ -20,8 +20,10 @@ import {
   Music,
   Swords,
   Crown,
+  Mic2,
 } from 'lucide-react'
 import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
+import { useAudioStore } from '@/src/state/audioStore'
 import { audioManager } from '@/lib/audio/audioManager'
 import type { SfxKey } from '@/lib/audio/audioManager'
 import { CURSOR_DISABLED_STORAGE_KEY } from '@/src/components/effects/CustomCursor'
@@ -97,6 +99,13 @@ export default function SettingsPage() {
     unlocked,
     unlock,
   } = useAmbientAudio()
+
+  // Voice-line channel (investor TTS) — separate from the ambient/SFX buses,
+  // so it is NOT governed by Master Audio. Persists via the audioStore.
+  const voiceVolume = useAudioStore((s) => s.voiceVolume)
+  const isVoiceMuted = useAudioStore((s) => s.isVoiceMuted)
+  const setVolume = useAudioStore((s) => s.setVolume)
+  const toggleVoiceMute = useAudioStore((s) => s.toggleVoiceMute)
 
   const handleTestSfx = (key: SfxKey) => {
     // Ensure the AudioContext is unlocked even when the user has not
@@ -722,6 +731,50 @@ export default function SettingsPage() {
                     }}
                     disabled={isMuted}
                     className={cn(isMuted && 'opacity-40')}
+                  />
+                </div>
+
+                {/* Voice Lines (investor TTS) — own channel, not bound to Master Audio */}
+                <div className="py-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label
+                        className="text-sm text-[color:var(--color-warroom-ivory)] flex items-center gap-2"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        <Mic2 className="h-3.5 w-3.5 text-[color:var(--color-warroom-gold)]" />
+                        Investor Voice Lines
+                      </Label>
+                      <p
+                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        style={{ fontFamily: 'var(--font-body, serif)' }}
+                      >
+                        Spoken questions and verdicts from the council of investors.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        id="voice-mute"
+                        aria-label={isVoiceMuted ? 'Unmute investor voice lines' : 'Mute investor voice lines'}
+                        checked={!isVoiceMuted}
+                        onCheckedChange={() => toggleVoiceMute()}
+                      />
+                      <span
+                        className="text-xs text-[color:var(--color-warroom-gold)] tabular-nums min-w-[2.5rem] text-right"
+                        style={{ fontFamily: 'var(--font-mono, monospace)' }}
+                      >
+                        {Math.round(voiceVolume * 100)}%
+                      </span>
+                    </div>
+                  </div>
+                  <Slider
+                    value={[Math.round(voiceVolume * 100)]}
+                    min={0}
+                    max={100}
+                    step={1}
+                    onValueChange={(v) => setVolume('voice', (v[0] ?? 0) / 100)}
+                    disabled={isVoiceMuted}
+                    className={cn(isVoiceMuted && 'opacity-40')}
                   />
                 </div>
 

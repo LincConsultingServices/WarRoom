@@ -11,7 +11,6 @@
  */
 
 import { create } from 'zustand'
-import { audioManager } from '@/lib/audio/audioManager'
 import { useAudioStore } from '@/src/state/audioStore'
 
 export type NarratorMood =
@@ -60,7 +59,6 @@ interface NarratorState {
 }
 
 const ONBOARDING_KEY_PREFIX = 'wr_onboarded_'
-const NARRATOR_MUTE_KEY = 'wr_narrator_muted'
 
 function loadOnboardedPhases(): Record<string, true> {
   if (typeof window === 'undefined') return {}
@@ -78,16 +76,13 @@ function loadOnboardedPhases(): Record<string, true> {
   return out
 }
 
-function loadNarratorMuted(): boolean {
-  if (typeof window === 'undefined') return false
-  try {
-    // Check the per-channel key first (set by AudioControls), then the legacy key.
-    const ch = window.localStorage.getItem('wr_ch_narrator_muted')
-    if (ch !== null) return ch === 'true'
-    return window.localStorage.getItem(NARRATOR_MUTE_KEY) === 'true'
-  } catch {
-    return false
-  }
+// NOTE: audioStore is the single source of truth for the narrator-channel
+// mute flag. We seed from it (it already reads `wr_ch_narrator_muted` with the
+// legacy `wr_narrator_muted` fallback) and mirror every change via a
+// subscription below — so the AudioControls panel and backend sync take
+// effect live, not just on reload.
+function initialNarratorMuted(): boolean {
+  return useAudioStore.getState().isNarratorMuted
 }
 
 // Shared HTMLAudioElement for narrator voiceovers. One instance so a new line
@@ -131,7 +126,7 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   currentMood: 'idle',
   targetElementId: null,
   queue: [],
-  isMuted: loadNarratorMuted(),
+  isMuted: initialNarratorMuted(),
   onboardedPhases: loadOnboardedPhases(),
 
   speak: (line) => {
@@ -218,15 +213,10 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
   },
 
   toggleMute: () => {
-    const next = !get().isMuted
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem(NARRATOR_MUTE_KEY, String(next))
-      } catch {
-        /* ignore */
-      }
-    }
-    set({ isMuted: next })
+    // Delegate to audioStore (single source of truth). Its toggle persists
+    // both the channel key and the legacy `wr_narrator_muted` key, and the
+    // subscription below mirrors the new value back into `isMuted`.
+    useAudioStore.getState().toggleNarratorMute()
   },
 
   markOnboardingComplete: (phase) => {
@@ -244,3 +234,17 @@ export const useNarratorStore = create<NarratorState>((set, get) => ({
 
   hasCompletedOnboarding: (phase) => Boolean(get().onboardedPhases[phase]),
 }))
+
+// Keep the narrator mute in lockstep with the audioStore "Narrator Voice"
+// channel — the single source of truth. This makes the AudioControls toggle
+// and backend settings sync take effect immediately (no reload required).
+if (typeof window !== 'undefined') {
+  useAudioStore.subscribe((state) => {
+    const muted = state.isNarratorMuted
+    if (useNarratorStore.getState().isMuted !== muted) {
+      useNarratorStore.setState({ isMuted: muted })
+      // Silence any in-flight voiceover the moment the channel is muted.
+      if (muted) stopNarratorVoice()
+    }
+  })
+}

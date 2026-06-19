@@ -3,10 +3,11 @@
 import { useEffect, useRef } from 'react'
 import api from '@/src/lib/api'
 import { useAudioStore } from '@/src/state/audioStore'
-import { useAuth } from '@/src/hooks/useAuth'
+import { useAuth } from '@/src/context/AuthContext'
 
 export function useAudioSettings() {
-  const { user } = useAuth()
+  // `profile` is the logged-in app user (AuthContext exposes no `user` field).
+  const { profile: user } = useAuth()
   const store = useAudioStore()
   const initialLoadDone = useRef(false)
   const isSyncing = useRef(false)

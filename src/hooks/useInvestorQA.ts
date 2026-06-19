@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import type { Investor, InvestorScorecard } from '@/src/types'
-import { isVoiceLineMuted } from '@/src/state/audioStore'
+import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
 
 
 // ============================================
@@ -41,6 +41,7 @@ export function useInvestorQA(assessmentId: string) {
     if (isVoiceLineMuted()) return
     if (audioRef.current) audioRef.current.pause()
     const audio = new Audio(`data:audio/mp3;base64,${base64}`)
+    audio.volume = getVoiceLineVolume()
     audioRef.current = audio
     audio.onplay = () => setIsPlayingAudio(true)
     audio.onended = () => setIsPlayingAudio(false)
