@@ -1,6 +1,6 @@
 import React from 'react'
-import Link from 'next/link'
-import { ScrollText, ArrowLeft, Shield } from 'lucide-react'
+import { ScrollText, Shield } from 'lucide-react'
+import { TermsBackLink } from './TermsBackLink'
 
 // ─── Section data ───────────────────────────────────────────────────────────
 
@@ -252,15 +252,8 @@ export default function TermsAndConditionsPage() {
       />
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-        {/* Back link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors mb-8"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Return to the War Room
-        </Link>
+        {/* Back link — returns to the previous page (e.g. register), not always home */}
+        <TermsBackLink />
 
         {/* Header */}
         <header className="mb-10">
