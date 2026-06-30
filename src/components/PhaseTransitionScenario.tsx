@@ -133,19 +133,21 @@ export function PhaseTransitionScenario({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-          className="h-14 w-14 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center text-xl font-bold flex-shrink-0 animate-glow-pulse"
+          className="relative overflow-hidden h-14 w-14 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center text-xl font-bold flex-shrink-0 animate-glow-pulse"
         >
-          {scenario.leaderAvatar ? (
+          {/* Initial is the base; the avatar overlays it and removes itself on
+              load error so a broken URL falls back to the initial. */}
+          <span aria-hidden>{scenario.leaderName.charAt(0)}</span>
+          {scenario.leaderAvatar && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={scenario.leaderAvatar}
               alt={scenario.leaderName}
               loading="lazy"
               decoding="async"
-              className="h-full w-full rounded-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none' }}
+              className="absolute inset-0 h-full w-full rounded-full object-cover"
             />
-          ) : (
-            scenario.leaderName.charAt(0)
           )}
         </motion.div>
         <div>

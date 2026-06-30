@@ -101,16 +101,24 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                   )}
                 </AnimatePresence>
                 <div className={cn(
-                  "h-12 w-12 rounded-full bg-muted flex items-center justify-center font-display text-lg font-bold border transition-all duration-300",
+                  "relative overflow-hidden h-12 w-12 rounded-full bg-muted flex items-center justify-center font-display text-lg font-bold border transition-all duration-300",
                   isSelected
                     ? "border-[color:var(--color-warroom-gold)] ring-2 ring-[color:var(--color-warroom-gold)]/35"
                     : "border-[color:var(--color-warroom-gold)]/20",
                 )}>
-                  {item.avatar ? (
+                  {/* Initial is the base; the avatar overlays it and removes itself
+                      on load error so a broken URL falls back to the initial. */}
+                  <span aria-hidden>{item.name.charAt(0)}</span>
+                  {item.avatar && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.avatar} alt={item.name} loading="lazy" decoding="async" className="h-full w-full rounded-full object-cover" />
-                  ) : (
-                    item.name.charAt(0)
+                    <img
+                      src={item.avatar}
+                      alt={item.name}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                      className="absolute inset-0 h-full w-full rounded-full object-cover"
+                    />
                   )}
                 </div>
               </div>
