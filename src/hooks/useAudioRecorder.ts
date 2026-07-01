@@ -3,6 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { toast } from '@/hooks/use-toast'
 
+// A recording shorter/smaller than this carries no real speech; the transcription
+// model fills the gap with hallucinated filler. Reject such clips at the source.
+const MIN_RECORDING_MS = 1200
+const MIN_RECORDING_BYTES = 1500
+
 interface UseAudioRecorderReturn {
     isRecording: boolean
     isStarting: boolean
@@ -28,6 +33,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
     const chunksRef = useRef<Blob[]>([])
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const streamRef = useRef<MediaStream | null>(null)
+    const recordStartRef = useRef<number>(0)
 
     useEffect(() => {
         // Check if MediaRecorder is supported
@@ -110,7 +116,15 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
 
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' })
-                setAudioBlob(blob)
+                const durationMs = recordStartRef.current ? Date.now() - recordStartRef.current : 0
+                // Reject near-empty clips (quick start+stop) so nothing downstream
+                // can submit a recording the model would only hallucinate over.
+                if (durationMs < MIN_RECORDING_MS || blob.size < MIN_RECORDING_BYTES) {
+                    setAudioBlob(null)
+                    setError('Recording too short — hold and speak for at least a second, then stop.')
+                } else {
+                    setAudioBlob(blob)
+                }
                 setIsRecording(false)
 
                 // Stop all tracks
@@ -126,6 +140,7 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
                 }
             }
 
+            recordStartRef.current = Date.now()
             mediaRecorder.start() // Do not pass timeSlice to avoid instant termination issues
             setIsRecording(true)
             setIsStarting(false)
