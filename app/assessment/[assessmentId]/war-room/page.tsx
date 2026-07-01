@@ -280,7 +280,15 @@ export default function WarRoomSimulation() {
     }
 
     const handleNegotiateAudio = async () => {
-        if (!negotiationRecorder.audioBlob || !selectedOffer) return
+        // Never fail silently — surface why nothing happened.
+        if (!selectedOffer) {
+            setError('No offer selected — pick an offer to negotiate first.')
+            return
+        }
+        if (!negotiationRecorder.audioBlob) {
+            setError('No recording captured — record your counter, then submit.')
+            return
+        }
 
         const nextRound = negRound + 1
 
@@ -1536,6 +1544,10 @@ export default function WarRoomSimulation() {
                                             <div className="countdown-bar">
                                                 <div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - negotiationRecorder.recordingTime) / 15) * 100)}%` }} />
                                             </div>
+                                        )}
+
+                                        {error && (
+                                            <div className="error-msg" style={{ marginTop: '1rem', color: '#f87171' }}>{error}</div>
                                         )}
 
                                         {negotiationRecorder.audioBlob && !negotiationRecorder.isRecording && negRound < MAX_NEG_ROUNDS && (
