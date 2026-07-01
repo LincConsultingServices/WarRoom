@@ -53,7 +53,7 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  useNarratorOnboarding('history', { delayMs: 1400 })
+  useNarratorOnboarding('history', { enabled: false }) // narrator disabled: was mid-nav spam
 
   useEffect(() => {
     async function fetchHistory() {

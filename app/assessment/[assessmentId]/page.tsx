@@ -54,9 +54,11 @@ export default function SimulationPage() {
     handleBuyoutSubmit, handleScenarioSubmit, retryScenario, acknowledgeInfo,
   } = sim
 
-  // ── Narrator — stage-specific onboarding lines ──
+  // ── Narrator — per-stage onboarding lines removed: they fired at every one
+  // of the 8 stages mid-assessment, which felt like spam. The assessment-start
+  // intro covers the welcome. ──
   const narratorPhase = simulation ? narratorPhaseForStage(simulation.currentStage) : null
-  useNarratorOnboarding(narratorPhase ?? '', { enabled: !!narratorPhase })
+  useNarratorOnboarding(narratorPhase ?? '', { enabled: false })
 
   // ---- Loading / Error ----
   if (loading) return (

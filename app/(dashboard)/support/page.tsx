@@ -80,7 +80,7 @@ export default function SupportPage() {
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null)
   const { toast } = useToast()
 
-  useNarratorOnboarding('support', { delayMs: 1200 })
+  useNarratorOnboarding('support', { enabled: false }) // narrator disabled: was mid-nav spam
 
   const handleSubmitTicket = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

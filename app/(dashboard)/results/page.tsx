@@ -91,7 +91,7 @@ export default function ResultsPage() {
   const [error, setError] = useState<string | null>(null)
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null)
 
-  useNarratorOnboarding('results', { delayMs: 1400 })
+  useNarratorOnboarding('results', { enabled: false }) // narrator disabled: was mid-nav spam
 
   useEffect(() => {
     async function fetchResults() {
