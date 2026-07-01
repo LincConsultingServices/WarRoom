@@ -148,7 +148,7 @@ export default function SettingsPage() {
     }
   }
 
-  useNarratorOnboarding('settings', { delayMs: 1200 })
+  useNarratorOnboarding('settings', { enabled: false }) // narrator disabled: was mid-nav spam
 
   const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

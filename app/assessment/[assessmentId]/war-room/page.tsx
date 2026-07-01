@@ -201,9 +201,10 @@ export default function WarRoomSimulation() {
     // State
     const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
 
-    // ── Narrator — war-room phase-specific onboarding lines ──
+    // ── Narrator — keep only ONE war-room intro (the pitch entry); the qa /
+    // deal / complete lines fired mid-flow and felt like spam. ──
     const narratorPhase = narratorPhaseForWarRoom(phase)
-    useNarratorOnboarding(narratorPhase ?? '', { enabled: !!narratorPhase })
+    useNarratorOnboarding(narratorPhase ?? '', { enabled: narratorPhase === 'warroom.pitch' })
 
     // ── First-hover Oracle intros for the War Room's key controls ──
     const offerIntro = useFeatureIntro('negotiation-offer')

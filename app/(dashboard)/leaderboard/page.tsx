@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
   const { progression } = useFounderProgression()
   const myRank = entries.find((e) => e.userId === user?.id)?.rank
 
-  useNarratorOnboarding('leaderboard', { delayMs: 1400 })
+  useNarratorOnboarding('leaderboard', { enabled: false }) // narrator disabled: was mid-nav spam
 
   return (
     <div className="py-6 px-2 sm:px-0 max-w-3xl mx-auto w-full">
