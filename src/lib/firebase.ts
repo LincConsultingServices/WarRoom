@@ -54,12 +54,23 @@ export function getFirebaseAuth(): Auth {
  * The SDK transparently refreshes the token when it is close to expiry, so calling
  * this per request keeps the Authorization header valid without manual refresh logic.
  */
-export async function getIdToken(): Promise<string | null> {
+export async function getIdToken(forceRefresh = false): Promise<string | null> {
   if (typeof window === 'undefined') return null
-  const user = getFirebaseAuth().currentUser
+  const auth = getFirebaseAuth()
+  // currentUser is null during SDK session-rehydration (e.g. navigating away and
+  // back). Wait for the persisted session to restore before giving up, otherwise
+  // a still-valid session sends no token → the backend 401s and signs the user out.
+  if (!auth.currentUser) {
+    try {
+      await auth.authStateReady()
+    } catch {
+      // ignore — fall through to the currentUser check below
+    }
+  }
+  const user = auth.currentUser
   if (!user) return null
   try {
-    return await user.getIdToken()
+    return await user.getIdToken(forceRefresh)
   } catch {
     return null
   }

@@ -51,9 +51,12 @@ const USE_LIVE_PROGRESSION = process.env.NEXT_PUBLIC_PROGRESSION_API === 'live';
 
 async function request<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retried = false,
 ): Promise<T> {
-  const token = await getIdToken();
+  // Force a token refresh on the retry pass so a stale/expired token can't
+  // wrongly sign the user out mid-assessment.
+  const token = await getIdToken(retried);
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -71,6 +74,13 @@ async function request<T>(
 
   if (!res.ok) {
     if (res.status === 401) {
+      // A 401 is often a transient token issue (SDK still rehydrating, or a token
+      // that just expired). Retry ONCE with a force-refreshed token before giving
+      // up. Only sign out if the fresh token is also rejected. Request bodies here
+      // are JSON strings, so replaying the request is safe.
+      if (!retried) {
+        return request<T>(endpoint, options, true);
+      }
       await signOutUser();
       throw new Error('Unauthorized');
     }
