@@ -272,7 +272,7 @@ export default function ProfilePage() {
             width={420}
             height={96}
             className="text-foreground/40"
-            onSelectRun={(run) => router.push(`/assessment/${run.id}/verdict`)}
+            onSelectRun={(run) => router.push(`/assessment/${run.id}/final-report`)}
           />
         </section>
 

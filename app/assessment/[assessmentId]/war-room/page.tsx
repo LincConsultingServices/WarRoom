@@ -726,24 +726,22 @@ export default function WarRoomSimulation() {
         router.push(`/assessment/${assessmentId}/final-report`)
     }
 
-    // Normal-completion path — the council has actually rendered a verdict
-    // (deal accepted or all offers declined). Plays a brief cinematic fade
-    // before pushing to the verdict ceremony, so the chamber doesn't snap-cut.
+    // Normal-completion path — deal accepted or all offers declined. Plays a
+    // brief cinematic fade, then goes straight to the evaluation report (the
+    // verdict ceremony page has been removed).
     const handleCompleteToVerdict = useCallback(async () => {
         if (timerRef.current) clearInterval(timerRef.current)
         setShowVerdictExit(true)
         // Fire walkout in the background — same backend contract as End Simulation,
-        // but the page won't wait on it before navigating. The ceremony's own
-        // GET /warroom/scorecard + GET /report calls handle data dependencies.
+        // but the page won't wait on it before navigating.
         try {
             await api.assessments.walkout(assessmentId as string)
         } catch (e) {
             console.error('Error finalising simulation:', e)
         }
-        // Hold the fade for ~900ms total so the chamber visually settles
-        // before the verdict route mounts its ember backdrop.
+        // Hold the fade briefly so the chamber settles before the report mounts.
         window.setTimeout(() => {
-            router.push(`/assessment/${assessmentId}/verdict`)
+            router.push(`/assessment/${assessmentId}/final-report`)
         }, 900)
     }, [assessmentId, router])
 

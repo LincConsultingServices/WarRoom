@@ -25,7 +25,8 @@ interface PastVerdictCardProps {
   archetypeName?: string | null
   /** Enrichment: composite score 0-100. */
   legacyScore?: number | null
-  /** Where clicking the card should go. Default: /verdict route. */
+  /** Retained for API compat; the card always links to the report now (the
+   * verdict route was removed). */
   hrefBase?: 'verdict' | 'final-report'
   className?: string
 }
@@ -58,11 +59,12 @@ export function PastVerdictCard({
   assessment,
   archetypeName,
   legacyScore,
-  hrefBase = 'verdict',
+  hrefBase = 'final-report',
   className,
 }: PastVerdictCardProps) {
   const status = STATUS_TONE[String(assessment.status).toUpperCase()] ?? STATUS_TONE.IN_PROGRESS
-  const href = `/assessment/${assessment.id}/${hrefBase === 'final-report' ? 'final-report' : 'verdict'}`
+  void hrefBase // verdict route removed — always link to the report
+  const href = `/assessment/${assessment.id}/final-report`
   const completedDate = formatDate(assessment.completedAt || assessment.updatedAt || assessment.createdAt)
   const idea = snippet(assessment.userIdea)
   const investorCount = assessment.selectedInvestors?.length ?? 0
