@@ -398,7 +398,7 @@ export default function RegisterPage() {
               disabled={loading || !acceptedTerms}
               className="w-full justify-center"
             >
-              {loading ? 'Forging your banner…' : 'Create Account'}
+              {loading ? 'Preparing your profile…' : 'Create Account'}
             </ChessboardCTA>
           </form>
         </StoneCard>

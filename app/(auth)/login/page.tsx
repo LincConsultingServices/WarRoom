@@ -333,10 +333,10 @@ function LoginContent() {
               className="w-full justify-center"
             >
               {loading
-                ? 'Opening the gates…'
+                ? 'Accessing your assessment…'
                 : isAdmin
                   ? 'Sign In as Admin'
-                  : 'Enter the Chessboard'}
+                  : 'Enter the Boardroom'}
             </ChessboardCTA>
           </form>
         </StoneCard>
