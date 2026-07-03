@@ -71,7 +71,7 @@ export function useChessboardCore(assessmentId: string) {
         setInvestors(finalList)
         setPhase('PITCH')
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load Chessboard')
+        setError(err instanceof Error ? err.message : 'Failed to load assessment')
         setPhase('PITCH')
       }
     }

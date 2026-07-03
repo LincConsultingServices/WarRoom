@@ -66,7 +66,7 @@ export default function SimulationPage() {
       <div className="text-center space-y-4">
         <div className="flex justify-center animate-torch-glow"><Flame className="h-9 w-9" style={{ color: 'var(--color-chessboard-gold)' }} /></div>
         <div className="w-8 h-8 mx-auto" style={{ border: '2px solid color-mix(in srgb, var(--color-chessboard-gold) 20%, transparent)', borderTopColor: 'var(--color-chessboard-gold)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-        <p className="text-xs" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-chessboard-silver)', letterSpacing: '0.15em' }}>INITIALIZING THE BOARD...</p>
+        <p className="text-xs" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-chessboard-silver)', letterSpacing: '0.15em' }}>INITIALIZING THE BOARDROOM...</p>
       </div>
     </div>
   )

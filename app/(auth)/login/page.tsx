@@ -123,7 +123,7 @@ function LoginContent() {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Return to the Chessboard
+          Return to the Boardroom
         </motion.h1>
 
         <motion.p
@@ -135,7 +135,7 @@ function LoginContent() {
         >
           {isAdmin
             ? 'Sign in to the admin panel'
-            : 'Sign in to your Chessboard simulation'}
+            : 'Sign in to your entrepreneurial assessment'}
         </motion.p>
       </div>
 

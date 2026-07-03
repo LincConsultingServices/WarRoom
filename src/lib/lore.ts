@@ -15,9 +15,9 @@ export const LORE = {
   sigil:
     'Emblems are achievements for genuine tactical feats — earned through merit, never shortcuts.',
   hearth:
-    'The Streak tracks your weekly consistency. Keep it active by returning each week to the board.',
+    'The Streak tracks your weekly consistency. Keep it active by returning each week to the boardroom.',
   house:
-    'Your Chess Club is your identity — emblem, motto, and colors. New options unlock as your title rises.',
+    'Your Startup Profile is your identity — brand, motto, and colors. New options unlock as your valuation rises.',
   ironRankings:
     'The Elo Ratings place every founder in your cohort by projected performance.',
   legacyScore:

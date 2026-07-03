@@ -55,9 +55,9 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 // player can audition the sound design before committing volume changes.
 const SFX_PREVIEWS: { key: SfxKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: 'wr.verdict', label: 'Gambit Roar', icon: Crown },
-  { key: 'sim.stage-begin', label: 'War Horn', icon: Swords },
+  { key: 'sim.stage-begin', label: 'Pitch Bell', icon: Swords },
   { key: 'sim.stage-clear', label: 'Triumph', icon: Crown },
-  { key: 'ui.click', label: 'Sword Clash', icon: Swords },
+  { key: 'ui.click', label: 'Market Clash', icon: Swords },
   { key: 'wr.vote-lock', label: 'Coin Drop', icon: Music },
   { key: 'narrator.appear', label: 'Raven Wings', icon: Music },
 ]

@@ -122,7 +122,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                     className="truncate font-semibold tracking-[0.04em] text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
-                    Chessboard
+                    Boardroom
                   </span>
                   <span
                     className="truncate text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"

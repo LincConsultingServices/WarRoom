@@ -289,7 +289,7 @@ export default function ProfilePage() {
           {readyRuns.length === 0 ? (
             <div className="rounded-md border border-dashed border-[color:var(--color-chessboard-silver)]/20 bg-card/30 px-6 py-10 text-center">
               <p className="font-display text-xs uppercase tracking-[0.22em] text-foreground/50">
-                The board awaits your first trial.
+                The boardroom awaits your first pitch.
               </p>
             </div>
           ) : (
@@ -318,7 +318,7 @@ function ProfileLoading() {
       <div className="relative z-10 flex flex-col items-center gap-4">
         <div className="h-10 w-10 animate-spin-slow rounded-full border-2 border-[color:var(--color-chessboard-silver)]/30 border-t-[color:var(--color-chessboard-silver)]" />
         <p className="font-display text-xs uppercase tracking-[0.22em] text-[color:var(--color-chessboard-silver)]/70">
-          Preparing the board…
+          Preparing the boardroom…
         </p>
       </div>
     </main>

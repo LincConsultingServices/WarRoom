@@ -158,7 +158,7 @@ export default function HomePage() {
           <FadeInUp delay={0.4}>
             <p className="mt-2 text-base max-w-xl mx-auto leading-relaxed" style={{ color: '#888888', letterSpacing: '0.01em' }}>
               Face a panel of seasoned investors, mentors, and operators.
-              Your strategy is on the board. Defend every move with precision.
+              Your business model is under review. Pitch every detail with precision.
             </p>
           </FadeInUp>
 

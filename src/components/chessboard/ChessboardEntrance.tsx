@@ -31,10 +31,10 @@ const FADE_OUT_MS = 800
 const FALLBACK_DURATION_MS = 5200
 
 const DEFAULT_CUES: SubtitleCue[] = [
-  { atMs: 1800, text: 'The Grandmasters are seated…', holdMs: 2800 },
-  { atMs: 4800, text: 'Six evaluators. One board.', holdMs: 2600 },
+  { atMs: 1800, text: 'The Investors are seated…', holdMs: 2800 },
+  { atMs: 4800, text: 'Six investors. One boardroom.', holdMs: 2600 },
   { atMs: 7600, text: 'Defend your vision.', holdMs: 2400 },
-  { atMs: 10200, text: 'Or face checkmate.', holdMs: 2600 },
+  { atMs: 10200, text: 'Or face elimination.', holdMs: 2600 },
 ]
 
 interface ChessboardEntranceProps {

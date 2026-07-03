@@ -141,7 +141,7 @@ export default function RegisterPage() {
           className="text-sm text-[color:var(--color-chessboard-smoke)] mt-2"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
-          Create your Chessboard account and join the Council.
+          Create your account and prepare for your pitch.
         </motion.p>
       </div>
 
