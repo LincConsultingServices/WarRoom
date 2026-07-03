@@ -6,9 +6,10 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/src/context/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
-import { CustomCursor } from '@/src/components/effects/CustomCursor'
-import { EmberParticles } from '@/src/components/effects/EmberParticles'
-import { AudioSettingsLoader } from '@/src/components/AudioSettingsLoader'
+import dynamic from 'next/dynamic'
+const CustomCursor = dynamic(() => import('@/src/components/effects/CustomCursor').then(mod => mod.CustomCursor))
+const EmberParticles = dynamic(() => import('@/src/components/effects/EmberParticles').then(mod => mod.EmberParticles))
+const AudioSettingsLoader = dynamic(() => import('@/src/components/AudioSettingsLoader').then(mod => mod.AudioSettingsLoader))
 import './globals.css'
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' })

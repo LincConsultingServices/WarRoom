@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -110,14 +111,12 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                       on load error so a broken URL falls back to the initial. */}
                   <span aria-hidden>{item.name.charAt(0)}</span>
                   {item.avatar && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={item.avatar}
                       alt={item.name}
-                      loading="lazy"
-                      decoding="async"
+                      fill
                       onError={(e) => { e.currentTarget.style.display = 'none' }}
-                      className="absolute inset-0 h-full w-full rounded-full object-cover"
+                      className="object-cover rounded-full"
                     />
                   )}
                 </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, Send, CheckCircle2, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -139,14 +140,12 @@ export function PhaseTransitionScenario({
               load error so a broken URL falls back to the initial. */}
           <span aria-hidden>{scenario.leaderName.charAt(0)}</span>
           {scenario.leaderAvatar && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={scenario.leaderAvatar}
               alt={scenario.leaderName}
-              loading="lazy"
-              decoding="async"
+              fill
               onError={(e) => { e.currentTarget.style.display = 'none' }}
-              className="absolute inset-0 h-full w-full rounded-full object-cover"
+              className="object-cover rounded-full"
             />
           )}
         </motion.div>

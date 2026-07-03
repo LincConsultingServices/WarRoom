@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { QuestionWordReveal } from './QuestionWordReveal'
@@ -88,12 +89,13 @@ export function QuestionCard({
 
       {/* Emblem watermark */}
       {emblemUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={emblemUrl}
           alt=""
+          width={176}
+          height={176}
           aria-hidden="true"
-          className="pointer-events-none absolute -right-6 -bottom-8 h-44 w-44 opacity-[0.06]"
+          className="pointer-events-none absolute -right-6 -bottom-8 opacity-[0.06]"
           draggable={false}
         />
       )}

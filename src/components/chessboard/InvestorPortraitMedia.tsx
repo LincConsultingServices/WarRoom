@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import {
   getInvestorAssetUrl,
@@ -139,18 +140,18 @@ export function InvestorPortraitMedia({
           preload="metadata"
         />
       ) : resolved.active.kind === 'gif' && resolved.active.url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={resolved.active.url}
           alt={`${name}, ${describeState(state, sentiment)}`}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          className="object-cover"
         />
       ) : portraitUrl && !portraitFailed ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={portraitUrl}
           alt={name}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          className="object-cover"
           onError={() => setPortraitFailed(true)}
         />
       ) : (

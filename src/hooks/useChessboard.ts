@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useMemo, useCallback } from 'react'
 import api from '@/src/lib/api'
 import { useChessboardCore } from './useChessboardCore'
 import { usePitchPhase } from './usePitchPhase'
@@ -29,20 +30,20 @@ export function useChessboard(assessmentId: string) {
   const qa = useInvestorQA(assessmentId)
   const neg = useNegotiation(assessmentId)
 
-  const currentInvestor = core.investors[qa.currentInvestorIndex]
+  const currentInvestor = useMemo(() => core.investors[qa.currentInvestorIndex], [core.investors, qa.currentInvestorIndex])
 
   // ---- Cross-phase wiring ----
 
   /** Called after pitch is analysed — moves to Q&A (no follow-up loop) */
-  function handleContinueFromPitch() {
+  const handleContinueFromPitch = useCallback(() => {
     pitch.setPitchAnalysis(null)
     qa.setCurrentInvestorIndex(0)
     qa.setResponseSubmitted(false)
     core.setPhase('INVESTOR_QA')
-  }
+  }, [pitch, qa, core])
 
   /** Move to next investor or, when all done, fetch offers and advance to deals */
-  async function handleContinueToNextInvestor() {
+  const handleContinueToNextInvestor = useCallback(async () => {
     const hasMore = qa.advanceToNextInvestor(core.investors)
     if (!hasMore) {
       try {
@@ -53,13 +54,13 @@ export function useChessboard(assessmentId: string) {
       }
       core.setPhase('DEAL_RESULTS')
     }
-  }
+  }, [qa, core, neg, assessmentId])
 
   /** End simulation (walkout) and go to final report */
-  async function handleEndSimulation() {
+  const handleEndSimulation = useCallback(async () => {
     try { await api.assessments.walkout(assessmentId) } catch { }
     router.push(`/assessment/${assessmentId}/final-report`)
-  }
+  }, [assessmentId, router])
 
   // Determine the shared error (last non-empty one wins)
   const error = neg.error || qa.error || pitch.error || core.error

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/src/lib/api'
 import { getPreparedPitchFromState } from '@/src/lib/helpers'
@@ -22,7 +22,7 @@ export function useChessboardCore(assessmentId: string) {
   const [investors, setInvestors] = useState<Investor[]>([])
   const [error, setError] = useState('')
 
-  const preparedPitch = getPreparedPitchFromState(assessmentState)
+  const preparedPitch = useMemo(() => getPreparedPitchFromState(assessmentState), [assessmentState])
 
   // Force dark theme for Chessboard
   useEffect(() => {

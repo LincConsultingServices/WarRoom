@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { investorPortraitSrc } from '@/src/lib/investorAssets'
@@ -163,11 +164,11 @@ export function CouncilWhispers({
           >
             <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-[color:var(--color-chessboard-silver)]/30 bg-muted">
               {w.investor.id || w.investor.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={investorPortraitSrc(w.investor)}
                   alt={w.investor.name}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                 />
               ) : (
