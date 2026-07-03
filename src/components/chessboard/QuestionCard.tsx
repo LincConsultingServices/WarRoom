@@ -61,7 +61,7 @@ export function QuestionCard({
       animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className={cn(
-        'relative overflow-hidden rounded-md border border-[color:var(--color-warroom-gold)]/30 bg-card/80 p-5 backdrop-blur-sm',
+        'relative overflow-hidden rounded-md border border-[color:var(--color-chessboard-gold)]/30 bg-card/80 p-5 backdrop-blur-sm',
         'shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(200,168,74,0.1)]',
         'noise-overlay',
         className,
@@ -100,7 +100,7 @@ export function QuestionCard({
 
       <header className="mb-3 flex items-center justify-between gap-3">
         <div className="flex flex-col">
-          <span className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/90">
+          <span className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-chessboard-gold)]/90">
             {label ?? `${investorName} asks`}
           </span>
         </div>
@@ -108,9 +108,9 @@ export function QuestionCard({
       </header>
 
       <p className="font-display text-lg leading-relaxed text-foreground sm:text-xl">
-        <span className="text-[color:var(--color-warroom-gold)]">&ldquo;</span>
+        <span className="text-[color:var(--color-chessboard-gold)]">&ldquo;</span>
         <QuestionWordReveal text={questionText} staggerMs={staggerMs} />
-        <span className="text-[color:var(--color-warroom-gold)]">&rdquo;</span>
+        <span className="text-[color:var(--color-chessboard-gold)]">&rdquo;</span>
       </p>
     </motion.article>
   )

@@ -74,7 +74,7 @@ export function BuyoutLockoutDialog({ open, company, amount, onContinue }: Buyou
 
               <p className="text-sm leading-relaxed" style={{ color: '#a89e90', letterSpacing: '0.01em' }}>
                 You accepted the buyout from <span style={{ color: '#34d399', fontWeight: 600 }}>{safeCompany}</span> for{' '}
-                <span style={{ color: '#34d399', fontWeight: 600 }}>{formatRevenue(amount)}</span>. The War Room is now
+                <span style={{ color: '#34d399', fontWeight: 600 }}>{formatRevenue(amount)}</span>. The Chessboard is now
                 closed to you — there is no path back.
               </p>
             </div>

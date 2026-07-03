@@ -48,7 +48,7 @@ export function LegacyScoreSparkline({
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-sm border border-dashed border-[color:var(--color-warroom-gold)]/20 bg-card/40 text-foreground/40',
+          'flex items-center justify-center rounded-sm border border-dashed border-[color:var(--color-chessboard-gold)]/20 bg-card/40 text-foreground/40',
           className,
         )}
         style={{ width, height }}

@@ -1,20 +1,20 @@
-# KK's War Room - Entrepreneurial Assessment Platform
+# The Chessboard - Premium Entrepreneurial Assessment Platform
 
-A comprehensive Next.js 16 application for assessing entrepreneurial competencies through adaptive questioning, real-time state tracking, and AI-powered personalized insights.
+A comprehensive Next.js 16 application for assessing entrepreneurial competencies through adaptive, chess-themed strategic questioning, real-time state tracking, and AI-powered personalized insights.
 
 ## 🎯 Overview
 
-The War Room is a full-stack entrepreneurial assessment platform that evaluates 16 core competencies across 6 business stages, providing:
-- **150+ adaptive questions** spanning pre-launch through growth stages
-- **Real-time consequence simulation** tracking financial, team, and customer metrics
+The Chessboard is a full-stack entrepreneurial assessment platform that evaluates 16 core competencies across 6 business stages, providing:
+- **150+ adaptive scenarios** spanning pre-launch through growth stages
+- **Real-time strategic simulation** tracking financial, team, and customer metrics
 - **AI-powered analysis** generating personalized development roadmaps
-- **2 attempts** with learning journey and improvement tracking
+- **2 tournament attempts** with learning journey and improvement tracking
 - **Professional reports** with competency visualization and actionable insights
 
 ## 🏗️ Project Structure
 
 ```
-kk-war-room/
+kk-chessboard/
 ├── app/                          # Next.js 16 app router
 │   ├── page.tsx                 # Landing page
 │   ├── layout.tsx               # Root layout
@@ -66,14 +66,14 @@ kk-war-room/
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- npm, yarn, or bun
 
 ### Installation
 
 1. **Clone and install:**
 ```bash
 git clone <repo>
-cd kk-war-room
+cd kk-chessboard
 npm install
 ```
 
@@ -98,7 +98,7 @@ http://localhost:3000
 - **Question Types:**
   - Open text responses
   - Multiple choice
-  - Scenarios with context
+  - Strategic scenarios with context
   - Budget allocation exercises
   
 - **Adaptive Logic:**
@@ -112,7 +112,7 @@ Tracks and displays:
 - Team metrics (size, satisfaction)
 - Customer metrics (total, retention)
 - Active mistakes and risk indicators
-- Time remaining
+- Time remaining (Chess clock simulation)
 
 ### 4. Reporting System
 - **Phase-End Reports:** After each stage
@@ -128,19 +128,20 @@ Tracks and displays:
 
 ## 🎨 Design System
 
-**Colors:**
-- Primary: `#2563EB` (Blue)
-- Secondary: `#7C3AED` (Purple)
+**Colors (Premium Chess Motif):**
+- Base Backgrounds: `#0d0d0d`, `#141414` (Sleek Matte Black)
+- Primary Accents: `#a0a0a0`, `#e0e0e0` (Silver / Slate)
+- Highlights: `#ffffff` (Ivory / Ghost)
 - Success: `#10B981` (Green)
 - Warning: `#F59E0B` (Amber)
 - Error: `#EF4444` (Red)
 
 **Typography:**
-- Font: Geist (sans-serif)
+- Font: Inter / Geist (sans-serif)
 - Mono: Geist Mono
 - Spacing: Tailwind scale (4, 8, 16, 24, 32)
 
-**Components:** Shadcn/ui with Tailwind CSS v4
+**Components:** Shadcn/ui with Tailwind CSS v4, Framer Motion, and custom glassmorphism
 
 ## 🔧 Tech Stack
 
@@ -251,14 +252,13 @@ Grouped by category:
 - **Growth:** Market Expansion, Stakeholder Alignment
 
 ## 🔐 Security Considerations
-
-- [ ] Password hashing with bcryptjs
-- [ ] Secure session management
-- [ ] SQL injection prevention (Prisma parameterized queries)
-- [ ] CSRF protection
-- [ ] Row-Level Security (RLS) for database
-- [ ] Input validation and sanitization
-- [ ] Environment variable management
+- Password hashing with bcryptjs
+- Secure session management
+- SQL injection prevention (Prisma parameterized queries)
+- CSRF protection
+- Row-Level Security (RLS) for database
+- Input validation and sanitization
+- Environment variable management
 
 ## 📚 Component Documentation
 
@@ -281,7 +281,6 @@ Grouped by category:
 ```bash
 git push origin main
 # Automatically deploys to production
-
 # Set environment variables in Vercel dashboard
 ```
 
@@ -291,23 +290,10 @@ git push origin main
 - Configure database connection
 
 ## 📖 API Documentation (Placeholder)
-
 See `/src/lib/services/placeholder-service.ts` for implementation stubs.
 
 ## 🤝 Contributing
-
 1. Create feature branch: `git checkout -b feature/name`
 2. Commit changes: `git commit -am 'Add feature'`
 3. Push to branch: `git push origin feature/name`
 4. Submit pull request
-
-## 📄 License
-
-Proprietary - KK's War Room
-
-## 🆘 Support
-
-For issues and questions:
-- Open a GitHub issue
-
----

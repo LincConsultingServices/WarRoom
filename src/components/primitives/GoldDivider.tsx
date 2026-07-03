@@ -49,7 +49,7 @@ export function GoldDivider({ variant = 'sword', width, className }: GoldDivider
       </svg>
       {glyph && (
         <motion.span
-          className="text-[color:var(--color-warroom-silver)]/60 text-base leading-none select-none"
+          className="text-[color:var(--color-chessboard-silver)]/60 text-base leading-none select-none"
           style={{ fontFamily: 'var(--font-display)' }}
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}

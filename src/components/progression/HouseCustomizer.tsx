@@ -29,7 +29,7 @@ export interface HouseCustomizerProps {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--color-warroom-gold)]/80"
+      className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--color-chessboard-gold)]/80"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       {children}
@@ -75,8 +75,8 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
                 className={cn(
                   'flex flex-col items-center gap-1 rounded-sm border p-2 transition-colors',
                   selected
-                    ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/10'
-                    : 'border-[color:var(--color-warroom-stone)]/50 hover:border-[color:var(--color-warroom-gold)]/40',
+                    ? 'border-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]/10'
+                    : 'border-[color:var(--color-chessboard-stone)]/50 hover:border-[color:var(--color-chessboard-gold)]/40',
                   !unlocked && 'cursor-not-allowed opacity-60',
                 )}
               >
@@ -87,7 +87,7 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
                   secondary="#7a6020"
                   locked={!unlocked}
                 />
-                <span className="text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-warroom-smoke)]">
+                <span className="text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-chessboard-smoke)]">
                   {s.name}
                 </span>
               </button>
@@ -113,7 +113,7 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
                 className={cn(
                   'relative h-11 w-11 rounded-sm border-2 transition-transform',
                   selected
-                    ? 'border-[color:var(--color-warroom-gold-bright)] scale-105'
+                    ? 'border-[color:var(--color-chessboard-gold-bright)] scale-105'
                     : 'border-transparent hover:scale-105',
                   !unlocked && 'cursor-not-allowed opacity-50',
                 )}
@@ -121,7 +121,7 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
                 aria-label={p.name}
               >
                 {selected && (
-                  <Check className="absolute inset-0 m-auto h-4 w-4 text-[color:var(--color-warroom-black)]" />
+                  <Check className="absolute inset-0 m-auto h-4 w-4 text-[color:var(--color-chessboard-black)]" />
                 )}
                 {!unlocked && (
                   <Lock className="absolute inset-0 m-auto h-4 w-4 text-white/80" />
@@ -144,8 +144,8 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
               className={cn(
                 'rounded-full border px-3 py-1 text-[11px] tracking-[0.04em] transition-colors',
                 words === w
-                  ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/10 text-[color:var(--color-warroom-gold-bright)]'
-                  : 'border-[color:var(--color-warroom-stone)]/50 text-[color:var(--color-warroom-smoke)] hover:border-[color:var(--color-warroom-gold)]/40',
+                  ? 'border-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]/10 text-[color:var(--color-chessboard-gold-bright)]'
+                  : 'border-[color:var(--color-chessboard-stone)]/50 text-[color:var(--color-chessboard-smoke)] hover:border-[color:var(--color-chessboard-gold)]/40',
               )}
               style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
             >
@@ -159,10 +159,10 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
           maxLength={HOUSE_WORDS_MAX}
           onChange={(e) => setWords(e.target.value)}
           placeholder="Or forge your own…"
-          className="w-full rounded-sm border border-[color:var(--color-warroom-stone)]/50 bg-[color:var(--color-warroom-black)]/60 px-3 py-2 text-sm italic text-[color:var(--color-warroom-ivory)] outline-none transition-colors focus:border-[color:var(--color-warroom-gold)]/60"
+          className="w-full rounded-sm border border-[color:var(--color-chessboard-stone)]/50 bg-[color:var(--color-chessboard-black)]/60 px-3 py-2 text-sm italic text-[color:var(--color-chessboard-ivory)] outline-none transition-colors focus:border-[color:var(--color-chessboard-gold)]/60"
           style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
         />
-        <div className="mt-1 text-right text-[10px] text-[color:var(--color-warroom-smoke)]">
+        <div className="mt-1 text-right text-[10px] text-[color:var(--color-chessboard-smoke)]">
           {words.length}/{HOUSE_WORDS_MAX}
         </div>
       </div>
@@ -174,8 +174,8 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
         className={cn(
           'inline-flex items-center gap-2 rounded-sm border px-5 py-2 text-xs font-bold uppercase tracking-[0.16em] transition-all',
           dirty && !saving
-            ? 'border-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-gold)]/10'
-            : 'cursor-not-allowed border-[color:var(--color-warroom-stone)]/50 text-[color:var(--color-warroom-smoke)]',
+            ? 'border-[color:var(--color-chessboard-gold)] text-[color:var(--color-chessboard-gold)] hover:bg-[color:var(--color-chessboard-gold)]/10'
+            : 'cursor-not-allowed border-[color:var(--color-chessboard-stone)]/50 text-[color:var(--color-chessboard-smoke)]',
         )}
         style={{ fontFamily: 'var(--font-display)' }}
       >

@@ -109,7 +109,7 @@ export function CompetencyConstellation({
               y1={pa.y}
               x2={pb.x}
               y2={pb.y}
-              stroke="var(--color-warroom-gold)"
+              stroke="var(--color-chessboard-gold)"
               strokeWidth={0.6 + minTier * 0.25}
               strokeOpacity={opacity}
               vectorEffect="non-scaling-stroke"
@@ -166,21 +166,21 @@ export function CompetencyConstellation({
           {activeMeta ? (
             <>
               <p
-                className="text-sm font-semibold tracking-[0.04em] text-[color:var(--color-warroom-gold-bright)]"
+                className="text-sm font-semibold tracking-[0.04em] text-[color:var(--color-chessboard-gold-bright)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {nameOf(activeMeta.code)}
-                <span className="ml-2 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]">
+                <span className="ml-2 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]">
                   {activeMastery ? CATEGORY_LABEL[activeMastery.category] : 'Unlit'}
                 </span>
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-[color:var(--color-warroom-smoke)]">
+              <p className="mt-1 text-xs leading-relaxed text-[color:var(--color-chessboard-smoke)]">
                 {activeMeta.plain}
               </p>
             </>
           ) : (
             <p
-              className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {litCount === 0

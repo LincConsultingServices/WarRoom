@@ -23,16 +23,16 @@ import {
 // ============================================================
 
 export type AmbientScene =
-  | 'warroom-lobby'
-  | 'warroom-active'
-  | 'warroom-deliberation'
+  | 'chessboard-lobby'
+  | 'chessboard-active'
+  | 'chessboard-deliberation'
   | 'verdict-ceremony'
   | null
 
 const SCENE_FILES: Record<Exclude<AmbientScene, null>, string> = {
-  'warroom-lobby': '/sfx/ambient-warroom-loop.mp3',
-  'warroom-active': '/sfx/ambient-warroom-loop.mp3',
-  'warroom-deliberation': '/sfx/ambient-deliberation.mp3',
+  'chessboard-lobby': '/sfx/ambient-chessboard-loop.mp3',
+  'chessboard-active': '/sfx/ambient-chessboard-loop.mp3',
+  'chessboard-deliberation': '/sfx/ambient-deliberation.mp3',
   'verdict-ceremony': '/sfx/ambient-verdict.mp3',
 }
 
@@ -46,22 +46,22 @@ const SKIP_AMBIENT_MP3_LOOKUP = true
 const DISABLE_PROCEDURAL_AMBIENT = false
 
 const SCENE_TARGET_VOLUME: Record<Exclude<AmbientScene, null>, number> = {
-  'warroom-lobby': 0.12,
-  'warroom-active': 0.18,
-  'warroom-deliberation': 0.22,
+  'chessboard-lobby': 0.12,
+  'chessboard-active': 0.18,
+  'chessboard-deliberation': 0.22,
   'verdict-ceremony': 0.28,
 }
 
 // Shared with GOTSoundManager so the single MuteToggle silences both the
 // ambient layer AND one-shot SFX. Exported so non-hook code can read the
 // flag without instantiating the hook.
-export const MUTE_STORAGE_KEY = 'warroom_audio_muted'
-export const AMBIENT_VOL_STORAGE_KEY = 'warroom_ambient_volume'
-export const SFX_VOL_STORAGE_KEY = 'warroom_sfx_volume'
+export const MUTE_STORAGE_KEY = 'chessboard_audio_muted'
+export const AMBIENT_VOL_STORAGE_KEY = 'chessboard_ambient_volume'
+export const SFX_VOL_STORAGE_KEY = 'chessboard_sfx_volume'
 
 /** Cheap synchronous read of the persisted mute preference.
  *  Safe to call from anywhere (SSR-safe; defaults to false). */
-export function isWarRoomAudioMuted(): boolean {
+export function isChessboardAudioMuted(): boolean {
   if (typeof window === 'undefined') return false
   try {
     return window.localStorage.getItem(MUTE_STORAGE_KEY) === 'true'

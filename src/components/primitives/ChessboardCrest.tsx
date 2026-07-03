@@ -6,19 +6,19 @@ import { cn } from '@/lib/utils'
 import { easeDramatic } from '@/lib/animations/variants'
 import { ASSET_REGISTRY } from '@/lib/assets/assetRegistry'
 
-export interface WarRoomCrestProps {
+export interface ChessboardCrestProps {
   size?: number
   className?: string
   staticRender?: boolean
 }
 
-const CREST_SRC = ASSET_REGISTRY.crests.warroom
+const CREST_SRC = ASSET_REGISTRY.crests.chessboard
 
 /**
- * <WarRoomCrest /> — Chess king emblem for the WarRoom brand.
+ * <ChessboardCrest /> — Chess king emblem for the Chessboard brand.
  * Pure SVG fallback — no asset dependency.
  */
-export function WarRoomCrest({ size = 120, className, staticRender }: WarRoomCrestProps) {
+export function ChessboardCrest({ size = 120, className, staticRender }: ChessboardCrestProps) {
   const prefersReducedMotion = useReducedMotion()
   const animate = !staticRender && !prefersReducedMotion
 
@@ -37,7 +37,7 @@ export function WarRoomCrest({ size = 120, className, staticRender }: WarRoomCre
     return (
       <motion.img
         src={CREST_SRC}
-        alt="WarRoom crest"
+        alt="Chessboard crest"
         width={size}
         height={size}
         className={cn('inline-block select-none', className)}
@@ -55,7 +55,7 @@ export function WarRoomCrest({ size = 120, className, staticRender }: WarRoomCre
       viewBox="0 0 100 100"
       className={cn('inline-block select-none', className)}
       role="img"
-      aria-label="WarRoom crest"
+      aria-label="Chessboard crest"
       initial={animate ? { opacity: 0, y: -8, scale: 0.92 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, ease: easeDramatic }}

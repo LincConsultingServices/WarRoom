@@ -18,7 +18,7 @@ import {
 import api from '@/src/lib/api'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
 } from '@/src/components/primitives'
@@ -103,8 +103,8 @@ export default function HistoryPage() {
     return (
       <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 space-y-6">
         <div className="flex items-center gap-3">
-          <Archive className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
-          <div className="h-6 w-48 rounded bg-[color:var(--color-warroom-rampart)] animate-pulse" />
+          <Archive className="h-5 w-5 text-[color:var(--color-chessboard-gold)]" />
+          <div className="h-6 w-48 rounded bg-[color:var(--color-chessboard-rampart)] animate-pulse" />
         </div>
         {[1, 2, 3].map((i) => (
           <div
@@ -122,21 +122,21 @@ export default function HistoryPage() {
   if (error) {
     return (
       <div className="py-12 max-w-md mx-auto text-center">
-        <StoneCard accent="var(--color-warroom-crimson)" className="py-10">
-          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-crimson-bright)]" />
+        <StoneCard accent="var(--color-chessboard-crimson)" className="py-10">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-chessboard-crimson-bright)]" />
           <p
-            className="text-sm text-[color:var(--color-warroom-crimson-bright)] mb-5"
+            className="text-sm text-[color:var(--color-chessboard-crimson-bright)] mb-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {error}
           </p>
-          <WarRoomCTA
+          <ChessboardCTA
             size="sm"
             variant="ghost"
             onClick={() => window.location.reload()}
           >
             Try Again
-          </WarRoomCTA>
+          </ChessboardCTA>
         </StoneCard>
       </div>
     )
@@ -156,7 +156,7 @@ export default function HistoryPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <Archive
-              className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+              className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
               aria-hidden
             />
             <h1
@@ -164,7 +164,7 @@ export default function HistoryPage() {
               style={{
                 fontFamily: 'var(--font-display)',
                 background:
-                  'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -174,14 +174,14 @@ export default function HistoryPage() {
           </div>
 
           <Link href="/assessment/start">
-            <WarRoomCTA size="sm" variant="ghost" icon={Play}>
+            <ChessboardCTA size="sm" variant="ghost" icon={Play}>
               New Campaign
-            </WarRoomCTA>
+            </ChessboardCTA>
           </Link>
         </div>
 
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] mb-4"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mb-4"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           Review your past campaigns and track your growth through the gauntlet.
@@ -192,24 +192,24 @@ export default function HistoryPage() {
       {history.length === 0 ? (
         /* ── Empty state ── */
         <StoneCard className="py-14 text-center">
-          <Clock className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-warroom-ash)]" />
+          <Clock className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-chessboard-ash)]" />
           <p
-            className="text-sm text-[color:var(--color-warroom-smoke)] mb-1"
+            className="text-sm text-[color:var(--color-chessboard-smoke)] mb-1"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             No simulations yet
           </p>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)] mb-6 max-w-sm mx-auto"
+            className="text-xs text-[color:var(--color-chessboard-smoke)] mb-6 max-w-sm mx-auto"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Complete your first campaign to see your history and track your
             progress through the gauntlet.
           </p>
           <Link href="/assessment/start">
-            <WarRoomCTA size="sm" variant="ghost" icon={Play}>
+            <ChessboardCTA size="sm" variant="ghost" icon={Play}>
               Start Campaign
-            </WarRoomCTA>
+            </ChessboardCTA>
           </Link>
         </StoneCard>
       ) : (
@@ -254,8 +254,8 @@ function HistoryCard({
       <StoneCard
         accent={
           isCompleted
-            ? 'var(--color-warroom-gold)'
-            : 'var(--color-warroom-ember)'
+            ? 'var(--color-chessboard-gold)'
+            : 'var(--color-chessboard-ember)'
         }
         padding="none"
       >
@@ -263,14 +263,14 @@ function HistoryCard({
         <div className="flex items-start justify-between px-6 pt-5 pb-4">
           <div>
             <h2
-              className="text-base font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+              className="text-base font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Campaign {item.attemptNumber}
             </h2>
             {item.date && (
               <p
-                className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5 flex items-center gap-1.5"
+                className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5 flex items-center gap-1.5"
                 style={{ fontFamily: 'var(--font-body, serif)' }}
               >
                 <Calendar className="h-3 w-3" />
@@ -289,7 +289,7 @@ function HistoryCard({
         </div>
 
         {/* ── Quick stats ── */}
-        <div className="grid grid-cols-3 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-warroom-ash)]/25">
+        <div className="grid grid-cols-3 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-chessboard-ash)]/25">
           {[
             { label: 'Stage', value: item.stage },
             {
@@ -306,16 +306,16 @@ function HistoryCard({
           ].map((stat) => (
             <div
               key={stat.label}
-              className="text-center py-3 bg-[color:var(--color-warroom-rampart)]/50"
+              className="text-center py-3 bg-[color:var(--color-chessboard-rampart)]/50"
             >
               <div
-                className="text-sm font-bold text-[color:var(--color-warroom-gold)]"
+                className="text-sm font-bold text-[color:var(--color-chessboard-gold)]"
                 style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
               >
                 {stat.value}
               </div>
               <div
-                className="text-[9px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
+                className="text-[9px] uppercase tracking-[0.12em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {stat.label}
@@ -326,7 +326,7 @@ function HistoryCard({
 
         {/* ── Mistakes indicator ── */}
         {item.mistakes > 0 && (
-          <div className="mx-6 mb-4 flex items-center gap-2 text-[color:var(--color-warroom-crimson-bright)]">
+          <div className="mx-6 mb-4 flex items-center gap-2 text-[color:var(--color-chessboard-crimson-bright)]">
             <AlertTriangle className="h-3.5 w-3.5" />
             <span
               className="text-[10px] uppercase tracking-[0.12em]"
@@ -341,7 +341,7 @@ function HistoryCard({
         <button
           type="button"
           onClick={onToggle}
-          className="w-full flex items-center justify-center gap-2 py-3 border-t border-[color:var(--color-warroom-ash)]/20 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 border-t border-[color:var(--color-chessboard-ash)]/20 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-gold)] transition-colors"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {isExpanded ? (
@@ -365,9 +365,9 @@ function HistoryCard({
               transition={{ duration: 0.3, ease: easeDramatic }}
               className="overflow-hidden"
             >
-              <div className="px-6 pb-6 pt-3 border-t border-[color:var(--color-warroom-ash)]/20 space-y-4">
+              <div className="px-6 pb-6 pt-3 border-t border-[color:var(--color-chessboard-ash)]/20 space-y-4">
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Open the full campaign report to review competencies, stage
@@ -376,15 +376,15 @@ function HistoryCard({
 
                 <div className="flex flex-wrap gap-3">
                   <Link href={`/history/${item.id}`}>
-                    <WarRoomCTA size="sm" variant="ghost" icon={Swords}>
+                    <ChessboardCTA size="sm" variant="ghost" icon={Swords}>
                       View Full Report
-                    </WarRoomCTA>
+                    </ChessboardCTA>
                   </Link>
                   {!isCompleted && item.status !== 'NOT_STARTED' && (
                     <Link href={`/assessment/${item.id}`}>
-                      <WarRoomCTA size="sm" variant="primary" icon={Play}>
+                      <ChessboardCTA size="sm" variant="primary" icon={Play}>
                         Continue Campaign
-                      </WarRoomCTA>
+                      </ChessboardCTA>
                     </Link>
                   )}
                 </div>

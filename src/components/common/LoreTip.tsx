@@ -55,7 +55,7 @@ export function LoreTip({ tip, children, className }: LoreTipProps) {
         tabIndex={0}
         {...getReferenceProps()}
         className={cn(
-          'cursor-help underline decoration-dotted decoration-[color:var(--color-warroom-gold)]/50 underline-offset-4 outline-none focus-visible:decoration-[color:var(--color-warroom-gold)]',
+          'cursor-help underline decoration-dotted decoration-[color:var(--color-chessboard-gold)]/50 underline-offset-4 outline-none focus-visible:decoration-[color:var(--color-chessboard-gold)]',
           className,
         )}
       >
@@ -69,7 +69,7 @@ export function LoreTip({ tip, children, className }: LoreTipProps) {
             ref={refs.setFloating}
             {...getFloatingProps()}
             style={{ ...floatingStyles, fontFamily: 'var(--font-body, var(--font-display))' }}
-            className="z-[70] max-w-[16rem] rounded-sm border border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-black)]/95 px-3 py-2 text-xs leading-relaxed text-[color:var(--color-warroom-ivory)] shadow-[0_8px_32px_rgba(0,0,0,0.7)] backdrop-blur-sm"
+            className="z-[70] max-w-[16rem] rounded-sm border border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-black)]/95 px-3 py-2 text-xs leading-relaxed text-[color:var(--color-chessboard-ivory)] shadow-[0_8px_32px_rgba(0,0,0,0.7)] backdrop-blur-sm"
           >
             {tip}
           </div>

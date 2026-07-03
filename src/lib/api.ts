@@ -1,5 +1,5 @@
 // ============================================
-// KK's War Room 2.0 - API Client
+// KK's Chessboard 2.0 - API Client
 // ============================================
 
 import type {
@@ -208,10 +208,10 @@ export const api = {
         body: JSON.stringify({ mentorId, question }),
       }),
 
-    // War Room
+    // Chessboard
     submitPitch: (id: string, pitchText: string) =>
       request<{ pitchReceived: boolean; investors: Record<string, unknown>[]; message: string }>(
-        `/assessments/${id}/warroom/pitch`,
+        `/assessments/${id}/chessboard/pitch`,
         {
           method: 'POST',
           body: JSON.stringify({ pitchText }),
@@ -219,31 +219,31 @@ export const api = {
       ),
 
     respondToInvestor: (id: string, investorId: string, response: string) =>
-      request<InvestorScorecard>(`/assessments/${id}/warroom/respond`, {
+      request<InvestorScorecard>(`/assessments/${id}/chessboard/respond`, {
         method: 'POST',
         body: JSON.stringify({ investorId, response }),
       }),
 
     getScorecard: (id: string) =>
-      request<InvestorScorecard[]>(`/assessments/${id}/warroom/scorecard`),
+      request<InvestorScorecard[]>(`/assessments/${id}/chessboard/scorecard`),
 
-    getWarRoomOffers: (id: string) =>
-      request<Record<string, unknown>[]>(`/assessments/${id}/warroom/offers`),
+    getChessboardOffers: (id: string) =>
+      request<Record<string, unknown>[]>(`/assessments/${id}/chessboard/offers`),
 
     counterNegotiate: (id: string, investorId: string, capital: number, equity: number) =>
-      request<{ message: string; accepted: boolean; capital: number; equity: number }>(`/assessments/${id}/warroom/counter`, {
+      request<{ message: string; accepted: boolean; capital: number; equity: number }>(`/assessments/${id}/chessboard/counter`, {
         method: 'POST',
         body: JSON.stringify({ investorId, capital, equity }),
       }),
 
     acceptDeal: (id: string, investorId: string, capital: number, equity: number) =>
-      request<{ message: string }>(`/assessments/${id}/warroom/accept-deal`, {
+      request<{ message: string }>(`/assessments/${id}/chessboard/accept-deal`, {
         method: 'POST',
         body: JSON.stringify({ investorId, capital, equity }),
       }),
 
     rejectOffer: (id: string, offerId: string) =>
-      request<Record<string, unknown>>(`/assessments/${id}/warroom/reject-offer`, {
+      request<Record<string, unknown>>(`/assessments/${id}/chessboard/reject-offer`, {
         method: 'POST',
         body: JSON.stringify({ offerId }),
       }),
@@ -258,7 +258,7 @@ export const api = {
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 35000)
       try {
-        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/counter-audio`, {
+        const res = await fetch(`${API_BASE}/assessments/${id}/chessboard/counter-audio`, {
           method: 'POST',
           headers,
           body: formData,
@@ -291,14 +291,14 @@ export const api = {
       }
     },
 
-    // War Room Audio
+    // Chessboard Audio
     submitPitchAudio: async (id: string, audioBlob: Blob) => {
       const token = await getIdToken()
       const formData = new FormData()
       formData.append('audio', audioBlob, 'pitch.webm')
       const headers: Record<string, string> = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
-      const res = await fetch(`${API_BASE}/assessments/${id}/warroom/pitch-audio`, {
+      const res = await fetch(`${API_BASE}/assessments/${id}/chessboard/pitch-audio`, {
         method: 'POST',
         headers,
         body: formData,
@@ -331,7 +331,7 @@ export const api = {
         formData.append('investorId', investorId)
         const headers: Record<string, string> = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
-        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/investor-followup-audio`, {
+        const res = await fetch(`${API_BASE}/assessments/${id}/chessboard/investor-followup-audio`, {
             method: 'POST',
             headers,
             body: formData,
@@ -349,7 +349,7 @@ export const api = {
         formData.append('followupQuestion', followupQuestion)
         const headers: Record<string, string> = {}
         if (token) headers['Authorization'] = `Bearer ${token}`
-        const res = await fetch(`${API_BASE}/assessments/${id}/warroom/respond-final-audio`, {
+        const res = await fetch(`${API_BASE}/assessments/${id}/chessboard/respond-final-audio`, {
             method: 'POST',
             headers,
             body: formData,
@@ -365,7 +365,7 @@ export const api = {
       formData.append('investorId', investorId)
       const headers: Record<string, string> = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
-      const res = await fetch(`${API_BASE}/assessments/${id}/warroom/respond-audio`, {
+      const res = await fetch(`${API_BASE}/assessments/${id}/chessboard/respond-audio`, {
         method: 'POST',
         headers,
         body: formData,

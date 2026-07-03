@@ -89,7 +89,7 @@ export function NarratorOrb() {
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
             className={cn(
               'relative shrink-0 rounded-full focus:outline-none',
-              'focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
+              'focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60',
               'cursor-pointer',
             )}
             style={{ width: ORB_SIZE, height: ORB_SIZE }}

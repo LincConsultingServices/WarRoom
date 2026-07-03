@@ -10,7 +10,7 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-[color:var(--color-warroom-void)] text-[color:var(--color-warroom-ivory)] relative overflow-hidden">
+    <div className="min-h-screen bg-[color:var(--color-chessboard-void)] text-[color:var(--color-chessboard-ivory)] relative overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"

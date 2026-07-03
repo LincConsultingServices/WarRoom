@@ -23,7 +23,7 @@ export const ASSET_REGISTRY = {
     landing:    '/assets/images/bg/landing-hall.webp',
     dashboard:  '/assets/images/bg/dashboard-chamber.webp',
     simulation: '/assets/images/bg/simulation-stone.webp',
-    warroom:    '/assets/images/bg/warroom-throne.webp',
+    chessboard:    '/assets/images/bg/chessboard-throne.webp',
     verdict:    '/assets/images/bg/verdict-hall.webp',
   },
 
@@ -36,12 +36,12 @@ export const ASSET_REGISTRY = {
   },
 
   door: {
-    openingMp4:  '/assets/video/warroom-door-opening.mp4',
-    openingWebm: '/assets/video/warroom-door-opening.webm',
+    openingMp4:  '/assets/video/chessboard-door-opening.mp4',
+    openingWebm: '/assets/video/chessboard-door-opening.webm',
   },
 
   crests: {
-    warroom: '/assets/images/crests/warroom-crest.svg',
+    chessboard: '/assets/images/crests/chessboard-crest.svg',
   },
 } as const
 

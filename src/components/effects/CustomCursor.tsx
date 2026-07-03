@@ -13,7 +13,7 @@ import { useEffect, useRef } from 'react'
 const INTERACTIVE_SELECTOR =
   'a, button, [role="button"], input, textarea, select, label, [data-interactive]'
 
-export const CURSOR_DISABLED_STORAGE_KEY = 'warroom_cursor_disabled'
+export const CURSOR_DISABLED_STORAGE_KEY = 'chessboard_cursor_disabled'
 
 function isCursorDisabled(): boolean {
   if (typeof window === 'undefined') return false
@@ -191,25 +191,25 @@ export function CustomCursor() {
       >
         <svg
           viewBox="0 0 24 28"
-          width={20}
-          height={24}
+          width={32}
+          height={36}
           aria-hidden="true"
           className="wr-cursor__arrow"
         >
           <defs>
             <linearGradient id="wrCursorSilver" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f0f0f0" />
+              <stop offset="0%" stopColor="#ffffff" />
               <stop offset="35%" stopColor="#d4d4d4" />
-              <stop offset="70%" stopColor="#c8a84a" />
-              <stop offset="100%" stopColor="#8a7030" />
+              <stop offset="70%" stopColor="#a0a0a0" />
+              <stop offset="100%" stopColor="#7a7a7a" />
             </linearGradient>
           </defs>
-          {/* Minimal arrow — clean geometric shape */}
+          {/* Pawn shape */}
           <path
-            d="M2 1 L2 22 L8 17 L11.5 24.5 L14.5 23 L11 16 L18.5 16 Z"
+            d="M12,2a3,3,0,1,0,3,3A3,3,0,0,0,12,2Zm0,5A3.16,3.16,0,0,0,9,9c0,2,1,4.42,1,7H8v2h8V16H14c0-2.58,1-5,1-7A3.16,3.16,0,0,0,12,7ZM7,19v2H17V19Z"
             fill="url(#wrCursorSilver)"
-            stroke="rgba(0,0,0,0.6)"
-            strokeWidth="0.8"
+            stroke="rgba(0,0,0,0.8)"
+            strokeWidth="1"
             strokeLinejoin="round"
           />
         </svg>

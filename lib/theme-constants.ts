@@ -1,5 +1,5 @@
 /**
- * War Room Design System - Theme Constants
+ * Chessboard Design System - Theme Constants
  * Centralized design tokens for consistent styling across the application
  */
 

@@ -168,7 +168,7 @@ export function AIScenarioQuestion({
                   style={{ background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent)' }}
                 />
 
-                {/* RIGHT HALF — Enter War Room (entire panel is the click target) */}
+                {/* RIGHT HALF — Enter Chessboard (entire panel is the click target) */}
                 <motion.button
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -190,7 +190,7 @@ export function AIScenarioQuestion({
                         className="text-2xl md:text-3xl font-bold tracking-wide text-red-200"
                         style={{ fontFamily: "var(--font-display)", letterSpacing: '0.04em' }}
                       >
-                        Enter the War Room
+                        Enter the Chessboard
                       </h3>
                       <p className="text-sm text-red-100/70 mt-2 max-w-sm">
                         Reject the buyout. Fight for valuation and retain control of the championship.
@@ -207,7 +207,7 @@ export function AIScenarioQuestion({
             </div>
           ) : (
             <>
-              <div className="text-xs font-bold text-[color:var(--color-warroom-gold)]">How do you respond to this situation?</div>
+              <div className="text-xs font-bold text-[color:var(--color-chessboard-gold)]">How do you respond to this situation?</div>
               <Textarea placeholder="Describe your decision and reasoning..." value={currentAnswer?.text || ''} onChange={e => onTextChange(e.target.value)} rows={5} className="resize-none" />
             </>
           )}

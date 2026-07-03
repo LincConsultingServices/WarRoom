@@ -2,7 +2,7 @@
 
 // ============================================
 // AuthProvider — listens to Firebase auth state and reconciles it with the
-// War Room backend via POST /auth/sync.
+// Chessboard backend via POST /auth/sync.
 //
 // It keeps localStorage['user'] and localStorage['batch'] populated as the app's
 // profile cache, so every existing component that reads those keys (sidebars,

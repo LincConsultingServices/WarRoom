@@ -19,10 +19,10 @@ import { cn } from '@/lib/utils'
 import { CampaignMap } from '@/src/components/dashboard/CampaignMap'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
-  WarRoomCrest,
+  ChessboardCrest,
 } from '@/src/components/primitives'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
@@ -63,7 +63,7 @@ const FEATURES = [
     desc: 'Problem Sensing, Learning Agility, Courage, Financial Discipline, Strategy, Influence, Team Management, Value Creation.',
     icon: Shield,
     tone: 'gold' as const,
-    accent: 'var(--color-warroom-gold)',
+    accent: 'var(--color-chessboard-gold)',
   },
   {
     glyph: 'M3',
@@ -71,15 +71,15 @@ const FEATURES = [
     desc: 'Consult the Mindset Architect, the Sales Commander, the Brand Pioneer, and four more world-class mentors when you need guidance.',
     icon: Users,
     tone: 'verdant' as const,
-    accent: 'var(--color-warroom-verdant)',
+    accent: 'var(--color-chessboard-verdant)',
   },
   {
     glyph: 'WR',
-    title: 'Investor War Room',
+    title: 'Investor Chessboard',
     desc: 'Pitch to seven investors — the Capital Strategist, the Operations Lead, the Market Instinct. Negotiate your deal.',
     icon: Crown,
     tone: 'crimson' as const,
-    accent: 'var(--color-warroom-crimson)',
+    accent: 'var(--color-chessboard-crimson)',
   },
   {
     glyph: 'E3',
@@ -87,7 +87,7 @@ const FEATURES = [
     desc: 'Get your entrepreneur archetype, competency spider chart, role fit map, and a personalised action plan.',
     icon: FileText,
     tone: 'amethyst' as const,
-    accent: 'var(--color-warroom-amethyst)',
+    accent: 'var(--color-chessboard-amethyst)',
   },
 ] as const
 
@@ -140,7 +140,7 @@ export default function SimulationStartPage() {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-warroom-void)] text-[color:var(--color-warroom-ivory)] relative overflow-x-hidden">
+    <div className="min-h-screen bg-[color:var(--color-chessboard-void)] text-[color:var(--color-chessboard-ivory)] relative overflow-x-hidden">
       {/* Atmospheric backdrop */}
       <div
         aria-hidden
@@ -152,10 +152,10 @@ export default function SimulationStartPage() {
       />
 
       {/* ── Top Navigation ── */}
-      <nav className="sticky top-0 z-20 flex items-center gap-2 px-6 py-3.5 border-b border-[color:var(--color-warroom-ash)]/25 bg-[color:var(--color-warroom-void)]/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-20 flex items-center gap-2 px-6 py-3.5 border-b border-[color:var(--color-chessboard-ash)]/25 bg-[color:var(--color-chessboard-void)]/90 backdrop-blur-sm">
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+          className="flex items-center gap-1.5 text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-gold)] transition-colors"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -163,9 +163,9 @@ export default function SimulationStartPage() {
             Dashboard
           </span>
         </Link>
-        <span className="text-[color:var(--color-warroom-ash)] text-xs">/</span>
+        <span className="text-[color:var(--color-chessboard-ash)] text-xs">/</span>
         <span
-          className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-gold)]"
+          className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-gold)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           The Trial
@@ -183,12 +183,12 @@ export default function SimulationStartPage() {
           transition={{ duration: 0.65, ease: easeDramatic }}
         >
           <div className="flex justify-center mb-6">
-            <WarRoomCrest size={88} />
+            <ChessboardCrest size={88} />
           </div>
 
           <div className="flex justify-center mb-5">
             <SigilBadge tone="gold" icon={Swords}>
-              KK&apos;s War Room 2.0
+              KK&apos;s Chessboard 2.0
             </SigilBadge>
           </div>
 
@@ -197,7 +197,7 @@ export default function SimulationStartPage() {
             style={{
               fontFamily: 'var(--font-display)',
               background:
-                'linear-gradient(135deg, var(--color-warroom-gold) 0%, var(--color-warroom-gold-bright) 50%, var(--color-warroom-gold) 100%)',
+                'linear-gradient(135deg, var(--color-chessboard-gold) 0%, var(--color-chessboard-gold-bright) 50%, var(--color-chessboard-gold) 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -206,7 +206,7 @@ export default function SimulationStartPage() {
           </h1>
 
           <p
-            className="text-[color:var(--color-warroom-smoke)] text-[0.95rem] leading-relaxed max-w-[580px] mx-auto"
+            className="text-[color:var(--color-chessboard-smoke)] text-[0.95rem] leading-relaxed max-w-[580px] mx-auto"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Navigate a 12-month startup journey across 9 stages. Make decisions under
@@ -236,14 +236,14 @@ export default function SimulationStartPage() {
                 whileHover={prefersReducedMotion ? undefined : { y: -4 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
                 transition={{ duration: 0.2, ease: easeDramatic }}
-                className="text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-[3px]"
+                className="text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60 rounded-[3px]"
                 aria-pressed={level === item.id}
               >
                 <StoneCard
                   accent={
                     level === item.id
-                      ? 'var(--color-warroom-gold)'
-                      : 'var(--color-warroom-ash)'
+                      ? 'var(--color-chessboard-gold)'
+                      : 'var(--color-chessboard-ash)'
                   }
                   sigilWatermark={
                     <span
@@ -256,7 +256,7 @@ export default function SimulationStartPage() {
                   className={cn(
                     'h-full p-6 transition-all duration-300',
                     level === item.id
-                      ? 'ring-1 ring-[color:var(--color-warroom-gold)]/40 shadow-[0_0_32px_-8px_rgba(201,162,39,0.55)]'
+                      ? 'ring-1 ring-[color:var(--color-chessboard-gold)]/40 shadow-[0_0_32px_-8px_rgba(201,162,39,0.55)]'
                       : '',
                   )}
                 >
@@ -266,8 +266,8 @@ export default function SimulationStartPage() {
                       className={cn(
                         'inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-[2px] border tracking-[0.14em] uppercase transition-all duration-300',
                         level === item.id
-                          ? 'text-primary-foreground bg-[color:var(--color-warroom-gold)] border-[color:var(--color-warroom-gold)]'
-                          : 'text-[color:var(--color-warroom-smoke)] bg-transparent border-[color:var(--color-warroom-ash)]/50',
+                          ? 'text-primary-foreground bg-[color:var(--color-chessboard-gold)] border-[color:var(--color-chessboard-gold)]'
+                          : 'text-[color:var(--color-chessboard-smoke)] bg-transparent border-[color:var(--color-chessboard-ash)]/50',
                       )}
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
@@ -288,7 +288,7 @@ export default function SimulationStartPage() {
                           }}
                         >
                           <Check
-                            className="w-5 h-5 text-[color:var(--color-warroom-gold)]"
+                            className="w-5 h-5 text-[color:var(--color-chessboard-gold)]"
                             strokeWidth={2.5}
                           />
                         </motion.span>
@@ -301,8 +301,8 @@ export default function SimulationStartPage() {
                     className={cn(
                       'text-base font-semibold mb-2.5 tracking-[0.05em] transition-colors duration-300',
                       level === item.id
-                        ? 'text-[color:var(--color-warroom-gold)]'
-                        : 'text-[color:var(--color-warroom-ivory)]',
+                        ? 'text-[color:var(--color-chessboard-gold)]'
+                        : 'text-[color:var(--color-chessboard-ivory)]',
                     )}
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
@@ -311,7 +311,7 @@ export default function SimulationStartPage() {
 
                   {/* Subtitle */}
                   <p
-                    className="text-sm text-[color:var(--color-warroom-smoke)] mb-5 leading-relaxed"
+                    className="text-sm text-[color:var(--color-chessboard-smoke)] mb-5 leading-relaxed"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     {item.subtitle}
@@ -322,15 +322,15 @@ export default function SimulationStartPage() {
                     {item.features.map((f) => (
                       <li
                         key={f}
-                        className="flex items-center gap-2.5 text-xs tracking-[0.05em] text-[color:var(--color-warroom-ivory)]/70"
+                        className="flex items-center gap-2.5 text-xs tracking-[0.05em] text-[color:var(--color-chessboard-ivory)]/70"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         <span
                           className={cn(
                             'w-1 h-1 rounded-full flex-shrink-0 transition-colors duration-300',
                             level === item.id
-                              ? 'bg-[color:var(--color-warroom-gold)]'
-                              : 'bg-[color:var(--color-warroom-ash)]',
+                              ? 'bg-[color:var(--color-chessboard-gold)]'
+                              : 'bg-[color:var(--color-chessboard-ash)]',
                           )}
                         />
                         {f}
@@ -396,13 +396,13 @@ export default function SimulationStartPage() {
                     </SigilBadge>
                   </div>
                   <h3
-                    className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] mb-2 tracking-[0.06em]"
+                    className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] mb-2 tracking-[0.06em]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {feat.title}
                   </h3>
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     {feat.desc}
@@ -424,8 +424,8 @@ export default function SimulationStartPage() {
             className={cn(
               'flex items-start gap-4 p-5 rounded-[3px] border mb-4 transition-all duration-300 cursor-pointer select-none',
               acceptedTerms
-                ? 'border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-gold)]/[0.04]'
-                : 'border-[color:var(--color-warroom-ash)]/30 bg-[color:var(--color-warroom-rampart)]/50',
+                ? 'border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-gold)]/[0.04]'
+                : 'border-[color:var(--color-chessboard-ash)]/30 bg-[color:var(--color-chessboard-rampart)]/50',
             )}
             onClick={toggleTerms}
             whileTap={prefersReducedMotion ? undefined : { scale: 0.997 }}
@@ -436,7 +436,7 @@ export default function SimulationStartPage() {
               role="checkbox"
               aria-checked={acceptedTerms}
               aria-label="Accept Terms & Conditions"
-              className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-full"
+              className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60 rounded-full"
               tabIndex={0}
               onClick={(e) => {
                 e.stopPropagation()
@@ -447,8 +447,8 @@ export default function SimulationStartPage() {
                 className={cn(
                   'w-7 h-7 rounded-full border-2 flex items-center justify-center relative overflow-hidden transition-colors duration-300',
                   acceptedTerms
-                    ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]'
-                    : 'border-[color:var(--color-warroom-ash)] bg-[color:var(--color-warroom-rampart)]',
+                    ? 'border-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]'
+                    : 'border-[color:var(--color-chessboard-ash)] bg-[color:var(--color-chessboard-rampart)]',
                 )}
                 animate={
                   acceptedTerms && !prefersReducedMotion
@@ -477,7 +477,7 @@ export default function SimulationStartPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-[7px] font-bold text-[color:var(--color-warroom-smoke)]"
+                      className="text-[7px] font-bold text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       WR
@@ -493,18 +493,18 @@ export default function SimulationStartPage() {
               className="text-sm leading-relaxed"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              <span className="text-[color:var(--color-warroom-ivory)]">
+              <span className="text-[color:var(--color-chessboard-ivory)]">
                 I have read and agree to the{' '}
               </span>
               <Link
                 href="/terms"
                 onClick={(e) => e.stopPropagation()}
-                className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                className="text-[color:var(--color-chessboard-gold)] underline underline-offset-2 hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
               >
                 Terms &amp; Conditions
               </Link>
-              <span className="text-[color:var(--color-warroom-ivory)]">
-                {' '}of the War Room.
+              <span className="text-[color:var(--color-chessboard-ivory)]">
+                {' '}of the Chessboard.
               </span>
             </p>
           </motion.div>
@@ -517,7 +517,7 @@ export default function SimulationStartPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.25 }}
-                className="mb-5 p-4 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-[color:var(--color-warroom-crimson-bright)] text-sm text-center"
+                className="mb-5 p-4 rounded-[3px] border border-[color:var(--color-chessboard-crimson)]/40 bg-[color:var(--color-chessboard-crimson)]/[0.08] text-[color:var(--color-chessboard-crimson-bright)] text-sm text-center"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {error}
@@ -527,7 +527,7 @@ export default function SimulationStartPage() {
 
           {/* Start CTA */}
           <div {...startIntro} className="flex flex-col items-stretch gap-3">
-            <WarRoomCTA
+            <ChessboardCTA
               size="lg"
               variant="primary"
               icon={Swords}
@@ -535,14 +535,14 @@ export default function SimulationStartPage() {
               onClick={handleStart}
               className="w-full justify-center"
             >
-              {isStarting ? 'Preparing the War Room…' : 'Enter the Trial'}
-            </WarRoomCTA>
+              {isStarting ? 'Preparing the Chessboard…' : 'Enter the Trial'}
+            </ChessboardCTA>
 
             {!acceptedTerms && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)]"
+                className="text-center text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Accept the terms above to enter the trial
@@ -563,7 +563,7 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
     <div className="flex items-center gap-3">
       <GoldDivider variant="line" className="flex-1" />
       <h2
-        className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--color-warroom-smoke)] whitespace-nowrap"
+        className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--color-chessboard-smoke)] whitespace-nowrap"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {children}

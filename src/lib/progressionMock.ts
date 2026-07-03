@@ -43,7 +43,7 @@ const PHOENIX_DELTA = 15
 const MILLION = 1_000_000
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-const HOUSE_STORAGE_KEY = 'warroom_house'
+const HOUSE_STORAGE_KEY = 'chessboard_house'
 
 type AssessmentWithRevenue = Assessment & { revenueProjection?: number }
 
@@ -157,7 +157,7 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     (a) => ((a as AssessmentWithRevenue).revenueProjection ?? 0) >= MILLION,
   )
   const anyUnbroken = completed.some((a) => (a.mentorLifelinesRemaining ?? 0) >= 3)
-  const reachedWarRoom = assessments.some(
+  const reachedChessboard = assessments.some(
     (a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED',
   )
   const naturalBorn = allEight.some((c) => masteryTier(c) >= 5)
@@ -188,7 +188,7 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     sigils.push({ id, tier, earnedAt: when })
 
   if (completed.length > 0) award('first_blood', 'BRONZE', earnedAtFor((a) => a.status === 'COMPLETED'))
-  if (reachedWarRoom) award('the_committed', 'BRONZE', earnedAtFor((a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED'))
+  if (reachedChessboard) award('the_committed', 'BRONZE', earnedAtFor((a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED'))
   if (anyUnbroken) award('the_unbroken', 'SILVER', earnedAtFor((a) => a.status === 'COMPLETED' && (a.mentorLifelinesRemaining ?? 0) >= 3))
   if (anyMillion) award('master_of_coin', 'GOLD', earnedAtFor((a) => ((a as AssessmentWithRevenue).revenueProjection ?? 0) >= MILLION))
   if (anyDeal) award('dragonslayer', 'GOLD', earnedAtFor((a) => !!a.dealResult?.dealMade))

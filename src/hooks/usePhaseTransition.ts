@@ -40,7 +40,7 @@ export function usePhaseTransition(assessmentId: string, load: () => Promise<voi
       setShowingScenario(false)
       setPhaseScenario(null)
       if (phaseScenario.toStage === 'STAGE_4_WARROOM') {
-        router.push(`/assessment/${assessmentId}/war-room`)
+        router.push(`/assessment/${assessmentId}/chessboard`)
         return
       }
       await load()

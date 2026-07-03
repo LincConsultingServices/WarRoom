@@ -199,14 +199,14 @@ function TermsSection({ item }: { item: SectionItem }) {
   return (
     <div className="space-y-2.5">
       <h3
-        className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.02em]"
+        className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.02em]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {item.title}
       </h3>
       {item.body && (
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] leading-relaxed"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] leading-relaxed"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           {item.body}
@@ -217,7 +217,7 @@ function TermsSection({ item }: { item: SectionItem }) {
           {item.list.map((li, i) => (
             <li
               key={i}
-              className="text-sm text-[color:var(--color-warroom-smoke)] leading-relaxed list-disc marker:text-[color:var(--color-warroom-gold)]/40"
+              className="text-sm text-[color:var(--color-chessboard-smoke)] leading-relaxed list-disc marker:text-[color:var(--color-chessboard-gold)]/40"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               {li}
@@ -227,7 +227,7 @@ function TermsSection({ item }: { item: SectionItem }) {
       )}
       {item.footer && (
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] leading-relaxed font-medium"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] leading-relaxed font-medium"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           {item.footer}
@@ -241,13 +241,13 @@ function TermsSection({ item }: { item: SectionItem }) {
 
 export default function TermsAndConditionsPage() {
   return (
-    <div className="min-h-screen bg-[color:var(--color-warroom-void)]">
+    <div className="min-h-screen bg-[color:var(--color-chessboard-void)]">
       {/* Atmospheric glow */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 0%, var(--color-warroom-gold)/0.03 0%, transparent 60%)',
+            'radial-gradient(ellipse at 50% 0%, var(--color-chessboard-gold)/0.03 0%, transparent 60%)',
         }}
       />
 
@@ -258,13 +258,13 @@ export default function TermsAndConditionsPage() {
         {/* Header */}
         <header className="mb-10">
           <div className="flex items-center gap-3 mb-3">
-            <ScrollText className="h-6 w-6 text-[color:var(--color-warroom-gold)]" />
+            <ScrollText className="h-6 w-6 text-[color:var(--color-chessboard-gold)]" />
             <h1
               className="text-2xl font-bold tracking-[0.04em]"
               style={{
                 fontFamily: 'var(--font-display)',
                 background:
-                  'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -273,34 +273,34 @@ export default function TermsAndConditionsPage() {
             </h1>
           </div>
           <p
-            className="text-sm text-[color:var(--color-warroom-smoke)]"
+            className="text-sm text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             KK&apos;s WAR ROOM — Terms & Conditions
           </p>
           {/* Divider */}
-          <div className="mt-6 h-px bg-gradient-to-r from-transparent via-[color:var(--color-warroom-gold)]/30 to-transparent" />
+          <div className="mt-6 h-px bg-gradient-to-r from-transparent via-[color:var(--color-chessboard-gold)]/30 to-transparent" />
         </header>
 
         {/* ═══ Section A ═══ */}
         <section className="mb-12">
           <div className="flex items-center gap-2.5 mb-6">
-            <Shield className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+            <Shield className="h-5 w-5 text-[color:var(--color-chessboard-gold)]" />
             <h2
-              className="text-base font-semibold text-[color:var(--color-warroom-gold)] tracking-[0.04em]"
+              className="text-base font-semibold text-[color:var(--color-chessboard-gold)] tracking-[0.04em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               A. Before Entering the WAR ROOM
             </h2>
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-6"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mb-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Participant Agreement
           </p>
 
-          <div className="space-y-6 pl-2 border-l border-[color:var(--color-warroom-gold)]/15">
+          <div className="space-y-6 pl-2 border-l border-[color:var(--color-chessboard-gold)]/15">
             <div className="pl-5 space-y-6">
               {SECTION_A.map((item) => (
                 <TermsSection key={item.title} item={item} />
@@ -310,27 +310,27 @@ export default function TermsAndConditionsPage() {
         </section>
 
         {/* Section divider */}
-        <div className="my-10 h-px bg-gradient-to-r from-transparent via-[color:var(--color-warroom-gold)]/25 to-transparent" />
+        <div className="my-10 h-px bg-gradient-to-r from-transparent via-[color:var(--color-chessboard-gold)]/25 to-transparent" />
 
         {/* ═══ Section B ═══ */}
         <section className="mb-12">
           <div className="flex items-center gap-2.5 mb-6">
-            <ScrollText className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
+            <ScrollText className="h-5 w-5 text-[color:var(--color-chessboard-gold)]" />
             <h2
-              className="text-base font-semibold text-[color:var(--color-warroom-gold)] tracking-[0.04em]"
+              className="text-base font-semibold text-[color:var(--color-chessboard-gold)] tracking-[0.04em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               B. WAR ROOM Evaluation Report
             </h2>
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-6"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mb-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Terms and Conditions
           </p>
 
-          <div className="space-y-6 pl-2 border-l border-[color:var(--color-warroom-gold)]/15">
+          <div className="space-y-6 pl-2 border-l border-[color:var(--color-chessboard-gold)]/15">
             <div className="pl-5 space-y-6">
               {SECTION_B.map((item) => (
                 <TermsSection key={item.title} item={item} />
@@ -340,12 +340,12 @@ export default function TermsAndConditionsPage() {
         </section>
 
         {/* Footer */}
-        <footer className="text-center pt-6 border-t border-[color:var(--color-warroom-ash)]/20">
+        <footer className="text-center pt-6 border-t border-[color:var(--color-chessboard-ash)]/20">
           <p
-            className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+            className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            By entering the War Room, you accept these terms in full.
+            By entering the Chessboard, you accept these terms in full.
           </p>
         </footer>
       </div>

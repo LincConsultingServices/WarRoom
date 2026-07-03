@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import {
   StoneCard,
-  WarRoomCTA,
-  WarRoomCrest,
+  ChessboardCTA,
+  ChessboardCrest,
 } from '@/src/components/primitives'
 import { audioManager } from '@/lib/audio/audioManager'
 import { easeDramatic } from '@/lib/animations/variants'
@@ -21,9 +21,9 @@ import { easeDramatic } from '@/lib/animations/variants'
 // ─── Shared style tokens ────────────────────────────────────────────────────
 
 const INPUT_CLASSES = cn(
-  'bg-[color:var(--color-warroom-rampart)]/80 border-[color:var(--color-warroom-ash)]/50',
-  'text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]',
-  'focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20',
+  'bg-[color:var(--color-chessboard-rampart)]/80 border-[color:var(--color-chessboard-ash)]/50',
+  'text-[color:var(--color-chessboard-ivory)] placeholder:text-[color:var(--color-chessboard-smoke)]',
+  'focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20',
 )
 
 // ─── Login content (wrapped in Suspense for useSearchParams) ────────────────
@@ -71,7 +71,7 @@ function LoginContent() {
     setError('')
 
     try {
-      // Authenticate against Firebase, then reconcile with the War Room backend.
+      // Authenticate against Firebase, then reconcile with the Chessboard backend.
       const profile = await login(
         email,
         password,
@@ -107,7 +107,7 @@ function LoginContent() {
           transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
           className="flex justify-center mb-5"
         >
-          <WarRoomCrest size={56} />
+          <ChessboardCrest size={56} />
         </motion.div>
 
         <motion.h1
@@ -118,24 +118,24 @@ function LoginContent() {
           style={{
             fontFamily: 'var(--font-display)',
             background:
-              'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+              'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Return to the War Room
+          Return to the Chessboard
         </motion.h1>
 
         <motion.p
           initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.35, duration: 0.4, ease: easeDramatic }}
-          className="text-sm text-[color:var(--color-warroom-smoke)] mt-2"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mt-2"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           {isAdmin
             ? 'Sign in to the admin panel'
-            : 'Sign in to your War Room simulation'}
+            : 'Sign in to your Chessboard simulation'}
         </motion.p>
       </div>
 
@@ -144,7 +144,7 @@ function LoginContent() {
         initial={prefersReducedMotion ? false : { y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.4, ease: easeDramatic }}
-        className="flex rounded-[3px] border border-[color:var(--color-warroom-ash)]/40 bg-[color:var(--color-warroom-rampart)]/60 p-1 mb-5"
+        className="flex rounded-[3px] border border-[color:var(--color-chessboard-ash)]/40 bg-[color:var(--color-chessboard-rampart)]/60 p-1 mb-5"
       >
         {(['Participant', 'Admin'] as const).map((label) => {
           const active = label === 'Participant' ? !isAdmin : isAdmin
@@ -155,8 +155,8 @@ function LoginContent() {
               className={cn(
                 'flex-1 rounded-[2px] py-2 text-[10px] font-semibold uppercase tracking-[0.14em] transition-all duration-300',
                 active
-                  ? 'bg-[color:var(--color-warroom-gold)]/[0.12] text-[color:var(--color-warroom-gold)] shadow-sm'
-                  : 'text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)]',
+                  ? 'bg-[color:var(--color-chessboard-gold)]/[0.12] text-[color:var(--color-chessboard-gold)] shadow-sm'
+                  : 'text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)]',
               )}
               style={{ fontFamily: 'var(--font-display)' }}
               onClick={() => {
@@ -176,16 +176,16 @@ function LoginContent() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.45, duration: 0.5, ease: easeDramatic }}
       >
-        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-gold)" padding="lg">
           <div className="mb-5">
             <h2
-              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-warroom-ivory)] mb-1"
+              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-chessboard-ivory)] mb-1"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {isAdmin ? 'Admin Sign In' : 'Sign In'}
             </h2>
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+              className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               {isAdmin
@@ -203,7 +203,7 @@ function LoginContent() {
                 exit={{ height: 0, opacity: 0 }}
                 className="mb-4 overflow-hidden"
               >
-                <div className="p-3 rounded-[3px] border border-[color:var(--color-warroom-verdant)]/40 bg-[color:var(--color-warroom-verdant)]/[0.08] text-sm text-[color:var(--color-warroom-verdant)]">
+                <div className="p-3 rounded-[3px] border border-[color:var(--color-chessboard-verdant)]/40 bg-[color:var(--color-chessboard-verdant)]/[0.08] text-sm text-[color:var(--color-chessboard-verdant)]">
                   Account created successfully! Please sign in.
                 </div>
               </motion.div>
@@ -218,7 +218,7 @@ function LoginContent() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -8, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-sm text-[color:var(--color-warroom-crimson-bright)]"
+                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-chessboard-crimson)]/40 bg-[color:var(--color-chessboard-crimson)]/[0.08] text-sm text-[color:var(--color-chessboard-crimson-bright)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {error}
@@ -232,7 +232,7 @@ function LoginContent() {
               <div>
                 <label
                   htmlFor="login-batch"
-                  className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                  className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Batch Code
@@ -252,9 +252,9 @@ function LoginContent() {
                   className={cn(
                     INPUT_CLASSES,
                     batchValid === true &&
-                      'border-[color:var(--color-warroom-verdant)] focus-visible:border-[color:var(--color-warroom-verdant)]',
+                      'border-[color:var(--color-chessboard-verdant)] focus-visible:border-[color:var(--color-chessboard-verdant)]',
                     batchValid === false &&
-                      'border-[color:var(--color-warroom-crimson)] focus-visible:border-[color:var(--color-warroom-crimson)]',
+                      'border-[color:var(--color-chessboard-crimson)] focus-visible:border-[color:var(--color-chessboard-crimson)]',
                   )}
                 />
                 <AnimatePresence>
@@ -263,7 +263,7 @@ function LoginContent() {
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-verdant)] mt-1.5"
+                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-chessboard-verdant)] mt-1.5"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       <Check className="w-3 h-3" /> {batchName}
@@ -274,7 +274,7 @@ function LoginContent() {
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-crimson-bright)] mt-1.5"
+                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-chessboard-crimson-bright)] mt-1.5"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       <X className="w-3 h-3" /> Invalid or inactive batch code
@@ -288,7 +288,7 @@ function LoginContent() {
             <div>
               <label
                 htmlFor="login-email"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Email
@@ -308,7 +308,7 @@ function LoginContent() {
             <div>
               <label
                 htmlFor="login-password"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Password
@@ -325,7 +325,7 @@ function LoginContent() {
             </div>
 
             {/* Submit */}
-            <WarRoomCTA
+            <ChessboardCTA
               type="submit"
               size="md"
               variant="primary"
@@ -336,8 +336,8 @@ function LoginContent() {
                 ? 'Opening the gates…'
                 : isAdmin
                   ? 'Sign In as Admin'
-                  : 'Enter the War Room'}
-            </WarRoomCTA>
+                  : 'Enter the Chessboard'}
+            </ChessboardCTA>
           </form>
         </StoneCard>
       </motion.div>
@@ -351,12 +351,12 @@ function LoginContent() {
           className="text-center text-sm mt-7"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          <span className="text-[color:var(--color-warroom-smoke)]">
+          <span className="text-[color:var(--color-chessboard-smoke)]">
             Don&apos;t have an account?{' '}
           </span>
           <Link
             href="/register"
-            className="font-semibold text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] underline underline-offset-2 transition-colors"
+            className="font-semibold text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)] underline underline-offset-2 transition-colors"
           >
             Claim your seat
           </Link>
@@ -373,7 +373,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[color:var(--color-chessboard-gold)]/30 border-t-[color:var(--color-chessboard-gold)] rounded-full animate-spin" />
         </div>
       }
     >

@@ -9,8 +9,8 @@ import { FadeInUp, StaggerGrid, AnimatedGradientText, Floating, ScaleOnHover } f
 import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import {
-  WarRoomCTA,
-  WarRoomCrest,
+  ChessboardCTA,
+  ChessboardCrest,
   GoldDivider,
   SigilBadge,
   StoneCard,
@@ -78,7 +78,7 @@ export default function HomePage() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
         className="fixed w-full z-50 backdrop-blur-md"
-        style={{ borderBottom: '1px solid rgba(200,168,74,0.10)', background: 'rgba(8,8,8,0.88)' }}
+        style={{ borderBottom: '1px solid rgba(200,200,200,0.10)', background: 'rgba(8,8,8,0.88)' }}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -88,9 +88,9 @@ export default function HomePage() {
                 className="h-9 w-9 rounded-sm flex items-center justify-center font-bold text-sm"
                 style={{
                   background: 'linear-gradient(135deg, #1a1a1a, #2a2a2a)',
-                  color: '#c8a84a',
-                  border: '1px solid rgba(200,168,74,0.3)',
-                  boxShadow: '0 0 16px rgba(200,168,74,0.15)',
+                  color: '#e0e0e0',
+                  border: '1px solid rgba(200,200,200,0.3)',
+                  boxShadow: '0 0 16px rgba(200,200,200,0.15)',
                   fontFamily: "var(--font-inter, 'Inter', sans-serif)",
                   fontWeight: 800,
                 }}
@@ -114,9 +114,9 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/register">
-                <WarRoomCTA size="sm" sfxKey="ui.click">
+                <ChessboardCTA size="sm" sfxKey="ui.click">
                   Get Started
-                </WarRoomCTA>
+                </ChessboardCTA>
               </Link>
             </div>
           </div>
@@ -135,13 +135,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl text-center relative z-10">
           <FadeInUp delay={0.05}>
             <div className="flex justify-center mb-6">
-              <WarRoomCrest size={120} />
+              <ChessboardCrest size={120} />
             </div>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <SigilBadge icon={Target} tone="gold" className="mb-8">
+            <SigilBadge icon={Target} tone="silver" className="mb-8">
               The Founder Assessment
-              <Star className="h-3 w-3 fill-amber-500 text-amber-500 ml-1" />
+              <Star className="h-3 w-3 fill-zinc-400 text-zinc-400 ml-1" />
             </SigilBadge>
           </FadeInUp>
 
@@ -171,7 +171,7 @@ export default function HomePage() {
           <FadeInUp delay={0.55}>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/dashboard">
-                <WarRoomCTA
+                <ChessboardCTA
                   size="md"
                   variant="primary"
                   icon={Target}
@@ -179,11 +179,11 @@ export default function HomePage() {
                   sfxKey="nav.page-enter"
                 >
                   Enter the Assessment
-                </WarRoomCTA>
+                </ChessboardCTA>
               </Link>
-              <WarRoomCTA size="md" variant="ghost" sfxKey="ui.hover">
+              <ChessboardCTA size="md" variant="ghost" sfxKey="ui.hover">
                 Watch Demo
-              </WarRoomCTA>
+              </ChessboardCTA>
             </div>
             <p className="mt-5 text-xs" style={{ color: 'rgba(136,136,136,0.5)', letterSpacing: '0.06em' }}>
               By entering, you agree to the{' '}
@@ -232,11 +232,11 @@ export default function HomePage() {
 
       {/* HOW IT WORKS */}
       <section className="px-4 py-24 sm:px-6 lg:px-8 relative" style={{ background: 'linear-gradient(180deg, rgba(13,13,13,0.3), rgba(17,17,17,0.5), rgba(13,13,13,0.3))' }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center top, rgba(200,168,74,0.03), transparent 60%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center top, rgba(200,200,200,0.03), transparent 60%)' }} />
         <div className="mx-auto max-w-6xl relative">
           <FadeInUp>
             <div className="text-center mb-16">
-              <SigilBadge tone="gold" className="mb-4">The Process</SigilBadge>
+              <SigilBadge tone="silver" className="mb-4">The Process</SigilBadge>
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.02em' }}>
                 Three Stages to Your Verdict
               </h2>
@@ -377,9 +377,9 @@ export default function HomePage() {
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <Link href="/dashboard">
-              <WarRoomCTA size="lg" variant="primary" icon={Target} iconRight={ArrowRight} sfxKey="wr.door-creak">
+              <ChessboardCTA size="lg" variant="primary" icon={Target} iconRight={ArrowRight} sfxKey="wr.door-creak">
                 Enter the Assessment
-              </WarRoomCTA>
+              </ChessboardCTA>
             </Link>
           </FadeInUp>
         </div>

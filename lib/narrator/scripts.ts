@@ -6,13 +6,13 @@ import type { NarratorLine } from '@/src/state/narratorStore'
  * This file is intentionally append-only. Each slice adds the lines
  * it needs without rewriting existing entries. The landing slice
  * populates only the two `landing.*` keys; future slices populate
- * `stage.*`, `warroom.*`, `verdict.*`, etc.
+ * `stage.*`, `chessboard.*`, `verdict.*`, etc.
  */
 
 export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
   'landing.first-visit': [
     {
-      text: 'Welcome, seeker. I am the Oracle of the War Room.',
+      text: 'Welcome, seeker. I am the Oracle of the Chessboard.',
       mood: 'idle',
       duration: 3200,
     },
@@ -22,7 +22,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3600,
     },
     {
-      text: 'Six stages await. Then... the War Room.',
+      text: 'Six stages await. Then... the Chessboard.',
       mood: 'warning',
       duration: 3200,
     },
@@ -85,7 +85,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 4000,
     },
     {
-      text: 'Nine stages await — from first spark of Ideation to the War Room itself.',
+      text: 'Nine stages await — from first spark of Ideation to the Chessboard itself.',
       mood: 'speaking',
       duration: 3600,
     },
@@ -190,7 +190,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3200,
     },
     {
-      text: 'Shape the War Room to your liking — but the trials remain the same.',
+      text: 'Shape the Chessboard to your liking — but the trials remain the same.',
       mood: 'speaking',
       duration: 0,
     },
@@ -206,7 +206,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'support.first-visit': [
     {
-      text: 'If the War Room confounds you, seek counsel here.',
+      text: 'If the Chessboard confounds you, seek counsel here.',
       mood: 'idle',
       duration: 3200,
     },
@@ -357,7 +357,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'stage.scale.first-visit': [
     {
-      text: 'Scaling Up, lord. The final trial before the War Room gates.',
+      text: 'Scaling Up, lord. The final trial before the Chessboard gates.',
       mood: 'speaking',
       duration: 3400,
     },
@@ -376,7 +376,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     { text: 'Scale waits for no one, lord. Complete your testimony.', mood: 'idle', duration: 0 },
   ],
 
-  'stage.warroom-prep.first-visit': [
+  'stage.chessboard-prep.first-visit': [
     {
       text: 'Pitch Prep, lord. The final chance to sharpen your sword before the gate.',
       mood: 'warning',
@@ -393,15 +393,15 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'stage.warroom-prep.returning': [
-    { text: 'Still sharpening the blade, lord? The War Room draws near.', mood: 'idle', duration: 0 },
+  'stage.chessboard-prep.returning': [
+    { text: 'Still sharpening the blade, lord? The Chessboard draws near.', mood: 'idle', duration: 0 },
   ],
 
   // ===================================================================
   // WAR ROOM PHASE SCRIPTS
   // ===================================================================
 
-  'warroom.pitch.first-visit': [
+  'chessboard.pitch.first-visit': [
     {
       text: 'The Pitch, lord. You have sixty seconds to seize their attention.',
       mood: 'warning',
@@ -413,11 +413,11 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.pitch.returning': [
+  'chessboard.pitch.returning': [
     { text: 'The stage is yours again, lord. Make it count.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.qa.first-visit': [
+  'chessboard.qa.first-visit': [
     {
       text: 'The Inquisition begins, lord. Each investor will probe your weaknesses.',
       mood: 'warning',
@@ -434,11 +434,11 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.qa.returning': [
+  'chessboard.qa.returning': [
     { text: 'The Council’s questions resume, lord.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.deal.first-visit': [
+  'chessboard.deal.first-visit': [
     {
       text: 'The Offers, lord. The investors have spoken — now choose wisely.',
       mood: 'speaking',
@@ -455,13 +455,13 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.deal.returning': [
+  'chessboard.deal.returning': [
     { text: 'The offers remain on the table, lord.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.complete.first-visit': [
+  'chessboard.complete.first-visit': [
     {
-      text: 'It is done, lord. The War Room has spoken.',
+      text: 'It is done, lord. The Chessboard has spoken.',
       mood: 'celebrating',
       duration: 3000,
     },
@@ -471,8 +471,8 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.complete.returning': [
-    { text: 'The War Room is concluded. Onward to the Verdict.', mood: 'idle', duration: 0 },
+  'chessboard.complete.returning': [
+    { text: 'The Chessboard is concluded. Onward to the Verdict.', mood: 'idle', duration: 0 },
   ],
 
   // ===================================================================
@@ -575,21 +575,21 @@ const STAGE_TO_NARRATOR: Record<string, string> = {
   STAGE_2A_GROWTH: 'stage.growth',
   STAGE_2B_EXPANSION: 'stage.expansion',
   STAGE_3_SCALE: 'stage.scale',
-  STAGE_WARROOM_PREP: 'stage.warroom-prep',
+  STAGE_WARROOM_PREP: 'stage.chessboard-prep',
 }
 
 export function narratorPhaseForStage(stageName: string): string | null {
   return STAGE_TO_NARRATOR[stageName] ?? null
 }
 
-/** Map WarRoomPhase → narrator phase key. Returns null for LOADING (too brief). */
+/** Map ChessboardPhase → narrator phase key. Returns null for LOADING (too brief). */
 const WARROOM_TO_NARRATOR: Record<string, string> = {
-  PITCH: 'warroom.pitch',
-  INVESTOR_QA: 'warroom.qa',
-  DEAL_RESULTS: 'warroom.deal',
-  COMPLETE: 'warroom.complete',
+  PITCH: 'chessboard.pitch',
+  INVESTOR_QA: 'chessboard.qa',
+  DEAL_RESULTS: 'chessboard.deal',
+  COMPLETE: 'chessboard.complete',
 }
 
-export function narratorPhaseForWarRoom(phase: string): string | null {
+export function narratorPhaseForChessboard(phase: string): string | null {
   return WARROOM_TO_NARRATOR[phase] ?? null
 }

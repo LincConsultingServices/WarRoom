@@ -41,22 +41,22 @@ const PODIUM: Record<
   }
 > = {
   0: {
-    badge: 'text-[color:var(--color-warroom-gold-bright)]',
-    row: 'bg-[color:var(--color-warroom-gold)]/[0.06]',
-    revenue: 'text-[color:var(--color-warroom-gold-bright)]',
+    badge: 'text-[color:var(--color-chessboard-gold-bright)]',
+    row: 'bg-[color:var(--color-chessboard-gold)]/[0.06]',
+    revenue: 'text-[color:var(--color-chessboard-gold-bright)]',
     label: '1st',
     Icon: Crown,
   },
   1: {
-    badge: 'text-[color:var(--color-warroom-silver)]',
-    row: 'bg-[color:var(--color-warroom-silver)]/[0.04]',
-    revenue: 'text-[color:var(--color-warroom-silver)]',
+    badge: 'text-[color:var(--color-chessboard-silver)]',
+    row: 'bg-[color:var(--color-chessboard-silver)]/[0.04]',
+    revenue: 'text-[color:var(--color-chessboard-silver)]',
     label: '2nd',
   },
   2: {
-    badge: 'text-[color:var(--color-warroom-ember)]',
-    row: 'bg-[color:var(--color-warroom-ember)]/[0.04]',
-    revenue: 'text-[color:var(--color-warroom-ember)]',
+    badge: 'text-[color:var(--color-chessboard-ember)]',
+    row: 'bg-[color:var(--color-chessboard-ember)]/[0.04]',
+    revenue: 'text-[color:var(--color-chessboard-ember)]',
     label: '3rd',
   },
 }
@@ -88,14 +88,14 @@ export function LeaderboardPanel({
       )}
     >
       {/* ── Header ── */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--color-warroom-ash)]/30">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--color-chessboard-ash)]/30">
         <div className="flex items-center gap-2.5">
           <Crown
-            className="h-4 w-4 text-[color:var(--color-warroom-gold)]"
+            className="h-4 w-4 text-[color:var(--color-chessboard-gold)]"
             aria-hidden
           />
           <span
-            className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[color:var(--color-warroom-ivory)]"
+            className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[color:var(--color-chessboard-ivory)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Elo Rankings
@@ -106,16 +106,16 @@ export function LeaderboardPanel({
             className={cn(
               'w-1.5 h-1.5 rounded-full',
               connected
-                ? 'bg-[color:var(--color-warroom-verdant)] animate-pulse'
-                : 'bg-[color:var(--color-warroom-ash)]',
+                ? 'bg-[color:var(--color-chessboard-verdant)] animate-pulse'
+                : 'bg-[color:var(--color-chessboard-ash)]',
             )}
           />
           <span
             className={cn(
               'text-[10px] uppercase tracking-[0.14em]',
               connected
-                ? 'text-[color:var(--color-warroom-verdant)]'
-                : 'text-[color:var(--color-warroom-smoke)]',
+                ? 'text-[color:var(--color-chessboard-verdant)]'
+                : 'text-[color:var(--color-chessboard-smoke)]',
             )}
             style={{ fontFamily: 'var(--font-display)' }}
           >
@@ -135,9 +135,9 @@ export function LeaderboardPanel({
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center py-12 gap-3"
             >
-              <Crown className="h-8 w-8 text-[color:var(--color-warroom-ash)]" />
+              <Crown className="h-8 w-8 text-[color:var(--color-chessboard-ash)]" />
               <p
-                className="text-xs text-[color:var(--color-warroom-smoke)] uppercase tracking-[0.14em]"
+                className="text-xs text-[color:var(--color-chessboard-smoke)] uppercase tracking-[0.14em]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Waiting for participants…
@@ -149,7 +149,7 @@ export function LeaderboardPanel({
               variants={staggerContainer}
               initial={prefersReducedMotion ? false : 'hidden'}
               animate="show"
-              className="divide-y divide-[color:var(--color-warroom-ash)]/20"
+              className="divide-y divide-[color:var(--color-chessboard-ash)]/20"
             >
               {entries.map((entry, idx) => {
                 const podium = PODIUM[idx]
@@ -169,9 +169,9 @@ export function LeaderboardPanel({
                     className={cn(
                       'flex items-center gap-3 px-5 py-3 text-sm transition-colors',
                       podium?.row,
-                      isRival && 'bg-[color:var(--color-warroom-crimson)]/[0.05]',
+                      isRival && 'bg-[color:var(--color-chessboard-crimson)]/[0.05]',
                       isMe &&
-                        'border-l-2 border-l-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/[0.04]',
+                        'border-l-2 border-l-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]/[0.04]',
                     )}
                   >
                     {/* Rank badge */}
@@ -179,7 +179,7 @@ export function LeaderboardPanel({
                       className={cn(
                         'w-10 flex items-center gap-1 font-bold shrink-0',
                         podium?.badge ||
-                          'text-[color:var(--color-warroom-smoke)]',
+                          'text-[color:var(--color-chessboard-smoke)]',
                       )}
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
@@ -211,26 +211,26 @@ export function LeaderboardPanel({
                         className={cn(
                           'truncate tracking-[0.03em]',
                           isMe
-                            ? 'text-[color:var(--color-warroom-gold)] font-semibold'
-                            : 'text-[color:var(--color-warroom-ivory)]',
+                            ? 'text-[color:var(--color-chessboard-gold)] font-semibold'
+                            : 'text-[color:var(--color-chessboard-ivory)]',
                         )}
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {entry.name}
                         {isMe && (
-                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-gold)]/70">
+                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-chessboard-gold)]/70">
                             (you)
                           </span>
                         )}
                         {isRival && (
-                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-crimson-bright)]/80">
+                          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--color-chessboard-crimson-bright)]/80">
                             · your rival
                           </span>
                         )}
                       </div>
                       {isMe && (
                         <div
-                          className="mt-0.5 truncate text-[10px] tracking-[0.04em] text-[color:var(--color-warroom-smoke)]"
+                          className="mt-0.5 truncate text-[10px] tracking-[0.04em] text-[color:var(--color-chessboard-smoke)]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {gapToRival != null && gapToRival > 0
@@ -245,7 +245,7 @@ export function LeaderboardPanel({
                       className={cn(
                         'font-semibold tabular-nums shrink-0',
                         podium?.revenue ||
-                          'text-[color:var(--color-warroom-ivory)]',
+                          'text-[color:var(--color-chessboard-ivory)]',
                       )}
                       style={{
                         fontFamily: 'var(--font-data, var(--font-mono))',
@@ -264,7 +264,7 @@ export function LeaderboardPanel({
       {/* ── Footer ── */}
       {updatedAt && (
         <div
-          className="px-5 py-2 text-[10px] tracking-[0.08em] text-[color:var(--color-warroom-smoke)] border-t border-[color:var(--color-warroom-ash)]/20 text-right"
+          className="px-5 py-2 text-[10px] tracking-[0.08em] text-[color:var(--color-chessboard-smoke)] border-t border-[color:var(--color-chessboard-ash)]/20 text-right"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Updated {new Date(updatedAt).toLocaleTimeString()}

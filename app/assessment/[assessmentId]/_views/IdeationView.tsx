@@ -103,7 +103,7 @@ export function IdeationView({
                             {answer?.selectedOptionId && (() => {
                               const sel = q.options?.find(o => o.id === answer.selectedOptionId)
                               return sel?.feedback ? (
-                                <div className="p-2.5 rounded-lg bg-[color:var(--color-warroom-gold)]/[0.08] border border-[color:var(--color-warroom-gold)]/30 text-xs text-[color:var(--color-warroom-ivory)]/85">
+                                <div className="p-2.5 rounded-lg bg-[color:var(--color-chessboard-gold)]/[0.08] border border-[color:var(--color-chessboard-gold)]/30 text-xs text-[color:var(--color-chessboard-ivory)]/85">
                                   <span className="font-medium">Insight: </span>{sel.feedback}
                                 </div>
                               ) : null

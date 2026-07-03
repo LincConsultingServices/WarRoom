@@ -165,10 +165,10 @@ export function useSimulation(assessmentId: string) {
     }
   }, [simulation?.currentStage, assessmentId])
 
-  // Redirect to war-room when stage hits STAGE_4
+  // Redirect to chessboard when stage hits STAGE_4
   useEffect(() => {
     if (simulation?.currentStage === 'STAGE_4_WARROOM' && !transition.showingScenario) {
-      router.push(`/assessment/${assessmentId}/war-room`)
+      router.push(`/assessment/${assessmentId}/chessboard`)
     }
   }, [simulation?.currentStage, assessmentId, router, transition.showingScenario])
 
@@ -340,9 +340,9 @@ export function useSimulation(assessmentId: string) {
         else if (result.nextStage) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const nxt = (result.nextStage as any)?.id || result.nextStage
-          if (nxt === 'STAGE_4_WARROOM') { router.push(`/assessment/${assessmentId}/war-room`); return }
+          if (nxt === 'STAGE_4_WARROOM') { router.push(`/assessment/${assessmentId}/chessboard`); return }
           await load()
-        } else { router.push(`/assessment/${assessmentId}/war-room`) }
+        } else { router.push(`/assessment/${assessmentId}/chessboard`) }
       }
       snapshotContinueRef.current = () => { setShowSnapshot(false); proceed() }
       if (sawHighSpam) {

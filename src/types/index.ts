@@ -161,7 +161,7 @@ export interface Assessment {
   productState?: ProductState;
   marketState?: MarketState;
   mentorLifelinesRemaining: number;
-  warRoomPitch?: string;
+  chessboardPitch?: string;
   dealResult?: DealResult;
 
   // Restructured Flow Fields

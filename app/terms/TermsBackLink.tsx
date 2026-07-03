@@ -25,7 +25,7 @@ export function TermsBackLink() {
     <button
       type="button"
       onClick={handleBack}
-      className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors mb-8"
+      className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-gold)] transition-colors mb-8"
       style={{ fontFamily: 'var(--font-display)' }}
     >
       <ArrowLeft className="h-3.5 w-3.5" />

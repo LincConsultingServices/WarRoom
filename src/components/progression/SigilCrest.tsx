@@ -128,10 +128,10 @@ export function SigilCrest({
 
       {locked && (
         <span
-          className="absolute -bottom-0.5 right-0 flex h-5 w-5 items-center justify-center rounded-full border border-[color:var(--color-warroom-gold)]/30 bg-[color:var(--color-warroom-black)]"
+          className="absolute -bottom-0.5 right-0 flex h-5 w-5 items-center justify-center rounded-full border border-[color:var(--color-chessboard-gold)]/30 bg-[color:var(--color-chessboard-black)]"
           aria-hidden
         >
-          <Lock className="h-2.5 w-2.5 text-[color:var(--color-warroom-smoke)]" />
+          <Lock className="h-2.5 w-2.5 text-[color:var(--color-chessboard-smoke)]" />
         </span>
       )}
     </div>

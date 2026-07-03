@@ -36,7 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { WarRoomCrest } from '@/src/components/primitives'
+import { ChessboardCrest } from '@/src/components/primitives'
 
 interface AppSidebarProps {
   user?: {
@@ -115,17 +115,17 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
                 <div className="flex aspect-square size-9 items-center justify-center rounded-sm">
-                  <WarRoomCrest size={32} staticRender />
+                  <ChessboardCrest size={32} staticRender />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span
-                    className="truncate font-semibold tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
+                    className="truncate font-semibold tracking-[0.04em] text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
-                    War Room
+                    Chessboard
                   </span>
                   <span
-                    className="truncate text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="truncate text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Assessment Platform
@@ -139,7 +139,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel
-            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Navigation
@@ -153,12 +153,12 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                   tooltip={item.title}
                   className={
                     item.isActive
-                      ? 'border-l-2 border-[color:var(--color-warroom-gold)] text-[color:var(--color-warroom-gold-bright)] data-[active=true]:bg-[color:var(--color-warroom-gold)]/[0.08] data-[active=true]:text-[color:var(--color-warroom-gold-bright)]'
-                      : 'hover:text-[color:var(--color-warroom-gold)]'
+                      ? 'border-l-2 border-[color:var(--color-chessboard-gold)] text-[color:var(--color-chessboard-gold-bright)] data-[active=true]:bg-[color:var(--color-chessboard-gold)]/[0.08] data-[active=true]:text-[color:var(--color-chessboard-gold-bright)]'
+                      : 'hover:text-[color:var(--color-chessboard-gold)]'
                   }
                 >
                   <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
-                    <item.icon className={item.isActive ? 'text-[color:var(--color-warroom-gold-bright)]' : ''} />
+                    <item.icon className={item.isActive ? 'text-[color:var(--color-chessboard-gold-bright)]' : ''} />
                     <span className="tracking-[0.06em]">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -174,7 +174,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                   <SidebarMenuButton
                     asChild
                     size="sm"
-                    className="hover:text-[color:var(--color-warroom-gold)]"
+                    className="hover:text-[color:var(--color-chessboard-gold)]"
                   >
                     <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
                       <item.icon />

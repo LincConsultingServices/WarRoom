@@ -21,7 +21,7 @@ import { Progress } from '@/components/ui/progress'
 import { CompetencyRadarChart } from '@/components/competency-radar-chart-lazy'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
 } from '@/src/components/primitives'
@@ -78,7 +78,7 @@ const STAGE_NAMES: Record<number, string> = {
 }
 
 const PROGRESS_CLASSES =
-  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+  'h-1.5 bg-[color:var(--color-chessboard-rampart)] [&>div]:bg-[color:var(--color-chessboard-gold)]'
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
@@ -121,8 +121,8 @@ export default function ResultsPage() {
     return (
       <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 space-y-6">
         <div className="flex items-center gap-3">
-          <ScrollText className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
-          <div className="h-6 w-48 rounded bg-[color:var(--color-warroom-rampart)] animate-pulse" />
+          <ScrollText className="h-5 w-5 text-[color:var(--color-chessboard-gold)]" />
+          <div className="h-6 w-48 rounded bg-[color:var(--color-chessboard-rampart)] animate-pulse" />
         </div>
         {[1, 2].map((i) => (
           <div
@@ -140,21 +140,21 @@ export default function ResultsPage() {
   if (error) {
     return (
       <div className="py-12 max-w-md mx-auto text-center">
-        <StoneCard accent="var(--color-warroom-crimson)" className="py-10">
-          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-crimson-bright)]" />
+        <StoneCard accent="var(--color-chessboard-crimson)" className="py-10">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-chessboard-crimson-bright)]" />
           <p
-            className="text-sm text-[color:var(--color-warroom-crimson-bright)] mb-5"
+            className="text-sm text-[color:var(--color-chessboard-crimson-bright)] mb-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {error}
           </p>
-          <WarRoomCTA
+          <ChessboardCTA
             size="sm"
             variant="ghost"
             onClick={() => window.location.reload()}
           >
             Try Again
-          </WarRoomCTA>
+          </ChessboardCTA>
         </StoneCard>
       </div>
     )
@@ -173,7 +173,7 @@ export default function ResultsPage() {
       >
         <div className="flex items-center gap-3 mb-4">
           <ScrollText
-            className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+            className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
             aria-hidden
           />
           <h1
@@ -181,7 +181,7 @@ export default function ResultsPage() {
             style={{
               fontFamily: 'var(--font-display)',
               background:
-                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -190,7 +190,7 @@ export default function ResultsPage() {
           </h1>
         </div>
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] mb-4"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mb-4"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           Detailed breakdown of all your simulation campaigns.
@@ -201,17 +201,17 @@ export default function ResultsPage() {
       {simulations.length === 0 ? (
         /* ── Empty state ── */
         <StoneCard className="py-14 text-center">
-          <Swords className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-warroom-ash)]" />
+          <Swords className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-chessboard-ash)]" />
           <p
-            className="text-sm text-[color:var(--color-warroom-smoke)] mb-5"
+            className="text-sm text-[color:var(--color-chessboard-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             No simulations found. Begin your first trial to see results here.
           </p>
           <Link href="/assessment/start">
-            <WarRoomCTA size="sm" variant="ghost" icon={Play}>
+            <ChessboardCTA size="sm" variant="ghost" icon={Play}>
               Start Simulation
-            </WarRoomCTA>
+            </ChessboardCTA>
           </Link>
         </StoneCard>
       ) : (
@@ -270,8 +270,8 @@ function SimulationCard({
       <StoneCard
         accent={
           isCompleted
-            ? 'var(--color-warroom-gold)'
-            : 'var(--color-warroom-ember)'
+            ? 'var(--color-chessboard-gold)'
+            : 'var(--color-chessboard-ember)'
         }
         padding="none"
       >
@@ -279,13 +279,13 @@ function SimulationCard({
         <div className="flex items-start justify-between px-6 pt-6 pb-4">
           <div>
             <h2
-              className="text-base font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+              className="text-base font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Campaign {simulation.attemptNumber}
             </h2>
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+              className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               {isCompleted && simulation.completedAt
@@ -299,13 +299,13 @@ function SimulationCard({
             {avgScore !== null && (
               <div className="text-right">
                 <div
-                  className="text-xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                  className="text-xl font-bold text-[color:var(--color-chessboard-gold-bright)]"
                   style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                 >
                   {avgScore}
                 </div>
                 <div
-                  className="text-[9px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-[9px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Avg Score
@@ -324,7 +324,7 @@ function SimulationCard({
         </div>
 
         {/* ── Quick stats ── */}
-        <div className="grid grid-cols-4 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-warroom-ash)]/25">
+        <div className="grid grid-cols-4 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-chessboard-ash)]/25">
           {[
             { label: 'Responses', value: totalResponses },
             { label: 'Stages', value: `${completedStages}/6` },
@@ -339,16 +339,16 @@ function SimulationCard({
           ].map((stat) => (
             <div
               key={stat.label}
-              className="text-center py-3 bg-[color:var(--color-warroom-rampart)]/50"
+              className="text-center py-3 bg-[color:var(--color-chessboard-rampart)]/50"
             >
               <div
-                className="text-sm font-bold text-[color:var(--color-warroom-gold)]"
+                className="text-sm font-bold text-[color:var(--color-chessboard-gold)]"
                 style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
               >
                 {stat.value}
               </div>
               <div
-                className="text-[9px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
+                className="text-[9px] uppercase tracking-[0.12em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {stat.label}
@@ -378,28 +378,28 @@ function SimulationCard({
                   className={cn(
                     'text-center py-2 px-1 rounded-[3px] text-[10px] border transition-colors',
                     isDone &&
-                      'bg-[color:var(--color-warroom-gold)]/[0.08] border-[color:var(--color-warroom-gold)]/30',
+                      'bg-[color:var(--color-chessboard-gold)]/[0.08] border-[color:var(--color-chessboard-gold)]/30',
                     isCurrent &&
-                      'bg-[color:var(--color-warroom-ember)]/[0.08] border-[color:var(--color-warroom-ember)]/40 ring-1 ring-[color:var(--color-warroom-ember)]/30',
+                      'bg-[color:var(--color-chessboard-ember)]/[0.08] border-[color:var(--color-chessboard-ember)]/40 ring-1 ring-[color:var(--color-chessboard-ember)]/30',
                     !isDone &&
                       !isCurrent &&
-                      'bg-[color:var(--color-warroom-rampart)]/40 border-[color:var(--color-warroom-ash)]/20',
+                      'bg-[color:var(--color-chessboard-rampart)]/40 border-[color:var(--color-chessboard-ash)]/20',
                   )}
                 >
                   <div
                     className={cn(
                       'font-semibold truncate',
                       isDone
-                        ? 'text-[color:var(--color-warroom-gold)]'
+                        ? 'text-[color:var(--color-chessboard-gold)]'
                         : isCurrent
-                          ? 'text-[color:var(--color-warroom-ember)]'
-                          : 'text-[color:var(--color-warroom-smoke)]',
+                          ? 'text-[color:var(--color-chessboard-ember)]'
+                          : 'text-[color:var(--color-chessboard-smoke)]',
                     )}
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {STAGE_NAMES[stageNum] || `S${stageNum}`}
                   </div>
-                  <div className="text-[color:var(--color-warroom-smoke)] mt-0.5">
+                  <div className="text-[color:var(--color-chessboard-smoke)] mt-0.5">
                     {stageResponses.length > 0
                       ? `${stageResponses.length} Q`
                       : '—'}
@@ -414,7 +414,7 @@ function SimulationCard({
         <button
           type="button"
           onClick={onToggle}
-          className="w-full flex items-center justify-center gap-2 py-3 border-t border-[color:var(--color-warroom-ash)]/20 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 border-t border-[color:var(--color-chessboard-ash)]/20 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-gold)] transition-colors"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {isExpanded ? (
@@ -438,14 +438,14 @@ function SimulationCard({
               transition={{ duration: 0.3, ease: easeDramatic }}
               className="overflow-hidden"
             >
-              <div className="px-6 pb-6 pt-2 border-t border-[color:var(--color-warroom-ash)]/20 space-y-6">
+              <div className="px-6 pb-6 pt-2 border-t border-[color:var(--color-chessboard-ash)]/20 space-y-6">
                 {/* Competency Scores */}
                 {simulation.competencyScores?.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+                      <BarChart3 className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
                       <h3
-                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         Competency Profile
@@ -479,7 +479,7 @@ function SimulationCard({
                           className="flex items-center gap-3"
                         >
                           <span
-                            className="text-[10px] w-7 text-[color:var(--color-warroom-smoke)] shrink-0"
+                            className="text-[10px] w-7 text-[color:var(--color-chessboard-smoke)] shrink-0"
                             style={{
                               fontFamily: 'var(--font-data, var(--font-mono))',
                             }}
@@ -487,7 +487,7 @@ function SimulationCard({
                             {c.competencyCode}
                           </span>
                           <span
-                            className="text-xs w-36 truncate text-[color:var(--color-warroom-ivory)]"
+                            className="text-xs w-36 truncate text-[color:var(--color-chessboard-ivory)]"
                             style={{ fontFamily: 'var(--font-display)' }}
                           >
                             {c.competencyName}
@@ -497,13 +497,13 @@ function SimulationCard({
                             className={cn('flex-1', PROGRESS_CLASSES)}
                           />
                           <span
-                            className="text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-[2px] border border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-smoke)] w-10 text-center shrink-0"
+                            className="text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-[2px] border border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-smoke)] w-10 text-center shrink-0"
                             style={{ fontFamily: 'var(--font-display)' }}
                           >
                             {c.levelAchieved}
                           </span>
                           <span
-                            className="text-xs w-7 text-right text-[color:var(--color-warroom-ivory)] shrink-0"
+                            className="text-xs w-7 text-right text-[color:var(--color-chessboard-ivory)] shrink-0"
                             style={{
                               fontFamily: 'var(--font-data, var(--font-mono))',
                             }}
@@ -520,9 +520,9 @@ function SimulationCard({
                 {simulation.mistakesTriggered?.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle className="h-4 w-4 text-[color:var(--color-warroom-crimson-bright)]" />
+                      <AlertTriangle className="h-4 w-4 text-[color:var(--color-chessboard-crimson-bright)]" />
                       <h3
-                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         Mistakes Triggered
@@ -532,16 +532,16 @@ function SimulationCard({
                       {simulation.mistakesTriggered.map((m, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/20 bg-[color:var(--color-warroom-crimson)]/[0.05]"
+                          className="flex items-center justify-between p-3 rounded-[3px] border border-[color:var(--color-chessboard-crimson)]/20 bg-[color:var(--color-chessboard-crimson)]/[0.05]"
                         >
                           <div>
                             <span
-                              className="text-xs text-[color:var(--color-warroom-ivory)]"
+                              className="text-xs text-[color:var(--color-chessboard-ivory)]"
                               style={{ fontFamily: 'var(--font-display)' }}
                             >
                               {m.mistakeName || m.mistakeCode}
                             </span>
-                            <span className="text-[10px] text-[color:var(--color-warroom-smoke)] ml-2">
+                            <span className="text-[10px] text-[color:var(--color-chessboard-smoke)] ml-2">
                               Stage {m.triggeredAtStage}
                             </span>
                           </div>
@@ -558,20 +558,20 @@ function SimulationCard({
                 <div className="flex flex-wrap gap-3 pt-2">
                   {isCompleted && (
                     <Link href={`/assessment/${simulation.id}/final-report`}>
-                      <WarRoomCTA
+                      <ChessboardCTA
                         size="sm"
                         variant="ghost"
                         icon={BarChart3}
                       >
                         View Full Report
-                      </WarRoomCTA>
+                      </ChessboardCTA>
                     </Link>
                   )}
                   {!isCompleted && simulation.status !== 'NOT_STARTED' && (
                     <Link href={`/assessment/${simulation.id}`}>
-                      <WarRoomCTA size="sm" variant="primary" icon={Play}>
+                      <ChessboardCTA size="sm" variant="primary" icon={Play}>
                         Continue Simulation
-                      </WarRoomCTA>
+                      </ChessboardCTA>
                     </Link>
                   )}
                 </div>

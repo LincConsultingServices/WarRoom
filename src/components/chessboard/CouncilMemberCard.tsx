@@ -115,7 +115,7 @@ export function CouncilMemberCard({
       <div
         className={cn(
           'relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-border bg-muted',
-          isActive && 'ring-1 ring-amber-300/60',
+          isActive && 'ring-1 ring-zinc-300/60',
         )}
       >
         {investor.id || investor.avatar ? (
@@ -151,7 +151,7 @@ export function CouncilMemberCard({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-silver)] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
           aria-label={`${investor.name} — view bio`}
         >
           {card}
@@ -162,7 +162,7 @@ export function CouncilMemberCard({
           <div>
             <h3 className="font-display text-base font-semibold text-foreground">{investor.name}</h3>
             {investor.primary_lens && (
-              <p className="text-[0.65rem] uppercase tracking-[0.18em] text-amber-400">
+              <p className="text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
                 {investor.primary_lens}
               </p>
             )}
@@ -179,7 +179,7 @@ export function CouncilMemberCard({
             </p>
           )}
           {investor.signature_question && (
-            <div className="rounded-sm border-l-2 border-amber-400/60 bg-muted/60 px-3 py-2">
+            <div className="rounded-sm border-l-2 border-zinc-400/60 bg-muted/60 px-3 py-2">
               <p className="text-[0.62rem] uppercase tracking-[0.18em] text-foreground/50">
                 Signature question
               </p>

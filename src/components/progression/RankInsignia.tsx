@@ -34,7 +34,7 @@ export function RankInsignia({
     const rad = (deg * Math.PI) / 180
     const cx = 50 + 38 * Math.cos(rad)
     const cy = 50 + 38 * Math.sin(rad)
-    return <circle key={i} cx={cx} cy={cy} r={3.2} fill="var(--color-warroom-gold-bright)" />
+    return <circle key={i} cx={cx} cy={cy} r={3.2} fill="var(--color-chessboard-gold-bright)" />
   })
 
   return (
@@ -62,14 +62,14 @@ export function RankInsignia({
           style={{
             width: size * 0.4,
             height: size * 0.4,
-            color: 'var(--color-warroom-gold-bright)',
+            color: 'var(--color-chessboard-gold-bright)',
             filter: `drop-shadow(0 0 ${6 + tier * 2}px rgba(232,200,74,${glow}))`,
           }}
         />
       </div>
       {showTitle && title && (
         <span
-          className="text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]"
+          className="text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {title}

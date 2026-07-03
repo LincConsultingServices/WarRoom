@@ -103,9 +103,9 @@ export function ScoreReveal({
   const isTriumph = clamped >= TRIUMPH_THRESHOLD
   const isFailure = clamped < FAILURE_THRESHOLD
   const tone = isTriumph
-    ? 'text-[color:var(--color-warroom-gold-bright)]'
+    ? 'text-[color:var(--color-chessboard-gold-bright)]'
     : isFailure
-      ? 'text-[color:var(--color-warroom-crimson-bright)]'
+      ? 'text-[color:var(--color-chessboard-crimson-bright)]'
       : 'text-foreground'
 
   return (
@@ -114,7 +114,7 @@ export function ScoreReveal({
       animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={cn(
-        'flex items-baseline gap-3 rounded-sm border border-[color:var(--color-warroom-gold)]/30 bg-card/60 px-4 py-3 backdrop-blur-sm',
+        'flex items-baseline gap-3 rounded-sm border border-[color:var(--color-chessboard-gold)]/30 bg-card/60 px-4 py-3 backdrop-blur-sm',
         isFailure && withEffects && !reducedMotion && 'animate-pulse [animation-duration:0.6s]',
         className,
       )}

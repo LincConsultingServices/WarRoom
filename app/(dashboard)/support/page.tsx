@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
 } from '@/src/components/primitives'
@@ -28,10 +28,10 @@ import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/va
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const INPUT_CLASSES =
-  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)] focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
+  'bg-[color:var(--color-chessboard-rampart)]/60 border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-ivory)] placeholder:text-[color:var(--color-chessboard-smoke)] focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20'
 
 const SELECT_CLASSES =
-  'flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
+  'flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-[color:var(--color-chessboard-rampart)]/60 border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-ivory)] focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20'
 
 const FAQ_ITEMS = [
   {
@@ -105,7 +105,7 @@ export default function SupportPage() {
       >
         <div className="flex items-center gap-3 mb-4">
           <HelpCircle
-            className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+            className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
             aria-hidden
           />
           <h1
@@ -113,7 +113,7 @@ export default function SupportPage() {
             style={{
               fontFamily: 'var(--font-display)',
               background:
-                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -122,7 +122,7 @@ export default function SupportPage() {
           </h1>
         </div>
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] mb-4"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mb-4"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           Get help with Assessment simulation and troubleshooting.
@@ -141,10 +141,10 @@ export default function SupportPage() {
           {/* Contact form */}
           <motion.div variants={staggerItem}>
             <StoneCard padding="none">
-              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
-                <MessageSquare className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
+                <MessageSquare className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
                 <h2
-                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Submit a Support Ticket
@@ -154,7 +154,7 @@ export default function SupportPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="subject"
-                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Subject
@@ -171,7 +171,7 @@ export default function SupportPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="category"
-                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Category
@@ -194,7 +194,7 @@ export default function SupportPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="description"
-                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Description
@@ -209,14 +209,14 @@ export default function SupportPage() {
                   />
                 </div>
 
-                <WarRoomCTA
+                <ChessboardCTA
                   type="submit"
                   size="sm"
                   disabled={isSubmitting}
                   icon={Send}
                 >
                   {isSubmitting ? 'Dispatching Raven…' : 'Submit Ticket'}
-                </WarRoomCTA>
+                </ChessboardCTA>
               </form>
             </StoneCard>
           </motion.div>
@@ -224,16 +224,16 @@ export default function SupportPage() {
           {/* FAQ */}
           <motion.div variants={staggerItem}>
             <StoneCard padding="none">
-              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
-                <Book className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
+                <Book className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
                 <h2
-                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Frequently Asked Questions
                 </h2>
               </div>
-              <div className="divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 {FAQ_ITEMS.map((faq) => {
                   const isOpen = expandedFaq === faq.id
                   return (
@@ -243,17 +243,17 @@ export default function SupportPage() {
                         onClick={() =>
                           setExpandedFaq(isOpen ? null : faq.id)
                         }
-                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-[color:var(--color-warroom-gold)]/[0.02] transition-colors"
+                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-[color:var(--color-chessboard-gold)]/[0.02] transition-colors"
                       >
                         <span
-                          className="text-sm text-[color:var(--color-warroom-ivory)] pr-4"
+                          className="text-sm text-[color:var(--color-chessboard-ivory)] pr-4"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {faq.question}
                         </span>
                         <ChevronDown
                           className={cn(
-                            'h-4 w-4 text-[color:var(--color-warroom-smoke)] transition-transform shrink-0',
+                            'h-4 w-4 text-[color:var(--color-chessboard-smoke)] transition-transform shrink-0',
                             isOpen && 'rotate-180',
                           )}
                         />
@@ -271,7 +271,7 @@ export default function SupportPage() {
                             className="overflow-hidden"
                           >
                             <p
-                              className="px-6 pb-4 text-sm text-[color:var(--color-warroom-smoke)] leading-relaxed"
+                              className="px-6 pb-4 text-sm text-[color:var(--color-chessboard-smoke)] leading-relaxed"
                               style={{
                                 fontFamily: 'var(--font-body, serif)',
                               }}
@@ -298,9 +298,9 @@ export default function SupportPage() {
         >
           {/* Quick contact */}
           <StoneCard padding="none">
-            <div className="px-5 py-3 border-b border-[color:var(--color-warroom-ash)]/20">
+            <div className="px-5 py-3 border-b border-[color:var(--color-chessboard-ash)]/20">
               <h3
-                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Quick Contact
@@ -308,20 +308,20 @@ export default function SupportPage() {
             </div>
             <div className="px-5 py-4">
               <div className="flex items-start gap-3">
-                <Mail className="h-4 w-4 text-[color:var(--color-warroom-gold)] mt-0.5 shrink-0" />
+                <Mail className="h-4 w-4 text-[color:var(--color-chessboard-gold)] mt-0.5 shrink-0" />
                 <div>
                   <p
-                    className="text-sm text-[color:var(--color-warroom-ivory)]"
+                    className="text-sm text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Email Support
                   </p>
                   <a
-                    href="mailto:support@warroom.app"
-                    className="text-xs text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                    href="mailto:support@chessboard.app"
+                    className="text-xs text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
-                    support@warroom.app
+                    support@chessboard.app
                   </a>
                 </div>
               </div>
@@ -330,9 +330,9 @@ export default function SupportPage() {
 
           {/* Resources */}
           <StoneCard padding="none">
-            <div className="px-5 py-3 border-b border-[color:var(--color-warroom-ash)]/20">
+            <div className="px-5 py-3 border-b border-[color:var(--color-chessboard-ash)]/20">
               <h3
-                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Resources
@@ -343,7 +343,7 @@ export default function SupportPage() {
                 <a
                   key={res.label}
                   href={res.href}
-                  className="flex items-center justify-between py-2 text-sm text-[color:var(--color-warroom-ivory)] hover:text-[color:var(--color-warroom-gold)] transition-colors"
+                  className="flex items-center justify-between py-2 text-sm text-[color:var(--color-chessboard-ivory)] hover:text-[color:var(--color-chessboard-gold)] transition-colors"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   <span>{res.label}</span>
@@ -355,16 +355,16 @@ export default function SupportPage() {
 
           {/* System status */}
           <StoneCard padding="none">
-            <div className="px-5 py-3 border-b border-[color:var(--color-warroom-ash)]/20">
+            <div className="px-5 py-3 border-b border-[color:var(--color-chessboard-ash)]/20">
               <h3
-                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 System Status
               </h3>
             </div>
             <div className="px-5 py-4 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[color:var(--color-warroom-verdant)] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[color:var(--color-chessboard-verdant)] animate-pulse" />
               <SigilBadge tone="verdant">All Systems Operational</SigilBadge>
             </div>
           </StoneCard>

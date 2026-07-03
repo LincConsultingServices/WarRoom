@@ -112,7 +112,7 @@ export function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[
 }
 
 export function getPreparedPitchFromState(state: AssessmentState | null): string {
-  const directPitch = state?.assessment?.warRoomPitch?.trim()
+  const directPitch = state?.assessment?.chessboardPitch?.trim()
   if (directPitch) return directPitch
 
   const previousResponses = normalizePreviousResponses(state?.assessment?.previousResponses)

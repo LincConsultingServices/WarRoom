@@ -45,14 +45,14 @@ export function CouncilDeliberatesLoader({
         {/* Outer ring */}
         <motion.div
           aria-hidden
-          className="absolute h-24 w-24 rounded-full border border-[color:var(--color-warroom-gold)]/30"
+          className="absolute h-24 w-24 rounded-full border border-[color:var(--color-chessboard-gold)]/30"
           animate={reducedMotion ? undefined : { rotate: 360 }}
           transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
         />
         {/* Inner ring */}
         <motion.div
           aria-hidden
-          className="absolute h-16 w-16 rounded-full border border-[color:var(--color-warroom-crimson)]/40"
+          className="absolute h-16 w-16 rounded-full border border-[color:var(--color-chessboard-crimson)]/40"
           animate={reducedMotion ? undefined : { rotate: -360 }}
           transition={{ duration: 11, repeat: Infinity, ease: 'linear' }}
         />
@@ -61,7 +61,7 @@ export function CouncilDeliberatesLoader({
           <motion.span
             key={rune}
             aria-hidden
-            className="absolute font-display text-2xl text-[color:var(--color-warroom-gold)]"
+            className="absolute font-display text-2xl text-[color:var(--color-chessboard-gold)]"
             style={{
               transformOrigin: '0 0',
             }}
@@ -90,7 +90,7 @@ export function CouncilDeliberatesLoader({
         {/* Center ember */}
         <motion.div
           aria-hidden
-          className="h-2 w-2 rounded-full bg-[color:var(--color-warroom-ember-bright)]"
+          className="h-2 w-2 rounded-full bg-[color:var(--color-chessboard-ember-bright)]"
           animate={
             reducedMotion
               ? undefined

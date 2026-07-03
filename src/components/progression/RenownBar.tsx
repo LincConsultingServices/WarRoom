@@ -34,13 +34,13 @@ export function RenownBar({ rank, rating, showInsignia = true, className }: Reno
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
           <span
-            className="truncate text-sm font-semibold tracking-[0.04em] text-[color:var(--color-warroom-ghost)]"
+            className="truncate text-sm font-semibold tracking-[0.04em] text-[color:var(--color-chessboard-ghost)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {rank.title}
           </span>
           <span
-            className="shrink-0 text-[11px] tracking-[0.08em] text-[color:var(--color-warroom-gold)]"
+            className="shrink-0 text-[11px] tracking-[0.08em] text-[color:var(--color-chessboard-gold)]"
             style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
           >
             <CountUp end={rating} duration={1.4} /> Rating
@@ -48,7 +48,7 @@ export function RenownBar({ rank, rating, showInsignia = true, className }: Reno
         </div>
 
         <div
-          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[color:var(--color-warroom-stone)]/60"
+          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[color:var(--color-chessboard-stone)]/60"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={100}
@@ -59,7 +59,7 @@ export function RenownBar({ rank, rating, showInsignia = true, className }: Reno
             className="h-full rounded-full"
             style={{
               background:
-                'linear-gradient(90deg, var(--color-warroom-gold-dark), var(--color-warroom-gold-bright))',
+                'linear-gradient(90deg, var(--color-chessboard-gold-dark), var(--color-chessboard-gold-bright))',
               boxShadow: '0 0 10px rgba(200,168,74,0.45)',
             }}
             initial={prefersReduced ? false : { width: 0 }}
@@ -69,7 +69,7 @@ export function RenownBar({ rank, rating, showInsignia = true, className }: Reno
         </div>
 
         <div
-          className="mt-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+          className="mt-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {atMax || !next

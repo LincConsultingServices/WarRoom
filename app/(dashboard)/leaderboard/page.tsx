@@ -51,7 +51,7 @@ export default function LeaderboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <Trophy
-              className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+              className="h-6 w-6 text-[color:var(--color-chessboard-silver)]"
               aria-hidden
             />
             <h1
@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
               style={{
                 fontFamily: 'var(--font-display)',
                 background:
-                  'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  'linear-gradient(135deg, var(--color-chessboard-silver), var(--color-chessboard-ghost))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -69,7 +69,7 @@ export default function LeaderboardPage() {
           </div>
 
           {batch && (
-            <SigilBadge tone="gold">
+            <SigilBadge tone="silver">
               {batch.code}
             </SigilBadge>
           )}
@@ -88,7 +88,7 @@ export default function LeaderboardPage() {
             transition={{ delay: 0.15, duration: 0.45, ease: easeDramatic }}
           >
             <h2
-              className="text-lg font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+              className="text-lg font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {batch.name || batch.code}
@@ -97,14 +97,14 @@ export default function LeaderboardPage() {
               className={cn(
                 'text-xs mt-1.5 uppercase tracking-[0.14em]',
                 connected
-                  ? 'text-[color:var(--color-warroom-verdant)]'
-                  : 'text-[color:var(--color-warroom-smoke)]',
+                  ? 'text-[color:var(--color-chessboard-verdant)]'
+                  : 'text-[color:var(--color-chessboard-smoke)]',
               )}
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {connected ? (
                 <span className="flex items-center justify-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--color-warroom-verdant)] animate-pulse inline-block" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--color-chessboard-verdant)] animate-pulse inline-block" />
                   Live updates active
                 </span>
               ) : (
@@ -132,13 +132,13 @@ export default function LeaderboardPage() {
                   {myRank && (
                     <div className="text-right">
                       <div
-                        className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                        className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         Your Standing
                       </div>
                       <div
-                        className="text-2xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                        className="text-2xl font-bold text-[color:var(--color-chessboard-silver)]"
                         style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                       >
                         #{myRank}
@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
             initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.4 }}
-            className="text-[10px] text-center uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] mt-5"
+            className="text-[10px] text-center uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)] mt-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Rankings are based on projected annual revenue from simulation decisions.
@@ -190,17 +190,17 @@ export default function LeaderboardPage() {
         >
           <StoneCard className="py-16 text-center">
             <Crown
-              className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-warroom-ash)]"
+              className="h-10 w-10 mx-auto mb-4 text-[color:var(--color-chessboard-ash)]"
               aria-hidden
             />
             <p
-              className="text-sm text-[color:var(--color-warroom-smoke)] mb-1"
+              className="text-sm text-[color:var(--color-chessboard-smoke)] mb-1"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               No batch associated with your account.
             </p>
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)]"
+              className="text-xs text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               Sign in with a batch code to see live rankings.

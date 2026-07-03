@@ -51,8 +51,8 @@ export function AnswerScrollInput({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-md border border-[color:var(--color-warroom-gold)]/25 p-4',
-        'bg-[color:var(--color-warroom-ivory)]/[0.04] backdrop-blur-sm',
+        'relative overflow-hidden rounded-md border border-[color:var(--color-chessboard-gold)]/25 p-4',
+        'bg-[color:var(--color-chessboard-ivory)]/[0.04] backdrop-blur-sm',
         'shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(245,230,200,0.06)]',
         'noise-overlay',
         disabled && 'opacity-60',
@@ -79,7 +79,7 @@ export function AnswerScrollInput({
 
       <label
         htmlFor={id}
-        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/90"
+        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-chessboard-gold)]/90"
       >
         {label}
       </label>
@@ -97,10 +97,10 @@ export function AnswerScrollInput({
           maxLength={maxLength}
           rows={minRows}
           className={cn(
-            'block w-full resize-y rounded-sm border border-[color:var(--color-warroom-gold)]/15 bg-transparent px-3 py-2',
+            'block w-full resize-y rounded-sm border border-[color:var(--color-chessboard-gold)]/15 bg-transparent px-3 py-2',
             'font-mono text-sm leading-relaxed text-foreground placeholder:italic placeholder:text-foreground/40',
-            'caret-[color:var(--color-warroom-gold)]',
-            'focus-visible:border-[color:var(--color-warroom-gold)]/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-warroom-gold)]/40',
+            'caret-[color:var(--color-chessboard-gold)]',
+            'focus-visible:border-[color:var(--color-chessboard-gold)]/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-chessboard-gold)]/40',
           )}
         />
       )}

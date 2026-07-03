@@ -20,7 +20,7 @@ import { Howl } from 'howler'
 import { playGOTSound } from '@/src/components/GOTSoundManager'
 import {
   getSfxVolumeMultiplier,
-  isWarRoomAudioMuted,
+  isChessboardAudioMuted,
   type AmbientScene,
 } from '@/src/hooks/useAmbientAudio'
 
@@ -49,7 +49,7 @@ export const SFX_MANIFEST = {
   'sim.timer-low':      '/assets/audio/sfx/timer-low.mp3',
   'sim.timer-end':      '/assets/audio/sfx/timer-end.mp3',
 
-  // War Room
+  // Chessboard
   'wr.door-creak':      '/assets/audio/sfx/wr-door-creak.mp3',
   'wr.investor-enter':  '/assets/audio/sfx/wr-investor-enter.mp3',
   'wr.gavel':           '/assets/audio/sfx/wr-gavel.mp3',
@@ -70,9 +70,9 @@ export type SfxKey = keyof typeof SFX_MANIFEST
 // ============================================================
 
 export const AMBIENT_TRACKS = {
-  'ambient.hall':        'warroom-lobby',
-  'ambient.warroom':     'warroom-active',
-  'ambient.deliberate':  'warroom-deliberation',
+  'ambient.hall':        'chessboard-lobby',
+  'ambient.chessboard':     'chessboard-active',
+  'ambient.deliberate':  'chessboard-deliberation',
   'ambient.victory':     'verdict-ceremony',
 } as const
 
@@ -114,7 +114,7 @@ const LEGACY_SFX_ALIASES: Record<SfxKey, LegacySoundEvent> = {
   'sim.timer-low':      'fire_crackle',
   'sim.timer-end':      'chains',
 
-  // War Room
+  // Chessboard
   'wr.door-creak':      'throne_settle',
   'wr.investor-enter':  'horn_battle',
   'wr.gavel':           'sword_clash',
@@ -248,7 +248,7 @@ const SFX_DISABLED = false
 export function playSfx(key: SfxKey, volumeOverride?: number): void {
   if (typeof window === 'undefined') return
   if (SFX_DISABLED) return
-  if (isWarRoomAudioMuted()) return
+  if (isChessboardAudioMuted()) return
 
   const baseVolume = volumeOverride ?? DEFAULT_VOLUMES[key]
 

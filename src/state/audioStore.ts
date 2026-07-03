@@ -20,7 +20,7 @@ import {
   getAmbientStore,
   getAmbientVolumeMultiplier,
   getSfxVolumeMultiplier,
-  isWarRoomAudioMuted,
+  isChessboardAudioMuted,
 } from '@/src/hooks/useAmbientAudio'
 
 const CH_SFX_KEY      = 'wr_ch_sfx_muted'
@@ -94,7 +94,7 @@ interface AudioState {
 }
 
 const initial = {
-  isMasterMuted:   typeof window === 'undefined' ? false : isWarRoomAudioMuted(),
+  isMasterMuted:   typeof window === 'undefined' ? false : isChessboardAudioMuted(),
   isAudioUnlocked: false,
   currentAmbientTrack: null as AmbientKey | null,
   ambientVolume:   typeof window === 'undefined' ? 1 : getAmbientVolumeMultiplier(),

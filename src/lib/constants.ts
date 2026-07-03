@@ -1,5 +1,5 @@
 // ============================================
-// War Room – Shared Constants
+// Chessboard – Shared Constants
 // ============================================
 
 import type { LucideIcon } from 'lucide-react'
@@ -30,7 +30,7 @@ export const STAGE_NARRATIVES: Record<string, { month: string; title: string; de
   STAGE_2B_EXPANSION: { month: 'Month 9', title: 'Expansion & Churn', desc: 'Growth brings problems. Deal with scaling issues, team dynamics, and keeping customers happy.' },
   STAGE_3_SCALE: { month: 'Month 12', title: 'Scaling Up', desc: 'You have hit early product-market fit. Now it is time to pour fuel on the fire and scale operations.' },
   STAGE_WARROOM_PREP: { month: 'Month 15', title: 'Pitch Prep', desc: 'You need outside capital to truly win the market. Perfect your pitch before facing the Sharks.' },
-  STAGE_4_WARROOM: { month: 'Month 18', title: 'The War Room', desc: 'Face the investors. Defend your valuation, handle tough questions, and secure the bag.' },
+  STAGE_4_WARROOM: { month: 'Month 18', title: 'The Chessboard', desc: 'Face the investors. Defend your valuation, handle tough questions, and secure the bag.' },
 }
 
 // Stage-specific mentor tip messages

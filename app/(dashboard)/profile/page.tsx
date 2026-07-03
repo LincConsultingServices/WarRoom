@@ -173,14 +173,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[color:var(--color-warroom-black)] text-foreground">
+    <main className="relative min-h-screen overflow-hidden bg-[color:var(--color-chessboard-black)] text-foreground">
       <EmberDriftBackdrop density={38} />
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-10 px-4 py-12 sm:py-16">
         {/* Hero — House identity */}
         <header className="flex flex-col items-center gap-5 text-center">
-          <p className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/70">
-            The Founder&apos;s Record
+          <p className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-chessboard-silver)]/70">
+            Player Profile
           </p>
           {progression ? (
             <HouseBanner
@@ -192,7 +192,7 @@ export default function ProfilePage() {
           ) : state.user?.name ? (
             <h1
               className="font-display text-3xl font-bold tracking-wider text-foreground sm:text-4xl"
-              style={{ textShadow: '0 0 24px rgba(200,168,74,0.25)' }}
+              style={{ textShadow: '0 0 24px rgba(200,200,200,0.25)' }}
             >
               {state.user.name}
             </h1>
@@ -214,8 +214,8 @@ export default function ProfilePage() {
 
         {/* Competency Constellation */}
         {progression && (
-          <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
-            <SigilBadge icon={Sparkles} tone="gold">
+          <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-chessboard-silver)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
+            <SigilBadge icon={Sparkles} tone="silver">
               <LoreTip tip={LORE.constellation}>Competency Constellation</LoreTip>
             </SigilBadge>
             <CompetencyConstellation
@@ -230,7 +230,7 @@ export default function ProfilePage() {
         {progression && (
           <section className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between px-1">
-              <SigilBadge icon={Award} tone="gold">
+              <SigilBadge icon={Award} tone="silver">
                 <LoreTip tip={LORE.sigil}>Sigils</LoreTip>
               </SigilBadge>
               <span className="font-display text-[0.55rem] uppercase tracking-[0.18em] text-foreground/40">
@@ -244,8 +244,8 @@ export default function ProfilePage() {
         {/* House decree (customiser) */}
         {progression && (
           <section className="flex flex-col gap-4">
-            <SigilBadge icon={Crown} tone="gold">
-              <LoreTip tip={LORE.house}>House Decree</LoreTip>
+            <SigilBadge icon={Crown} tone="silver">
+              <LoreTip tip={LORE.house}>Club Affiliation</LoreTip>
             </SigilBadge>
             <StoneCard padding="md">
               <HouseCustomizer
@@ -258,7 +258,7 @@ export default function ProfilePage() {
         )}
 
         {/* Legacy score history */}
-        <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
+        <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-chessboard-silver)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
           <div className="text-center">
             <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-foreground/55">
               <LoreTip tip={LORE.legacyScore}>Performance Score History</LoreTip>
@@ -287,9 +287,9 @@ export default function ProfilePage() {
             </span>
           </div>
           {readyRuns.length === 0 ? (
-            <div className="rounded-md border border-dashed border-[color:var(--color-warroom-gold)]/20 bg-card/30 px-6 py-10 text-center">
+            <div className="rounded-md border border-dashed border-[color:var(--color-chessboard-silver)]/20 bg-card/30 px-6 py-10 text-center">
               <p className="font-display text-xs uppercase tracking-[0.22em] text-foreground/50">
-                The chamber awaits your first trial.
+                The board awaits your first trial.
               </p>
             </div>
           ) : (
@@ -313,12 +313,12 @@ export default function ProfilePage() {
 
 function ProfileLoading() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-warroom-black)]">
+    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-chessboard-black)]">
       <EmberDriftBackdrop density={30} />
       <div className="relative z-10 flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin-slow rounded-full border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)]" />
-        <p className="font-display text-xs uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/70">
-          Unrolling the scroll…
+        <div className="h-10 w-10 animate-spin-slow rounded-full border-2 border-[color:var(--color-chessboard-silver)]/30 border-t-[color:var(--color-chessboard-silver)]" />
+        <p className="font-display text-xs uppercase tracking-[0.22em] text-[color:var(--color-chessboard-silver)]/70">
+          Preparing the board…
         </p>
       </div>
     </main>
@@ -327,17 +327,17 @@ function ProfileLoading() {
 
 function ProfileError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-warroom-black)] px-4">
+    <main className="relative flex min-h-screen items-center justify-center bg-[color:var(--color-chessboard-black)] px-4">
       <EmberDriftBackdrop density={20} />
-      <div className="relative z-10 max-w-md rounded-md border border-[color:var(--color-warroom-crimson)]/40 bg-card/85 p-6 text-center backdrop-blur-md">
-        <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-crimson-bright)]">
-          The scroll is sealed
+      <div className="relative z-10 max-w-md rounded-md border border-[color:var(--color-chessboard-crimson)]/40 bg-card/85 p-6 text-center backdrop-blur-md">
+        <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-chessboard-crimson-bright)]">
+          The record is unavailable
         </p>
         <p className="mt-3 text-sm text-foreground/80">{message}</p>
         <button
           type="button"
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/45 px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] transition-all hover:border-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-charcoal)]/70"
+          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-chessboard-silver)]/45 px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-chessboard-silver)] transition-all hover:border-[color:var(--color-chessboard-silver)] hover:bg-[color:var(--color-chessboard-charcoal)]/70"
         >
           Try again
         </button>

@@ -11,7 +11,7 @@ import {
 import type { StageName } from '@/src/types'
 
 // ============================================================
-// <WarMap />
+// <ChessMap />
 // ----------------------------------------------------------------
 // A campaign map of the trial's 9 stages, rendered as an SVG
 // path with one waypoint per stage. State per node:
@@ -32,14 +32,14 @@ import type { StageName } from '@/src/types'
 // completed (from the assessment state).
 // ============================================================
 
-export type WarMapVariant = 'horizontal' | 'campaign'
+export type ChessMapVariant = 'horizontal' | 'campaign'
 
-interface WarMapProps {
+interface ChessMapProps {
   /** Stages that have been finished. Order doesn't matter. */
   completedStages: StageName[]
   /** The stage the founder is currently inside. null = none active. */
   currentStage: StageName | null
-  variant?: WarMapVariant
+  variant?: ChessMapVariant
   /** Click a node to navigate to a stage's report etc. Optional. */
   onStageClick?: (stage: StageName) => void
   className?: string
@@ -65,7 +65,7 @@ interface NodeGeo {
 function computeGeometry(
   completed: Set<string>,
   current: StageName | null,
-  variant: WarMapVariant,
+  variant: ChessMapVariant,
 ): NodeGeo[] {
   const count = STAGE_ORDER.length
   const usableW = VIEW_W - PAD_X * 2
@@ -97,14 +97,14 @@ function computeGeometry(
   })
 }
 
-export function WarMap({
+export function ChessMap({
   completedStages,
   currentStage,
   variant = 'horizontal',
   onStageClick,
   className,
   showLabels = true,
-}: WarMapProps) {
+}: ChessMapProps) {
   const reducedMotion = useReducedMotion()
   const completedSet = new Set<string>(completedStages)
   const nodes = computeGeometry(completedSet, currentStage, variant)
@@ -176,7 +176,7 @@ export function WarMap({
 
         {/* Nodes */}
         {nodes.map((n) => (
-          <WarMapNode
+          <ChessMapNode
             key={n.stage}
             node={n}
             reducedMotion={!!reducedMotion}
@@ -192,7 +192,7 @@ export function WarMap({
               key={`label-${n.stage}`}
               className={cn(
                 'flex flex-1 flex-col items-center text-center font-display text-[0.55rem] uppercase tracking-[0.18em] sm:text-[0.62rem]',
-                n.state === 'completed' && 'text-[color:var(--color-warroom-gold)]',
+                n.state === 'completed' && 'text-[color:var(--color-chessboard-gold)]',
                 n.state === 'current' && 'text-foreground',
                 n.state === 'locked' && 'text-foreground/35',
               )}
@@ -209,13 +209,13 @@ export function WarMap({
   )
 }
 
-interface WarMapNodeProps {
+interface ChessMapNodeProps {
   node: NodeGeo
   reducedMotion: boolean
   onClick?: () => void
 }
 
-function WarMapNode({ node, reducedMotion, onClick }: WarMapNodeProps) {
+function ChessMapNode({ node, reducedMotion, onClick }: ChessMapNodeProps) {
   const { x, y, state, color, label, narrative } = node
   const isCurrent = state === 'current'
   const isCompleted = state === 'completed'

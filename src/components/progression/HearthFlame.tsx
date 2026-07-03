@@ -23,7 +23,7 @@ export function HearthFlame({ streak, showLabel = true, size = 22, className }: 
   const weeks = streak.current ?? 0
   const lit = weeks > 0
   const intensity = Math.min(1, weeks / 6)
-  const color = lit ? 'var(--color-warroom-ember)' : 'var(--color-warroom-smoke)'
+  const color = lit ? 'var(--color-chessboard-ember)' : 'var(--color-chessboard-smoke)'
 
   return (
     <div className={cn('inline-flex items-center gap-2', className)} title={`Longest streak: ${streak.longest} weeks`}>
@@ -48,7 +48,7 @@ export function HearthFlame({ streak, showLabel = true, size = 22, className }: 
       </motion.span>
       {showLabel && (
         <span
-          className="text-[11px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
+          className="text-[11px] uppercase tracking-[0.12em] text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {lit ? `${weeks}-week streak` : 'Streak unlit'}

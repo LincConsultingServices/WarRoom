@@ -59,15 +59,15 @@ export function BurningFuseTimerTimer({ progress, readout, className }: BurningF
       >
         <defs>
           <radialGradient id="fuseEmber" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%"   stopColor="#fff3b0" stopOpacity="1" />
-            <stop offset="35%"  stopColor="#ff9933" stopOpacity="0.95" />
-            <stop offset="70%"  stopColor="#c8a84a" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#7a2020" stopOpacity="0" />
+            <stop offset="0%"   stopColor="#ffffff" stopOpacity="1" />
+            <stop offset="35%"  stopColor="#e0e0e0" stopOpacity="0.95" />
+            <stop offset="70%"  stopColor="#a0a0a0" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#303030" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="ropeUnburnt" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#7a6020" />
-            <stop offset="50%" stopColor="#c8a84a" />
-            <stop offset="100%" stopColor="#7a6020" />
+            <stop offset="0%" stopColor="#808080" />
+            <stop offset="50%" stopColor="#d0d0d0" />
+            <stop offset="100%" stopColor="#808080" />
           </linearGradient>
         </defs>
 
@@ -86,7 +86,7 @@ export function BurningFuseTimerTimer({ progress, readout, className }: BurningF
           <line
             x1="0" y1={ROPE_Y}
             x2={burnt - 6} y2={ROPE_Y}
-            stroke="#3d3530"
+            stroke="#404040"
             strokeWidth="1.4"
             strokeDasharray="2 3"
             strokeLinecap="round"
@@ -100,7 +100,7 @@ export function BurningFuseTimerTimer({ progress, readout, className }: BurningF
           y1={ROPE_Y}
           x2={FUSE_LENGTH}
           y2={ROPE_Y}
-          stroke={urgent ? '#b03030' : 'url(#ropeUnburnt)'}
+          stroke={urgent ? '#a03030' : 'url(#ropeUnburnt)'}
           strokeWidth="3.5"
           strokeLinecap="round"
         />
@@ -115,7 +115,7 @@ export function BurningFuseTimerTimer({ progress, readout, className }: BurningF
               className={cn(!reducedMotion && 'animate-pulse')}
               style={{ animationDuration: urgent ? '0.6s' : '1.4s' }}
             />
-            <circle cx={emberX} cy={ROPE_Y} r="2.2" fill="#fff3b0" />
+            <circle cx={emberX} cy={ROPE_Y} r="2.2" fill="#ffffff" />
           </>
         )}
       </svg>
@@ -124,7 +124,7 @@ export function BurningFuseTimerTimer({ progress, readout, className }: BurningF
         <span
           className={cn(
             'font-mono text-base font-semibold tabular-nums tracking-wider',
-            urgent ? 'text-[color:var(--color-warroom-crimson-bright)]' : 'text-foreground',
+            urgent ? 'text-[color:var(--color-chessboard-crimson-bright)]' : 'text-foreground',
           )}
         >
           {readout}

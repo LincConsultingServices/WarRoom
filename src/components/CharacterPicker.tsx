@@ -33,7 +33,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
   return (
     <div className="space-y-3">
       <div>
-        <h3 className="font-display text-base font-semibold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]/90">
+        <h3 className="font-display text-base font-semibold uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)]/90">
           {title}
         </h3>
         <p className="text-[0.65rem] uppercase tracking-[0.18em] text-foreground/55">
@@ -66,8 +66,8 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
               className={cn(
                 'relative flex flex-col items-center gap-2 rounded-md border p-3 text-center backdrop-blur-sm transition-all duration-300',
                 isSelected
-                  ? 'border-[color:var(--color-warroom-gold)]/65 bg-[color:var(--color-warroom-charcoal)]/65 shadow-md'
-                  : 'border-[color:var(--color-warroom-gold)]/15 bg-card/60 hover:border-[color:var(--color-warroom-gold)]/45',
+                  ? 'border-[color:var(--color-chessboard-gold)]/65 bg-[color:var(--color-chessboard-charcoal)]/65 shadow-md'
+                  : 'border-[color:var(--color-chessboard-gold)]/15 bg-card/60 hover:border-[color:var(--color-chessboard-gold)]/45',
                 isDisabled && !isSelected && 'opacity-40 cursor-not-allowed'
               )}
               style={isSelected ? { boxShadow: `0 0 20px ${accentColor}40, 0 0 40px ${accentColor}15` } : undefined}
@@ -80,7 +80,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[color:var(--color-warroom-gold)] flex items-center justify-center shadow-[0_0_12px_rgba(200,168,74,0.55)]"
+                    className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[color:var(--color-chessboard-gold)] flex items-center justify-center shadow-[0_0_12px_rgba(200,168,74,0.55)]"
                   >
                     <Check className="h-3 w-3 text-primary-foreground" />
                   </motion.div>
@@ -103,8 +103,8 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                 <div className={cn(
                   "relative overflow-hidden h-12 w-12 rounded-full bg-muted flex items-center justify-center font-display text-lg font-bold border transition-all duration-300",
                   isSelected
-                    ? "border-[color:var(--color-warroom-gold)] ring-2 ring-[color:var(--color-warroom-gold)]/35"
-                    : "border-[color:var(--color-warroom-gold)]/20",
+                    ? "border-[color:var(--color-chessboard-gold)] ring-2 ring-[color:var(--color-chessboard-gold)]/35"
+                    : "border-[color:var(--color-chessboard-gold)]/20",
                 )}>
                   {/* Initial is the base; the avatar overlays it and removes itself
                       on load error so a broken URL falls back to the initial. */}
@@ -127,7 +127,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                 <div className="font-display text-sm font-semibold leading-tight tracking-wide">
                   {item.name}
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]/85 font-semibold">
+                <div className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)]/85 font-semibold">
                   {renderBadge(item)}
                 </div>
                 <div className="text-[10px] text-muted-foreground leading-snug line-clamp-2">

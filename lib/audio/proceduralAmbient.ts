@@ -25,9 +25,9 @@
 // ============================================================
 
 export type ProceduralScene =
-  | 'warroom-lobby'
-  | 'warroom-active'
-  | 'warroom-deliberation'
+  | 'chessboard-lobby'
+  | 'chessboard-active'
+  | 'chessboard-deliberation'
   | 'verdict-ceremony'
 
 interface SceneMix {
@@ -42,7 +42,7 @@ interface SceneMix {
 }
 
 const SCENE_MIX: Record<ProceduralScene, SceneMix> = {
-  'warroom-lobby': {
+  'chessboard-lobby': {
     drone: 0.55,
     cello: 0.35,
     organ: 0.0,
@@ -50,7 +50,7 @@ const SCENE_MIX: Record<ProceduralScene, SceneMix> = {
     pulse: 0.0,
     bpm: 38,
   },
-  'warroom-active': {
+  'chessboard-active': {
     drone: 0.70,
     cello: 0.55,
     organ: 0.35,
@@ -58,7 +58,7 @@ const SCENE_MIX: Record<ProceduralScene, SceneMix> = {
     pulse: 0.30,
     bpm: 50,
   },
-  'warroom-deliberation': {
+  'chessboard-deliberation': {
     drone: 0.65,
     cello: 0.65,
     organ: 0.55,

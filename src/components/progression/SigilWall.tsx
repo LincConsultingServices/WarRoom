@@ -45,14 +45,14 @@ export function SigilWall({ earned, crestSize = 64, className }: SigilWallProps)
                 className={cn(
                   'text-[11px] font-semibold uppercase tracking-[0.1em]',
                   locked
-                    ? 'text-[color:var(--color-warroom-smoke)]'
-                    : 'text-[color:var(--color-warroom-ghost)]',
+                    ? 'text-[color:var(--color-chessboard-smoke)]'
+                    : 'text-[color:var(--color-chessboard-ghost)]',
                 )}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {sigil.name}
               </span>
-              <span className="mt-0.5 text-[10px] leading-snug text-[color:var(--color-warroom-smoke)]">
+              <span className="mt-0.5 text-[10px] leading-snug text-[color:var(--color-chessboard-smoke)]">
                 {locked ? sigil.description : style.label}
               </span>
             </div>

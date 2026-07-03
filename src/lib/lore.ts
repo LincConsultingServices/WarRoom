@@ -1,5 +1,5 @@
 // ============================================
-// War Room — Codex (chess/strategy plain language)
+// Chessboard — Codex (chess/strategy plain language)
 // Central definitions for themed terms, surfaced via <LoreTip>.
 // ============================================
 

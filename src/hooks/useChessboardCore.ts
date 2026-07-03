@@ -7,24 +7,24 @@ import { getPreparedPitchFromState } from '@/src/lib/helpers'
 import type { AssessmentState, Investor } from '@/src/types'
 
 // ============================================
-// useWarRoomCore — loads assessment state and investors,
+// useChessboardCore — loads assessment state and investors,
 // manages the active phase, and enforces dark theme.
-// Can be used independently to bootstrap the War Room.
+// Can be used independently to bootstrap the Chessboard.
 // ============================================
 
-export type WarRoomPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
+export type ChessboardPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
 
-export function useWarRoomCore(assessmentId: string) {
+export function useChessboardCore(assessmentId: string) {
   const router = useRouter()
 
-  const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
+  const [phase, setPhase] = useState<ChessboardPhase>('LOADING')
   const [assessmentState, setAssessmentState] = useState<AssessmentState | null>(null)
   const [investors, setInvestors] = useState<Investor[]>([])
   const [error, setError] = useState('')
 
   const preparedPitch = getPreparedPitchFromState(assessmentState)
 
-  // Force dark theme for War Room
+  // Force dark theme for Chessboard
   useEffect(() => {
     document.documentElement.classList.add('dark')
     return () => { document.documentElement.classList.remove('dark') }
@@ -57,7 +57,7 @@ export function useWarRoomCore(assessmentId: string) {
           } catch { return [] }
         })()
 
-        // War Room always faces the full Council (all 7 investors).
+        // Chessboard always faces the full Council (all 7 investors).
         // Older assessments that captured only a 4-investor subset are
         // augmented up to the full list so the chamber renders correctly.
         const FULL_COUNCIL_SIZE = 7
@@ -71,7 +71,7 @@ export function useWarRoomCore(assessmentId: string) {
         setInvestors(finalList)
         setPhase('PITCH')
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load War Room')
+        setError(err instanceof Error ? err.message : 'Failed to load Chessboard')
         setPhase('PITCH')
       }
     }

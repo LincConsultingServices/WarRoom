@@ -38,11 +38,11 @@ export function ArchetypeBadge({
   if (variant === 'hero') {
     return (
       <div className={cn('flex flex-col items-center gap-2 text-center', className)}>
-        <span className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/70">
+        <span className="font-display text-[0.6rem] uppercase tracking-[0.32em] text-[color:var(--color-chessboard-gold)]/70">
           Founder Archetype
         </span>
         <h2
-          className="font-display text-3xl font-bold uppercase tracking-wide text-[color:var(--color-warroom-gold-bright)] sm:text-4xl"
+          className="font-display text-3xl font-bold uppercase tracking-wide text-[color:var(--color-chessboard-gold-bright)] sm:text-4xl"
           style={{ textShadow: '0 0 30px rgba(232,200,74,0.45)' }}
         >
           {archetypeName}
@@ -60,11 +60,11 @@ export function ArchetypeBadge({
     return (
       <div
         className={cn(
-          'flex items-center gap-3 rounded-sm border border-[color:var(--color-warroom-gold)]/30 bg-card/70 px-3 py-2 backdrop-blur-sm',
+          'flex items-center gap-3 rounded-sm border border-[color:var(--color-chessboard-gold)]/30 bg-card/70 px-3 py-2 backdrop-blur-sm',
           className,
         )}
       >
-        <span aria-hidden className="font-display text-base text-[color:var(--color-warroom-gold)]">
+        <span aria-hidden className="font-display text-base text-[color:var(--color-chessboard-gold)]">
           ⚜
         </span>
         <div className="flex min-w-0 flex-col">
@@ -83,7 +83,7 @@ export function ArchetypeBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-sm border border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-charcoal)]/55 px-2 py-0.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]',
+        'inline-flex items-center gap-1.5 rounded-sm border border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-charcoal)]/55 px-2 py-0.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)]',
         className,
       )}
     >

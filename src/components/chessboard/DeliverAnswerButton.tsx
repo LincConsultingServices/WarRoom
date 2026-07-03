@@ -68,8 +68,8 @@ export function DeliverAnswerButton({
         'text-primary-foreground',
         'shadow-[0_2px_12px_rgba(200,168,74,0.32),inset_0_1px_0_rgba(255,220,100,0.35)]',
         'transition-all duration-300',
-        'border border-[color:var(--color-warroom-gold)]/55',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'border border-[color:var(--color-chessboard-gold)]/55',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

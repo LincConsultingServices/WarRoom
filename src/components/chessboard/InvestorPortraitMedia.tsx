@@ -161,7 +161,7 @@ export function InvestorPortraitMedia({
             label={`${name} portrait`}
             path={`public/investors/${investorId}/portrait.{webp,jpg,png}`}
             formatHint="3:4 · 720×960+ · ≤300KB"
-            className="bg-[color:var(--color-warroom-obsidian)]/60"
+            className="bg-[color:var(--color-chessboard-obsidian)]/60"
           />
         </>
       )}
