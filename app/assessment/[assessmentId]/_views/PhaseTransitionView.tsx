@@ -31,8 +31,8 @@ export function PhaseTransitionView({
         <div className="fixed inset-0 z-50 backdrop-blur-xl flex flex-col items-center justify-center gap-5"
           style={{ background: 'rgba(10,8,6,0.92)' }}>
           <div className="text-3xl animate-torch-glow">⚔</div>
-          <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#c9a227' }} />
-          <p className="text-sm font-bold" style={{ fontFamily: "'Cinzel', Georgia, serif", letterSpacing: '0.12em', color: '#c9a227' }}>
+          <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#c8a84a' }} />
+          <p className="text-sm font-bold" style={{ fontFamily: "var(--font-display)", letterSpacing: '0.12em', color: '#c8a84a' }}>
             The Council deliberates...
           </p>
         </div>
@@ -49,7 +49,7 @@ export function PhaseTransitionView({
             {/* Header */}
             <div className="text-center space-y-4 pt-4">
               <div className="text-4xl mb-2">⚔</div>
-              <h2 className="text-2xl font-bold" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.06em' }}>
+              <h2 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: '#e8e0d0', letterSpacing: '0.06em' }}>
                 The Crossroads
               </h2>
               <div className="h-px max-w-xs mx-auto" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.4), transparent)' }} />
@@ -78,16 +78,16 @@ export function PhaseTransitionView({
                 <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,26,26,0.5), transparent)' }} />
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 flex items-center justify-center" style={{ background: 'rgba(139,26,26,0.15)', border: '1px solid rgba(139,26,26,0.3)', borderRadius: '2px' }}>
-                    <AlertTriangle className="h-4 w-4" style={{ color: '#c23b3b' }} />
+                    <AlertTriangle className="h-4 w-4" style={{ color: '#b03030' }} />
                   </div>
-                  <h3 className="font-bold text-sm" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
+                  <h3 className="font-bold text-sm" style={{ fontFamily: "var(--font-display)", color: '#e8e0d0', letterSpacing: '0.04em' }}>
                     Sound the Retreat
                   </h3>
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: '#8c8075' }}>
                   The battle plan has flaws. Pull back and reforge your idea from the beginning.
                 </p>
-                <div className="pt-1 text-xs font-bold" style={{ color: '#c23b3b', letterSpacing: '0.08em', fontFamily: "'Cinzel', Georgia, serif" }}>
+                <div className="pt-1 text-xs font-bold" style={{ color: '#b03030', letterSpacing: '0.08em', fontFamily: "var(--font-display)" }}>
                   ↩ Restart Simulation
                 </div>
               </motion.button>
@@ -110,16 +110,16 @@ export function PhaseTransitionView({
                 <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.5), transparent)' }} />
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 flex items-center justify-center" style={{ background: 'rgba(201,162,39,0.1)', border: '1px solid rgba(201,162,39,0.3)', borderRadius: '2px' }}>
-                    <CheckCircle2 className="h-4 w-4" style={{ color: '#c9a227' }} />
+                    <CheckCircle2 className="h-4 w-4" style={{ color: '#c8a84a' }} />
                   </div>
-                  <h3 className="font-bold text-sm" style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#e8e0d0', letterSpacing: '0.04em' }}>
+                  <h3 className="font-bold text-sm" style={{ fontFamily: "var(--font-display)", color: '#e8e0d0', letterSpacing: '0.04em' }}>
                     March to Battle
                   </h3>
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: '#8c8075' }}>
                   The plan is solid. Commit forces. Enter the execution phase and build the kingdom.
                 </p>
-                <div className="pt-1 text-xs font-bold" style={{ color: '#c9a227', letterSpacing: '0.08em', fontFamily: "'Cinzel', Georgia, serif" }}>
+                <div className="pt-1 text-xs font-bold" style={{ color: '#c8a84a', letterSpacing: '0.08em', fontFamily: "var(--font-display)" }}>
                   ⚔ Continue to Execution
                 </div>
               </motion.button>

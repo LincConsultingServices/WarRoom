@@ -78,7 +78,7 @@ export default function SimulationPage() {
   )
   if (!state || !simulation) return null
 
-  const accent = STAGE_THEMES[simulation.currentStage] || '#c9a227'
+  const accent = STAGE_THEMES[simulation.currentStage] || '#c8a84a'
   const narration = STAGE_NARRATIVES[simulation.currentStage]
   const mentorTip = STAGE_MENTOR_TIPS[simulation.currentStage]
   const stageIdx = STAGE_ORDER.indexOf(simulation.currentStage as StageName)
@@ -97,7 +97,7 @@ export default function SimulationPage() {
         <div className="w-full max-w-4xl space-y-8">
           <div className="text-center space-y-3">
             <div className="flex justify-center"><Crown className="h-8 w-8" style={{ color: 'var(--color-warroom-gold)' }} /></div>
-            <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-warroom-ivory)', letterSpacing: '0.06em' }}>Assemble the War Council</h1>
+            <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-warroom-ivory)', letterSpacing: '0.06em' }}>Assemble the Expert Panel</h1>
             <div className="h-px max-w-sm mx-auto" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warroom-gold) 40%, transparent), transparent)' }} />
             <p style={{ color: 'var(--color-warroom-smoke)', fontSize: '0.85rem', letterSpacing: '0.04em' }}>Choose wisely, Lord Commander. Their counsel will shape your fate.</p>
           </div>

@@ -83,8 +83,8 @@ export function HouseCustomizer({ house, rankTier, onSave, className }: HouseCus
                 <SigilCrest
                   icon={iconForHouseSigil(s.id)}
                   size={40}
-                  primary="#c9a227"
-                  secondary="#8b6914"
+                  primary="#c8a84a"
+                  secondary="#7a6020"
                   locked={!unlocked}
                 />
                 <span className="text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-warroom-smoke)]">

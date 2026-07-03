@@ -727,7 +727,7 @@ export default function SimulationResultPage() {
       <div className="flex justify-center gap-4 pb-6">
         <Link href="/dashboard">
           <WarRoomCTA size="sm" variant="ghost" icon={ArrowLeft}>
-            The Great Hall
+            Dashboard
           </WarRoomCTA>
         </Link>
         {isInProgress && (

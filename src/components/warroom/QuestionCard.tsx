@@ -6,15 +6,15 @@ import { cn } from '@/lib/utils'
 import { QuestionWordReveal } from './QuestionWordReveal'
 
 // ============================================================
-// <QuestionCard /> — the parchment-on-stone slab that holds the
+// <QuestionCard /> — the ivory-on-stone slab that holds the
 // active investor's question. Subtle gold shimmer on the top
-// edge, optional sigil watermark, and the word-reveal animation
+// edge, optional emblem watermark, and the word-reveal animation
 // inside.
 //
 // Composition:
 //   <QuestionCard
 //     investorName="Mira"
-//     sigilUrl="/investors/mira/sigil.svg"   // optional
+//     emblemUrl="/investors/mira/emblem.svg"   // optional
 //     label="The mirror of identity asks:"
 //     audioSlot={<QuestionAudioPlayer ... />}
 //   >
@@ -22,7 +22,7 @@ import { QuestionWordReveal } from './QuestionWordReveal'
 //   </QuestionCard>
 //
 // The actual reveal animation is delegated to QuestionWordReveal;
-// this card owns chrome, framing, sigil, and the audio-player slot.
+// this card owns chrome, framing, emblem, and the audio-player slot.
 // ============================================================
 
 interface QuestionCardProps {
@@ -30,8 +30,8 @@ interface QuestionCardProps {
   questionText: string
   /** Pre-text label like "Lord Bartlett asks:" */
   label?: string
-  /** Optional sigil watermark URL (svg/png). */
-  sigilUrl?: string | null
+  /** Optional emblem watermark URL (svg/png). */
+  emblemUrl?: string | null
   /** Slot for the per-investor audio player (TTS). */
   audioSlot?: React.ReactNode
   className?: string
@@ -45,7 +45,7 @@ export function QuestionCard({
   investorName,
   questionText,
   label,
-  sigilUrl = null,
+  emblemUrl = null,
   audioSlot,
   className,
   revealKey,
@@ -62,7 +62,7 @@ export function QuestionCard({
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className={cn(
         'relative overflow-hidden rounded-md border border-[color:var(--color-warroom-gold)]/30 bg-card/80 p-5 backdrop-blur-sm',
-        'shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(201,162,39,0.1)]',
+        'shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(200,168,74,0.1)]',
         'noise-overlay',
         className,
       )}
@@ -70,7 +70,7 @@ export function QuestionCard({
         // Parchment-on-stone slab: aged vellum grain under a warm-dark wash that
         // keeps gold + ivory copy fully legible.
         backgroundImage:
-          'var(--wr-parchment-wash), url("/assets/images/textures/parchment.webp")',
+          'var(--wr-ivory-wash), url("/assets/images/textures/ivory.webp")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -82,15 +82,15 @@ export function QuestionCard({
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            'linear-gradient(90deg, transparent, rgba(201,162,39,0.55), transparent)',
+            'linear-gradient(90deg, transparent, rgba(200,168,74,0.55), transparent)',
         }}
       />
 
-      {/* Sigil watermark */}
-      {sigilUrl && (
+      {/* Emblem watermark */}
+      {emblemUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={sigilUrl}
+          src={emblemUrl}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute -right-6 -bottom-8 h-44 w-44 opacity-[0.06]"

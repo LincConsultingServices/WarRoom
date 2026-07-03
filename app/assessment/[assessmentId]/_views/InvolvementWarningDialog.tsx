@@ -50,12 +50,12 @@ export function InvolvementWarningDialog({ open, spamPercent, onAcknowledge }: I
                   borderRadius: '2px',
                 }}
               >
-                <AlertTriangle className="h-5 w-5" style={{ color: '#c9a227' }} />
+                <AlertTriangle className="h-5 w-5" style={{ color: '#c8a84a' }} />
               </div>
               <h2
                 className="text-xl font-bold"
                 style={{
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   color: '#e8e0d0',
                   letterSpacing: '0.06em',
                 }}
@@ -79,8 +79,8 @@ export function InvolvementWarningDialog({ open, spamPercent, onAcknowledge }: I
                   background: 'rgba(201,162,39,0.18)',
                   border: '1px solid rgba(201,162,39,0.45)',
                   borderRadius: '3px',
-                  color: '#c9a227',
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  color: '#c8a84a',
+                  fontFamily: "var(--font-display)",
                   letterSpacing: '0.1em',
                   cursor: 'pointer',
                 }}

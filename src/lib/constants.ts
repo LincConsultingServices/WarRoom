@@ -7,17 +7,17 @@ import { Globe, AlertTriangle, Target, BarChart3 } from 'lucide-react'
 import type { StageName } from '@/src/types'
 
 
-// Stage accent colours — GOT themed
+// Stage accent colours — chess/strategy themed
 export const STAGE_THEMES: Record<string, string> = {
-  STAGE_NEG2_IDEATION: '#6b5a8e',     // Dragonglass purple
-  STAGE_NEG1_VISION: '#7c5a9e',       // Raven's wing purple
-  STAGE_0_COMMITMENT: '#c9a227',      // Lannister Gold
-  STAGE_1_VALIDATION: '#4a7c59',      // Stark green (Godswood)
-  STAGE_2A_GROWTH: '#3d6b8e',         // Castle Black steel blue
-  STAGE_2B_EXPANSION: '#2e7d82',      // Braavosi teal
-  STAGE_3_SCALE: '#c9a227',           // Molten Gold
-  STAGE_WARROOM_PREP: '#8b3a1a',      // Dragonstone burnt orange-red
-  STAGE_4_WARROOM: '#8b1a1a',         // Dragon fire blood red
+  STAGE_NEG2_IDEATION: '#6b5a8e',
+  STAGE_NEG1_VISION: '#7c5a9e',
+  STAGE_0_COMMITMENT: '#c8a84a',
+  STAGE_1_VALIDATION: '#4a7c59',
+  STAGE_2A_GROWTH: '#3d6b8e',
+  STAGE_2B_EXPANSION: '#2e7d82',
+  STAGE_3_SCALE: '#c8a84a',
+  STAGE_WARROOM_PREP: '#8b3a1a',
+  STAGE_4_WARROOM: '#7a2020',
 }
 
 // Cinematic narration metadata per stage
@@ -73,7 +73,7 @@ export const STAGE_DURATIONS: Record<string, number> = {
 }
 
 // Short labels shown on stage timeline
-export const NARRATION_STAGE_LABELS = ['Idea', 'Vision', 'Commit', 'Validate', 'Grow', 'Expand', 'Scale', 'Prep', 'War Room']
+export const NARRATION_STAGE_LABELS = ['Idea', 'Vision', 'Commit', 'Validate', 'Grow', 'Expand', 'Scale', 'Prep', 'Final']
 
 // Investor voice filename overrides, keyed by investor id (stable across rename)
 export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
@@ -90,13 +90,13 @@ export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
 // Investor panel context_text shows the title; we resolve it here to look up
 // voice assets and other id-keyed resources.
 export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
-  'The Mirror of Identity': 'mirror_identity',
-  'The Master of Coin': 'master_coin',
-  'The Lord of Hustle': 'lord_hustle',
-  'The Mother of Instinct': 'mother_instinct',
-  'The Hand of Execution': 'hand_execution',
-  'The Spider of Strategy': 'spider_strategy',
-  'The Warden of Trust': 'warden_trust',
+  'The Identity Mirror': 'mirror_identity',
+  'The Capital Strategist': 'master_coin',
+  'The Execution Driver': 'lord_hustle',
+  'The Market Instinct': 'mother_instinct',
+  'The Operations Lead': 'hand_execution',
+  'The Strategic Advisor': 'spider_strategy',
+  'The Trust Builder': 'warden_trust',
 }
 
 // Scenario step styling — icons are lucide components (on-brand SVG, no emoji).

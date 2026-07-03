@@ -84,7 +84,7 @@ export function ScoreReveal({
             particleCount: 60,
             spread: 70,
             origin: { x: originX, y: 0.6 },
-            colors: ['#c9a227', '#e8c84a', '#ff9933', '#f5e6c8'],
+            colors: ['#c8a84a', '#d4aa40', '#ff9933', '#f5e6c8'],
             scalar: 0.9,
             gravity: 0.7,
             ticks: 200,

@@ -30,7 +30,7 @@ import { LORE } from '@/src/lib/lore'
 // /profile (route: /(dashboard)/profile)
 // ----------------------------------------------------------------
 // The founder's character sheet. Surfaces:
-//   • House identity (crest, rank, words) + Renown progress
+//   • House identity (crest, rank, words) + Rating progress
 //   • Competency Constellation (best-ever mastery across all runs)
 //   • Sigil Wall (earned achievements + aspirational locked ones)
 //   • House customiser (rank-gated, earned cosmetics)
@@ -192,7 +192,7 @@ export default function ProfilePage() {
           ) : state.user?.name ? (
             <h1
               className="font-display text-3xl font-bold tracking-wider text-foreground sm:text-4xl"
-              style={{ textShadow: '0 0 24px rgba(201,162,39,0.25)' }}
+              style={{ textShadow: '0 0 24px rgba(200,168,74,0.25)' }}
             >
               {state.user.name}
             </h1>
@@ -202,12 +202,12 @@ export default function ProfilePage() {
           )}
         </header>
 
-        {/* Renown + hearth */}
+        {/* Rating + streak */}
         {progression && (
           <StoneCard padding="md">
-            <RenownBar rank={progression.rank} renown={progression.renown} />
+            <RenownBar rank={progression.rank} rating={progression.rating} />
             <div className="mt-4 flex justify-end">
-              <HearthFlame hearth={progression.hearth} />
+              <HearthFlame streak={progression.streak} />
             </div>
           </StoneCard>
         )}
@@ -261,7 +261,7 @@ export default function ProfilePage() {
         <section className="flex flex-col items-center gap-4 rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/50 p-6 backdrop-blur-sm noise-overlay">
           <div className="text-center">
             <p className="font-display text-[0.6rem] uppercase tracking-[0.22em] text-foreground/55">
-              <LoreTip tip={LORE.legacyScore}>Legacy Score History</LoreTip>
+              <LoreTip tip={LORE.legacyScore}>Performance Score History</LoreTip>
             </p>
             <p className="mt-1 font-mono text-xs text-foreground/45">
               {completedCount} completed {completedCount === 1 ? 'trial' : 'trials'}
@@ -337,7 +337,7 @@ function ProfileError({ message, onRetry }: { message: string; onRetry: () => vo
         <button
           type="button"
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/45 px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] transition-all hover:border-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-obsidian)]/70"
+          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/45 px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] transition-all hover:border-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-charcoal)]/70"
         >
           Try again
         </button>

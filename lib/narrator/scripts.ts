@@ -43,7 +43,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'dashboard.first-visit': [
     {
-      text: 'Welcome to the Great Hall. This is your council chamber between trials.',
+      text: 'Welcome to the Dashboard. This is your council chamber between trials.',
       mood: 'idle',
       duration: 3600,
     },
@@ -54,7 +54,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3400,
     },
     {
-      text: 'The Iron Rankings track every founder who has dared the gauntlet.',
+      text: 'The Elo Rankings track every founder who has dared the gauntlet.',
       mood: 'speaking',
       duration: 3400,
     },
@@ -107,17 +107,17 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'leaderboard.first-visit': [
     {
-      text: 'The Iron Rankings, lord. Here, all founders are measured by the coin they command.',
+      text: 'The Elo Rankings, lord. Here, all founders are measured by the coin they command.',
       mood: 'idle',
       duration: 3600,
     },
     {
-      text: 'Your projected revenue determines your standing among the realm.',
+      text: 'Your projected revenue determines your standing among the domain.',
       mood: 'speaking',
       duration: 3200,
     },
     {
-      text: 'The throne awaits the boldest.',
+      text: 'The championship awaits the boldest.',
       mood: 'idle',
       duration: 0,
     },
@@ -133,7 +133,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'results.first-visit': [
     {
-      text: 'The Legacy Scroll, lord. Every campaign you have fought is recorded here.',
+      text: 'Results, lord. Every campaign you have fought is recorded here.',
       mood: 'idle',
       duration: 3600,
     },
@@ -336,7 +336,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'stage.expansion.first-visit': [
     {
-      text: 'Expansion, lord. The realm grows — but so do the threats.',
+      text: 'Expansion, lord. The domain grows — but so do the threats.',
       mood: 'warning',
       duration: 3200,
     },
@@ -491,7 +491,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3200,
     },
     {
-      text: 'Your legacy score will be etched into the Iron Rankings for all to see.',
+      text: 'Your performance score will be etched into the Elo Rankings for all to see.',
       mood: 'warning',
       duration: 3400,
     },
@@ -506,14 +506,14 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
   ],
 
   // ===================================================================
-  // GREAT HALL — the Maester's Welcome (progression onboarding).
+  // GREAT HALL — the Advisor's Welcome (progression onboarding).
   // A dedicated phase so it fires once for EVERY founder, including
   // those who saw the older 'dashboard' intro before progression existed.
   // ===================================================================
 
   'great-hall.first-visit': [
     {
-      text: 'Welcome to the Great Hall, lord — your seat of power between trials.',
+      text: 'Welcome to the Dashboard, lord — your seat of power between trials.',
       mood: 'idle',
       duration: 3400,
     },
@@ -524,9 +524,9 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3800,
     },
     {
-      text: 'Renown measures your standing. Earn it through sharp decisions and rise from Aspirant to Ruler of the Realm.',
+      text: 'Rating measures your standing. Earn it through sharp decisions and rise from Aspirant to Ruler of the Domain.',
       mood: 'speaking',
-      highlight: 'dashboard-renown',
+      highlight: 'dashboard-rating',
       duration: 4200,
     },
     {
@@ -536,7 +536,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 4000,
     },
     {
-      text: 'Sigils mark your great deeds — won through merit, never bought.',
+      text: 'Emblems mark your great deeds — won through merit, never bought.',
       mood: 'speaking',
       duration: 3400,
     },

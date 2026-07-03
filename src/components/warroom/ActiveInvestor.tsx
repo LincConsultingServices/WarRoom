@@ -14,7 +14,7 @@ import {
 // <ActiveInvestor /> — Left panel of the council chamber.
 //
 // Renders the investor currently holding the floor: large dramatic
-// portrait (or its CSS-fallback state), Cinzel name + house badge,
+// portrait (or its CSS-fallback state), display name + club badge,
 // primary lens, bias trait, and the live disposition meter.
 //
 // State derives from the parent's signals — this component is

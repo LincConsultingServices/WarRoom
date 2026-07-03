@@ -66,7 +66,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
               className={cn(
                 'relative flex flex-col items-center gap-2 rounded-md border p-3 text-center backdrop-blur-sm transition-all duration-300',
                 isSelected
-                  ? 'border-[color:var(--color-warroom-gold)]/65 bg-[color:var(--color-warroom-obsidian)]/65 shadow-md'
+                  ? 'border-[color:var(--color-warroom-gold)]/65 bg-[color:var(--color-warroom-charcoal)]/65 shadow-md'
                   : 'border-[color:var(--color-warroom-gold)]/15 bg-card/60 hover:border-[color:var(--color-warroom-gold)]/45',
                 isDisabled && !isSelected && 'opacity-40 cursor-not-allowed'
               )}
@@ -80,7 +80,7 @@ function CharacterGroup<T extends { id: string; name: string; avatar?: string }>
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[color:var(--color-warroom-gold)] flex items-center justify-center shadow-[0_0_12px_rgba(201,162,39,0.55)]"
+                    className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[color:var(--color-warroom-gold)] flex items-center justify-center shadow-[0_0_12px_rgba(200,168,74,0.55)]"
                   >
                     <Check className="h-3 w-3 text-primary-foreground" />
                   </motion.div>
@@ -210,7 +210,7 @@ export function CharacterPicker({
 
       <CharacterGroup
         title="Investors"
-        subtitle="They will evaluate your pitch in the War Room"
+        subtitle="They will evaluate your pitch in the Assessment"
         items={investors}
         selected={selInvestors}
         maxSelect={7}

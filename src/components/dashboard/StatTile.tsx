@@ -20,7 +20,7 @@ export interface StatTileProps {
 /**
  * <StatTile /> — a stone-card statistic tile.
  *
- * Layout: top accent rule, large monospace numeric value, small Cinzel
+ * Layout: top accent rule, large monospace numeric value, small display font
  * label, optional icon and hint. Designed for the 2×2 dashboard grid.
  */
 export function StatTile({

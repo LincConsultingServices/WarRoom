@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              The Iron Rankings
+              The Elo Rankings
             </h1>
           </div>
 
@@ -113,7 +113,7 @@ export default function LeaderboardPage() {
             </p>
           </motion.div>
 
-          {/* ── Your standing (House + rank + Renown) ── */}
+          {/* ── Your standing (Club + rank + Rating) ── */}
           {progression && (
             <motion.div
               className="mb-6"
@@ -149,7 +149,7 @@ export default function LeaderboardPage() {
                 <div className="my-3">
                   <GoldDivider variant="line" />
                 </div>
-                <RenownBar rank={progression.rank} renown={progression.renown} />
+                <RenownBar rank={progression.rank} rating={progression.rating} />
               </StoneCard>
             </motion.div>
           )}
@@ -165,7 +165,7 @@ export default function LeaderboardPage() {
               currentUserId={user?.id}
               connected={connected}
               updatedAt={updatedAt}
-              currentUserHouse={progression?.house}
+              currentUserClub={progression?.house}
               className="w-full min-h-[460px]"
             />
           </motion.div>

@@ -10,11 +10,11 @@ import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 // ============================================================
 // <WarRoomEntrance />
 // Fullscreen cinematic overlay played the FIRST time a user
-// crosses into the War Room. Behaviour:
+// crosses into the Assessment. Behaviour:
 //   • Plays /assets/video/warroom-door-opening.{webm,mp4} muted.
 //   • Falls back to an SVG doors-parting animation if the video
 //     is missing or fails to load — never blocks the UX.
-//   • Reveals timed Cinzel subtitles over the video.
+//   • Reveals timed subtitles over the video.
 //   • Skip control: visible immediately on repeat visits
 //     (localStorage flag), else after 3s.
 //   • On end: fade-to-black ~800ms → unmount + onComplete().
@@ -31,8 +31,8 @@ const FADE_OUT_MS = 800
 const FALLBACK_DURATION_MS = 5200
 
 const DEFAULT_CUES: SubtitleCue[] = [
-  { atMs: 1800, text: 'The Council has been assembled…', holdMs: 2800 },
-  { atMs: 4800, text: 'Six lords. One throne.', holdMs: 2600 },
+  { atMs: 1800, text: 'The Panel has been assembled…', holdMs: 2800 },
+  { atMs: 4800, text: 'Six lords. One championship.', holdMs: 2600 },
   { atMs: 7600, text: 'Defend your vision.', holdMs: 2400 },
   { atMs: 10200, text: 'Or burn.', holdMs: 2600 },
 ]
@@ -157,7 +157,7 @@ export function WarRoomEntrance({
         onKeyDown={begin}
         tabIndex={-1}
         role="dialog"
-        aria-label="Entering the War Room"
+        aria-label="Entering the Assessment"
       >
         {!videoFailed ? (
           <video
@@ -227,8 +227,8 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
         style={{
           background:
             'linear-gradient(90deg, #1a0a00 0%, #2a1808 60%, #3d2210 100%)',
-          borderRight: '2px solid rgba(201,162,39,0.45)',
-          boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.7), 8px 0 40px rgba(201,162,39,0.18)',
+          borderRight: '2px solid rgba(200,168,74,0.45)',
+          boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.7), 8px 0 40px rgba(200,168,74,0.18)',
         }}
       />
       <motion.div
@@ -239,8 +239,8 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
         style={{
           background:
             'linear-gradient(270deg, #1a0a00 0%, #2a1808 60%, #3d2210 100%)',
-          borderLeft: '2px solid rgba(201,162,39,0.45)',
-          boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.7), -8px 0 40px rgba(201,162,39,0.18)',
+          borderLeft: '2px solid rgba(200,168,74,0.45)',
+          boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.7), -8px 0 40px rgba(200,168,74,0.18)',
         }}
       />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

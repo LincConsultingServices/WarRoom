@@ -10,7 +10,7 @@ interface EmberParticlesProps {
   hueShift?: number
 }
 
-interface Ember {
+interface Particle {
   x: number
   y: number
   size: number
@@ -18,16 +18,19 @@ interface Ember {
   vx: number
   life: number
   maxLife: number
-  hue: number
+  brightness: number
 }
 
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
+/**
+ * Subtle silver/white ambient particles — replaces the medieval ember effect.
+ * Sparse, slow-drifting motes that evoke a premium tournament hall atmosphere.
+ */
 export function EmberParticles({
   className,
-  density = 40,
+  density = 20,
   speed = 1,
-  hueShift = 0,
 }: EmberParticlesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -41,7 +44,7 @@ export function EmberParticles({
     if (!ctx) return
 
     let raf = 0
-    let embers: Ember[] = []
+    let particles: Particle[] = []
     let dpr = Math.min(window.devicePixelRatio || 1, 2)
 
     const resize = () => {
@@ -56,24 +59,24 @@ export function EmberParticles({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
-    const spawn = (initial = false): Ember => {
+    const spawn = (initial = false): Particle => {
       const w = canvas.width / dpr
       const h = canvas.height / dpr
-      const maxLife = 2400 + Math.random() * 2600
+      const maxLife = 3000 + Math.random() * 3000
       return {
         x: Math.random() * w,
         y: initial ? Math.random() * h : h + Math.random() * 20,
-        size: 1 + Math.random() * 2.4,
-        vy: -(0.15 + Math.random() * 0.45) * speed,
-        vx: (Math.random() - 0.5) * 0.25 * speed,
+        size: 0.6 + Math.random() * 1.4,
+        vy: -(0.08 + Math.random() * 0.22) * speed,
+        vx: (Math.random() - 0.5) * 0.15 * speed,
         life: 0,
         maxLife,
-        hue: 28 + Math.random() * 22 + hueShift,
+        brightness: 70 + Math.random() * 30,
       }
     }
 
     const populate = () => {
-      embers = Array.from({ length: density }, () => spawn(true))
+      particles = Array.from({ length: density }, () => spawn(true))
     }
 
     let last = performance.now()
@@ -86,26 +89,29 @@ export function EmberParticles({
       ctx.clearRect(0, 0, w, h)
       ctx.globalCompositeOperation = 'lighter'
 
-      for (let i = 0; i < embers.length; i++) {
-        const e = embers[i]
-        e.life += dt
-        e.x += e.vx * (dt / 16)
-        e.y += e.vy * (dt / 16)
-        e.vx += (Math.random() - 0.5) * 0.02
-        const t = e.life / e.maxLife
-        const alpha = Math.max(0, Math.sin(Math.PI * Math.min(1, t)))
-        const glow = e.size * 4
-        const grad = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, glow)
-        grad.addColorStop(0, `hsla(${e.hue}, 95%, 65%, ${alpha * 0.85})`)
-        grad.addColorStop(0.4, `hsla(${e.hue - 6}, 90%, 50%, ${alpha * 0.35})`)
-        grad.addColorStop(1, `hsla(${e.hue - 10}, 90%, 40%, 0)`)
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        p.life += dt
+        p.x += p.vx * (dt / 16)
+        p.y += p.vy * (dt / 16)
+        p.vx += (Math.random() - 0.5) * 0.01
+
+        const t = p.life / p.maxLife
+        const alpha = Math.max(0, Math.sin(Math.PI * Math.min(1, t))) * 0.45
+        const glow = p.size * 3.5
+
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glow)
+        grad.addColorStop(0, `rgba(${p.brightness * 2}, ${p.brightness * 2}, ${p.brightness * 2}, ${alpha})`)
+        grad.addColorStop(0.5, `rgba(200, 200, 200, ${alpha * 0.3})`)
+        grad.addColorStop(1, `rgba(200, 200, 200, 0)`)
+
         ctx.fillStyle = grad
         ctx.beginPath()
-        ctx.arc(e.x, e.y, glow, 0, Math.PI * 2)
+        ctx.arc(p.x, p.y, glow, 0, Math.PI * 2)
         ctx.fill()
 
-        if (e.life >= e.maxLife || e.y < -20) {
-          embers[i] = spawn(false)
+        if (p.life >= p.maxLife || p.y < -20) {
+          particles[i] = spawn(false)
         }
       }
 
@@ -116,17 +122,14 @@ export function EmberParticles({
     populate()
     raf = requestAnimationFrame(frame)
 
-    const ro = new ResizeObserver(() => {
-      resize()
-      populate()
-    })
+    const ro = new ResizeObserver(() => { resize(); populate() })
     if (canvas.parentElement) ro.observe(canvas.parentElement)
 
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [density, speed, hueShift])
+  }, [density, speed])
 
   return (
     <canvas

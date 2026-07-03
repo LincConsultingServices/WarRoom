@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 // "answer submitted" and "feedback streaming").
 //
 // Visual: dim crimson vignette + three slowly-rotating rune
-// glyphs + Cinzel "The council deliberates…" text. No external
+// glyphs + display font "The panel deliberates…" text. No external
 // images — everything is Unicode + SVG so it works offline / on
 // poor connections.
 // ============================================================
@@ -22,7 +22,7 @@ interface CouncilDeliberatesLoaderProps {
 const RUNES = ['⚔', '⚜', '✦'] as const
 
 export function CouncilDeliberatesLoader({
-  message = 'The council deliberates…',
+  message = 'The panel deliberates…',
   className,
 }: CouncilDeliberatesLoaderProps) {
   const reducedMotion = useReducedMotion()

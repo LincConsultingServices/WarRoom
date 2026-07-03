@@ -2,7 +2,7 @@
 
 // ============================================
 // <RenownBar /> — rank insignia + a restrained progress rail toward
-// the next rank, with a CountUp of total Renown. The prestige spine's
+// the next rank, with a CountUp of total Rating. The prestige spine's
 // at-a-glance widget for the dashboard banner.
 // ============================================
 
@@ -16,16 +16,16 @@ import { RankInsignia } from './RankInsignia'
 
 export interface RenownBarProps {
   rank: RankProgress
-  renown: number
+  rating: number
   showInsignia?: boolean
   className?: string
 }
 
-export function RenownBar({ rank, renown, showInsignia = true, className }: RenownBarProps) {
+export function RenownBar({ rank, rating, showInsignia = true, className }: RenownBarProps) {
   const prefersReduced = useReducedMotion()
   const frac = rankFraction(rank)
   const next = RANKS.find((r) => r.tier === rank.tier + 1)
-  const atMax = rank.renownForNextTier == null
+  const atMax = rank.ratingForNextTier == null
 
   return (
     <div className={cn('flex items-center gap-4', className)}>
@@ -43,7 +43,7 @@ export function RenownBar({ rank, renown, showInsignia = true, className }: Reno
             className="shrink-0 text-[11px] tracking-[0.08em] text-[color:var(--color-warroom-gold)]"
             style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
           >
-            <CountUp end={renown} duration={1.4} /> Renown
+            <CountUp end={rating} duration={1.4} /> Rating
           </span>
         </div>
 
@@ -60,7 +60,7 @@ export function RenownBar({ rank, renown, showInsignia = true, className }: Reno
             style={{
               background:
                 'linear-gradient(90deg, var(--color-warroom-gold-dark), var(--color-warroom-gold-bright))',
-              boxShadow: '0 0 10px rgba(201,162,39,0.45)',
+              boxShadow: '0 0 10px rgba(200,168,74,0.45)',
             }}
             initial={prefersReduced ? false : { width: 0 }}
             animate={{ width: `${frac * 100}%` }}
@@ -73,8 +73,8 @@ export function RenownBar({ rank, renown, showInsignia = true, className }: Reno
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {atMax || !next
-            ? 'Apex rank — the realm is yours'
-            : `${rank.renownIntoTier.toLocaleString()} / ${rank.renownForNextTier?.toLocaleString()} to ${next.title}`}
+            ? 'Apex rank — the domain is yours'
+            : `${rank.ratingIntoTier.toLocaleString()} / ${rank.ratingForNextTier?.toLocaleString()} to ${next.title}`}
         </div>
       </div>
     </div>

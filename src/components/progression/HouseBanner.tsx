@@ -44,7 +44,7 @@ export function HouseBanner({
         {founderName && (
           <h1
             className="text-2xl font-bold tracking-wide text-[color:var(--color-warroom-ghost)] sm:text-3xl"
-            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 24px rgba(201,162,39,0.22)' }}
+            style={{ fontFamily: 'var(--font-display)' }}
           >
             {founderName}
           </h1>

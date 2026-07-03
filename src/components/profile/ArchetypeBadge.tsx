@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 //
 // Variants:
 //   'inline'  — small chip-style for inline use
-//   'hero'    — big Cinzel display for the profile page
+//   'hero'    — big display font for the profile page
 //   'compact' — single-line label + name, dashboard-friendly
 //
 // Pure presentational. No data fetching.
@@ -83,7 +83,7 @@ export function ArchetypeBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-sm border border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-obsidian)]/55 px-2 py-0.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]',
+        'inline-flex items-center gap-1.5 rounded-sm border border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-charcoal)]/55 px-2 py-0.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]',
         className,
       )}
     >

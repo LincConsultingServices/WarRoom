@@ -9,29 +9,19 @@ import { ASSET_REGISTRY } from '@/lib/assets/assetRegistry'
 export interface WarRoomCrestProps {
   size?: number
   className?: string
-  /** Disable mount animation. */
   staticRender?: boolean
 }
 
 const CREST_SRC = ASSET_REGISTRY.crests.warroom
 
 /**
- * <WarRoomCrest /> — the inline SVG sigil for the WarRoom brand.
- *
- * Stylized crown with crossed swords and a "KK" monogram at center.
- * Pure SVG — no asset dependency. Designed to look intentional even
- * before bespoke art lands.
+ * <WarRoomCrest /> — Chess king emblem for the WarRoom brand.
+ * Pure SVG fallback — no asset dependency.
  */
-export function WarRoomCrest({
-  size = 120,
-  className,
-  staticRender,
-}: WarRoomCrestProps) {
+export function WarRoomCrest({ size = 120, className, staticRender }: WarRoomCrestProps) {
   const prefersReducedMotion = useReducedMotion()
   const animate = !staticRender && !prefersReducedMotion
 
-  // Probe the on-disk crest SVG; when present, render it instead of the inline
-  // placeholder. Falls back automatically if the file is missing.
   const [crestLoaded, setCrestLoaded] = useState(false)
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -72,13 +62,13 @@ export function WarRoomCrest({
     >
       <defs>
         <linearGradient id="crest-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f0c040" />
-          <stop offset="55%" stopColor="#c9962a" />
-          <stop offset="100%" stopColor="#8b6914" />
+          <stop offset="0%" stopColor="#e0c870" />
+          <stop offset="55%" stopColor="#c8a84a" />
+          <stop offset="100%" stopColor="#8a7030" />
         </linearGradient>
         <radialGradient id="crest-glow" cx="50%" cy="55%" r="55%">
-          <stop offset="0%" stopColor="rgba(240,192,64,0.35)" />
-          <stop offset="60%" stopColor="rgba(240,192,64,0.08)" />
+          <stop offset="0%" stopColor="rgba(200,168,74,0.25)" />
+          <stop offset="60%" stopColor="rgba(200,168,74,0.06)" />
           <stop offset="100%" stopColor="rgba(0,0,0,0)" />
         </radialGradient>
       </defs>
@@ -86,82 +76,41 @@ export function WarRoomCrest({
       {/* Glow halo */}
       <circle cx="50" cy="55" r="46" fill="url(#crest-glow)" />
 
-      {/* Outer ring */}
-      <circle
-        cx="50"
-        cy="50"
-        r="42"
-        fill="none"
-        stroke="url(#crest-gold)"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <circle
-        cx="50"
-        cy="50"
-        r="38"
-        fill="none"
-        stroke="url(#crest-gold)"
-        strokeWidth="0.6"
-        opacity="0.4"
-      />
+      {/* Outer rings */}
+      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#crest-gold)" strokeWidth="1" opacity="0.5" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="url(#crest-gold)" strokeWidth="0.5" opacity="0.3" />
 
-      {/* Crossed swords */}
-      <g stroke="url(#crest-gold)" strokeWidth="1.6" strokeLinecap="round" fill="none">
-        {/* Sword 1: top-left to bottom-right */}
-        <line x1="22" y1="22" x2="78" y2="78" />
-        {/* Sword 2: top-right to bottom-left */}
-        <line x1="78" y1="22" x2="22" y2="78" />
-      </g>
-      {/* Hilts (small rectangles at the top of each sword) */}
-      <g fill="url(#crest-gold)">
-        <rect
-          x="17"
-          y="15"
-          width="10"
-          height="2.2"
-          transform="rotate(45 22 22)"
-        />
-        <rect
-          x="73"
-          y="15"
-          width="10"
-          height="2.2"
-          transform="rotate(-45 78 22)"
-        />
+      {/* Chess board accent — 4 small squares */}
+      <g fill="url(#crest-gold)" opacity="0.25">
+        <rect x="20" y="20" width="6" height="6" />
+        <rect x="26" y="26" width="6" height="6" />
+        <rect x="68" y="20" width="6" height="6" />
+        <rect x="62" y="26" width="6" height="6" />
       </g>
 
-      {/* Crown — five points across the top */}
-      <g fill="url(#crest-gold)" stroke="url(#crest-gold)" strokeWidth="0.4">
-        <polygon points="34,30 38,18 42,30" />
-        <polygon points="42,30 46,14 50,30" />
-        <polygon points="50,30 54,11 58,30" />
-        <polygon points="58,30 62,14 66,30" />
-        <polygon points="66,30 70,18 74,30" />
-        <rect x="32" y="29" width="44" height="3.5" />
-        {/* Three jewel dots on the crown band */}
-        <circle cx="40" cy="31" r="0.8" fill="#0a0805" />
-        <circle cx="54" cy="31" r="0.8" fill="#0a0805" />
-        <circle cx="68" cy="31" r="0.8" fill="#0a0805" />
+      {/* Chess King piece */}
+      <g fill="url(#crest-gold)" stroke="url(#crest-gold)" strokeWidth="0.3">
+        {/* Cross top */}
+        <rect x="47" y="14" width="6" height="14" rx="1" />
+        <rect x="43" y="18" width="14" height="6" rx="1" />
+        {/* Neck */}
+        <rect x="45" y="28" width="10" height="4" rx="1" />
+        {/* Body */}
+        <path d="M 36 32 Q 36 30 38 30 L 62 30 Q 64 30 64 32 L 68 62 Q 68 66 64 66 L 36 66 Q 32 66 32 62 Z" />
+        {/* Base */}
+        <rect x="30" y="66" width="40" height="6" rx="2" />
+        <rect x="28" y="72" width="44" height="4" rx="2" />
       </g>
 
-      {/* Central shield */}
-      <path
-        d="M 36 44 Q 36 41 39 41 L 61 41 Q 64 41 64 44 L 64 60 Q 64 70 50 76 Q 36 70 36 60 Z"
-        fill="rgba(10,8,5,0.85)"
-        stroke="url(#crest-gold)"
-        strokeWidth="1.1"
-      />
-
-      {/* KK monogram */}
+      {/* KK monogram on body */}
       <text
         x="50"
-        y="61"
+        y="54"
         textAnchor="middle"
-        fill="url(#crest-gold)"
-        fontSize="14"
-        fontWeight="700"
-        style={{ fontFamily: 'var(--font-display-decorative, var(--font-display))' }}
+        fill="rgba(8,8,8,0.85)"
+        fontSize="13"
+        fontWeight="800"
+        style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}
       >
         KK
       </text>

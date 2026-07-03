@@ -186,7 +186,7 @@ export default function ResultsPage() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            The Legacy Scroll
+            Results
           </h1>
         </div>
         <p

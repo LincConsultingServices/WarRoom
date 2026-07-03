@@ -34,7 +34,7 @@ function stageStatus(currentStage: StageName | null, stageIndex: number): NodeSt
  * <CampaignMap /> — horizontal ribbon of 9 hexagonal stage nodes.
  *
  * Visualizes the user's progression: Ideation → Vision → Commitment →
- * Validation → Growth → Expansion → Scale → War Room Prep → War Room.
+ * Validation → Growth → Expansion → Scale → Assessment Prep → Assessment.
  * Completed nodes glow gold; the current node pulses; locked nodes
  * stay dim. Clickable completed nodes call `onStageClick`.
  */
@@ -53,7 +53,7 @@ export function CampaignMap({
         className="absolute left-4 right-4 top-1/2 h-[2px] -translate-y-1/2 pointer-events-none"
         style={{
           background:
-            'linear-gradient(90deg, rgba(74,63,56,0.6) 0%, rgba(201,162,39,0.35) 50%, rgba(74,63,56,0.6) 100%)',
+            'linear-gradient(90deg, rgba(74,63,56,0.6) 0%, rgba(200,168,74,0.35) 50%, rgba(74,63,56,0.6) 100%)',
         }}
       />
 
@@ -65,7 +65,7 @@ export function CampaignMap({
       >
         {STAGE_ORDER.map((stage, i) => {
           const status = stageStatus(currentStage, i)
-          const accent = STAGE_THEMES[stage] ?? '#c9a227'
+          const accent = STAGE_THEMES[stage] ?? '#c8a84a'
           const label = NARRATION_STAGE_LABELS[i] ?? STAGE_NARRATIVES[stage]?.title
           const month = STAGE_NARRATIVES[stage]?.month ?? ''
           const fullTitle = STAGE_NARRATIVES[stage]?.title ?? label

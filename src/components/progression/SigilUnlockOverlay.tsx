@@ -90,7 +90,7 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
 
           <h2
             className="text-2xl font-bold tracking-wide text-[color:var(--color-warroom-ghost)] sm:text-3xl"
-            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 26px rgba(201,162,39,0.3)' }}
+            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 26px rgba(200,168,74,0.3)' }}
           >
             {def?.name ?? current.id}
           </h2>

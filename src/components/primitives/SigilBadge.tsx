@@ -25,7 +25,7 @@ const TONE_STYLES: Record<SigilTone, string> = {
 
 /**
  * <SigilBadge /> — small house-banner chip used for section labels
- * ("The Trial", "The Council") and status pills.
+ * ("The Trial", "The Panel") and status pills.
  */
 export const SigilBadge = forwardRef<HTMLSpanElement, SigilBadgeProps>(
   function SigilBadge(
@@ -41,7 +41,7 @@ export const SigilBadge = forwardRef<HTMLSpanElement, SigilBadgeProps>(
           TONE_STYLES[tone],
           className,
         )}
-        style={{ fontFamily: 'var(--font-display)' }}
+        style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.12em' }}
         {...rest}
       >
         {Icon && <Icon className="h-3 w-3 shrink-0" aria-hidden />}

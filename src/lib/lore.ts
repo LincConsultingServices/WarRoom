@@ -1,30 +1,27 @@
 // ============================================
-// War Room — Codex (lore → plain language)
-// ----------------------------------------------------------------
-// Central plain-language definitions for the themed terms, surfaced
-// via <LoreTip>. Keeps the GoT metaphors atmospheric without
-// sacrificing comprehension. One source of truth for the copy.
+// War Room — Codex (chess/strategy plain language)
+// Central definitions for themed terms, surfaced via <LoreTip>.
 // ============================================
 
 export const LORE = {
   renown:
-    'Renown — your prestige score, earned by making strong decisions in trials. It raises your Founder Rank.',
+    'Rating — your performance score, earned by making strong decisions across assessment stages. It raises your Title.',
   founderRank:
-    'Founder Rank — your prestige tier, from Aspirant up to Ruler of the Realm, earned by accumulating Renown.',
+    'Founder Title — your prestige tier, from Candidate Master up to Grandmaster, earned by accumulating Rating points.',
   ranking:
-    'Your live position on this cohort’s leaderboard, ranked by projected revenue.',
+    'Your live position on this cohort\'s leaderboard, ranked by projected performance score.',
   constellation:
-    'Each star is one of your eight founder competencies. It brightens as you master that skill across trials.',
+    'Each node represents one of your eight founder competencies. It strengthens as you demonstrate mastery across stages.',
   sigil:
-    'Sigils are achievements for genuine feats — earned through merit, never bought.',
+    'Emblems are achievements for genuine tactical feats — earned through merit, never shortcuts.',
   hearth:
-    'The Hearth tracks your weekly consistency. Keep it lit by returning each week.',
+    'The Streak tracks your weekly consistency. Keep it active by returning each week to the board.',
   house:
-    'Your House is your identity — crest, words, and colours. New options unlock as your rank rises.',
+    'Your Chess Club is your identity — emblem, motto, and colors. New options unlock as your title rises.',
   ironRankings:
-    'The Iron Rankings rank every founder in your cohort by projected revenue.',
+    'The Elo Ratings place every founder in your cohort by projected performance.',
   legacyScore:
-    'Your legacy score is the investors’ average verdict from a completed trial.',
+    'Your performance score is the evaluators\' average verdict from a completed assessment.',
 } as const
 
 export type LoreKey = keyof typeof LORE

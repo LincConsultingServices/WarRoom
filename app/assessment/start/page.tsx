@@ -39,20 +39,20 @@ const LEVELS = [
   {
     id: 1 as const,
     badge: 'L1',
-    title: 'Student of the Realm',
+    title: 'Student of the Domain',
     subtitle:
       'For students & early-career professionals exploring entrepreneurship.',
     features: ['Guided scenarios', 'Foundational questions', '~85 minutes total'],
-    sigil: '⚔',
+    emblem: '⚔',
   },
   {
     id: 2 as const,
     badge: 'L2',
-    title: 'Commander of the Realm',
+    title: 'Commander of the Domain',
     subtitle:
       'For mid-level managers & experienced professionals ready for the full gauntlet.',
     features: ['Complex scenarios', 'Advanced pressure', '~85 minutes total'],
-    sigil: '♛',
+    emblem: '♛',
   },
 ] as const
 
@@ -76,7 +76,7 @@ const FEATURES = [
   {
     glyph: 'WR',
     title: 'Investor War Room',
-    desc: 'Pitch to seven investors — the Master of Coin, the Hand of Execution, the Mother of Instinct. Negotiate your deal.',
+    desc: 'Pitch to seven investors — the Capital Strategist, the Operations Lead, the Market Instinct. Negotiate your deal.',
     icon: Crown,
     tone: 'crimson' as const,
     accent: 'var(--color-warroom-crimson)',
@@ -160,7 +160,7 @@ export default function SimulationStartPage() {
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="text-[10px] uppercase tracking-[0.14em]">
-            The Great Hall
+            Dashboard
           </span>
         </Link>
         <span className="text-[color:var(--color-warroom-ash)] text-xs">/</span>
@@ -250,7 +250,7 @@ export default function SimulationStartPage() {
                       className="text-[9rem] leading-none select-none"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
-                      {item.sigil}
+                      {item.emblem}
                     </span>
                   }
                   className={cn(

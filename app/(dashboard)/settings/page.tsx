@@ -54,7 +54,7 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 // Curated SFX preview buttons — one per major audio category so the
 // player can audition the sound design before committing volume changes.
 const SFX_PREVIEWS: { key: SfxKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: 'wr.verdict', label: 'Dragon Roar', icon: Crown },
+  { key: 'wr.verdict', label: 'Gambit Roar', icon: Crown },
   { key: 'sim.stage-begin', label: 'War Horn', icon: Swords },
   { key: 'sim.stage-clear', label: 'Triumph', icon: Crown },
   { key: 'ui.click', label: 'Sword Clash', icon: Swords },
@@ -70,7 +70,7 @@ type AmbientPreview = {
 const AMBIENT_PREVIEWS: AmbientPreview[] = [
   { key: null, label: 'Silence' },
   { key: 'ambient.hall', label: 'The Hall' },
-  { key: 'ambient.warroom', label: 'War Room' },
+  { key: 'ambient.warroom', label: 'Assessment' },
   { key: 'ambient.deliberate', label: 'Deliberation' },
   { key: 'ambient.victory', label: 'Verdict' },
 ]
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                   className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
-                  Customize the appearance of the War Room.
+                  Customize the appearance of the Assessment.
                 </p>
               </div>
               <div className="p-6 space-y-0 divide-y divide-[color:var(--color-warroom-ash)]/15">
@@ -506,7 +506,7 @@ export default function SettingsPage() {
                     className="text-xs text-[color:var(--color-warroom-smoke)] mt-1 mb-3"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
-                    The War Room is forged in darkness. Theme control is
+                    The Assessment is forged in darkness. Theme control is
                     available in the sidebar.
                   </p>
                   <div className="flex items-center gap-2 text-xs text-[color:var(--color-warroom-smoke)]">
@@ -670,7 +670,7 @@ export default function SettingsPage() {
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         Cello drone, organ pad, and piano motifs that score
-                        the war room.
+                        the assessment.
                       </p>
                     </div>
                     <span
@@ -749,7 +749,7 @@ export default function SettingsPage() {
                         className="text-xs text-[color:var(--color-warroom-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
-                        Spoken questions and verdicts from the council of investors.
+                        Spoken questions and verdicts from the panel of investors.
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -844,7 +844,7 @@ export default function SettingsPage() {
                       'hover:border-[color:var(--color-warroom-gold)]/55',
                       'hover:bg-[color:var(--color-warroom-gold)]/[0.06]',
                       'hover:text-[color:var(--color-warroom-gold)]',
-                      'hover:shadow-[0_0_18px_rgba(201,162,39,0.18)]',
+                      'hover:shadow-[0_0_18px_rgba(200,168,74,0.18)]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
                       'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-warroom-gold)]/25 disabled:hover:bg-[color:var(--color-warroom-rampart)]/40 disabled:hover:text-[color:var(--color-warroom-ivory)] disabled:hover:shadow-none',
                     )}
@@ -890,7 +890,7 @@ export default function SettingsPage() {
                       'hover:border-[color:var(--color-warroom-gold)]/55',
                       'hover:bg-[color:var(--color-warroom-gold)]/[0.06]',
                       'hover:text-[color:var(--color-warroom-gold)]',
-                      'hover:shadow-[0_0_18px_rgba(201,162,39,0.18)]',
+                      'hover:shadow-[0_0_18px_rgba(200,168,74,0.18)]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
                       'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-warroom-gold)]/25 disabled:hover:bg-[color:var(--color-warroom-rampart)]/40 disabled:hover:text-[color:var(--color-warroom-ivory)] disabled:hover:shadow-none',
                     )}
@@ -943,7 +943,7 @@ export default function SettingsPage() {
                       className="text-xs text-[color:var(--color-warroom-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Help improve War Room by sharing anonymous usage data
+                      Help improve Assessment by sharing anonymous usage data
                     </p>
                   </div>
                   <Switch id="analytics" defaultChecked />
@@ -962,7 +962,7 @@ export default function SettingsPage() {
                       className="text-xs text-[color:var(--color-warroom-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Make your profile visible on the Iron Rankings
+                      Make your profile visible on the Elo Rankings
                     </p>
                   </div>
                   <Switch id="profile-public" />

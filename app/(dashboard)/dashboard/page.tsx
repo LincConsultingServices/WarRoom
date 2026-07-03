@@ -154,8 +154,8 @@ export default function DashboardPage() {
     }
   }, [completedAssessments, simulations, entries])
 
-  // Earned sigils, newest first.
-  const earnedSigils = useMemo(
+  // Earned emblems, newest first.
+  const earnedEmblems = useMemo(
     () =>
       [...(progression?.sigils ?? [])].sort(
         (a, b) => new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime(),
@@ -192,7 +192,7 @@ export default function DashboardPage() {
       title: 'Begin a new trial',
       detail: weakestName
         ? `Your thinnest banner is ${weakestName}. A fresh trial is your chance to raise it.`
-        : 'A new trial raises your Renown and sharpens your record.',
+        : 'A new trial raises your Rating and sharpens your record.',
     }
   }, [currentSim, completedAssessments.length, progression])
 
@@ -213,14 +213,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen relative bg-[color:var(--color-warroom-void)]">
+    <div className="min-h-screen relative bg-transparent">
       {/* Soft torch glow overhead */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-96 opacity-60"
         style={{
           background:
-            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,162,39,0.07), transparent 70%)',
+            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,168,74,0.07), transparent 70%)',
         }}
       />
 
@@ -235,10 +235,10 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-sm flex items-center justify-center text-[10px] font-bold tracking-wider"
               style={{
-                background: 'linear-gradient(135deg, #8b6914, #c9a227, #8b6914)',
+                background: 'linear-gradient(135deg, #7a6020, #c8a84a, #7a6020)',
                 color: '#0a0805',
                 fontFamily: 'var(--font-display)',
-                boxShadow: '0 0 14px rgba(201,162,39,0.3)',
+                boxShadow: '0 0 14px rgba(200,168,74,0.3)',
               }}
             >
               {user?.name?.substring(0, 2).toUpperCase() || 'KK'}
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                 className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                Iron Rankings
+                Elo Rankings
               </button>
             </Link>
             <ThemeToggle />
@@ -303,7 +303,7 @@ export default function DashboardPage() {
             <FadeInUp>
               <div className="space-y-5">
                 <SigilBadge icon={Sparkles} tone="gold">
-                  The Great Hall
+                  The Dashboard
                 </SigilBadge>
                 <h1
                   className="text-3xl sm:text-4xl font-bold tracking-[0.02em] text-[color:var(--color-warroom-ghost)]"
@@ -313,7 +313,7 @@ export default function DashboardPage() {
                   <span
                     style={{
                       background:
-                        'linear-gradient(135deg, #c9a227, #f0c040, #c9a227)',
+                        'linear-gradient(135deg, #c8a84a, #f0c040, #c8a84a)',
                       WebkitBackgroundClip: 'text',
                       backgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
@@ -331,8 +331,8 @@ export default function DashboardPage() {
                   }}
                 >
                   {batch
-                    ? `The ${batch.name || batch.code} council awaits your next move.`
-                    : 'The realm is quiet. When you are ready, the trial begins.'}
+                    ? `The ${batch.name || batch.code} panel awaits your next move.`
+                    : 'The domain is quiet. When you are ready, the trial begins.'}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   <div {...beginIntro}>
@@ -359,24 +359,24 @@ export default function DashboardPage() {
               </div>
             </FadeInUp>
 
-            {/* Founder progression banner — House, rank, renown, hearth */}
+            {/* Founder progression banner — Club, rank, rating, streak */}
             {progression && (
               <FadeInUp delay={0.08}>
                 <StoneCard padding="md" texture="leather">
-                  <div id="dashboard-house" className="flex flex-wrap items-center justify-between gap-4">
+                  <div id="dashboard-club" className="flex flex-wrap items-center justify-between gap-4">
                     <HouseBanner
                       house={progression.house}
                       rank={progression.rank}
                       founderName={user?.name}
                       variant="compact"
                     />
-                    <HearthFlame hearth={progression.hearth} />
+                    <HearthFlame streak={progression.streak} />
                   </div>
                   <div className="my-4">
                     <GoldDivider variant="line" />
                   </div>
-                  <div id="dashboard-renown">
-                    <RenownBar rank={progression.rank} renown={progression.renown} />
+                  <div id="dashboard-rating">
+                    <RenownBar rank={progression.rank} rating={progression.rating} />
                   </div>
                 </StoneCard>
               </FadeInUp>
@@ -449,7 +449,7 @@ export default function DashboardPage() {
                   hint={stats.bestRevenue > 0 ? 'Annual revenue' : 'Finish a trial to record'}
                 />
                 <StatTile
-                  label={<LoreTip tip={LORE.ranking}>Rank in the Realm</LoreTip>}
+                  label={<LoreTip tip={LORE.ranking}>Rank in the Domain</LoreTip>}
                   value={stats.rank ? `#${stats.rank}` : '—'}
                   icon={Award}
                   accent={stats.rank && stats.rank <= 3 ? 'var(--color-warroom-crimson-bright)' : 'var(--color-warroom-gold)'}
@@ -467,18 +467,18 @@ export default function DashboardPage() {
                   }
                   icon={Crown}
                   accent="var(--color-warroom-gold)"
-                  hint={progression ? `${progression.renown.toLocaleString()} Renown` : 'Begin to earn Renown'}
+                  hint={progression ? `${progression.rating.toLocaleString()} Rating` : 'Begin to earn Rating'}
                 />
               </div>
             </FadeInUp>
 
-            {/* Recently earned sigils */}
-            {progression && earnedSigils.length > 0 && (
+            {/* Recently earned emblems */}
+            {progression && earnedEmblems.length > 0 && (
               <FadeInUp delay={0.2}>
-                <div id="dashboard-sigils" className="space-y-3">
+                <div id="dashboard-emblems" className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <SigilBadge icon={Award} tone="gold">
-                      Sigils Earned ({earnedSigils.length})
+                      Emblems Earned ({earnedEmblems.length})
                     </SigilBadge>
                     <Link
                       href="/profile"
@@ -489,7 +489,7 @@ export default function DashboardPage() {
                     </Link>
                   </div>
                   <div className="flex flex-wrap gap-4">
-                    {earnedSigils.slice(0, 6).map((s) => {
+                    {earnedEmblems.slice(0, 6).map((s) => {
                       const def = sigilById(s.id)
                       const style = SIGIL_TIER_COLOR[s.tier]
                       return (
@@ -677,12 +677,12 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Side rail: Iron Rankings */}
+          {/* Side rail: Elo Rankings */}
           <div className="space-y-6">
             <FadeInUp delay={0.2}>
               <div id="dashboard-leaderboard" className="space-y-4">
                 <SigilBadge icon={ScrollText} tone="gold">
-                  <LoreTip tip={LORE.ironRankings}>Iron Rankings</LoreTip>
+                  <LoreTip tip={LORE.ironRankings}>Elo Rankings</LoreTip>
                 </SigilBadge>
                 {batch ? (
                   <LeaderboardPanel
@@ -690,7 +690,7 @@ export default function DashboardPage() {
                     currentUserId={user?.id}
                     connected={connected}
                     updatedAt={updatedAt}
-                    currentUserHouse={progression?.house}
+                    currentUserClub={progression?.house}
                     className={cn('h-[520px]')}
                   />
                 ) : (

@@ -1,5 +1,5 @@
 // ============================================
-// War Room – Shared Helper Functions
+// Assessment – Shared Helper Functions
 // ============================================
 
 import { FileText, AlertTriangle, Target, DollarSign, Lightbulb } from 'lucide-react'
@@ -43,10 +43,10 @@ export function getQuestionTypeIcon(type: string) {
 
 export function getQuestionTypeColor(type: string): string {
   switch (type) {
-    case 'scenario': return '#ff6b00'
-    case 'multiple_choice': return '#c9a227'
+    case 'scenario': return '#c8a84a'
+    case 'multiple_choice': return '#c8a84a'
     case 'budget_allocation': return '#2d6a4f'
-    case 'ai_scenario': return '#8b1a1a'
+    case 'ai_scenario': return '#7a2020'
     case 'info': return '#3d6b8e'
     default: return '#7c5a9e'
   }
@@ -89,7 +89,7 @@ export function parseInvestorPanelQuestions(
     .filter((item): item is { investorName: string; question: string; voiceKeys: string[] } => item !== null)
 }
 
-// ---- War Room helpers ----
+// ---- Assessment helpers ----
 
 type PreviousResponseEntry = Record<string, unknown>
 
@@ -125,7 +125,7 @@ export function getPreparedPitchFromState(state: AssessmentState | null): string
     if (
       questionId === 'Q_WP_1' ||
       question.includes('pitch template') ||
-      question.includes('war room pitch') ||
+      question.includes('assessment pitch') ||
       question.includes('prepared pitch')
     ) {
       return answer

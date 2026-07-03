@@ -48,13 +48,13 @@ export function RankInsignia({
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
           <defs>
             <linearGradient id="rank-ring" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#8b6914" />
-              <stop offset="50%" stopColor="#e8c84a" />
-              <stop offset="100%" stopColor="#8b6914" />
+              <stop offset="0%" stopColor="#7a6020" />
+              <stop offset="50%" stopColor="#d4aa40" />
+              <stop offset="100%" stopColor="#7a6020" />
             </linearGradient>
           </defs>
-          <circle cx="50" cy="50" r="46" fill="rgba(10,8,5,0.92)" stroke="url(#rank-ring)" strokeWidth="3" />
-          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(201,162,39,0.25)" strokeWidth="1" />
+          <circle cx="50" cy="50" r="46" fill="rgba(12,12,12,0.94)" stroke="url(#rank-ring)" strokeWidth="3" />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(200,168,74,0.20)" strokeWidth="1" />
           {pipNodes}
         </svg>
         <Crown

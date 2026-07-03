@@ -55,7 +55,7 @@ export function MicPermissionDialog({ open, onAllow, onUseText, hideTextOption }
               <h2
                 className="text-xl font-bold"
                 style={{
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   color: '#e8e0d0',
                   letterSpacing: '0.06em',
                 }}
@@ -68,7 +68,7 @@ export function MicPermissionDialog({ open, onAllow, onUseText, hideTextOption }
               />
               <p className="text-sm leading-relaxed" style={{ color: '#a89e90', letterSpacing: '0.01em' }}>
                 {hideTextOption
-                  ? 'The War Room requires your microphone so the investors can hear you pitch, answer, and negotiate. Recordings stay private to this assessment.'
+                  ? 'The Assessment requires your microphone so the investors can hear you pitch, answer, and negotiate. Recordings stay private to this assessment.'
                   : 'The next section needs your microphone so the investors can hear you pitch, answer, and negotiate. Recordings stay private to this assessment. If you\'d rather type, you can continue with text instead.'}
               </p>
             </div>
@@ -82,7 +82,7 @@ export function MicPermissionDialog({ open, onAllow, onUseText, hideTextOption }
                   border: '1px solid rgba(99,102,241,0.55)',
                   borderRadius: '3px',
                   color: '#c7d2fe',
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   letterSpacing: '0.1em',
                   cursor: 'pointer',
                 }}
@@ -94,11 +94,11 @@ export function MicPermissionDialog({ open, onAllow, onUseText, hideTextOption }
                   onClick={onUseText}
                   className="py-2.5 text-xs font-bold transition-colors flex items-center justify-center gap-2"
                   style={{
-                    background: 'rgba(201,162,39,0.06)',
-                    border: '1px solid rgba(201,162,39,0.25)',
+                    background: 'rgba(200,168,74,0.06)',
+                    border: '1px solid rgba(200,168,74,0.25)',
                     borderRadius: '3px',
-                    color: '#c9a227',
-                    fontFamily: "'Cinzel', Georgia, serif",
+                    color: '#c8a84a',
+                    fontFamily: "var(--font-display)",
                     letterSpacing: '0.1em',
                     cursor: 'pointer',
                   }}

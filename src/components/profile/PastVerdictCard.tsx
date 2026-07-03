@@ -33,7 +33,7 @@ interface PastVerdictCardProps {
 
 const STATUS_TONE: Record<string, { label: string; cls: string }> = {
   COMPLETED:   { label: 'Completed',   cls: 'border-emerald-400/45 bg-emerald-900/25 text-emerald-200' },
-  IN_PROGRESS: { label: 'In progress', cls: 'border-[color:var(--color-warroom-gold)]/45 bg-[color:var(--color-warroom-obsidian)]/60 text-[color:var(--color-warroom-gold)]' },
+  IN_PROGRESS: { label: 'In progress', cls: 'border-[color:var(--color-warroom-gold)]/45 bg-[color:var(--color-warroom-charcoal)]/60 text-[color:var(--color-warroom-gold)]' },
   ABANDONED:   { label: 'Abandoned',   cls: 'border-foreground/15 bg-card/40 text-foreground/45' },
   FAILED:      { label: 'Failed',      cls: 'border-[color:var(--color-warroom-crimson)]/55 bg-[color:var(--color-warroom-crimson)]/15 text-[color:var(--color-warroom-crimson-bright)]' },
 }
@@ -85,7 +85,7 @@ export function PastVerdictCard({
       href={href}
       className={cn(
         'group block rounded-md border border-[color:var(--color-warroom-gold)]/25 bg-card/70 p-4 backdrop-blur-sm transition-all',
-        'hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-card/85 hover:shadow-[0_4px_24px_rgba(201,162,39,0.18)]',
+        'hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-card/85 hover:shadow-[0_4px_24px_rgba(200,168,74,0.18)]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]',
         className,
       )}
@@ -125,7 +125,7 @@ export function PastVerdictCard({
           )}
 
           <p className="mt-2 text-[0.65rem] uppercase tracking-[0.16em] text-foreground/40">
-            {investorCount > 0 ? `${investorCount} investors faced` : 'Council not yet assembled'}
+            {investorCount > 0 ? `${investorCount} investors faced` : 'Panel not yet assembled'}
           </p>
         </div>
 

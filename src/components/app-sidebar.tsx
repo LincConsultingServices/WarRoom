@@ -4,11 +4,11 @@ import * as React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  Castle,
-  Swords,
-  ScrollText,
+  LayoutDashboard,
+  Target,
+  BarChart2,
   Trophy,
-  Crown,
+  Settings,
   LogOut,
   User,
   HelpCircle,
@@ -61,28 +61,28 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
     }
   }, [userProp])
 
-  // "House Banners" — premium GOT-flavored navigation labels.
+  // Navigation items — chess/strategy themed labels
   const navMain = [
     {
-      title: 'The Great Hall',
+      title: 'Dashboard',
       url: '/dashboard',
-      icon: Castle,
+      icon: LayoutDashboard,
       isActive: pathname === '/dashboard',
     },
     {
-      title: 'The Trial',
+      title: 'Assessment',
       url: '/assessment/start',
-      icon: Swords,
+      icon: Target,
       isActive: pathname.startsWith('/assessment'),
     },
     {
-      title: 'The Legacy Scroll',
+      title: 'Results',
       url: '/results',
-      icon: ScrollText,
+      icon: BarChart2,
       isActive: pathname.startsWith('/results'),
     },
     {
-      title: 'The Iron Rankings',
+      title: 'Leaderboard',
       url: '/leaderboard',
       icon: Trophy,
       isActive: pathname.startsWith('/leaderboard'),
@@ -91,14 +91,14 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
 
   const navSecondary = [
     {
-      title: "The Maester's Hall",
+      title: 'Support',
       url: '/support',
       icon: HelpCircle,
     },
     {
-      title: 'The Citadel',
+      title: 'Settings',
       url: '/settings',
-      icon: Crown,
+      icon: Settings,
     },
   ]
 
@@ -119,16 +119,16 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span
-                    className="truncate font-semibold tracking-[0.08em] text-[color:var(--color-warroom-gold)]"
+                    className="truncate font-semibold tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     War Room
                   </span>
                   <span
-                    className="truncate text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-warroom-smoke)]"
+                    className="truncate text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
-                    Forge Your Legacy
+                    Assessment Platform
                   </span>
                 </div>
               </Link>
@@ -139,10 +139,10 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel
-            className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-warroom-smoke)]"
+            className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            House Banners
+            Navigation
           </SidebarGroupLabel>
           <SidebarMenu>
             {navMain.map((item) => (

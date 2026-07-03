@@ -81,7 +81,7 @@ export function SigilCrest({
   const top = locked ? '#3a352c' : secondary ?? primary
   const mid = locked ? '#2a261e' : primary
   const stroke = locked ? '#4a4336' : secondary ?? primary
-  const tint = locked ? '#6b6353' : iconColor ?? '#f3ead7'
+  const tint = locked ? '#6b6353' : iconColor ?? '#e8e8e8'
 
   return (
     <div
@@ -112,7 +112,7 @@ export function SigilCrest({
           fill="rgba(255,255,255,0.14)"
         />
         {/* dark central medallion for icon legibility */}
-        <circle cx="50" cy="56" r="23" fill="rgba(8,6,4,0.88)" stroke={stroke} strokeWidth="1.5" opacity={locked ? 0.6 : 1} />
+        <circle cx="50" cy="56" r="23" fill="rgba(10,10,10,0.90)" stroke={stroke} strokeWidth="1.5" opacity={locked ? 0.6 : 1} />
       </svg>
 
       <Icon

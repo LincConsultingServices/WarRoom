@@ -1304,7 +1304,7 @@ export default function WarRoomSimulation() {
                                                     borderRadius: '4px',
                                                     border: '1px solid rgba(201,162,39,0.5)',
                                                     background: 'rgba(201,162,39,0.12)',
-                                                    color: '#c9a227',
+                                                    color: '#c8a84a',
                                                     fontSize: '0.85rem',
                                                     cursor: 'pointer',
                                                 }}
@@ -1565,7 +1565,7 @@ export default function WarRoomSimulation() {
                                                 </motion.button>
                                                 <motion.button 
                                                     className="respond-btn" 
-                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#c23b3b' : '#c9a227' }}
+                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#b03030' : '#c8a84a' }}
                                                     onClick={handleNegotiateAudio} 
                                                     disabled={isNegVoiceSubmitting}
                                                     initial={{ scale: 0.9, opacity: 0 }}

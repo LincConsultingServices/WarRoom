@@ -88,7 +88,7 @@ function buildCohortCsv(
   }
   const headers = [
     'Name', 'Email', 'Joined', 'Status', 'Stage', 'Revenue',
-    'Mean Spam %', 'Rank', 'Renown', 'Sigils', 'Lit Competencies',
+    'Mean Spam %', 'Rank', 'Rating', 'Sigils', 'Lit Competencies',
   ]
   const rows = participants.map((p) => {
     const eng = p.phaseEngagement ? Object.values(p.phaseEngagement) : []
@@ -100,7 +100,7 @@ function buildCohortCsv(
       p.userName, p.email, new Date(p.joinedAt).toISOString().slice(0, 10),
       p.status ?? '', p.currentStage?.replace(/^STAGE_/, '').replace(/_/g, ' ') ?? '',
       p.revenueProjection ?? '', meanSpam,
-      st?.rankTitle ?? '', st?.renown ?? '', st?.sigilCount ?? '',
+      st?.rankTitle ?? '', st?.rating ?? '', st?.sigilCount ?? '',
       st ? `${st.litCompetencies}/8` : '',
     ].map(esc).join(',')
   })
@@ -418,12 +418,12 @@ export default function BatchDetailPage() {
                 interactive
               />
             </div>
-            {/* Founder standings — renown-descending */}
+            {/* Founder standings — rating-descending */}
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[color:var(--color-warroom-ash)]/20">
-                    {['Founder', 'Rank', 'Renown', 'Sigils', 'Lit'].map((h, i) => (
+                    {['Founder', 'Rank', 'Rating', 'Sigils', 'Lit'].map((h, i) => (
                       <th
                         key={h}
                         className={`py-3 px-2 font-medium text-[color:var(--color-warroom-smoke)] text-[10px] uppercase tracking-[0.14em] ${i >= 2 ? 'text-right' : 'text-left'}`}
@@ -455,7 +455,7 @@ export default function BatchDetailPage() {
                         </div>
                       </td>
                       <td className="py-3 px-2 text-right font-mono font-bold text-[color:var(--color-warroom-gold)]">
-                        {s.renown.toLocaleString()}
+                        {s.rating.toLocaleString()}
                       </td>
                       <td className="py-3 px-2 text-right font-mono text-xs text-[color:var(--color-warroom-ivory)]">
                         {s.sigilCount}

@@ -16,8 +16,8 @@ interface LeaderboardPanelProps {
   currentUserId?: string
   connected?: boolean
   updatedAt?: string | null
-  /** Current user's House — renders their crest on their own row. */
-  currentUserHouse?: HouseConfig
+  /** Current user's Club — renders their crest on their own row. */
+  currentUserClub?: HouseConfig
   className?: string
 }
 
@@ -68,7 +68,7 @@ export function LeaderboardPanel({
   currentUserId,
   connected = false,
   updatedAt,
-  currentUserHouse,
+  currentUserClub,
   className,
 }: LeaderboardPanelProps) {
   const prefersReducedMotion = useReducedMotion()
@@ -78,7 +78,7 @@ export function LeaderboardPanel({
     : -1
   // The founder one rung above — the one to overtake.
   const rivalIndex = myIndex > 0 ? myIndex - 1 : -1
-  const housePalette = currentUserHouse ? paletteById(currentUserHouse.paletteId) : null
+  const clubPalette = currentUserClub ? paletteById(currentUserClub.paletteId) : null
 
   return (
     <div
@@ -98,7 +98,7 @@ export function LeaderboardPanel({
             className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[color:var(--color-warroom-ivory)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Iron Rankings
+            Elo Rankings
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -194,13 +194,13 @@ export function LeaderboardPanel({
                       </span>
                     </div>
 
-                    {/* Current user's House crest */}
-                    {isMe && currentUserHouse && housePalette && (
+                    {/* Current user's Club crest */}
+                    {isMe && currentUserClub && clubPalette && (
                       <SigilCrest
-                        icon={iconForHouseSigil(currentUserHouse.sigilId)}
+                        icon={iconForHouseSigil(currentUserClub.sigilId)}
                         size={24}
-                        primary={housePalette.primary}
-                        secondary={housePalette.secondary}
+                        primary={clubPalette.primary}
+                        secondary={clubPalette.secondary}
                         className="shrink-0"
                       />
                     )}
@@ -235,7 +235,7 @@ export function LeaderboardPanel({
                         >
                           {gapToRival != null && gapToRival > 0
                             ? `↑ ${formatRevenue(gapToRival)} to overtake ${entries[rivalIndex].name}`
-                            : 'You hold the top of the realm'}
+                            : 'You hold the top of the domain'}
                         </div>
                       )}
                     </div>

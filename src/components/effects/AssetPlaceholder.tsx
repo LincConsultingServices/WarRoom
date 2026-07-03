@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 // audio) isn't on disk yet. Communicates exactly which file the
 // caller is missing so the team can drop one in.
 //
-// Designed to be quiet but legible — dashed gold border, Cinzel
+// Designed to be quiet but legible — dashed gold border, display font
 // label, asset path in monospace. Sits inside the same bounding
 // box the real asset would occupy.
 //
@@ -76,14 +76,14 @@ export function AssetPlaceholder({
       className={cn(
         'absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden p-4 text-center',
         'border border-dashed border-[color:var(--color-warroom-gold)]/40',
-        'bg-[color:var(--color-warroom-obsidian)]/40 backdrop-blur-[2px]',
+        'bg-[color:var(--color-warroom-charcoal)]/40 backdrop-blur-[2px]',
         className,
       )}
     >
       <span
         aria-hidden
         className="font-display text-3xl text-[color:var(--color-warroom-gold)]/55"
-        style={{ textShadow: '0 0 14px rgba(201,162,39,0.35)' }}
+        style={{ textShadow: '0 0 14px rgba(200,168,74,0.35)' }}
       >
         {KIND_ICON[kind]}
       </span>

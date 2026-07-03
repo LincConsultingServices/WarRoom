@@ -4,7 +4,7 @@ import { useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 // ============================================================
-// <BurningFuseTimer /> — a fuse burning right-to-left as the
+// <BurningFuseTimerTimer /> — a fuse burning right-to-left as the
 // remaining time on a stage drops to zero. Replaces the boring
 // progress-bar timer with something that lives in the chamber's
 // world (gunpowder fuses, sieges, etc.).
@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils'
 //     and a faster flicker.
 // ============================================================
 
-interface BurningFuseTimerProps {
+interface BurningFuseTimerTimerProps {
   /** 0..1 — fraction of time remaining (1 = full, 0 = expired). */
   progress: number
   /** Display string e.g. "01:45". Optional. */
@@ -34,7 +34,7 @@ const FUSE_LENGTH = 240
 const FUSE_HEIGHT = 36
 const ROPE_Y = FUSE_HEIGHT / 2
 
-export function BurningFuseTimer({ progress, readout, className }: BurningFuseTimerProps) {
+export function BurningFuseTimerTimer({ progress, readout, className }: BurningFuseTimerTimerProps) {
   const reducedMotion = useReducedMotion()
   const clamped = Math.max(0, Math.min(1, progress))
   const burnt = (1 - clamped) * FUSE_LENGTH
@@ -61,13 +61,13 @@ export function BurningFuseTimer({ progress, readout, className }: BurningFuseTi
           <radialGradient id="fuseEmber" cx="0.5" cy="0.5" r="0.5">
             <stop offset="0%"   stopColor="#fff3b0" stopOpacity="1" />
             <stop offset="35%"  stopColor="#ff9933" stopOpacity="0.95" />
-            <stop offset="70%"  stopColor="#ff6b00" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#8b1a1a" stopOpacity="0" />
+            <stop offset="70%"  stopColor="#c8a84a" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#7a2020" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="ropeUnburnt" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8b6914" />
-            <stop offset="50%" stopColor="#c9a227" />
-            <stop offset="100%" stopColor="#8b6914" />
+            <stop offset="0%" stopColor="#7a6020" />
+            <stop offset="50%" stopColor="#c8a84a" />
+            <stop offset="100%" stopColor="#7a6020" />
           </linearGradient>
         </defs>
 
@@ -100,7 +100,7 @@ export function BurningFuseTimer({ progress, readout, className }: BurningFuseTi
           y1={ROPE_Y}
           x2={FUSE_LENGTH}
           y2={ROPE_Y}
-          stroke={urgent ? '#c23b3b' : 'url(#ropeUnburnt)'}
+          stroke={urgent ? '#b03030' : 'url(#ropeUnburnt)'}
           strokeWidth="3.5"
           strokeLinecap="round"
         />

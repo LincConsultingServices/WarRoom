@@ -3,30 +3,30 @@
 // ============================================
 // <HearthFlame /> — gentle weekly streak indicator. The flame brightens
 // with consecutive active weeks. Designed to encourage, never to shame:
-// a dim hearth simply reads "unlit", with no penalty language.
+// a dim streak simply reads "unlit", with no penalty language.
 // ============================================
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { Flame } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { HearthState } from '@/src/types'
+import type { StreakState } from '@/src/types'
 
 export interface HearthFlameProps {
-  hearth: HearthState
+  streak: StreakState
   showLabel?: boolean
   size?: number
   className?: string
 }
 
-export function HearthFlame({ hearth, showLabel = true, size = 22, className }: HearthFlameProps) {
+export function HearthFlame({ streak, showLabel = true, size = 22, className }: HearthFlameProps) {
   const prefersReduced = useReducedMotion()
-  const weeks = hearth.current ?? 0
+  const weeks = streak.current ?? 0
   const lit = weeks > 0
   const intensity = Math.min(1, weeks / 6)
   const color = lit ? 'var(--color-warroom-ember)' : 'var(--color-warroom-smoke)'
 
   return (
-    <div className={cn('inline-flex items-center gap-2', className)} title={`Longest hearth: ${hearth.longest} weeks`}>
+    <div className={cn('inline-flex items-center gap-2', className)} title={`Longest streak: ${streak.longest} weeks`}>
       <motion.span
         className="inline-flex"
         animate={
@@ -41,7 +41,7 @@ export function HearthFlame({ hearth, showLabel = true, size = 22, className }: 
             width: size,
             height: size,
             color,
-            filter: lit ? `drop-shadow(0 0 ${4 + intensity * 12}px rgba(255,107,0,${0.3 + intensity * 0.5}))` : 'none',
+            filter: lit ? `drop-shadow(0 0 ${4 + intensity * 12}px rgba(200,168,74,${0.3 + intensity * 0.5}))` : 'none',
           }}
           aria-hidden
         />
@@ -51,7 +51,7 @@ export function HearthFlame({ hearth, showLabel = true, size = 22, className }: 
           className="text-[11px] uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          {lit ? `${weeks}-week hearth` : 'Hearth unlit'}
+          {lit ? `${weeks}-week streak` : 'Streak unlit'}
         </span>
       )}
     </div>

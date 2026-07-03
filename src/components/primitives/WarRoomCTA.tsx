@@ -8,11 +8,9 @@ import { audioManager, type SfxKey } from '@/lib/audio/audioManager'
 
 type WarRoomCTASize = 'sm' | 'md' | 'lg'
 type WarRoomCTAVariant = 'primary' | 'ghost'
-
 type MotionButtonProps = HTMLMotionProps<'button'>
 
-export interface WarRoomCTAProps
-  extends Omit<MotionButtonProps, 'children' | 'ref'> {
+export interface WarRoomCTAProps extends Omit<MotionButtonProps, 'children' | 'ref'> {
   size?: WarRoomCTASize
   variant?: WarRoomCTAVariant
   icon?: LucideIcon
@@ -28,20 +26,11 @@ const SIZE_CLASSES: Record<WarRoomCTASize, string> = {
   lg: 'px-10 py-5 text-base',
 }
 
-const CORNER_SIZE: Record<WarRoomCTASize, number> = {
-  sm: 6,
-  md: 8,
-  lg: 10,
-}
+const CORNER_SIZE: Record<WarRoomCTASize, number> = { sm: 6, md: 8, lg: 10 }
 
 /**
- * <WarRoomCTA /> — the canonical primary action button for the app.
- *
- * Gold-bordered with corner embellishments. Plays a UI click SFX
- * on click (routed via audioManager, which falls through to the
- * GOTSoundManager synth when files are missing).
- *
- * Wrap in <Link> for navigation: <Link href="..."><WarRoomCTA>...</WarRoomCTA></Link>.
+ * <WarRoomCTA /> — premium chess-themed action button.
+ * Charcoal base with muted gold border and corner embellishments.
  */
 export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
   function WarRoomCTA(
@@ -70,22 +59,22 @@ export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
       <motion.button
         ref={ref}
         type={type}
-        whileHover={{ scale: 1.04, y: -2 }}
+        whileHover={{ scale: 1.03, y: -2 }}
         whileTap={{ scale: 0.97 }}
         transition={{ type: 'spring', stiffness: 400, damping: 22 }}
         onClick={handleClick}
         className={cn(
-          'relative inline-flex items-center justify-center gap-2.5 font-bold uppercase tracking-[0.1em] select-none',
+          'relative inline-flex items-center justify-center gap-2.5 font-bold uppercase tracking-[0.08em] select-none',
           'border rounded-[3px] overflow-visible',
           SIZE_CLASSES[size],
           variant === 'primary' && [
-            'text-primary-foreground',
-            'border-[color:var(--color-warroom-gold)]/60',
-            'shadow-[0_4px_24px_rgba(201,150,42,0.35),inset_0_1px_0_rgba(255,230,120,0.3)]',
+            'text-[#e8e8e8]',
+            'border-[color:var(--color-warroom-gold)]/40',
+            'shadow-[0_4px_20px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]',
           ],
           variant === 'ghost' && [
-            'text-warroom-gold border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-gold)]/[0.06]',
-            'hover:border-[color:var(--color-warroom-gold)]/60',
+            'text-[color:var(--color-warroom-silver)] border-[color:var(--color-warroom-gold)]/25 bg-[color:var(--color-warroom-gold)]/[0.04]',
+            'hover:border-[color:var(--color-warroom-gold)]/45 hover:text-[color:var(--color-warroom-ivory)]',
           ],
           className,
         )}
@@ -93,15 +82,13 @@ export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
           fontFamily: 'var(--font-display)',
           ...(variant === 'primary'
             ? {
-                background:
-                  'linear-gradient(135deg, #8b6914, #c9a227, #e8c84a, #c9a227, #8b6914)',
+                background: 'linear-gradient(135deg, #141414, #1e1e1e, #282828, #1e1e1e, #141414)',
                 backgroundSize: '200% 100%',
               }
             : {}),
         }}
         {...rest}
       >
-        {/* Corner embellishments — 4 small L-shapes at each corner */}
         <CornerOrnament position="tl" size={corner} variant={variant} />
         <CornerOrnament position="tr" size={corner} variant={variant} />
         <CornerOrnament position="bl" size={corner} variant={variant} />
@@ -109,9 +96,7 @@ export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
 
         {Icon && <Icon className="h-[1.1em] w-[1.1em] shrink-0" aria-hidden />}
         <span>{children}</span>
-        {IconRight && (
-          <IconRight className="h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
-        )}
+        {IconRight && <IconRight className="h-[1.1em] w-[1.1em] shrink-0" aria-hidden />}
       </motion.button>
     )
   },
@@ -119,48 +104,15 @@ export const WarRoomCTA = forwardRef<HTMLButtonElement, WarRoomCTAProps>(
 
 type CornerPosition = 'tl' | 'tr' | 'bl' | 'br'
 
-function CornerOrnament({
-  position,
-  size,
-  variant,
-}: {
-  position: CornerPosition
-  size: number
-  variant: WarRoomCTAVariant
-}) {
-  const color =
-    variant === 'primary'
-      ? 'rgba(255, 230, 120, 0.85)'
-      : 'var(--color-warroom-gold)'
+function CornerOrnament({ position, size, variant }: { position: CornerPosition; size: number; variant: WarRoomCTAVariant }) {
+  const color = variant === 'primary' ? 'rgba(200,168,74,0.55)' : 'var(--color-warroom-gold)'
   const offset = -2
+  const styles: React.CSSProperties = { position: 'absolute', width: size, height: size, borderColor: color, pointerEvents: 'none' }
 
-  const styles: React.CSSProperties = {
-    position: 'absolute',
-    width: size,
-    height: size,
-    borderColor: color,
-    pointerEvents: 'none',
-  }
-  if (position === 'tl') {
-    styles.top = offset
-    styles.left = offset
-    styles.borderTop = `1px solid ${color}`
-    styles.borderLeft = `1px solid ${color}`
-  } else if (position === 'tr') {
-    styles.top = offset
-    styles.right = offset
-    styles.borderTop = `1px solid ${color}`
-    styles.borderRight = `1px solid ${color}`
-  } else if (position === 'bl') {
-    styles.bottom = offset
-    styles.left = offset
-    styles.borderBottom = `1px solid ${color}`
-    styles.borderLeft = `1px solid ${color}`
-  } else {
-    styles.bottom = offset
-    styles.right = offset
-    styles.borderBottom = `1px solid ${color}`
-    styles.borderRight = `1px solid ${color}`
-  }
+  if (position === 'tl') { styles.top = offset; styles.left = offset; styles.borderTop = `1px solid ${color}`; styles.borderLeft = `1px solid ${color}` }
+  else if (position === 'tr') { styles.top = offset; styles.right = offset; styles.borderTop = `1px solid ${color}`; styles.borderRight = `1px solid ${color}` }
+  else if (position === 'bl') { styles.bottom = offset; styles.left = offset; styles.borderBottom = `1px solid ${color}`; styles.borderLeft = `1px solid ${color}` }
+  else { styles.bottom = offset; styles.right = offset; styles.borderBottom = `1px solid ${color}`; styles.borderRight = `1px solid ${color}` }
+
   return <span aria-hidden style={styles} />
 }

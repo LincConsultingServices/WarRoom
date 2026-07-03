@@ -73,7 +73,16 @@ export function RouteBackground({ bg, brightness = 0.35 }: RouteBackgroundProps)
     <>
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 -z-20"
+        style={{
+          backgroundColor: '#000000',
+          backgroundImage: 'conic-gradient(#ffffff 25%, #000000 0 50%, #ffffff 0 75%, #000000 0)',
+          backgroundSize: '160px 160px',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 opacity-[0.20]"
         style={{
           backgroundImage: `url("${src}")`,
           backgroundSize: 'cover',

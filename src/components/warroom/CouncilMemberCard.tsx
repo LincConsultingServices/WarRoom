@@ -8,11 +8,11 @@ import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor } from '@/src/types'
 
 // ============================================================
-// <CouncilMemberCard /> — single seat at the war council table.
+// <CouncilMemberCard /> — single seat at the war panel table.
 //
 // Renders a portrait thumb + name + lens badge per investor in
 // the roster strip. The mood-driven aura is the load-bearing
-// visual: a glowing border whose colour reflects the council
+// visual: a glowing border whose colour reflects the panel
 // member's running disposition.
 //
 // Click → shadcn Popover with bio, primary lens, bias trait, and
@@ -28,7 +28,7 @@ interface CouncilMemberCardProps {
   isActive: boolean
   /** Disables the popover (e.g. while overlays are open). */
   disableBio?: boolean
-  /** Counter that increments whenever the council should "stir" (active
+  /** Counter that increments whenever the panel should "stir" (active
    *  member just changed). When it bumps, the card briefly rotate-shakes. */
   stirSignal?: number
   className?: string
@@ -75,7 +75,7 @@ export function CouncilMemberCard({
     .join('')
     .toUpperCase()
 
-  // "Council stirs" — fire a brief shake when stirSignal increments.
+  // "Panel stirs" — fire a brief shake when stirSignal increments.
   // Skipped under reducedMotion. Skipped on the very first render so the
   // initial mount doesn't stir.
   useEffect(() => {
