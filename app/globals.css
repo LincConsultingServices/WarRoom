@@ -83,6 +83,8 @@
   --wr-parchment-wash: linear-gradient(rgba(252, 252, 252, 0.88), rgba(252, 252, 252, 0.92));
   --wr-overlay-bg: rgba(248, 248, 248, 0.85);
   --wr-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(248, 248, 248, 0.72) 0%, rgba(248, 248, 248, 0.45) 50%, transparent 100%);
+  --wr-checker-1: #f8f8f8;
+  --wr-checker-2: #eeeeee;
 }
 
 .dark {
@@ -159,6 +161,8 @@
   --wr-parchment-wash: linear-gradient(rgba(12, 12, 12, 0.82), rgba(12, 12, 12, 0.86));
   --wr-overlay-bg: rgba(0, 0, 0, 0.65);
   --wr-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(8, 8, 8, 0.72) 0%, rgba(8, 8, 8, 0.45) 50%, transparent 100%);
+  --wr-checker-1: #0d0d0d;
+  --wr-checker-2: #141414;
 }
 
 @theme inline {
@@ -271,12 +275,12 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
     /* Subtle premium chess board checkerboard pattern */
-    background-color: #0d0d0d;
+    background-color: var(--wr-checker-1);
     background-image: conic-gradient(
-      #141414 25%,
-      #0d0d0d 0 50%,
-      #141414 0 75%,
-      #0d0d0d 0
+      var(--wr-checker-2) 25%,
+      var(--wr-checker-1) 0 50%,
+      var(--wr-checker-2) 0 75%,
+      var(--wr-checker-1) 0
     );
     background-size: 160px 160px;
   }
