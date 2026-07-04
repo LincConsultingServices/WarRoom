@@ -12,7 +12,7 @@ export const CompetencyRadarChart = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex h-64 items-center justify-center text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+        className="flex h-64 items-center justify-center text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Charting the realm&hellip;

@@ -84,7 +84,7 @@ export function ScoreReveal({
             particleCount: 60,
             spread: 70,
             origin: { x: originX, y: 0.6 },
-            colors: ['#c9a227', '#e8c84a', '#ff9933', '#f5e6c8'],
+            colors: ['#c8a84a', '#d4aa40', '#ff9933', '#f5e6c8'],
             scalar: 0.9,
             gravity: 0.7,
             ticks: 200,
@@ -103,9 +103,9 @@ export function ScoreReveal({
   const isTriumph = clamped >= TRIUMPH_THRESHOLD
   const isFailure = clamped < FAILURE_THRESHOLD
   const tone = isTriumph
-    ? 'text-[color:var(--color-warroom-gold-bright)]'
+    ? 'text-[color:var(--color-chessboard-gold-bright)]'
     : isFailure
-      ? 'text-[color:var(--color-warroom-crimson-bright)]'
+      ? 'text-[color:var(--color-chessboard-crimson-bright)]'
       : 'text-foreground'
 
   return (
@@ -114,7 +114,7 @@ export function ScoreReveal({
       animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={cn(
-        'flex items-baseline gap-3 rounded-sm border border-[color:var(--color-warroom-gold)]/30 bg-card/60 px-4 py-3 backdrop-blur-sm',
+        'flex items-baseline gap-3 rounded-sm border border-[color:var(--color-chessboard-gold)]/30 bg-card/60 px-4 py-3 backdrop-blur-sm',
         isFailure && withEffects && !reducedMotion && 'animate-pulse [animation-duration:0.6s]',
         className,
       )}

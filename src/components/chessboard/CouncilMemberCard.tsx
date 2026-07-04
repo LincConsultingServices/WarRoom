@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Image from 'next/image'
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -8,11 +9,11 @@ import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import type { Investor } from '@/src/types'
 
 // ============================================================
-// <CouncilMemberCard /> — single seat at the war council table.
+// <CouncilMemberCard /> — single seat at the war panel table.
 //
 // Renders a portrait thumb + name + lens badge per investor in
 // the roster strip. The mood-driven aura is the load-bearing
-// visual: a glowing border whose colour reflects the council
+// visual: a glowing border whose colour reflects the panel
 // member's running disposition.
 //
 // Click → shadcn Popover with bio, primary lens, bias trait, and
@@ -28,7 +29,7 @@ interface CouncilMemberCardProps {
   isActive: boolean
   /** Disables the popover (e.g. while overlays are open). */
   disableBio?: boolean
-  /** Counter that increments whenever the council should "stir" (active
+  /** Counter that increments whenever the panel should "stir" (active
    *  member just changed). When it bumps, the card briefly rotate-shakes. */
   stirSignal?: number
   className?: string
@@ -75,7 +76,7 @@ export function CouncilMemberCard({
     .join('')
     .toUpperCase()
 
-  // "Council stirs" — fire a brief shake when stirSignal increments.
+  // "Panel stirs" — fire a brief shake when stirSignal increments.
   // Skipped under reducedMotion. Skipped on the very first render so the
   // initial mount doesn't stir.
   useEffect(() => {
@@ -115,15 +116,15 @@ export function CouncilMemberCard({
       <div
         className={cn(
           'relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-border bg-muted',
-          isActive && 'ring-1 ring-amber-300/60',
+          isActive && 'ring-1 ring-zinc-300/60',
         )}
       >
         {investor.id || investor.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={investorPortraitSrc(investor)}
             alt={investor.name}
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            className="object-cover"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
@@ -151,7 +152,7 @@ export function CouncilMemberCard({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+          className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-silver)] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
           aria-label={`${investor.name} — view bio`}
         >
           {card}
@@ -162,7 +163,7 @@ export function CouncilMemberCard({
           <div>
             <h3 className="font-display text-base font-semibold text-foreground">{investor.name}</h3>
             {investor.primary_lens && (
-              <p className="text-[0.65rem] uppercase tracking-[0.18em] text-amber-400">
+              <p className="text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
                 {investor.primary_lens}
               </p>
             )}
@@ -179,7 +180,7 @@ export function CouncilMemberCard({
             </p>
           )}
           {investor.signature_question && (
-            <div className="rounded-sm border-l-2 border-amber-400/60 bg-muted/60 px-3 py-2">
+            <div className="rounded-sm border-l-2 border-zinc-400/60 bg-muted/60 px-3 py-2">
               <p className="text-[0.62rem] uppercase tracking-[0.18em] text-foreground/50">
                 Signature question
               </p>

@@ -12,7 +12,7 @@ import { EmberParticles } from '@/src/components/effects/EmberParticles'
 // Fullscreen interlude between investor rounds. Shows:
 //   • The round label (e.g. "Round 2 of 3 — Cleared")
 //   • A sparkline of the founder's scores across rounds so far
-//   • Verdict text ("Round survived" vs "The council is unmoved")
+//   • Verdict text ("Round survived" vs "The panel is unmoved")
 //   • Continue button → onContinue()
 //
 // Auto-fires the appropriate SFX on mount:
@@ -60,7 +60,7 @@ export function RoundCompleteOverlay({
     audioManager.playSfx(survived ? 'sim.stage-clear' : 'ui.error', survived ? 0.55 : 0.5)
   }, [open, survived])
 
-  const verdict = message ?? (survived ? 'Round survived.' : 'The council is unmoved.')
+  const verdict = message ?? (survived ? 'Round survived.' : 'The panel is unmoved.')
   const headingLabel = totalRounds
     ? `Round ${roundIndex + 1} of ${totalRounds}`
     : `Round ${roundIndex + 1}`
@@ -86,7 +86,7 @@ export function RoundCompleteOverlay({
             className="pointer-events-none absolute inset-0"
             style={{
               background: survived
-                ? 'radial-gradient(ellipse at center, rgba(201,162,39,0.08) 0%, rgba(0,0,0,0.92) 75%)'
+                ? 'radial-gradient(ellipse at center, rgba(200,168,74,0.08) 0%, rgba(0,0,0,0.92) 75%)'
                 : 'radial-gradient(ellipse at center, rgba(139,26,26,0.12) 0%, rgba(0,0,0,0.95) 75%)',
             }}
           />
@@ -95,25 +95,25 @@ export function RoundCompleteOverlay({
             initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.98 }}
             animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-            className="relative z-10 mx-4 w-full max-w-lg rounded-md border border-[color:var(--color-warroom-gold)]/30 bg-card/85 p-8 text-center backdrop-blur-md noise-overlay"
+            className="relative z-10 mx-4 w-full max-w-lg rounded-md border border-[color:var(--color-chessboard-gold)]/30 bg-card/85 p-8 text-center backdrop-blur-md noise-overlay"
             style={{
               boxShadow:
-                '0 12px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,162,39,0.15)',
+                '0 12px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(200,168,74,0.15)',
             }}
           >
-            <p className="font-display text-[0.65rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/70">
+            <p className="font-display text-[0.65rem] uppercase tracking-[0.22em] text-[color:var(--color-chessboard-gold)]/70">
               {headingLabel}
             </p>
             <h2
               className={cn(
                 'mt-2 font-display text-3xl font-bold uppercase tracking-wider sm:text-4xl',
                 survived
-                  ? 'text-[color:var(--color-warroom-gold-bright)]'
-                  : 'text-[color:var(--color-warroom-crimson-bright)]',
+                  ? 'text-[color:var(--color-chessboard-gold-bright)]'
+                  : 'text-[color:var(--color-chessboard-crimson-bright)]',
               )}
               style={{
                 textShadow: survived
-                  ? '0 0 30px rgba(201,162,39,0.4)'
+                  ? '0 0 30px rgba(200,168,74,0.4)'
                   : '0 0 30px rgba(139,26,26,0.4)',
               }}
             >
@@ -131,7 +131,7 @@ export function RoundCompleteOverlay({
                   <span
                     className={cn(
                       'font-semibold',
-                      survived ? 'text-[color:var(--color-warroom-gold-bright)]' : 'text-[color:var(--color-warroom-crimson-bright)]',
+                      survived ? 'text-[color:var(--color-chessboard-gold-bright)]' : 'text-[color:var(--color-chessboard-crimson-bright)]',
                     )}
                   >
                     {Math.round(latest)}
@@ -148,9 +148,9 @@ export function RoundCompleteOverlay({
                 'mt-8 inline-flex items-center gap-2 rounded-sm border px-6 py-2.5',
                 'font-display text-xs font-bold uppercase tracking-[0.16em]',
                 'transition-all duration-200',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-                'border-[color:var(--color-warroom-gold)]/45 bg-[color:var(--color-warroom-obsidian)]/60 text-[color:var(--color-warroom-gold)]',
-                'hover:border-[color:var(--color-warroom-gold)]/85 hover:bg-[color:var(--color-warroom-obsidian)]/80 hover:shadow-[0_0_22px_rgba(201,162,39,0.35)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                'border-[color:var(--color-chessboard-gold)]/45 bg-[color:var(--color-chessboard-charcoal)]/60 text-[color:var(--color-chessboard-gold)]',
+                'hover:border-[color:var(--color-chessboard-gold)]/85 hover:bg-[color:var(--color-chessboard-charcoal)]/80 hover:shadow-[0_0_22px_rgba(200,168,74,0.35)]',
               )}
             >
               Next investor <span aria-hidden>→</span>
@@ -176,7 +176,7 @@ function Sparkline({ scores, survived }: SparklineProps) {
   const pathD = points
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
     .join(' ')
-  const accent = survived ? '#e8c84a' : '#c23b3b'
+  const accent = survived ? '#d4aa40' : '#b03030'
 
   return (
     <svg

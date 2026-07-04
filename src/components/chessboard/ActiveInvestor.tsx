@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 import type { Investor } from '@/src/types'
 import { InvestorPortraitMedia } from './InvestorPortraitMedia'
 import { DispositionMeter } from './DispositionMeter'
@@ -14,7 +15,7 @@ import {
 // <ActiveInvestor /> — Left panel of the council chamber.
 //
 // Renders the investor currently holding the floor: large dramatic
-// portrait (or its CSS-fallback state), Cinzel name + house badge,
+// portrait (or its CSS-fallback state), display name + club badge,
 // primary lens, bias trait, and the live disposition meter.
 //
 // State derives from the parent's signals — this component is
@@ -91,12 +92,13 @@ export function ActiveInvestor({
 
       {/* Heraldic sigil watermark — top-right, above the portrait. Self-hides
           when the file is missing. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={`/investors/${investor.id}/sigil.webp`}
         alt=""
+        width={40}
+        height={40}
         aria-hidden
-        className="pointer-events-none absolute right-3 top-3 z-20 h-10 w-10 opacity-80 mix-blend-screen"
+        className="pointer-events-none absolute right-3 top-3 z-20 opacity-80 mix-blend-screen"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
       />
 

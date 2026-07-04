@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
 import { Progress } from '@/components/ui/progress'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
 } from '@/src/components/primitives'
@@ -49,45 +49,45 @@ const STAGE_LABELS: Record<string, string> = {
   STAGE_2A_GROWTH: 'Growth',
   STAGE_2B_EXPANSION: 'Expansion',
   STAGE_3_SCALE: 'Scale',
-  STAGE_WARROOM_PREP: 'War Room Prep',
-  STAGE_4_WARROOM: 'War Room',
+  STAGE_WARROOM_PREP: 'Chessboard Prep',
+  STAGE_4_WARROOM: 'Chessboard',
 }
 
 const CATEGORY_TONES: Record<string, { label: string; text: string; bg: string; border: string }> = {
   NATURAL_DOMINANT: {
     label: 'Natural Dominant',
-    text: 'text-[color:var(--color-warroom-gold-bright)]',
-    bg: 'bg-[color:var(--color-warroom-gold)]/[0.08]',
-    border: 'border-[color:var(--color-warroom-gold)]/30',
+    text: 'text-[color:var(--color-chessboard-gold-bright)]',
+    bg: 'bg-[color:var(--color-chessboard-gold)]/[0.08]',
+    border: 'border-[color:var(--color-chessboard-gold)]/30',
   },
   STRONG: {
     label: 'Strong',
-    text: 'text-[color:var(--color-warroom-verdant)]',
-    bg: 'bg-[color:var(--color-warroom-verdant)]/[0.10]',
-    border: 'border-[color:var(--color-warroom-verdant)]/30',
+    text: 'text-[color:var(--color-chessboard-verdant)]',
+    bg: 'bg-[color:var(--color-chessboard-verdant)]/[0.10]',
+    border: 'border-[color:var(--color-chessboard-verdant)]/30',
   },
   FUNCTIONAL: {
     label: 'Functional',
-    text: 'text-[color:var(--color-warroom-silver)]',
-    bg: 'bg-[color:var(--color-warroom-silver)]/[0.08]',
-    border: 'border-[color:var(--color-warroom-silver)]/30',
+    text: 'text-[color:var(--color-chessboard-silver)]',
+    bg: 'bg-[color:var(--color-chessboard-silver)]/[0.08]',
+    border: 'border-[color:var(--color-chessboard-silver)]/30',
   },
   DEVELOPMENT_REQUIRED: {
     label: 'Development',
-    text: 'text-[color:var(--color-warroom-ember)]',
-    bg: 'bg-[color:var(--color-warroom-ember)]/[0.08]',
-    border: 'border-[color:var(--color-warroom-ember)]/30',
+    text: 'text-[color:var(--color-chessboard-ember)]',
+    bg: 'bg-[color:var(--color-chessboard-ember)]/[0.08]',
+    border: 'border-[color:var(--color-chessboard-ember)]/30',
   },
   HIGH_RISK: {
     label: 'High Risk',
-    text: 'text-[color:var(--color-warroom-crimson-bright)]',
-    bg: 'bg-[color:var(--color-warroom-crimson)]/[0.08]',
-    border: 'border-[color:var(--color-warroom-crimson)]/30',
+    text: 'text-[color:var(--color-chessboard-crimson-bright)]',
+    bg: 'bg-[color:var(--color-chessboard-crimson)]/[0.08]',
+    border: 'border-[color:var(--color-chessboard-crimson)]/30',
   },
 }
 
 const PROGRESS_CLASSES =
-  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+  'h-1.5 bg-[color:var(--color-chessboard-rampart)] [&>div]:bg-[color:var(--color-chessboard-gold)]'
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
@@ -135,9 +135,9 @@ export default function SimulationResultPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-[color:var(--color-warroom-gold)]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[color:var(--color-chessboard-gold)]" />
         <p
-          className="text-xs uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+          className="text-xs uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Loading simulation results…
@@ -152,19 +152,19 @@ export default function SimulationResultPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-5">
         <p
-          className="text-sm text-[color:var(--color-warroom-crimson-bright)]"
+          className="text-sm text-[color:var(--color-chessboard-crimson-bright)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {error || 'Simulation not found'}
         </p>
-        <WarRoomCTA
+        <ChessboardCTA
           size="sm"
           variant="ghost"
           icon={ArrowLeft}
           onClick={() => router.push('/dashboard')}
         >
           Back to Dashboard
-        </WarRoomCTA>
+        </ChessboardCTA>
       </div>
     )
   }
@@ -209,18 +209,18 @@ export default function SimulationResultPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <BarChart3
-              className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+              className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
               aria-hidden
             />
             <div>
               <h1
-                className="text-xl font-semibold tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
+                className="text-xl font-semibold tracking-[0.04em] text-[color:var(--color-chessboard-ivory)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Simulation Results
               </h1>
               <p
-                className="text-xs text-[color:var(--color-warroom-smoke)]"
+                className="text-xs text-[color:var(--color-chessboard-smoke)]"
                 style={{ fontFamily: 'var(--font-body, serif)' }}
               >
                 {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : String((sim.status as string) || '')}
@@ -239,9 +239,9 @@ export default function SimulationResultPage() {
             </SigilBadge>
             {isInProgress && (
               <Link href={`/assessment/${assessmentId}`}>
-                <WarRoomCTA size="sm" variant="primary" icon={Play}>
+                <ChessboardCTA size="sm" variant="primary" icon={Play}>
                   Continue
-                </WarRoomCTA>
+                </ChessboardCTA>
               </Link>
             )}
           </div>
@@ -261,7 +261,7 @@ export default function SimulationResultPage() {
             label="Avg Competency"
             value={avgScore}
             icon={Trophy}
-            accent="var(--color-warroom-gold)"
+            accent="var(--color-chessboard-gold)"
           />
         </motion.div>
         <motion.div variants={staggerItem}>
@@ -269,7 +269,7 @@ export default function SimulationResultPage() {
             label="Revenue Projection"
             value={formatRev(revenueProjection)}
             icon={TrendingUp}
-            accent="var(--color-warroom-verdant)"
+            accent="var(--color-chessboard-verdant)"
           />
         </motion.div>
         <motion.div variants={staggerItem}>
@@ -277,7 +277,7 @@ export default function SimulationResultPage() {
             label="Progress"
             value={`${progress?.percentComplete || 0}%`}
             icon={Target}
-            accent="var(--color-warroom-electrum)"
+            accent="var(--color-chessboard-electrum)"
           />
         </motion.div>
         <motion.div variants={staggerItem}>
@@ -285,17 +285,17 @@ export default function SimulationResultPage() {
             label="Questions"
             value={progress?.answeredQuestions || 0}
             icon={BarChart3}
-            accent="var(--color-warroom-amethyst)"
+            accent="var(--color-chessboard-amethyst)"
           />
         </motion.div>
       </motion.div>
 
       {/* ── Stage Progress ── */}
-      <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+      <StoneCard accent="var(--color-chessboard-gold)" padding="lg">
         <div className="flex items-center gap-2 mb-5">
-          <Zap className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+          <Zap className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
           <h2
-            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Stage Progress
@@ -317,33 +317,33 @@ export default function SimulationResultPage() {
                 className={cn(
                   'text-center py-2.5 px-1 rounded-[3px] text-[10px] border transition-colors',
                   isDone &&
-                    'bg-[color:var(--color-warroom-gold)]/[0.08] border-[color:var(--color-warroom-gold)]/30',
+                    'bg-[color:var(--color-chessboard-gold)]/[0.08] border-[color:var(--color-chessboard-gold)]/30',
                   isActive &&
                     !isCompleted &&
-                    'bg-[color:var(--color-warroom-ember)]/[0.08] border-[color:var(--color-warroom-ember)]/40 ring-1 ring-[color:var(--color-warroom-ember)]/25',
+                    'bg-[color:var(--color-chessboard-ember)]/[0.08] border-[color:var(--color-chessboard-ember)]/40 ring-1 ring-[color:var(--color-chessboard-ember)]/25',
                   !isDone &&
                     !isActive &&
-                    'bg-[color:var(--color-warroom-rampart)]/40 border-[color:var(--color-warroom-ash)]/20',
+                    'bg-[color:var(--color-chessboard-rampart)]/40 border-[color:var(--color-chessboard-ash)]/20',
                 )}
               >
                 <div
                   className={cn(
                     'font-semibold truncate',
-                    isDone && 'text-[color:var(--color-warroom-gold)]',
+                    isDone && 'text-[color:var(--color-chessboard-gold)]',
                     isActive &&
                       !isCompleted &&
-                      'text-[color:var(--color-warroom-ember)]',
+                      'text-[color:var(--color-chessboard-ember)]',
                     !isDone &&
                       !isActive &&
-                      'text-[color:var(--color-warroom-smoke)]',
+                      'text-[color:var(--color-chessboard-smoke)]',
                   )}
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {label}
                 </div>
-                <div className="text-[color:var(--color-warroom-smoke)] mt-0.5">
+                <div className="text-[color:var(--color-chessboard-smoke)] mt-0.5">
                   {isDone ? (
-                    <CheckCircle2 className="h-3 w-3 mx-auto text-[color:var(--color-warroom-gold)]" />
+                    <CheckCircle2 className="h-3 w-3 mx-auto text-[color:var(--color-chessboard-gold)]" />
                   ) : isActive ? (
                     '…'
                   ) : (
@@ -362,18 +362,18 @@ export default function SimulationResultPage() {
 
       {/* ── Competency Scores ── */}
       {competencies && competencies.length > 0 && (
-        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-gold)" padding="lg">
           <div className="flex items-center gap-2 mb-1">
-            <Award className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+            <Award className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
             <h2
-              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Competency Scores
             </h2>
           </div>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
+            className="text-xs text-[color:var(--color-chessboard-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Your performance across all 8 entrepreneurial competencies.
@@ -389,7 +389,7 @@ export default function SimulationResultPage() {
                 return (
                   <div key={comp.competencyCode} className="flex items-center gap-3">
                     <span
-                      className="text-[10px] w-5 text-[color:var(--color-warroom-smoke)] shrink-0"
+                      className="text-[10px] w-5 text-[color:var(--color-chessboard-smoke)] shrink-0"
                       style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                     >
                       {i + 1}
@@ -397,7 +397,7 @@ export default function SimulationResultPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span
-                          className="text-xs font-medium text-[color:var(--color-warroom-ivory)] truncate"
+                          className="text-xs font-medium text-[color:var(--color-chessboard-ivory)] truncate"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {comp.competencyName}
@@ -423,7 +423,7 @@ export default function SimulationResultPage() {
                       />
                     </div>
                     <span
-                      className="text-xs font-bold w-10 text-right text-[color:var(--color-warroom-ivory)] shrink-0"
+                      className="text-xs font-bold w-10 text-right text-[color:var(--color-chessboard-ivory)] shrink-0"
                       style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                     >
                       {(((comp.weightedAverage || 0) / 3) * 10).toFixed(1)}
@@ -438,17 +438,17 @@ export default function SimulationResultPage() {
       {/* ── Entrepreneur Type (from report) ── */}
       {report?.entrepreneurType && (
         <StoneCard
-          accent="var(--color-warroom-gold)"
+          accent="var(--color-chessboard-gold)"
           padding="lg"
           className="text-center"
         >
-          <Star className="h-10 w-10 mx-auto mb-3 text-[color:var(--color-warroom-gold)]" />
+          <Star className="h-10 w-10 mx-auto mb-3 text-[color:var(--color-chessboard-gold)]" />
           <h2
             className="text-2xl font-bold tracking-[0.04em] mb-2"
             style={{
               fontFamily: 'var(--font-display)',
               background:
-                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -457,7 +457,7 @@ export default function SimulationResultPage() {
           </h2>
           {report.organizationalRole && (
             <p
-              className="text-sm text-[color:var(--color-warroom-smoke)]"
+              className="text-sm text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Best Organisational Role: {report.organizationalRole}
@@ -465,7 +465,7 @@ export default function SimulationResultPage() {
           )}
           {report.archetypeNarrative && (
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)] max-w-2xl mx-auto mt-3 leading-relaxed"
+              className="text-xs text-[color:var(--color-chessboard-smoke)] max-w-2xl mx-auto mt-3 leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               {report.archetypeNarrative}
@@ -476,15 +476,15 @@ export default function SimulationResultPage() {
 
       {/* ── Action Plan ── */}
       {report?.actionPlan && report.actionPlan.length > 0 && (
-        <StoneCard accent="var(--color-warroom-verdant)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-verdant)" padding="lg">
           <h2
-            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] mb-1"
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)] mb-1"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Action Plan
           </h2>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
+            className="text-xs text-[color:var(--color-chessboard-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Recommended actions to improve your entrepreneurial skills.
@@ -493,23 +493,23 @@ export default function SimulationResultPage() {
             {report.actionPlan.map((item, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-3 rounded-[3px] bg-[color:var(--color-warroom-rampart)]/40 border border-[color:var(--color-warroom-ash)]/20"
+                className="flex items-start gap-3 p-3 rounded-[3px] bg-[color:var(--color-chessboard-rampart)]/40 border border-[color:var(--color-chessboard-ash)]/20"
               >
                 <div
-                  className="h-6 w-6 rounded-full bg-[color:var(--color-warroom-gold)]/[0.12] flex items-center justify-center text-[10px] font-bold text-[color:var(--color-warroom-gold)] shrink-0"
+                  className="h-6 w-6 rounded-full bg-[color:var(--color-chessboard-gold)]/[0.12] flex items-center justify-center text-[10px] font-bold text-[color:var(--color-chessboard-gold)] shrink-0"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {i + 1}
                 </div>
                 <div className="min-w-0">
                   <div
-                    className="text-xs font-semibold text-[color:var(--color-warroom-ivory)]"
+                    className="text-xs font-semibold text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {item.competency}
                   </div>
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5 leading-relaxed"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5 leading-relaxed"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     {item.action}
@@ -523,9 +523,9 @@ export default function SimulationResultPage() {
 
       {/* ── Stage Narrations ── */}
       {report?.stageNarrations && report.stageNarrations.length > 0 && (
-        <StoneCard accent="var(--color-warroom-ash)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-ash)" padding="lg">
           <h2
-            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] mb-5"
+            className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Stage-by-Stage Breakdown
@@ -534,14 +534,14 @@ export default function SimulationResultPage() {
             {report.stageNarrations.map((narration, i) => (
               <div
                 key={i}
-                className="p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/25 bg-[color:var(--color-warroom-rampart)]/30"
+                className="p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/25 bg-[color:var(--color-chessboard-rampart)]/30"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <SigilBadge tone="gold">
                     {STAGE_LABELS[narration.stage] || narration.stage}
                   </SigilBadge>
                   <span
-                    className="text-[10px] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {narration.questionsAnswered} questions
@@ -550,7 +550,7 @@ export default function SimulationResultPage() {
                 {narration.decisions && narration.decisions.length > 0 && (
                   <div className="mt-2">
                     <h5
-                      className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-warroom-smoke)] mb-1"
+                      className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-chessboard-smoke)] mb-1"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Key Decisions
@@ -560,7 +560,7 @@ export default function SimulationResultPage() {
                         (d: string, j: number) => (
                           <li
                             key={j}
-                            className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+                            className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
                             style={{ fontFamily: 'var(--font-body, serif)' }}
                           >
                             — {d}
@@ -572,7 +572,7 @@ export default function SimulationResultPage() {
                 )}
                 {narration.scoringRationale && (
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-2 leading-relaxed"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] mt-2 leading-relaxed"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     {narration.scoringRationale}
@@ -586,18 +586,18 @@ export default function SimulationResultPage() {
 
       {/* ── Competency Analysis (detailed) ── */}
       {competencies && competencies.length > 0 && (
-        <StoneCard accent="var(--color-warroom-amethyst)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-amethyst)" padding="lg">
           <div className="flex items-center gap-2 mb-1">
-            <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-amethyst)]" />
+            <BarChart3 className="h-4 w-4 text-[color:var(--color-chessboard-amethyst)]" />
             <h2
-              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+              className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Competency Analysis
             </h2>
           </div>
           <p
-            className="text-xs text-[color:var(--color-warroom-smoke)] mb-5"
+            className="text-xs text-[color:var(--color-chessboard-smoke)] mb-5"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             Detailed breakdown of your performance across the 8 core competencies.
@@ -616,18 +616,18 @@ export default function SimulationResultPage() {
                 return (
                   <div
                     key={comp.competencyCode}
-                    className="space-y-3 p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/20 bg-[color:var(--color-warroom-rampart)]/30"
+                    className="space-y-3 p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/20 bg-[color:var(--color-chessboard-rampart)]/30"
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h4
-                          className="font-semibold text-xs text-[color:var(--color-warroom-ivory)]"
+                          className="font-semibold text-xs text-[color:var(--color-chessboard-ivory)]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {comp.competencyName}
                         </h4>
                         <span
-                          className="text-[9px] text-[color:var(--color-warroom-smoke)] uppercase"
+                          className="text-[9px] text-[color:var(--color-chessboard-smoke)] uppercase"
                           style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                         >
                           {comp.competencyCode}
@@ -648,11 +648,11 @@ export default function SimulationResultPage() {
 
                     <div className="space-y-1">
                       <div className="flex justify-between text-[10px]">
-                        <span className="text-[color:var(--color-warroom-smoke)]">
+                        <span className="text-[color:var(--color-chessboard-smoke)]">
                           Proficiency
                         </span>
                         <span
-                          className="text-[color:var(--color-warroom-ivory)]"
+                          className="text-[color:var(--color-chessboard-ivory)]"
                           style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                         >
                           {(((comp.weightedAverage || 0) / 3) * 10).toFixed(
@@ -672,7 +672,7 @@ export default function SimulationResultPage() {
                     {strengths.length > 0 && (
                       <div className="space-y-1">
                         <span
-                          className="text-[9px] font-bold text-[color:var(--color-warroom-verdant)] uppercase tracking-[0.08em]"
+                          className="text-[9px] font-bold text-[color:var(--color-chessboard-verdant)] uppercase tracking-[0.08em]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           Positive Signals
@@ -681,9 +681,9 @@ export default function SimulationResultPage() {
                           {strengths.slice(0, 2).map((s, si) => (
                             <li
                               key={si}
-                              className="flex items-start gap-1.5 text-[color:var(--color-warroom-smoke)] leading-tight"
+                              className="flex items-start gap-1.5 text-[color:var(--color-chessboard-smoke)] leading-tight"
                             >
-                              <span className="text-[color:var(--color-warroom-verdant)] mt-0.5">
+                              <span className="text-[color:var(--color-chessboard-verdant)] mt-0.5">
                                 +
                               </span>
                               {s}
@@ -696,7 +696,7 @@ export default function SimulationResultPage() {
                     {weaknesses.length > 0 && (
                       <div className="space-y-1">
                         <span
-                          className="text-[9px] font-bold text-[color:var(--color-warroom-ember)] uppercase tracking-[0.08em]"
+                          className="text-[9px] font-bold text-[color:var(--color-chessboard-ember)] uppercase tracking-[0.08em]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           Development Areas
@@ -705,9 +705,9 @@ export default function SimulationResultPage() {
                           {weaknesses.slice(0, 2).map((w, wi) => (
                             <li
                               key={wi}
-                              className="flex items-start gap-1.5 text-[color:var(--color-warroom-smoke)] leading-tight"
+                              className="flex items-start gap-1.5 text-[color:var(--color-chessboard-smoke)] leading-tight"
                             >
-                              <span className="text-[color:var(--color-warroom-ember)] mt-0.5">
+                              <span className="text-[color:var(--color-chessboard-ember)] mt-0.5">
                                 -
                               </span>
                               {w}
@@ -726,15 +726,15 @@ export default function SimulationResultPage() {
       {/* ── Bottom Actions ── */}
       <div className="flex justify-center gap-4 pb-6">
         <Link href="/dashboard">
-          <WarRoomCTA size="sm" variant="ghost" icon={ArrowLeft}>
-            The Great Hall
-          </WarRoomCTA>
+          <ChessboardCTA size="sm" variant="ghost" icon={ArrowLeft}>
+            Dashboard
+          </ChessboardCTA>
         </Link>
         {isInProgress && (
           <Link href={`/assessment/${assessmentId}`}>
-            <WarRoomCTA size="sm" variant="primary" icon={Play}>
+            <ChessboardCTA size="sm" variant="primary" icon={Play}>
               Continue Simulation
-            </WarRoomCTA>
+            </ChessboardCTA>
           </Link>
         )}
       </div>

@@ -73,7 +73,7 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
           className="relative z-10 flex flex-col items-center gap-4"
         >
           <p
-            className="text-[0.6rem] font-semibold uppercase tracking-[0.34em] text-[color:var(--color-warroom-gold)]/80"
+            className="text-[0.6rem] font-semibold uppercase tracking-[0.34em] text-[color:var(--color-chessboard-gold)]/80"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Sigil Earned
@@ -89,8 +89,8 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
           />
 
           <h2
-            className="text-2xl font-bold tracking-wide text-[color:var(--color-warroom-ghost)] sm:text-3xl"
-            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 26px rgba(201,162,39,0.3)' }}
+            className="text-2xl font-bold tracking-wide text-[color:var(--color-chessboard-ghost)] sm:text-3xl"
+            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 26px rgba(200,168,74,0.3)' }}
           >
             {def?.name ?? current.id}
           </h2>
@@ -103,7 +103,7 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
           </p>
 
           {def?.description && (
-            <p className="max-w-sm text-sm leading-relaxed text-[color:var(--color-warroom-smoke)]">
+            <p className="max-w-sm text-sm leading-relaxed text-[color:var(--color-chessboard-smoke)]">
               {def.description}
             </p>
           )}
@@ -117,8 +117,8 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
                   style={{
                     background:
                       i === index
-                        ? 'var(--color-warroom-gold-bright)'
-                        : 'var(--color-warroom-stone)',
+                        ? 'var(--color-chessboard-gold-bright)'
+                        : 'var(--color-chessboard-stone)',
                   }}
                 />
               ))}
@@ -128,7 +128,7 @@ export function SigilUnlockOverlay({ sigils, onClose }: SigilUnlockOverlayProps)
           <button
             type="button"
             onClick={advance}
-            className="mt-4 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/50 px-6 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] transition-all hover:border-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-gold)]/10"
+            className="mt-4 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-chessboard-gold)]/50 px-6 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)] transition-all hover:border-[color:var(--color-chessboard-gold)] hover:bg-[color:var(--color-chessboard-gold)]/10"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {isLast ? 'Claim' : `Next (${index + 1}/${total})`}

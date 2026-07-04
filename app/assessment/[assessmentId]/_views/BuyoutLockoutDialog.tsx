@@ -59,7 +59,7 @@ export function BuyoutLockoutDialog({ open, company, amount, onContinue }: Buyou
               <h2
                 className="text-2xl font-bold"
                 style={{
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   color: '#e8e0d0',
                   letterSpacing: '0.06em',
                 }}
@@ -74,7 +74,7 @@ export function BuyoutLockoutDialog({ open, company, amount, onContinue }: Buyou
 
               <p className="text-sm leading-relaxed" style={{ color: '#a89e90', letterSpacing: '0.01em' }}>
                 You accepted the buyout from <span style={{ color: '#34d399', fontWeight: 600 }}>{safeCompany}</span> for{' '}
-                <span style={{ color: '#34d399', fontWeight: 600 }}>{formatRevenue(amount)}</span>. The War Room is now
+                <span style={{ color: '#34d399', fontWeight: 600 }}>{formatRevenue(amount)}</span>. The Chessboard is now
                 closed to you — there is no path back.
               </p>
             </div>
@@ -87,7 +87,7 @@ export function BuyoutLockoutDialog({ open, company, amount, onContinue }: Buyou
                 border: '1px solid rgba(16,185,129,0.55)',
                 borderRadius: '3px',
                 color: '#a7f3d0',
-                fontFamily: "'Cinzel', Georgia, serif",
+                fontFamily: "var(--font-display)",
                 letterSpacing: '0.12em',
                 cursor: 'pointer',
               }}

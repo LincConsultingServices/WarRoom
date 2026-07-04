@@ -19,13 +19,13 @@ export function MuteToggle({ className }: MuteToggleProps) {
       onClick={toggleMute}
       className={cn(
         'inline-flex h-10 w-10 items-center justify-center rounded-sm',
-        'border border-[color:var(--color-warroom-gold)]/30',
-        'bg-[color:var(--color-warroom-obsidian)]/60 backdrop-blur-md',
-        'text-[color:var(--color-warroom-gold)]',
+        'border border-[color:var(--color-chessboard-gold)]/30',
+        'bg-[color:var(--color-chessboard-obsidian)]/60 backdrop-blur-md',
+        'text-[color:var(--color-chessboard-gold)]',
         'transition-all duration-200',
-        'hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-[color:var(--color-warroom-obsidian)]/80',
+        'hover:border-[color:var(--color-chessboard-gold)]/60 hover:bg-[color:var(--color-chessboard-obsidian)]/80',
         'hover:shadow-[0_0_18px_rgba(201,162,39,0.35)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]',
         className,
       )}
     >

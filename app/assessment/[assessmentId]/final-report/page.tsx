@@ -59,14 +59,14 @@ export default function FinalReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-warroom-void)]">
+      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-chessboard-void)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[color:var(--color-chessboard-silver)]/30 border-t-[color:var(--color-chessboard-silver)] rounded-full animate-spin" />
           <p
-            className="text-sm text-[color:var(--color-warroom-smoke)] tracking-[0.04em]"
+            className="text-sm text-[color:var(--color-chessboard-smoke)] tracking-[0.04em]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Unsealing the Legacy Scroll&hellip;
+            Processing the Analysis&hellip;
           </p>
         </div>
       </div>
@@ -75,16 +75,16 @@ export default function FinalReportPage() {
 
   if (error || !report) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-warroom-void)]">
+      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-chessboard-void)]">
         <div className="text-center space-y-3">
-          <p className="text-[color:var(--color-warroom-crimson)]">
+          <p className="text-[color:var(--color-chessboard-crimson)]">
             {error || 'Report not found'}
           </p>
           <Link
             href="/"
-            className="text-sm text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+            className="text-sm text-[color:var(--color-chessboard-silver)] hover:text-[color:var(--color-chessboard-ghost)] transition-colors"
           >
-            &larr; Return to the Great Hall
+            &larr; Return to the Dashboard
           </Link>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function FinalReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-warroom-void)] relative">
+    <div className="min-h-screen bg-[color:var(--color-chessboard-void)] relative">
       {/* Stone texture backdrop */}
       <div
         aria-hidden
@@ -111,7 +111,7 @@ export default function FinalReportPage() {
         className="fixed inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 0%, var(--color-warroom-gold)/0.03 0%, transparent 60%)',
+            'radial-gradient(ellipse at 50% 0%, var(--color-chessboard-silver)/0.03 0%, transparent 60%)',
         }}
       />
 
@@ -125,7 +125,7 @@ export default function FinalReportPage() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-gold)] transition-colors mb-6"
+            className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-silver)] transition-colors mb-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -133,13 +133,13 @@ export default function FinalReportPage() {
           </Link>
 
           <div className="flex items-center gap-3 mb-3">
-            <ScrollText className="h-6 w-6 text-[color:var(--color-warroom-gold)]" />
+            <ScrollText className="h-6 w-6 text-[color:var(--color-chessboard-silver)]" />
             <h1
               className="text-xl sm:text-2xl font-bold tracking-[0.04em]"
               style={{
                 fontFamily: 'var(--font-display)',
                 background:
-                  'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                  'linear-gradient(135deg, var(--color-chessboard-silver), var(--color-chessboard-ghost))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -148,7 +148,7 @@ export default function FinalReportPage() {
             </h1>
           </div>
           <p
-            className="text-sm text-[color:var(--color-warroom-smoke)]"
+            className="text-sm text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-body, serif)' }}
           >
             {report.entrepreneurType} &bull; {report.organizationalRole}
@@ -171,8 +171,8 @@ export default function FinalReportPage() {
                   flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border
                   ${
                     isActive
-                      ? 'bg-[color:var(--color-warroom-gold)]/10 border-[color:var(--color-warroom-gold)]/40 text-[color:var(--color-warroom-gold)]'
-                      : 'bg-transparent border-[color:var(--color-warroom-ash)]/20 text-[color:var(--color-warroom-smoke)] hover:bg-[color:var(--color-warroom-gold)]/[0.04] hover:text-[color:var(--color-warroom-ivory)]'
+                      ? 'bg-[color:var(--color-chessboard-gold)]/10 border-[color:var(--color-chessboard-gold)]/40 text-[color:var(--color-chessboard-gold)]'
+                      : 'bg-transparent border-[color:var(--color-chessboard-ash)]/20 text-[color:var(--color-chessboard-smoke)] hover:bg-[color:var(--color-chessboard-gold)]/[0.04] hover:text-[color:var(--color-chessboard-ivory)]'
                   }
                 `}
                 style={{ fontFamily: 'var(--font-display)' }}

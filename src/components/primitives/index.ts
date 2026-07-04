@@ -1,4 +1,4 @@
-export { WarRoomCTA, type WarRoomCTAProps } from './WarRoomCTA'
+export { ChessboardCTA, type ChessboardCTAProps } from './ChessboardCTA'
 export { StoneCard, type StoneCardProps } from './StoneCard'
 export {
   GoldDivider,
@@ -6,4 +6,4 @@ export {
   type GoldDividerVariant,
 } from './GoldDivider'
 export { SigilBadge, type SigilBadgeProps, type SigilTone } from './SigilBadge'
-export { WarRoomCrest, type WarRoomCrestProps } from './WarRoomCrest'
+export { ChessboardCrest, type ChessboardCrestProps } from './ChessboardCrest'

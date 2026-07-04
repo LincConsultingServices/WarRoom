@@ -113,12 +113,12 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         .responses-page { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .responses-header { text-align: center; margin-bottom: 2rem; }
-        .responses-header h2 { font-size: 1.5rem; font-weight: 800; color: var(--color-warroom-ivory); margin-bottom: 0.5rem; font-family: var(--font-display); }
-        .responses-subtitle { color: var(--color-warroom-smoke); font-size: 0.9rem; font-family: var(--font-body, serif); }
+        .responses-header h2 { font-size: 1.5rem; font-weight: 800; color: var(--color-chessboard-ivory); margin-bottom: 0.5rem; font-family: var(--font-display); }
+        .responses-subtitle { color: var(--color-chessboard-smoke); font-size: 0.9rem; font-family: var(--font-body, serif); }
         .stage-group { margin-bottom: 2rem; }
         .stage-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
-        .stage-badge { background: rgba(201,162,39,0.12); color: var(--color-warroom-gold); padding: 0.25rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; font-family: var(--font-display); }
-        .response-count { font-size: 0.8rem; color: var(--color-warroom-smoke); }
+        .stage-badge { background: rgba(201,162,39,0.12); color: var(--color-chessboard-gold); padding: 0.25rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; font-family: var(--font-display); }
+        .response-count { font-size: 0.8rem; color: var(--color-chessboard-smoke); }
 
         .response-accordion :global(.response-item) {
           background: color-mix(in srgb, var(--foreground) 3%, transparent);
@@ -136,10 +136,10 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         }
 
         .trigger-content { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
-        .q-type { font-size: 0.7rem; font-weight: 600; color: var(--color-warroom-gold); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-display); }
-        .trigger-question { font-size: 0.9rem; color: var(--color-warroom-ivory); margin: 0; line-height: 1.4; font-family: var(--font-body, serif); }
+        .q-type { font-size: 0.7rem; font-weight: 600; color: var(--color-chessboard-gold); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-display); }
+        .trigger-question { font-size: 0.9rem; color: var(--color-chessboard-ivory); margin: 0; line-height: 1.4; font-family: var(--font-body, serif); }
         .trigger-meta { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-        .match-badge { font-size: 0.7rem; font-weight: 600; color: var(--color-warroom-verdant); background: rgba(16,185,129,0.1); padding: 0.15rem 0.5rem; border-radius: 6px; font-family: var(--font-display); }
+        .match-badge { font-size: 0.7rem; font-weight: 600; color: var(--color-chessboard-verdant); background: rgba(16,185,129,0.1); padding: 0.15rem 0.5rem; border-radius: 6px; font-family: var(--font-display); }
 
         .answer-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
         @media (min-width: 640px) { .answer-grid { grid-template-columns: 1fr 1fr; } }
@@ -149,12 +149,12 @@ export function ResponsesTab({ report }: { report: EvaluationReport }) {
         .answer-card.is-match { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.04); }
         .answer-card.ideal-card { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
 
-        .answer-label { font-size: 0.7rem; font-weight: 600; color: var(--color-warroom-smoke); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-display); }
-        .ideal-label { color: var(--color-warroom-verdant); }
+        .answer-label { font-size: 0.7rem; font-weight: 600; color: var(--color-chessboard-smoke); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-display); }
+        .ideal-label { color: var(--color-chessboard-verdant); }
         .answer-card p { color: var(--muted-foreground); font-size: 0.88rem; margin: 0.3rem 0 0 0; line-height: 1.5; font-family: var(--font-body, serif); }
-        .ai-tip { font-size: 0.78rem; color: var(--color-warroom-smoke); font-style: italic; margin-top: 0.5rem !important; }
-        .no-ideal-note { font-size: 0.74rem; color: var(--color-warroom-smoke); font-style: italic; margin-top: 0.6rem !important; }
-        .no-data { color: var(--color-warroom-smoke); text-align: center; padding: 3rem; font-family: var(--font-body, serif); }
+        .ai-tip { font-size: 0.78rem; color: var(--color-chessboard-smoke); font-style: italic; margin-top: 0.5rem !important; }
+        .no-ideal-note { font-size: 0.74rem; color: var(--color-chessboard-smoke); font-style: italic; margin-top: 0.6rem !important; }
+        .no-data { color: var(--color-chessboard-smoke); text-align: center; padding: 3rem; font-family: var(--font-body, serif); }
       `}</style>
     </div>
   )

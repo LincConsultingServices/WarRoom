@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
-import { getAmbientStore, getSfxVolumeMultiplier, isWarRoomAudioMuted } from '@/src/hooks/useAmbientAudio'
+import { getAmbientStore, getSfxVolumeMultiplier, isChessboardAudioMuted } from '@/src/hooks/useAmbientAudio'
 import { playSynthSound, type SoundEvent } from '@/lib/audio/synthSounds'
 
 /** Read per-channel SFX mute flag without subscribing to the store. */
@@ -71,7 +71,7 @@ export function useGOTSound() {
   const playSound = useCallback(async (event: SoundEvent, volume = 0.6) => {
     if (!enabled.current) return
     if (typeof window === 'undefined') return
-    if (isWarRoomAudioMuted()) return
+    if (isChessboardAudioMuted()) return
     if (isSfxChannelMuted()) return
 
 
@@ -119,7 +119,7 @@ export function useGOTSound() {
 export function playGOTSound(event: SoundEvent, volume = 0.6) {
   if (typeof window === 'undefined') return
   // Same mute gate as the hook — respects the persisted MuteToggle preference.
-  if (isWarRoomAudioMuted()) return
+  if (isChessboardAudioMuted()) return
   if (isSfxChannelMuted()) return
 
 

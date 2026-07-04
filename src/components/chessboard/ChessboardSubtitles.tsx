@@ -8,7 +8,7 @@ export interface SubtitleCue {
   holdMs?: number
 }
 
-interface WarRoomSubtitlesProps {
+interface ChessboardSubtitlesProps {
   cues: SubtitleCue[]
   /** Monotonic clock in ms since entrance start. */
   elapsedMs: number
@@ -32,7 +32,7 @@ function findActiveCue(cues: SubtitleCue[], elapsedMs: number): ActiveCue | null
   return null
 }
 
-export function WarRoomSubtitles({ cues, elapsedMs }: WarRoomSubtitlesProps) {
+export function ChessboardSubtitles({ cues, elapsedMs }: ChessboardSubtitlesProps) {
   const reducedMotion = useReducedMotion()
   const active = findActiveCue(cues, elapsedMs)
 

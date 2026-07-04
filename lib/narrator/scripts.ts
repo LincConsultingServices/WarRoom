@@ -6,28 +6,28 @@ import type { NarratorLine } from '@/src/state/narratorStore'
  * This file is intentionally append-only. Each slice adds the lines
  * it needs without rewriting existing entries. The landing slice
  * populates only the two `landing.*` keys; future slices populate
- * `stage.*`, `warroom.*`, `verdict.*`, etc.
+ * `stage.*`, `chessboard.*`, `verdict.*`, etc.
  */
 
 export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
   'landing.first-visit': [
     {
-      text: 'Welcome, seeker. I am the Oracle of the War Room.',
+      text: 'Welcome, seeker. I am the Oracle of the Boardroom Pitch.',
       mood: 'idle',
       duration: 3200,
     },
     {
-      text: 'Before you stands the greatest trial a founder can face.',
+      text: 'Before you stands the greatest assessment a founder can face.',
       mood: 'speaking',
       duration: 3600,
     },
     {
-      text: 'Six stages await. Then... the War Room.',
+      text: 'Six stages await. Then... the Boardroom Pitch.',
       mood: 'warning',
       duration: 3200,
     },
     {
-      text: 'Are you prepared to defend your vision before the Council?',
+      text: 'Are you prepared to defend your vision before the Investors?',
       mood: 'idle',
       duration: 0,
     },
@@ -35,7 +35,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'landing.returning': [
     {
-      text: 'You return, lord. The Council remembers.',
+      text: 'You return, founder. The Investors remember.',
       mood: 'idle',
       duration: 2800,
     },
@@ -43,23 +43,23 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'dashboard.first-visit': [
     {
-      text: 'Welcome to the Great Hall. This is your council chamber between trials.',
+      text: 'Welcome to the Dashboard. This is your boardroom between trials.',
       mood: 'idle',
       duration: 3600,
     },
     {
-      text: 'When you are ready, the trial begins beyond that door.',
+      text: 'When you are ready, the assessment begins beyond that door.',
       mood: 'pointing',
       highlight: 'dashboard-begin-cta',
       duration: 3400,
     },
     {
-      text: 'The Iron Rankings track every founder who has dared the gauntlet.',
+      text: 'The Elo Rankings track every founder who has dared the pitch.',
       mood: 'speaking',
       duration: 3400,
     },
     {
-      text: 'Choose your path, lord.',
+      text: 'Choose your path, founder.',
       mood: 'idle',
       duration: 0,
     },
@@ -67,7 +67,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'dashboard.returning': [
     {
-      text: 'The hall is quiet, lord. Your campaigns await.',
+      text: 'The boardroom is quiet, founder. Your ventures await.',
       mood: 'idle',
       duration: 2600,
     },
@@ -75,22 +75,22 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'assessment.first-visit': [
     {
-      text: 'The Trial has many paths, lord. Choose your rank with care.',
+      text: 'The assessment has many paths, founder. Choose your rank with care.',
       mood: 'idle',
       duration: 3400,
     },
     {
-      text: 'A Student walks the guided path. A Commander faces the full gauntlet.',
+      text: 'A Student walks the guided path. A Commander faces the full pitch.',
       mood: 'speaking',
       duration: 4000,
     },
     {
-      text: 'Nine stages await — from first spark of Ideation to the War Room itself.',
+      text: 'Nine stages await — from first spark of Ideation to the Boardroom Pitch itself.',
       mood: 'speaking',
       duration: 3600,
     },
     {
-      text: 'Seal your oath below, then press Enter the Trial when you are ready.',
+      text: 'confirm your details below, then press Enter the assessment when you are ready.',
       mood: 'pointing',
       highlight: 'assessment-start-cta',
       duration: 0,
@@ -99,7 +99,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'assessment.returning': [
     {
-      text: 'You return to the threshold, lord. The Council remembers your last campaign.',
+      text: 'You return to the threshold, founder. The Investors remember your last venture.',
       mood: 'idle',
       duration: 0,
     },
@@ -107,17 +107,17 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'leaderboard.first-visit': [
     {
-      text: 'The Iron Rankings, lord. Here, all founders are measured by the coin they command.',
+      text: 'The Elo Rankings, founder. Here, all founders are measured by the coin they command.',
       mood: 'idle',
       duration: 3600,
     },
     {
-      text: 'Your projected revenue determines your standing among the realm.',
+      text: 'Your projected revenue determines your standing among the domain.',
       mood: 'speaking',
       duration: 3200,
     },
     {
-      text: 'The throne awaits the boldest.',
+      text: 'The championship awaits the boldest.',
       mood: 'idle',
       duration: 0,
     },
@@ -125,7 +125,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'leaderboard.returning': [
     {
-      text: 'The rankings shift with every trial. Where do you stand now, lord?',
+      text: 'The rankings shift with every assessment. Where do you stand now, founder?',
       mood: 'idle',
       duration: 0,
     },
@@ -133,12 +133,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'results.first-visit': [
     {
-      text: 'The Legacy Scroll, lord. Every campaign you have fought is recorded here.',
+      text: 'Results, founder. Every venture you have fought is recorded here.',
       mood: 'idle',
       duration: 3600,
     },
     {
-      text: 'Study your strengths and failures — the Council remembers every choice.',
+      text: 'Study your strengths and failures — the Investors remembers every choice.',
       mood: 'speaking',
       duration: 3400,
     },
@@ -151,7 +151,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'results.returning': [
     {
-      text: 'Your campaigns await review, lord. Has the scroll revealed new wisdom?',
+      text: 'Your ventures await review, founder. Has the scroll revealed new wisdom?',
       mood: 'idle',
       duration: 0,
     },
@@ -159,7 +159,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'history.first-visit': [
     {
-      text: 'The Archives, lord. A chronicle of every question asked and answer given.',
+      text: 'The Archives, founder. A chronicle of every question asked and answer given.',
       mood: 'idle',
       duration: 3600,
     },
@@ -169,7 +169,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3200,
     },
     {
-      text: 'Review your past, and the future campaigns will be sharper for it.',
+      text: 'Review your past, and the future ventures will be sharper for it.',
       mood: 'idle',
       duration: 0,
     },
@@ -177,7 +177,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'history.returning': [
     {
-      text: 'The archives remain as you left them, lord.',
+      text: 'The archives remain as you left them, founder.',
       mood: 'idle',
       duration: 0,
     },
@@ -185,12 +185,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'settings.first-visit': [
     {
-      text: 'The Forge, lord. Here you may temper your preferences.',
+      text: 'The Forge, founder. Here you may temper your preferences.',
       mood: 'idle',
       duration: 3200,
     },
     {
-      text: 'Shape the War Room to your liking — but the trials remain the same.',
+      text: 'Shape the Boardroom Pitch to your liking — but the trials remain the same.',
       mood: 'speaking',
       duration: 0,
     },
@@ -198,7 +198,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'settings.returning': [
     {
-      text: 'Adjusting the armour again, lord?',
+      text: 'Adjusting the armour again, founder?',
       mood: 'idle',
       duration: 0,
     },
@@ -206,7 +206,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'support.first-visit': [
     {
-      text: 'If the War Room confounds you, seek counsel here.',
+      text: 'If the Boardroom Pitch confounds you, seek counsel here.',
       mood: 'idle',
       duration: 3200,
     },
@@ -219,7 +219,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'support.returning': [
     {
-      text: 'The Council stands ready to assist, lord.',
+      text: 'The Investors stand ready to assist, founder.',
       mood: 'idle',
       duration: 0,
     },
@@ -231,12 +231,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'stage.ideation.first-visit': [
     {
-      text: 'The Spark, lord. Every empire begins with a single dangerous idea.',
+      text: 'The Spark, founder. Every empire begins with a single dangerous idea.',
       mood: 'speaking',
       duration: 3200,
     },
     {
-      text: 'Tell the Council what problem burns in your gut — and why you alone can solve it.',
+      text: 'Tell the Investors what problem burns in your gut — and why you alone can solve it.',
       mood: 'speaking',
       duration: 3600,
     },
@@ -247,12 +247,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.ideation.returning': [
-    { text: 'Back to the forge of ideas, lord. Has the spark grown brighter?', mood: 'idle', duration: 0 },
+    { text: 'Back to the forge of ideas, founder. Has the spark grown brighter?', mood: 'idle', duration: 0 },
   ],
 
   'stage.vision.first-visit': [
     {
-      text: 'Vision, lord. The Council must see the world you intend to build.',
+      text: 'Vision, founder. The Investors must see the world you intend to build.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -268,17 +268,17 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.vision.returning': [
-    { text: 'Your vision awaits refinement, lord.', mood: 'idle', duration: 0 },
+    { text: 'Your vision awaits refinement, founder.', mood: 'idle', duration: 0 },
   ],
 
   'stage.commitment.first-visit': [
     {
-      text: 'The Commitment, lord. Here you stake your oath to this venture.',
+      text: 'The Commitment, founder. Here you stake your oath to this venture.',
       mood: 'warning',
       duration: 3200,
     },
     {
-      text: 'The Council watches for hesitation. They invest in certainty.',
+      text: 'The Investors watches for hesitation. They invest in certainty.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -289,12 +289,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.commitment.returning': [
-    { text: 'The oath was taken, lord. Does your resolve hold?', mood: 'idle', duration: 0 },
+    { text: 'The oath was taken, founder. Does your resolve hold?', mood: 'idle', duration: 0 },
   ],
 
   'stage.validation.first-visit': [
     {
-      text: 'Market Validation, lord. Dreams are cheap — the Council demands proof.',
+      text: 'Market Validation, founder. Dreams are cheap — the Investors demands proof.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -310,17 +310,17 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.validation.returning': [
-    { text: 'The market evidence awaits your hand, lord.', mood: 'idle', duration: 0 },
+    { text: 'The market evidence awaits your hand, founder.', mood: 'idle', duration: 0 },
   ],
 
   'stage.growth.first-visit': [
     {
-      text: 'Initial Growth, lord. The seed is planted — now it must break ground.',
+      text: 'Initial Growth, founder. The seed is planted — now it must break ground.',
       mood: 'speaking',
       duration: 3200,
     },
     {
-      text: 'The Council watches for traction. Early signs of life.',
+      text: 'The Investors watches for traction. Early signs of life.',
       mood: 'speaking',
       duration: 3000,
     },
@@ -331,17 +331,17 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.growth.returning': [
-    { text: 'Growth pauses for no one, lord. The numbers are waiting.', mood: 'idle', duration: 0 },
+    { text: 'Growth pauses for no one, founder. The numbers are waiting.', mood: 'idle', duration: 0 },
   ],
 
   'stage.expansion.first-visit': [
     {
-      text: 'Expansion, lord. The realm grows — but so do the threats.',
+      text: 'Expansion, founder. The domain grows — but so do the threats.',
       mood: 'warning',
       duration: 3200,
     },
     {
-      text: 'Churn is the silent killer. The Council knows this well.',
+      text: 'Churn is the silent killer. The Investors knows this well.',
       mood: 'speaking',
       duration: 3000,
     },
@@ -352,12 +352,12 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
     },
   ],
   'stage.expansion.returning': [
-    { text: 'The expansion questions remain, lord. Press forward.', mood: 'idle', duration: 0 },
+    { text: 'The expansion questions remain, founder. Press forward.', mood: 'idle', duration: 0 },
   ],
 
   'stage.scale.first-visit': [
     {
-      text: 'Scaling Up, lord. The final trial before the War Room gates.',
+      text: 'Scaling Up, founder. The final assessment before the Boardroom Pitch gates.',
       mood: 'speaking',
       duration: 3400,
     },
@@ -367,23 +367,23 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3200,
     },
     {
-      text: 'The Council must believe your walls will hold.',
+      text: 'The Investors must believe your walls will hold.',
       mood: 'idle',
       duration: 0,
     },
   ],
   'stage.scale.returning': [
-    { text: 'Scale waits for no one, lord. Complete your testimony.', mood: 'idle', duration: 0 },
+    { text: 'Scale waits for no one, founder. Complete your testimony.', mood: 'idle', duration: 0 },
   ],
 
-  'stage.warroom-prep.first-visit': [
+  'stage.chessboard-prep.first-visit': [
     {
-      text: 'Pitch Prep, lord. The final chance to sharpen your sword before the gate.',
+      text: 'Pitch Prep, founder. The final chance to sharpen your strategy before the gate.',
       mood: 'warning',
       duration: 3400,
     },
     {
-      text: 'Beyond this point, you face the Council directly. Prepare well.',
+      text: 'Beyond this point, you face the Investors directly. Prepare well.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -393,33 +393,33 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'stage.warroom-prep.returning': [
-    { text: 'Still sharpening the blade, lord? The War Room draws near.', mood: 'idle', duration: 0 },
+  'stage.chessboard-prep.returning': [
+    { text: 'Still sharpening the tactic, founder? The Boardroom Pitch draws near.', mood: 'idle', duration: 0 },
   ],
 
   // ===================================================================
-  // WAR ROOM PHASE SCRIPTS
+  // boardroom PHASE SCRIPTS
   // ===================================================================
 
-  'warroom.pitch.first-visit': [
+  'chessboard.pitch.first-visit': [
     {
-      text: 'The Pitch, lord. You have sixty seconds to seize their attention.',
+      text: 'The Pitch, founder. You have sixty seconds to seize their attention.',
       mood: 'warning',
       duration: 3200,
     },
     {
-      text: 'Speak your truth with fire. The Council respects conviction above all.',
+      text: 'Speak your truth with fire. The Investors respects conviction above all.',
       mood: 'speaking',
       duration: 0,
     },
   ],
-  'warroom.pitch.returning': [
-    { text: 'The stage is yours again, lord. Make it count.', mood: 'idle', duration: 0 },
+  'chessboard.pitch.returning': [
+    { text: 'The stage is yours again, founder. Make it count.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.qa.first-visit': [
+  'chessboard.qa.first-visit': [
     {
-      text: 'The Inquisition begins, lord. Each investor will probe your weaknesses.',
+      text: 'The Inquisition begins, founder. Each investor will probe your weaknesses.',
       mood: 'warning',
       duration: 3400,
     },
@@ -434,13 +434,13 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.qa.returning': [
-    { text: 'The Council’s questions resume, lord.', mood: 'idle', duration: 0 },
+  'chessboard.qa.returning': [
+    { text: 'The Investors’s questions resume, founder.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.deal.first-visit': [
+  'chessboard.deal.first-visit': [
     {
-      text: 'The Offers, lord. The investors have spoken — now choose wisely.',
+      text: 'The Offers, founder. The investors have spoken — now choose wisely.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -455,13 +455,13 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.deal.returning': [
-    { text: 'The offers remain on the table, lord.', mood: 'idle', duration: 0 },
+  'chessboard.deal.returning': [
+    { text: 'The offers remain on the table, founder.', mood: 'idle', duration: 0 },
   ],
 
-  'warroom.complete.first-visit': [
+  'chessboard.complete.first-visit': [
     {
-      text: 'It is done, lord. The War Room has spoken.',
+      text: 'It is done, founder. The Boardroom Pitch has spoken.',
       mood: 'celebrating',
       duration: 3000,
     },
@@ -471,8 +471,8 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 0,
     },
   ],
-  'warroom.complete.returning': [
-    { text: 'The War Room is concluded. Onward to the Verdict.', mood: 'idle', duration: 0 },
+  'chessboard.complete.returning': [
+    { text: 'The Boardroom Pitch is concluded. Onward to the Verdict.', mood: 'idle', duration: 0 },
   ],
 
   // ===================================================================
@@ -481,7 +481,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'verdict.first-visit': [
     {
-      text: 'The Verdict Chamber, lord. Here, all is revealed.',
+      text: 'The Verdict Chamber, founder. Here, all is revealed.',
       mood: 'speaking',
       duration: 3200,
     },
@@ -491,29 +491,29 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3200,
     },
     {
-      text: 'Your legacy score will be etched into the Iron Rankings for all to see.',
+      text: 'Your performance score will be etched into the Elo Rankings for all to see.',
       mood: 'warning',
       duration: 3400,
     },
     {
-      text: 'Whatever the outcome — you dared the gauntlet. That alone is worthy.',
+      text: 'Whatever the outcome — you dared the pitch. That alone is worthy.',
       mood: 'celebrating',
       duration: 0,
     },
   ],
   'verdict.returning': [
-    { text: 'Revisiting the verdict, lord? The judgments do not change.', mood: 'idle', duration: 0 },
+    { text: 'Revisiting the verdict, founder? The judgments do not change.', mood: 'idle', duration: 0 },
   ],
 
   // ===================================================================
-  // GREAT HALL — the Maester's Welcome (progression onboarding).
+  // GREAT HALL — the Advisor's Welcome (progression onboarding).
   // A dedicated phase so it fires once for EVERY founder, including
   // those who saw the older 'dashboard' intro before progression existed.
   // ===================================================================
 
   'great-hall.first-visit': [
     {
-      text: 'Welcome to the Great Hall, lord — your seat of power between trials.',
+      text: 'Welcome to the Dashboard, founder — your seat of power between trials.',
       mood: 'idle',
       duration: 3400,
     },
@@ -524,9 +524,9 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 3800,
     },
     {
-      text: 'Renown measures your standing. Earn it through sharp decisions and rise from Aspirant to Ruler of the Realm.',
+      text: 'Rating measures your standing. Earn it through sharp decisions and rise from Aspirant to Ruler of the Domain.',
       mood: 'speaking',
-      highlight: 'dashboard-renown',
+      highlight: 'dashboard-rating',
       duration: 4200,
     },
     {
@@ -536,18 +536,18 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
       duration: 4000,
     },
     {
-      text: 'Sigils mark your great deeds — won through merit, never bought.',
+      text: 'Emblems mark your great deeds — won through merit, never bought.',
       mood: 'speaking',
       duration: 3400,
     },
     {
-      text: 'When you are ready, the trial begins beyond that door.',
+      text: 'When you are ready, the assessment begins beyond that door.',
       mood: 'pointing',
       highlight: 'dashboard-begin-cta',
       duration: 3400,
     },
     {
-      text: 'Choose your path, lord.',
+      text: 'Choose your path, founder.',
       mood: 'idle',
       duration: 0,
     },
@@ -555,7 +555,7 @@ export const NARRATOR_SCRIPTS: Record<string, NarratorLine[]> = {
 
   'great-hall.returning': [
     {
-      text: 'The hall is quiet, lord. Your House and your campaigns await.',
+      text: 'The boardroom is quiet, founder. Your House and your ventures await.',
       mood: 'idle',
       duration: 2600,
     },
@@ -575,21 +575,21 @@ const STAGE_TO_NARRATOR: Record<string, string> = {
   STAGE_2A_GROWTH: 'stage.growth',
   STAGE_2B_EXPANSION: 'stage.expansion',
   STAGE_3_SCALE: 'stage.scale',
-  STAGE_WARROOM_PREP: 'stage.warroom-prep',
+  STAGE_WARROOM_PREP: 'stage.chessboard-prep',
 }
 
 export function narratorPhaseForStage(stageName: string): string | null {
   return STAGE_TO_NARRATOR[stageName] ?? null
 }
 
-/** Map WarRoomPhase → narrator phase key. Returns null for LOADING (too brief). */
+/** Map ChessboardPhase → narrator phase key. Returns null for LOADING (too brief). */
 const WARROOM_TO_NARRATOR: Record<string, string> = {
-  PITCH: 'warroom.pitch',
-  INVESTOR_QA: 'warroom.qa',
-  DEAL_RESULTS: 'warroom.deal',
-  COMPLETE: 'warroom.complete',
+  PITCH: 'chessboard.pitch',
+  INVESTOR_QA: 'chessboard.qa',
+  DEAL_RESULTS: 'chessboard.deal',
+  COMPLETE: 'chessboard.complete',
 }
 
-export function narratorPhaseForWarRoom(phase: string): string | null {
+export function narratorPhaseForChessboard(phase: string): string | null {
   return WARROOM_TO_NARRATOR[phase] ?? null
 }

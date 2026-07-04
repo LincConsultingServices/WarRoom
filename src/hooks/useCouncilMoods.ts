@@ -1,14 +1,14 @@
 'use client'
 
 import type { InvestorScorecard } from '@/src/types'
-import type { CouncilMood } from '@/src/components/warroom/CouncilMemberCard'
+import type { CouncilMood } from '@/src/components/chessboard/CouncilMemberCard'
 import type { Sentiment } from './useInvestorPortraitState'
 
 // ============================================================
 // useCouncilMoods
 // ----------------------------------------------------------------
 // Derives a `Record<investorId, CouncilMood>` map from the
-// per-investor scorecards returned by `GET /warroom/scorecard`,
+// per-investor scorecards returned by `GET /chessboard/scorecard`,
 // with the currently-speaking investor's mood overridden by
 // the live sentiment from useFeedbackSentiment (Phase 5).
 //

@@ -14,18 +14,18 @@ export interface SigilBadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const TONE_STYLES: Record<SigilTone, string> = {
   gold:
-    'bg-[color:var(--color-warroom-gold)]/[0.10] text-[color:var(--color-warroom-gold)] border-[color:var(--color-warroom-gold)]/30',
+    'bg-[color:var(--color-chessboard-gold)]/[0.10] text-[color:var(--color-chessboard-gold)] border-[color:var(--color-chessboard-gold)]/30',
   crimson:
-    'bg-[color:var(--color-warroom-crimson)]/[0.15] text-[color:var(--color-warroom-crimson-bright)] border-[color:var(--color-warroom-crimson)]/35',
+    'bg-[color:var(--color-chessboard-crimson)]/[0.15] text-[color:var(--color-chessboard-crimson-bright)] border-[color:var(--color-chessboard-crimson)]/35',
   verdant:
-    'bg-[color:var(--color-warroom-verdant)]/[0.15] text-[color:var(--color-warroom-verdant)] border-[color:var(--color-warroom-verdant)]/35',
+    'bg-[color:var(--color-chessboard-verdant)]/[0.15] text-[color:var(--color-chessboard-verdant)] border-[color:var(--color-chessboard-verdant)]/35',
   amethyst:
-    'bg-[color:var(--color-warroom-amethyst)]/[0.15] text-[color:var(--color-warroom-amethyst)] border-[color:var(--color-warroom-amethyst)]/35',
+    'bg-[color:var(--color-chessboard-amethyst)]/[0.15] text-[color:var(--color-chessboard-amethyst)] border-[color:var(--color-chessboard-amethyst)]/35',
 }
 
 /**
  * <SigilBadge /> — small house-banner chip used for section labels
- * ("The Trial", "The Council") and status pills.
+ * ("The Trial", "The Panel") and status pills.
  */
 export const SigilBadge = forwardRef<HTMLSpanElement, SigilBadgeProps>(
   function SigilBadge(
@@ -41,7 +41,7 @@ export const SigilBadge = forwardRef<HTMLSpanElement, SigilBadgeProps>(
           TONE_STYLES[tone],
           className,
         )}
-        style={{ fontFamily: 'var(--font-display)' }}
+        style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.12em' }}
         {...rest}
       >
         {Icon && <Icon className="h-3 w-3 shrink-0" aria-hidden />}

@@ -69,9 +69,9 @@ export function SoundwaveVisualizer({
         const x = i * (barWidth + gap)
         const tip = value > 0.78
         const grad = c.createLinearGradient(0, mid - halfH, 0, mid + halfH)
-        grad.addColorStop(0, tip ? '#c23b3b' : '#e8c84a')
-        grad.addColorStop(0.5, '#c9a227')
-        grad.addColorStop(1, tip ? '#c23b3b' : '#8b6914')
+        grad.addColorStop(0, tip ? '#b03030' : '#d4aa40')
+        grad.addColorStop(0.5, '#c8a84a')
+        grad.addColorStop(1, tip ? '#b03030' : '#7a6020')
         c.fillStyle = grad
         c.fillRect(x, mid - halfH, barWidth, halfH * 2)
       }

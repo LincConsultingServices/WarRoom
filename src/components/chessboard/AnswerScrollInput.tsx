@@ -51,18 +51,18 @@ export function AnswerScrollInput({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-md border border-[color:var(--color-warroom-gold)]/25 p-4',
-        'bg-[color:var(--color-warroom-parchment)]/[0.04] backdrop-blur-sm',
+        'relative overflow-hidden rounded-md border border-[color:var(--color-chessboard-gold)]/25 p-4',
+        'bg-[color:var(--color-chessboard-ivory)]/[0.04] backdrop-blur-sm',
         'shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(245,230,200,0.06)]',
         'noise-overlay',
         disabled && 'opacity-60',
         className,
       )}
       style={{
-        // Aged war-scroll: parchment grain beneath a warm-dark wash so the
+        // Aged war-scroll: ivory grain beneath a warm-dark wash so the
         // mono dispatch text stays crisp.
         backgroundImage:
-          'var(--wr-parchment-wash), url("/assets/images/textures/parchment.webp")',
+          'var(--wr-ivory-wash), url("/assets/images/textures/ivory.webp")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -73,13 +73,13 @@ export function AnswerScrollInput({
         className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
         style={{
           background:
-            'linear-gradient(90deg, transparent, rgba(201,162,39,0.6), rgba(232,200,74,0.85), rgba(201,162,39,0.6), transparent)',
+            'linear-gradient(90deg, transparent, rgba(200,168,74,0.6), rgba(232,200,74,0.85), rgba(200,168,74,0.6), transparent)',
         }}
       />
 
       <label
         htmlFor={id}
-        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-warroom-gold)]/90"
+        className="mb-2 block font-display text-[0.6rem] uppercase tracking-[0.22em] text-[color:var(--color-chessboard-gold)]/90"
       >
         {label}
       </label>
@@ -97,10 +97,10 @@ export function AnswerScrollInput({
           maxLength={maxLength}
           rows={minRows}
           className={cn(
-            'block w-full resize-y rounded-sm border border-[color:var(--color-warroom-gold)]/15 bg-transparent px-3 py-2',
+            'block w-full resize-y rounded-sm border border-[color:var(--color-chessboard-gold)]/15 bg-transparent px-3 py-2',
             'font-mono text-sm leading-relaxed text-foreground placeholder:italic placeholder:text-foreground/40',
-            'caret-[color:var(--color-warroom-gold)]',
-            'focus-visible:border-[color:var(--color-warroom-gold)]/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-warroom-gold)]/40',
+            'caret-[color:var(--color-chessboard-gold)]',
+            'focus-visible:border-[color:var(--color-chessboard-gold)]/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-chessboard-gold)]/40',
           )}
         />
       )}

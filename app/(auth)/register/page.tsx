@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import {
   StoneCard,
-  WarRoomCTA,
-  WarRoomCrest,
+  ChessboardCTA,
+  ChessboardCrest,
 } from '@/src/components/primitives'
 import { audioManager } from '@/lib/audio/audioManager'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
@@ -22,9 +22,9 @@ import { easeDramatic } from '@/lib/animations/variants'
 // ─── Shared style tokens ────────────────────────────────────────────────────
 
 const INPUT_CLASSES = cn(
-  'bg-[color:var(--color-warroom-rampart)]/80 border-[color:var(--color-warroom-ash)]/50',
-  'text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)]',
-  'focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20',
+  'bg-[color:var(--color-chessboard-rampart)]/80 border-[color:var(--color-chessboard-ash)]/50',
+  'text-[color:var(--color-chessboard-ivory)] placeholder:text-[color:var(--color-chessboard-smoke)]',
+  'focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20',
 )
 
 // ─── Page ───────────────────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ export default function RegisterPage() {
           transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
           className="flex justify-center mb-5"
         >
-          <WarRoomCrest size={56} />
+          <ChessboardCrest size={56} />
         </motion.div>
 
         <motion.h1
@@ -126,7 +126,7 @@ export default function RegisterPage() {
           style={{
             fontFamily: 'var(--font-display)',
             background:
-              'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+              'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -138,10 +138,10 @@ export default function RegisterPage() {
           initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.35, duration: 0.4, ease: easeDramatic }}
-          className="text-sm text-[color:var(--color-warroom-smoke)] mt-2"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mt-2"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
-          Create your War Room account and join the Council.
+          Create your account and prepare for your pitch.
         </motion.p>
       </div>
 
@@ -151,22 +151,22 @@ export default function RegisterPage() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5, ease: easeDramatic }}
       >
-        <StoneCard accent="var(--color-warroom-gold)" padding="lg">
+        <StoneCard accent="var(--color-chessboard-gold)" padding="lg">
           <div className="mb-5">
             <h2
-              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-warroom-ivory)] mb-1"
+              className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-chessboard-ivory)] mb-1"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Create Account
             </h2>
             <p
-              className="text-xs text-[color:var(--color-warroom-smoke)] leading-relaxed"
+              className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               Enter your batch code and details to begin your simulation. Review the{' '}
               <Link
                 href="/terms"
-                className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                className="text-[color:var(--color-chessboard-gold)] underline underline-offset-2 hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
               >
                 Terms &amp; Conditions
               </Link>{' '}
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -8, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/40 bg-[color:var(--color-warroom-crimson)]/[0.08] text-sm text-[color:var(--color-warroom-crimson-bright)]"
+                className="mb-4 p-3 rounded-[3px] border border-[color:var(--color-chessboard-crimson)]/40 bg-[color:var(--color-chessboard-crimson)]/[0.08] text-sm text-[color:var(--color-chessboard-crimson-bright)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {error}
@@ -195,7 +195,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="reg-batch"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Batch Code
@@ -215,9 +215,9 @@ export default function RegisterPage() {
                 className={cn(
                   INPUT_CLASSES,
                   batchValid === true &&
-                    'border-[color:var(--color-warroom-verdant)] focus-visible:border-[color:var(--color-warroom-verdant)]',
+                    'border-[color:var(--color-chessboard-verdant)] focus-visible:border-[color:var(--color-chessboard-verdant)]',
                   batchValid === false &&
-                    'border-[color:var(--color-warroom-crimson)] focus-visible:border-[color:var(--color-warroom-crimson)]',
+                    'border-[color:var(--color-chessboard-crimson)] focus-visible:border-[color:var(--color-chessboard-crimson)]',
                 )}
               />
               <AnimatePresence>
@@ -226,7 +226,7 @@ export default function RegisterPage() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-verdant)] mt-1.5"
+                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-chessboard-verdant)] mt-1.5"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     <Check className="w-3 h-3" /> {batchName}
@@ -237,7 +237,7 @@ export default function RegisterPage() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-warroom-crimson-bright)] mt-1.5"
+                    className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-chessboard-crimson-bright)] mt-1.5"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     <X className="w-3 h-3" /> Invalid or inactive batch code
@@ -250,7 +250,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="reg-name"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Full Name
@@ -270,7 +270,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="reg-email"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Email
@@ -290,7 +290,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="reg-password"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)] mb-1.5 block"
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Password
@@ -311,8 +311,8 @@ export default function RegisterPage() {
               className={cn(
                 'flex items-start gap-3.5 p-4 rounded-[3px] border transition-all duration-300 cursor-pointer select-none',
                 acceptedTerms
-                  ? 'border-[color:var(--color-warroom-gold)]/35 bg-[color:var(--color-warroom-gold)]/[0.04]'
-                  : 'border-[color:var(--color-warroom-ash)]/30 bg-[color:var(--color-warroom-rampart)]/50',
+                  ? 'border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-gold)]/[0.04]'
+                  : 'border-[color:var(--color-chessboard-ash)]/30 bg-[color:var(--color-chessboard-rampart)]/50',
               )}
               onClick={toggleTerms}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.997 }}
@@ -322,7 +322,7 @@ export default function RegisterPage() {
                 role="checkbox"
                 aria-checked={acceptedTerms}
                 aria-label="Accept Terms & Conditions"
-                className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60 rounded-full"
+                className="flex-shrink-0 mt-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60 rounded-full"
                 tabIndex={0}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -333,8 +333,8 @@ export default function RegisterPage() {
                   className={cn(
                     'w-6 h-6 rounded-full border-2 flex items-center justify-center relative overflow-hidden transition-colors duration-300',
                     acceptedTerms
-                      ? 'border-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]'
-                      : 'border-[color:var(--color-warroom-ash)] bg-[color:var(--color-warroom-rampart)]',
+                      ? 'border-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]'
+                      : 'border-[color:var(--color-chessboard-ash)] bg-[color:var(--color-chessboard-rampart)]',
                   )}
                   animate={
                     acceptedTerms && !prefersReducedMotion
@@ -363,7 +363,7 @@ export default function RegisterPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="text-[6px] font-bold text-[color:var(--color-warroom-smoke)]"
+                        className="text-[6px] font-bold text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         WR
@@ -377,13 +377,13 @@ export default function RegisterPage() {
                 className="text-xs leading-relaxed"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                <span className="text-[color:var(--color-warroom-ivory)]">
+                <span className="text-[color:var(--color-chessboard-ivory)]">
                   I have read and agree to the{' '}
                 </span>
                 <Link
                   href="/terms"
                   onClick={(e) => e.stopPropagation()}
-                  className="text-[color:var(--color-warroom-gold)] underline underline-offset-2 hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                  className="text-[color:var(--color-chessboard-gold)] underline underline-offset-2 hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
                 >
                   Terms &amp; Conditions
                 </Link>
@@ -391,15 +391,15 @@ export default function RegisterPage() {
             </motion.div>
 
             {/* Submit */}
-            <WarRoomCTA
+            <ChessboardCTA
               type="submit"
               size="md"
               variant="primary"
               disabled={loading || !acceptedTerms}
               className="w-full justify-center"
             >
-              {loading ? 'Forging your banner…' : 'Create Account'}
-            </WarRoomCTA>
+              {loading ? 'Preparing your profile…' : 'Create Account'}
+            </ChessboardCTA>
           </form>
         </StoneCard>
       </motion.div>
@@ -412,12 +412,12 @@ export default function RegisterPage() {
         className="text-center text-sm mt-7"
         style={{ fontFamily: 'var(--font-display)' }}
       >
-        <span className="text-[color:var(--color-warroom-smoke)]">
+        <span className="text-[color:var(--color-chessboard-smoke)]">
           Already have an account?{' '}
         </span>
         <Link
           href="/login"
-          className="font-semibold text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] underline underline-offset-2 transition-colors"
+          className="font-semibold text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)] underline underline-offset-2 transition-colors"
         >
           Sign in
         </Link>

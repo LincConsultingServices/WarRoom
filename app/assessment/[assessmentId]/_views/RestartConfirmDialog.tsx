@@ -51,12 +51,12 @@ export function RestartConfirmDialog({ open, submitting, onCancel, onConfirm }: 
                   borderRadius: '2px',
                 }}
               >
-                <AlertTriangle className="h-5 w-5" style={{ color: '#c23b3b' }} />
+                <AlertTriangle className="h-5 w-5" style={{ color: '#b03030' }} />
               </div>
               <h2
                 className="text-xl font-bold"
                 style={{
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   color: '#e8e0d0',
                   letterSpacing: '0.06em',
                 }}
@@ -81,8 +81,8 @@ export function RestartConfirmDialog({ open, submitting, onCancel, onConfirm }: 
                   background: 'rgba(201,162,39,0.06)',
                   border: '1px solid rgba(201,162,39,0.25)',
                   borderRadius: '3px',
-                  color: '#c9a227',
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  color: '#c8a84a',
+                  fontFamily: "var(--font-display)",
                   letterSpacing: '0.1em',
                   cursor: submitting ? 'not-allowed' : 'pointer',
                 }}
@@ -98,7 +98,7 @@ export function RestartConfirmDialog({ open, submitting, onCancel, onConfirm }: 
                   border: '1px solid rgba(139,26,26,0.55)',
                   borderRadius: '3px',
                   color: '#e8a8a8',
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: "var(--font-display)",
                   letterSpacing: '0.1em',
                   cursor: submitting ? 'not-allowed' : 'pointer',
                 }}

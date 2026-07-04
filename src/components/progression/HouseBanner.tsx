@@ -43,8 +43,8 @@ export function HouseBanner({
         />
         {founderName && (
           <h1
-            className="text-2xl font-bold tracking-wide text-[color:var(--color-warroom-ghost)] sm:text-3xl"
-            style={{ fontFamily: 'var(--font-display)', textShadow: '0 0 24px rgba(201,162,39,0.22)' }}
+            className="text-2xl font-bold tracking-wide text-[color:var(--color-chessboard-ghost)] sm:text-3xl"
+            style={{ fontFamily: 'var(--font-display)' }}
           >
             {founderName}
           </h1>
@@ -52,7 +52,7 @@ export function HouseBanner({
         <RankInsignia tier={rank.tier} title={rank.title} size={48} showTitle />
         {house.words && (
           <p
-            className="max-w-xs text-sm italic text-[color:var(--color-warroom-smoke)]"
+            className="max-w-xs text-sm italic text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
           >
             &ldquo;{house.words}&rdquo;
@@ -75,21 +75,21 @@ export function HouseBanner({
       <div className="min-w-0">
         {founderName && (
           <div
-            className="truncate text-lg font-bold tracking-[0.02em] text-[color:var(--color-warroom-ghost)]"
+            className="truncate text-lg font-bold tracking-[0.02em] text-[color:var(--color-chessboard-ghost)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {founderName}
           </div>
         )}
         <div
-          className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)]"
+          className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {rank.title}
         </div>
         {house.words && (
           <div
-            className="mt-0.5 truncate text-xs italic text-[color:var(--color-warroom-smoke)]"
+            className="mt-0.5 truncate text-xs italic text-[color:var(--color-chessboard-smoke)]"
             style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
           >
             &ldquo;{house.words}&rdquo;

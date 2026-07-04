@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 // ============================================================
 // <LegacyScoreSparkline />
 // ----------------------------------------------------------------
-// Compact line chart of the founder's run-by-run legacy scores.
+// Compact line chart of the founder's run-by-run performance scores.
 // Optimised for inline use (profile hero, dashboard panel) — no
 // axes, no legend, just the trend line + endpoint markers.
 //
@@ -48,7 +48,7 @@ export function LegacyScoreSparkline({
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-sm border border-dashed border-[color:var(--color-warroom-gold)]/20 bg-card/40 text-foreground/40',
+          'flex items-center justify-center rounded-sm border border-dashed border-[color:var(--color-chessboard-gold)]/20 bg-card/40 text-foreground/40',
           className,
         )}
         style={{ width, height }}
@@ -80,10 +80,10 @@ export function LegacyScoreSparkline({
   const latestTone = latest.score >= 80
     ? '#34d399'
     : latest.score >= 60
-      ? '#e8c84a'
+      ? '#d4aa40'
       : latest.score >= 40
-        ? '#c9a227'
-        : '#c23b3b'
+        ? '#c8a84a'
+        : '#b03030'
 
   return (
     <svg
@@ -96,9 +96,9 @@ export function LegacyScoreSparkline({
     >
       <defs>
         <linearGradient id="legacySpark" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8b6914" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#e8c84a" />
+          <stop offset="0%" stopColor="#7a6020" />
+          <stop offset="50%" stopColor="#c8a84a" />
+          <stop offset="100%" stopColor="#d4aa40" />
         </linearGradient>
       </defs>
 
@@ -125,7 +125,7 @@ export function LegacyScoreSparkline({
       {points.map((p, i) => {
         const isLast = i === points.length - 1
         const r = isLast ? 4 : 2.6
-        const fill = isLast ? latestTone : '#c9a227'
+        const fill = isLast ? latestTone : '#c8a84a'
         const clickable = !!onSelectRun
         return (
           <g

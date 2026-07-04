@@ -29,10 +29,10 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
       return { title: 'Exited via Buyout', subtitle: capitalSource || `You accepted a buyout offer${exitStage ? ` at ${exitStage}` : ''}.`, tone: 'positive' as const }
     }
     if (exitedVia === 'WALKOUT') {
-      return { title: 'Walked Out of the War Room', subtitle: 'You declined every investor offer and exited without a deal.', tone: 'negative' as const }
+      return { title: 'Walked Out of the Chessboard', subtitle: 'You declined every investor offer and exited without a deal.', tone: 'negative' as const }
     }
     if (exitedVia === 'EARLY_EXIT') {
-      return { title: 'Early Exit', subtitle: `Simulation ended at ${exitStage || 'your current phase'} before reaching the War Room.`, tone: 'neutral' as const }
+      return { title: 'Early Exit', subtitle: `Simulation ended at ${exitStage || 'your current phase'} before reaching the Chessboard.`, tone: 'neutral' as const }
     }
     return null
   })()
@@ -80,7 +80,7 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .exit-banner { border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent); }
         .exit-banner .exit-title { font-weight: 700; color: var(--foreground); margin-bottom: 0.2rem; font-size: 1.05rem; font-family: var(--font-display); }
-        .exit-banner .exit-subtitle { color: var(--color-warroom-smoke); font-size: 0.85rem; }
+        .exit-banner .exit-subtitle { color: var(--color-chessboard-smoke); font-size: 0.85rem; }
         .exit-positive { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); }
         .exit-negative { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
         .exit-neutral  { background: rgba(201,162,39,0.07); border-color: rgba(201,162,39,0.25); }
@@ -88,16 +88,16 @@ export function DealSummaryTab({ report }: { report: EvaluationReport }) {
         .deal-hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0px, transparent 2px, rgba(201,162,39,0.03) 2px, rgba(201,162,39,0.03) 4px); pointer-events: none; }
         .deal-hero--success { border-color: rgba(201,162,39,0.3); }
         .deal-hero--empty   { border-color: rgba(239,68,68,0.25); }
-        .deal-hero__label { font-family: var(--font-display); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--color-warroom-gold); margin-bottom: 0.6rem; }
+        .deal-hero__label { font-family: var(--font-display); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--color-chessboard-gold); margin-bottom: 0.6rem; }
         .deal-hero__count { display: flex; align-items: baseline; justify-content: center; gap: 0.4rem; margin-bottom: 1.8rem; }
         .deal-hero__num { font-family: var(--font-display); font-size: 4.5rem; font-weight: 800; line-height: 1; color: var(--foreground); }
-        .deal-hero__unit { font-family: var(--font-display); font-size: 1rem; color: var(--color-warroom-smoke); text-transform: uppercase; letter-spacing: 0.1em; }
+        .deal-hero__unit { font-family: var(--font-display); font-size: 1rem; color: var(--color-chessboard-smoke); text-transform: uppercase; letter-spacing: 0.1em; }
         .deal-terms { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 0.2rem; }
         .deal-term { flex: 1; max-width: 200px; padding: 1.2rem 1rem; background: color-mix(in srgb, var(--foreground) 4%, transparent); border-radius: 14px; border: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent); }
         .deal-term__divider { width: 1.5rem; flex-shrink: 0; }
-        .deal-term__value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--color-warroom-gold-bright, var(--color-warroom-gold)); line-height: 1; margin-bottom: 0.35rem; }
-        .deal-term__label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-warroom-smoke); font-family: var(--font-display); }
-        .deal-hero__empty-msg { color: var(--color-warroom-smoke); font-size: 0.9rem; margin-top: 0.5rem; }
+        .deal-term__value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--color-chessboard-gold-bright, var(--color-chessboard-gold)); line-height: 1; margin-bottom: 0.35rem; }
+        .deal-term__label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-chessboard-smoke); font-family: var(--font-display); }
+        .deal-hero__empty-msg { color: var(--color-chessboard-smoke); font-size: 0.9rem; margin-top: 0.5rem; }
       `}</style>
     </div>
   )

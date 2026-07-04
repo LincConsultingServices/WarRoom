@@ -1,5 +1,5 @@
 // ============================================
-// War Room — Progression mock adapter
+// Assessment — Progression mock adapter
 // ----------------------------------------------------------------
 // Derives a FounderProgression from data that ALREADY exists
 // (assessments + reports + locally-stored house) so the UI is fully
@@ -20,14 +20,14 @@ import type {
   FounderProgression,
   HouseConfig,
   InvestorScorecard,
-  RenownEvent,
+  RatingEvent,
   SigilTierName,
 } from '@/src/types'
 import {
   CATEGORY_TIER,
   DEFAULT_HOUSE,
   categoryForAverage,
-  rankForRenown,
+  rankForRating,
 } from '@/src/lib/progression'
 
 // --- tunable mock weights (the backend owns the real numbers) ---
@@ -43,7 +43,7 @@ const PHOENIX_DELTA = 15
 const MILLION = 1_000_000
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-const HOUSE_STORAGE_KEY = 'warroom_house'
+const HOUSE_STORAGE_KEY = 'chessboard_house'
 
 type AssessmentWithRevenue = Assessment & { revenueProjection?: number }
 
@@ -65,7 +65,7 @@ function avgScorecard(cards: InvestorScorecard[] | undefined): number | null {
   return Math.round(sum / cards.length)
 }
 
-function computeHearth(dates: string[]): {
+function computeStreak(dates: string[]): {
   current: number
   longest: number
   lastActiveAt: string | null
@@ -127,7 +127,7 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     }
   }
 
-  // --- per-run legacy scores (chronological) for the Phoenix sigil ---
+  // --- per-run performance scores (chronological) for the Phoenix sigil ---
   const legacyRuns = completed
     .map((a) => {
       const report = reportFor(a.id)
@@ -157,7 +157,7 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     (a) => ((a as AssessmentWithRevenue).revenueProjection ?? 0) >= MILLION,
   )
   const anyUnbroken = completed.some((a) => (a.mentorLifelinesRemaining ?? 0) >= 3)
-  const reachedWarRoom = assessments.some(
+  const reachedChessboard = assessments.some(
     (a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED',
   )
   const naturalBorn = allEight.some((c) => masteryTier(c) >= 5)
@@ -173,10 +173,10 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     )
   })
 
-  const hearth = computeHearth(
+  const streak = computeStreak(
     assessments.map((a) => a.completedAt || a.updatedAt || a.createdAt),
   )
-  const ironWill = hearth.longest >= 4
+  const ironWill = streak.longest >= 4
 
   const earnedAtFor = (predicate: (a: Assessment) => boolean): string => {
     const match = assessments.find(predicate)
@@ -188,31 +188,31 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
     sigils.push({ id, tier, earnedAt: when })
 
   if (completed.length > 0) award('first_blood', 'BRONZE', earnedAtFor((a) => a.status === 'COMPLETED'))
-  if (reachedWarRoom) award('the_committed', 'BRONZE', earnedAtFor((a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED'))
+  if (reachedChessboard) award('the_committed', 'BRONZE', earnedAtFor((a) => a.currentStage === 'STAGE_4_WARROOM' || a.status === 'COMPLETED'))
   if (anyUnbroken) award('the_unbroken', 'SILVER', earnedAtFor((a) => a.status === 'COMPLETED' && (a.mentorLifelinesRemaining ?? 0) >= 3))
   if (anyMillion) award('master_of_coin', 'GOLD', earnedAtFor((a) => ((a as AssessmentWithRevenue).revenueProjection ?? 0) >= MILLION))
   if (anyDeal) award('dragonslayer', 'GOLD', earnedAtFor((a) => !!a.dealResult?.dealMade))
   if (naturalBorn) award('natural_born', 'GOLD', new Date().toISOString())
   if (phoenix) award('the_phoenix', 'GOLD', new Date().toISOString())
-  if (ironWill) award('iron_will', 'GOLD', hearth.lastActiveAt || new Date().toISOString())
+  if (ironWill) award('iron_will', 'GOLD', streak.lastActiveAt || new Date().toISOString())
   if (strategist) award('the_strategist', 'GOLD', new Date().toISOString())
   if (polymath) award('polymath', 'OBSIDIAN', new Date().toISOString())
   if (unanimous) award('unanimous', 'OBSIDIAN', new Date().toISOString())
 
-  // --- renown: quality-weighted (trials + mastery + sigils) ---
-  const masteryRenown = allEight.reduce(
+  // --- rating: quality-weighted (trials + mastery + sigils) ---
+  const masteryRating = allEight.reduce(
     (acc, c) => acc + Math.max(0, masteryTier(c) - 1) * RENOWN_PER_MASTERY_TIER,
     0,
   )
-  const sigilRenown = sigils.reduce((acc, s) => acc + SIGIL_RENOWN[s.tier], 0)
-  const trialRenown = completed.length * RENOWN_PER_TRIAL
-  const renown = trialRenown + masteryRenown + sigilRenown
+  const sigilRating = sigils.reduce((acc, s) => acc + SIGIL_RENOWN[s.tier], 0)
+  const trialRating = completed.length * RENOWN_PER_TRIAL
+  const rating = trialRating + masteryRating + sigilRating
 
-  const rank = rankForRenown(renown)
+  const rank = rankForRating(rating)
   if (rank.tier >= 6) award('the_sovereign', 'OBSIDIAN', new Date().toISOString())
 
-  // --- renown history (most-recent-first) ---
-  const history: RenownEvent[] = []
+  // --- rating history (most-recent-first) ---
+  const history: RatingEvent[] = []
   for (const a of completed) {
     history.push({
       date: a.completedAt || a.updatedAt || a.createdAt,
@@ -227,13 +227,13 @@ export function deriveProgression(input: DeriveInput): FounderProgression {
 
   return {
     userId,
-    renown,
+    rating,
     rank,
     competencyMastery: mastery,
     sigils,
-    hearth,
+    streak,
     house: { ...DEFAULT_HOUSE, ...house },
-    renownHistory: history.slice(0, 12),
+    ratingHistory: history.slice(0, 12),
   }
 }
 

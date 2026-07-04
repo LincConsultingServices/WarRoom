@@ -2,19 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { WarRoomSubtitles, type SubtitleCue } from './WarRoomSubtitles'
+import { ChessboardSubtitles, type SubtitleCue } from './ChessboardSubtitles'
 import { EmberParticles } from '@/src/components/effects/EmberParticles'
 import { AssetPlaceholder } from '@/src/components/effects/AssetPlaceholder'
 import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 
 // ============================================================
-// <WarRoomEntrance />
+// <ChessboardEntrance />
 // Fullscreen cinematic overlay played the FIRST time a user
-// crosses into the War Room. Behaviour:
-//   • Plays /assets/video/warroom-door-opening.{webm,mp4} muted.
+// crosses into the Assessment. Behaviour:
+//   • Plays /assets/video/chessboard-door-opening.{webm,mp4} muted.
 //   • Falls back to an SVG doors-parting animation if the video
 //     is missing or fails to load — never blocks the UX.
-//   • Reveals timed Cinzel subtitles over the video.
+//   • Reveals timed subtitles over the video.
 //   • Skip control: visible immediately on repeat visits
 //     (localStorage flag), else after 3s.
 //   • On end: fade-to-black ~800ms → unmount + onComplete().
@@ -23,21 +23,21 @@ import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 //     mounts behind us.
 // ============================================================
 
-const VIDEO_SRC_WEBM = '/assets/video/warroom-door-opening.webm'
-const VIDEO_SRC_MP4 = '/assets/video/warroom-door-opening.mp4'
-const ENTERED_FLAG = 'warroom_entered_before'
+const VIDEO_SRC_WEBM = '/assets/video/chessboard-door-opening.webm'
+const VIDEO_SRC_MP4 = '/assets/video/chessboard-door-opening.mp4'
+const ENTERED_FLAG = 'chessboard_entered_before'
 const SKIP_GRACE_MS = 3000
 const FADE_OUT_MS = 800
 const FALLBACK_DURATION_MS = 5200
 
 const DEFAULT_CUES: SubtitleCue[] = [
-  { atMs: 1800, text: 'The Council has been assembled…', holdMs: 2800 },
-  { atMs: 4800, text: 'Six lords. One throne.', holdMs: 2600 },
+  { atMs: 1800, text: 'The Investors are seated…', holdMs: 2800 },
+  { atMs: 4800, text: 'Six investors. One boardroom.', holdMs: 2600 },
   { atMs: 7600, text: 'Defend your vision.', holdMs: 2400 },
-  { atMs: 10200, text: 'Or burn.', holdMs: 2600 },
+  { atMs: 10200, text: 'Or face elimination.', holdMs: 2600 },
 ]
 
-interface WarRoomEntranceProps {
+interface ChessboardEntranceProps {
   onComplete: () => void
   cues?: SubtitleCue[]
   /** Force the fallback CSS sequence (useful while a real video isn't on disk). */
@@ -55,11 +55,11 @@ function isReturningVisitor(): boolean {
   }
 }
 
-export function WarRoomEntrance({
+export function ChessboardEntrance({
   onComplete,
   cues = DEFAULT_CUES,
   forceFallback = false,
-}: WarRoomEntranceProps) {
+}: ChessboardEntranceProps) {
   const reducedMotion = useReducedMotion()
   const videoRef = useRef<HTMLVideoElement>(null)
   const startedAtRef = useRef<number>(0)
@@ -95,7 +95,7 @@ export function WarRoomEntrance({
 
   const begin = useCallback(() => {
     unlock()
-    setScene('warroom-lobby')
+    setScene('chessboard-lobby')
   }, [setScene, unlock])
 
   // Capture start time. Reveal the skip button immediately for returning
@@ -157,7 +157,7 @@ export function WarRoomEntrance({
         onKeyDown={begin}
         tabIndex={-1}
         role="dialog"
-        aria-label="Entering the War Room"
+        aria-label="Entering the Assessment"
       >
         {!videoFailed ? (
           <video
@@ -190,13 +190,13 @@ export function WarRoomEntrance({
         />
         <EmberParticles className="opacity-70" density={28} speed={0.85} />
 
-        <WarRoomSubtitles cues={cues} elapsedMs={elapsedMs} />
+        <ChessboardSubtitles cues={cues} elapsedMs={elapsedMs} />
 
         {skipVisible && (
           <button
             type="button"
             onClick={handleSkip}
-            className="absolute right-6 top-6 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-warroom-gold)]/25 bg-black/50 px-3 py-1.5 font-display text-xs tracking-[0.18em] uppercase text-zinc-200/80 backdrop-blur-md transition-all duration-200 hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-black/70 hover:text-[color:var(--color-warroom-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]"
+            className="absolute right-6 top-6 inline-flex items-center gap-2 rounded-sm border border-[color:var(--color-chessboard-silver)]/25 bg-black/50 px-3 py-1.5 font-display text-xs tracking-[0.18em] uppercase text-zinc-200/80 backdrop-blur-md transition-all duration-200 hover:border-[color:var(--color-chessboard-silver)]/60 hover:bg-black/70 hover:text-[color:var(--color-chessboard-silver)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-silver)]"
             aria-label="Skip cinematic"
           >
             Skip <span aria-hidden>→</span>
@@ -216,7 +216,7 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse at center, rgba(60,30,8,0.5) 0%, rgba(20,8,0,0.95) 70%, #000 100%)',
+            'radial-gradient(ellipse at center, rgba(40,40,40,0.5) 0%, rgba(10,10,10,0.95) 70%, #000 100%)',
         }}
       />
       <motion.div
@@ -226,9 +226,9 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
         transition={{ duration: reducedMotion ? 0.3 : 4.2, delay: 0.6, ease: [0.65, 0, 0.35, 1] }}
         style={{
           background:
-            'linear-gradient(90deg, #1a0a00 0%, #2a1808 60%, #3d2210 100%)',
-          borderRight: '2px solid rgba(201,162,39,0.45)',
-          boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.7), 8px 0 40px rgba(201,162,39,0.18)',
+            'linear-gradient(90deg, #0a0a0a 0%, #1a1a1a 60%, #2d2d2d 100%)',
+          borderRight: '2px solid rgba(200,200,200,0.45)',
+          boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.7), 8px 0 40px rgba(200,200,200,0.18)',
         }}
       />
       <motion.div
@@ -238,9 +238,9 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
         transition={{ duration: reducedMotion ? 0.3 : 4.2, delay: 0.6, ease: [0.65, 0, 0.35, 1] }}
         style={{
           background:
-            'linear-gradient(270deg, #1a0a00 0%, #2a1808 60%, #3d2210 100%)',
-          borderLeft: '2px solid rgba(201,162,39,0.45)',
-          boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.7), -8px 0 40px rgba(201,162,39,0.18)',
+            'linear-gradient(270deg, #0a0a0a 0%, #1a1a1a 60%, #2d2d2d 100%)',
+          borderLeft: '2px solid rgba(200,200,200,0.45)',
+          boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.7), -8px 0 40px rgba(200,200,200,0.18)',
         }}
       />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -248,7 +248,7 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
           <AssetPlaceholder
             kind="video"
             label="Door cinematic"
-            path="public/assets/video/warroom-door-opening.{webm,mp4}"
+            path="public/assets/video/chessboard-door-opening.{webm,mp4}"
             formatHint="1080p · 8–14s · ≤6MB · muted autoplay"
           />
         </div>

@@ -81,7 +81,7 @@ export function SigilCrest({
   const top = locked ? '#3a352c' : secondary ?? primary
   const mid = locked ? '#2a261e' : primary
   const stroke = locked ? '#4a4336' : secondary ?? primary
-  const tint = locked ? '#6b6353' : iconColor ?? '#f3ead7'
+  const tint = locked ? '#6b6353' : iconColor ?? '#e8e8e8'
 
   return (
     <div
@@ -112,7 +112,7 @@ export function SigilCrest({
           fill="rgba(255,255,255,0.14)"
         />
         {/* dark central medallion for icon legibility */}
-        <circle cx="50" cy="56" r="23" fill="rgba(8,6,4,0.88)" stroke={stroke} strokeWidth="1.5" opacity={locked ? 0.6 : 1} />
+        <circle cx="50" cy="56" r="23" fill="rgba(10,10,10,0.90)" stroke={stroke} strokeWidth="1.5" opacity={locked ? 0.6 : 1} />
       </svg>
 
       <Icon
@@ -128,10 +128,10 @@ export function SigilCrest({
 
       {locked && (
         <span
-          className="absolute -bottom-0.5 right-0 flex h-5 w-5 items-center justify-center rounded-full border border-[color:var(--color-warroom-gold)]/30 bg-[color:var(--color-warroom-black)]"
+          className="absolute -bottom-0.5 right-0 flex h-5 w-5 items-center justify-center rounded-full border border-[color:var(--color-chessboard-gold)]/30 bg-[color:var(--color-chessboard-black)]"
           aria-hidden
         >
-          <Lock className="h-2.5 w-2.5 text-[color:var(--color-warroom-smoke)]" />
+          <Lock className="h-2.5 w-2.5 text-[color:var(--color-chessboard-smoke)]" />
         </span>
       )}
     </div>

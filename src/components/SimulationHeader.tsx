@@ -22,7 +22,7 @@ export function SimulationHeader({
   timer,
   showTimer = true,
   isCrisis,
-  accent = '#c9a227',
+  accent = '#c8a84a',
   rightSlot,
 }: SimulationHeaderProps) {
   return (
@@ -34,10 +34,10 @@ export function SimulationHeader({
           : 'rgba(10,8,6,0.95)',
         borderBottom: isCrisis
           ? '1px solid rgba(139,26,26,0.5)'
-          : `1px solid rgba(201,162,39,0.12)`,
+          : `1px solid rgba(200,168,74,0.12)`,
         boxShadow: isCrisis
           ? '0 0 30px rgba(139,26,26,0.25), 0 1px 0 rgba(139,26,26,0.3)'
-          : '0 1px 0 rgba(201,162,39,0.08), 0 4px 16px rgba(0,0,0,0.4)',
+          : '0 1px 0 rgba(200,168,74,0.08), 0 4px 16px rgba(0,0,0,0.4)',
       }}
     >
       {/* Brand mark */}
@@ -45,13 +45,13 @@ export function SimulationHeader({
         className="h-7 w-7 rounded-sm flex items-center justify-center text-xs font-bold flex-shrink-0"
         style={{
           background: isCrisis
-            ? 'linear-gradient(135deg, #5c1010, #8b1a1a)'
-            : 'linear-gradient(135deg, #8b6914, #c9a227)',
+            ? 'linear-gradient(135deg, #5c1010, #7a2020)'
+            : 'linear-gradient(135deg, #7a6020, #c8a84a)',
           color: '#0a0806',
-          fontFamily: "'Cinzel', Georgia, serif",
+          fontFamily: "var(--font-display)",
           boxShadow: isCrisis
             ? '0 0 12px rgba(139,26,26,0.6)'
-            : '0 0 12px rgba(201,162,39,0.4)',
+            : '0 0 12px rgba(200,168,74,0.4)',
         }}
       >
         {isCrisis ? '⚔' : 'KK'}
@@ -62,11 +62,11 @@ export function SimulationHeader({
         <div className="flex items-center gap-2 text-xs mb-1">
           <span
             style={{
-              fontFamily: "'Cinzel', Georgia, serif",
+              fontFamily: "var(--font-display)",
               fontWeight: 700,
               letterSpacing: '0.08em',
               fontSize: '0.65rem',
-              color: isCrisis ? '#c23b3b' : accent,
+              color: isCrisis ? '#b03030' : accent,
               textShadow: isCrisis ? '0 0 12px rgba(194,59,59,0.5)' : `0 0 10px ${accent}60`,
             }}
           >
@@ -80,14 +80,14 @@ export function SimulationHeader({
           )}
         </div>
         {/* GOT-styled progress bar */}
-        <div className="h-1 rounded-none overflow-hidden" style={{ background: 'rgba(201,162,39,0.08)' }}>
+        <div className="h-1 rounded-none overflow-hidden" style={{ background: 'rgba(200,168,74,0.08)' }}>
           <div
             className="h-full transition-all duration-700 ease-out"
             style={{
               width: `${progressPct}%`,
               background: isCrisis
-                ? 'linear-gradient(90deg, #5c1010, #8b1a1a, #c23b3b)'
-                : `linear-gradient(90deg, #8b6914, ${accent}, #e8c84a)`,
+                ? 'linear-gradient(90deg, #5c1010, #7a2020, #b03030)'
+                : `linear-gradient(90deg, #7a6020, ${accent}, #d4aa40)`,
               boxShadow: isCrisis
                 ? '0 0 8px rgba(194,59,59,0.6)'
                 : `0 0 8px ${accent}60`,
@@ -104,13 +104,13 @@ export function SimulationHeader({
             background: 'rgba(139,26,26,0.15)',
             border: '1px solid rgba(139,26,26,0.4)',
             borderRadius: '2px',
-            color: '#c23b3b',
-            fontFamily: "'Cinzel', Georgia, serif",
+            color: '#b03030',
+            fontFamily: "var(--font-display)",
             letterSpacing: '0.08em',
             animation: 'crisisBorder 2.2s ease-in-out infinite',
           }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#c23b3b', display: 'inline-block', animation: 'danger-pulse-dot 1.5s ease-in-out infinite' }} />
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#b03030', display: 'inline-block', animation: 'danger-pulse-dot 1.5s ease-in-out infinite' }} />
           CRISIS
         </div>
       )}
@@ -124,10 +124,10 @@ export function SimulationHeader({
             'flex items-center gap-1.5 text-sm font-mono flex-shrink-0 px-3 py-1',
           )}
           style={{
-            background: timer.isWarning ? 'rgba(139,26,26,0.15)' : 'rgba(201,162,39,0.06)',
-            border: timer.isWarning ? '1px solid rgba(139,26,26,0.4)' : '1px solid rgba(201,162,39,0.15)',
+            background: timer.isWarning ? 'rgba(139,26,26,0.15)' : 'rgba(200,168,74,0.06)',
+            border: timer.isWarning ? '1px solid rgba(139,26,26,0.4)' : '1px solid rgba(200,168,74,0.15)',
             borderRadius: '2px',
-            color: timer.isWarning ? '#c23b3b' : '#c9a227',
+            color: timer.isWarning ? '#b03030' : '#c8a84a',
             animation: timer.isWarning ? 'danger-pulse-dot 1s ease-in-out infinite' : undefined,
           }}
         >

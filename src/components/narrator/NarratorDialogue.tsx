@@ -52,7 +52,7 @@ function useTypewriter(text: string, enabled: boolean) {
 }
 
 /**
- * <NarratorDialogue /> — parchment-styled card anchored next to the orb.
+ * <NarratorDialogue /> — ivory-styled card anchored next to the orb.
  *
  * Typewriter text reveal + auto-advance progress bar + Next/Dismiss links.
  * Rendered inside <NarratorOrb /> so it sits naturally next to the orb.
@@ -99,8 +99,8 @@ export function NarratorDialogue() {
           className={cn(
             'relative max-w-sm sm:max-w-md',
             'rounded-[3px] overflow-hidden',
-            'border border-[color:var(--color-warroom-gold)]/35',
-            'shadow-[0_8px_28px_rgba(0,0,0,0.7),0_0_24px_rgba(201,162,39,0.18)]',
+            'border border-[color:var(--color-chessboard-gold)]/35',
+            'shadow-[0_8px_28px_rgba(0,0,0,0.7),0_0_24px_rgba(200,168,74,0.18)]',
           )}
           style={{
             background:
@@ -113,7 +113,7 @@ export function NarratorDialogue() {
             className="absolute inset-x-0 top-0 h-px"
             style={{
               background:
-                'linear-gradient(90deg, transparent, rgba(201,162,39,0.6), transparent)',
+                'linear-gradient(90deg, transparent, rgba(200,168,74,0.6), transparent)',
             }}
           />
 
@@ -136,7 +136,7 @@ export function NarratorDialogue() {
             className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[0.6rem] font-bold select-none cursor-pointer transition-transform hover:scale-110 active:scale-95 z-10"
             style={{
               background:
-                'radial-gradient(circle at 35% 35%, #c23b3b, #6e1010 70%, #2a0808)',
+                'radial-gradient(circle at 35% 35%, #b03030, #6e1010 70%, #2a0808)',
               color: '#f0c040',
               border: '1px solid rgba(240,192,64,0.4)',
               fontFamily: 'var(--font-display)',
@@ -155,7 +155,7 @@ export function NarratorDialogue() {
               <motion.span
                 key={i}
                 className="w-[3px] rounded-sm"
-                style={{ background: 'var(--color-warroom-gold)' }}
+                style={{ background: 'var(--color-chessboard-gold)' }}
                 animate={
                   prefersReducedMotion
                     ? { height: '40%' }
@@ -185,7 +185,7 @@ export function NarratorDialogue() {
                 <span
                   aria-hidden
                   className="inline-block w-[2px] h-[1em] align-text-bottom ml-[1px] animate-narrator-caret"
-                  style={{ background: 'var(--color-warroom-gold)' }}
+                  style={{ background: 'var(--color-chessboard-gold)' }}
                 />
               )}
             </p>
@@ -194,7 +194,7 @@ export function NarratorDialogue() {
               <button
                 type="button"
                 onClick={() => dismiss()}
-                className="text-[10px] uppercase tracking-[0.18em] transition-colors hover:text-[color:var(--color-warroom-gold)]"
+                className="text-[10px] uppercase tracking-[0.18em] transition-colors hover:text-[color:var(--color-chessboard-gold)]"
                 style={{ fontFamily: 'var(--font-display)', color: 'rgba(200,185,160,0.7)' }}
               >
                 ✕ Dismiss
@@ -206,7 +206,7 @@ export function NarratorDialogue() {
                 className={cn(
                   'text-[10px] uppercase tracking-[0.18em] transition-colors',
                   'disabled:opacity-30 disabled:cursor-not-allowed',
-                  'text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)]',
+                  'text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)]',
                 )}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
@@ -222,8 +222,8 @@ export function NarratorDialogue() {
               className="absolute bottom-0 left-0 h-[2px]"
               style={{
                 background:
-                  'linear-gradient(90deg, #c9962a, #f0c040, #ff6b00)',
-                boxShadow: '0 0 8px rgba(255,107,0,0.6)',
+                  'linear-gradient(90deg, #c9962a, #f0c040, #c8a84a)',
+                boxShadow: '0 0 8px rgba(200,168,74,0.6)',
               }}
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}

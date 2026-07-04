@@ -27,7 +27,7 @@ export const FEATURE_INTROS: Record<string, FeatureIntro> = {
     mood: 'pointing',
   },
   'assessment-start': {
-    text: 'Seal your oath and enter the gauntlet. Nine stages stand between you and the War Room.',
+    text: 'Seal your oath and enter the gauntlet. Nine stages stand between you and the Chessboard.',
     mood: 'pointing',
   },
 
@@ -41,12 +41,12 @@ export const FEATURE_INTROS: Record<string, FeatureIntro> = {
     mood: 'whispering',
   },
 
-  // ── War Room ──────────────────────────────────────────────────
-  'warroom-pitch-record': {
+  // ── Chessboard ──────────────────────────────────────────────────
+  'chessboard-pitch-record': {
     text: 'Raise your voice, lord. Sixty seconds to set the chamber alight with your pitch.',
     mood: 'warning',
   },
-  'warroom-investor-mic': {
+  'chessboard-investor-mic': {
     text: 'Speak your answer aloud. The investor listens for conviction, not polish.',
     mood: 'pointing',
   },

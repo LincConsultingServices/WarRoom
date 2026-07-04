@@ -28,7 +28,7 @@ import type { Assessment } from '@/src/types'
 import { STAGE_NARRATIVES } from '@/src/lib/constants'
 import { FadeInUp } from '@/src/components/AnimatedComponents'
 import {
-  WarRoomCTA,
+  ChessboardCTA,
   StoneCard,
   GoldDivider,
   SigilBadge,
@@ -154,8 +154,8 @@ export default function DashboardPage() {
     }
   }, [completedAssessments, simulations, entries])
 
-  // Earned sigils, newest first.
-  const earnedSigils = useMemo(
+  // Earned emblems, newest first.
+  const earnedEmblems = useMemo(
     () =>
       [...(progression?.sigils ?? [])].sort(
         (a, b) => new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime(),
@@ -192,11 +192,11 @@ export default function DashboardPage() {
       title: 'Begin a new trial',
       detail: weakestName
         ? `Your thinnest banner is ${weakestName}. A fresh trial is your chance to raise it.`
-        : 'A new trial raises your Renown and sharpens your record.',
+        : 'A new trial raises your Rating and sharpens your record.',
     }
   }, [currentSim, completedAssessments.length, progression])
 
-  const firstName = user?.name?.split(' ')[0] ?? 'Lord'
+  const firstName = user?.name?.split(' ')[0] ?? 'Player'
   const primaryCtaLabel = currentSim
     ? currentSim.status === 'IN_PROGRESS'
       ? 'Resume Your Trial'
@@ -213,14 +213,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen relative bg-[color:var(--color-warroom-void)]">
+    <div className="min-h-screen relative bg-transparent">
       {/* Soft torch glow overhead */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-96 opacity-60"
         style={{
           background:
-            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,162,39,0.07), transparent 70%)',
+            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,200,200,0.07), transparent 70%)',
         }}
       />
 
@@ -229,23 +229,23 @@ export default function DashboardPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-40 border-b backdrop-blur-md bg-[color:var(--color-warroom-black)]/80 border-[color:var(--color-warroom-gold)]/15"
+        className="sticky top-0 z-40 border-b backdrop-blur-md bg-[color:var(--color-chessboard-black)]/80 border-[color:var(--color-chessboard-silver)]/15"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-sm flex items-center justify-center text-[10px] font-bold tracking-wider"
               style={{
-                background: 'linear-gradient(135deg, #8b6914, #c9a227, #8b6914)',
+                background: 'linear-gradient(135deg, #a0a0a0, #e0e0e0, #a0a0a0)',
                 color: '#0a0805',
                 fontFamily: 'var(--font-display)',
-                boxShadow: '0 0 14px rgba(201,162,39,0.3)',
+                boxShadow: '0 0 14px rgba(200,200,200,0.3)',
               }}
             >
               {user?.name?.substring(0, 2).toUpperCase() || 'KK'}
             </div>
             <div className="leading-tight">
               <div
-                className="font-semibold text-sm text-[color:var(--color-warroom-ghost)]"
+                className="font-semibold text-sm text-[color:var(--color-chessboard-ghost)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {user?.name || 'Loading...'}
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 -mt-0.5">
                   <Badge
                     variant="outline"
-                    className="text-[9px] uppercase tracking-[0.18em] h-5 px-1.5 border-[color:var(--color-warroom-gold)]/30 text-[color:var(--color-warroom-gold)]"
+                    className="text-[9px] uppercase tracking-[0.18em] h-5 px-1.5 border-[color:var(--color-chessboard-silver)]/30 text-[color:var(--color-chessboard-silver)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {batch.code}
@@ -267,26 +267,26 @@ export default function DashboardPage() {
             <Link href="/profile">
               <button
                 type="button"
-                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-silver)] hover:text-[color:var(--color-chessboard-ghost)] transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                The Record
+                Player Profile
               </button>
             </Link>
             <Link href="/leaderboard">
               <button
                 type="button"
-                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-silver)] hover:text-[color:var(--color-chessboard-ghost)] transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                Iron Rankings
+                Elo Ratings
               </button>
             </Link>
             <ThemeToggle />
             <button
               type="button"
               onClick={handleLogout}
-              className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)] transition-colors"
+              className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)] transition-colors"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Sign Out
@@ -303,17 +303,17 @@ export default function DashboardPage() {
             <FadeInUp>
               <div className="space-y-5">
                 <SigilBadge icon={Sparkles} tone="gold">
-                  The Great Hall
+                  The Dashboard
                 </SigilBadge>
                 <h1
-                  className="text-3xl sm:text-4xl font-bold tracking-[0.02em] text-[color:var(--color-warroom-ghost)]"
+                  className="text-3xl sm:text-4xl font-bold tracking-[0.02em] text-[color:var(--color-chessboard-ghost)]"
                   style={{ fontFamily: 'var(--font-display)', lineHeight: 1.1 }}
                 >
                   Welcome back, Lord{' '}
                   <span
                     style={{
                       background:
-                        'linear-gradient(135deg, #c9a227, #f0c040, #c9a227)',
+                        'linear-gradient(135deg, #c8a84a, #f0c040, #c8a84a)',
                       WebkitBackgroundClip: 'text',
                       backgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                   </span>
                 </h1>
                 <p
-                  className="text-[color:var(--color-warroom-smoke)] max-w-xl"
+                  className="text-[color:var(--color-chessboard-smoke)] max-w-xl"
                   style={{
                     fontFamily: 'var(--font-body, var(--font-display))',
                     fontSize: '1rem',
@@ -331,12 +331,12 @@ export default function DashboardPage() {
                   }}
                 >
                   {batch
-                    ? `The ${batch.name || batch.code} council awaits your next move.`
-                    : 'The realm is quiet. When you are ready, the trial begins.'}
+                    ? `The ${batch.name || batch.code} panel awaits your next move.`
+                    : 'The domain is quiet. When you are ready, the trial begins.'}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   <div {...beginIntro}>
-                    <WarRoomCTA
+                    <ChessboardCTA
                       size="lg"
                       variant="primary"
                       icon={Swords}
@@ -345,11 +345,11 @@ export default function DashboardPage() {
                       onClick={handlePrimaryCta}
                     >
                       {primaryCtaLabel}
-                    </WarRoomCTA>
+                    </ChessboardCTA>
                   </div>
                   {currentSim && (
                     <span
-                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Currently at: {stageLabel(currentSim.currentStage)}
@@ -359,24 +359,24 @@ export default function DashboardPage() {
               </div>
             </FadeInUp>
 
-            {/* Founder progression banner — House, rank, renown, hearth */}
+            {/* Founder progression banner — Club, rank, rating, streak */}
             {progression && (
               <FadeInUp delay={0.08}>
                 <StoneCard padding="md" texture="leather">
-                  <div id="dashboard-house" className="flex flex-wrap items-center justify-between gap-4">
+                  <div id="dashboard-club" className="flex flex-wrap items-center justify-between gap-4">
                     <HouseBanner
                       house={progression.house}
                       rank={progression.rank}
                       founderName={user?.name}
                       variant="compact"
                     />
-                    <HearthFlame hearth={progression.hearth} />
+                    <HearthFlame streak={progression.streak} />
                   </div>
                   <div className="my-4">
                     <GoldDivider variant="line" />
                   </div>
-                  <div id="dashboard-renown">
-                    <RenownBar rank={progression.rank} renown={progression.renown} />
+                  <div id="dashboard-rating">
+                    <RenownBar rank={progression.rank} rating={progression.rating} />
                   </div>
                 </StoneCard>
               </FadeInUp>
@@ -403,19 +403,19 @@ export default function DashboardPage() {
                       Next Objective
                     </SigilBadge>
                     <h3
-                      className="mt-3 text-lg font-semibold text-[color:var(--color-warroom-ghost)]"
+                      className="mt-3 text-lg font-semibold text-[color:var(--color-chessboard-ghost)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       {nextObjective.title}
                     </h3>
                     <p
-                      className="mt-2 flex-1 text-sm leading-relaxed text-[color:var(--color-warroom-smoke)]"
+                      className="mt-2 flex-1 text-sm leading-relaxed text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
                     >
                       {nextObjective.detail}
                     </p>
                     <div className="mt-4">
-                      <WarRoomCTA
+                      <ChessboardCTA
                         size="sm"
                         variant="primary"
                         icon={Swords}
@@ -424,7 +424,7 @@ export default function DashboardPage() {
                         onClick={handlePrimaryCta}
                       >
                         {primaryCtaLabel}
-                      </WarRoomCTA>
+                      </ChessboardCTA>
                     </div>
                   </StoneCard>
                 </div>
@@ -438,58 +438,58 @@ export default function DashboardPage() {
                   label="Trials Complete"
                   value={stats.completed}
                   icon={CheckCircle2}
-                  accent="var(--color-warroom-verdant)"
+                  accent="var(--color-chessboard-verdant)"
                   hint={stats.attempts > 0 ? `${stats.attempts} attempt${stats.attempts === 1 ? '' : 's'}` : 'No attempts yet'}
                 />
                 <StatTile
                   label="Best Projection"
                   value={stats.bestRevenue > 0 ? formatRevenue(stats.bestRevenue) : '—'}
                   icon={Coins}
-                  accent="var(--color-warroom-gold)"
+                  accent="var(--color-chessboard-gold)"
                   hint={stats.bestRevenue > 0 ? 'Annual revenue' : 'Finish a trial to record'}
                 />
                 <StatTile
-                  label={<LoreTip tip={LORE.ranking}>Rank in the Realm</LoreTip>}
+                  label={<LoreTip tip={LORE.ranking}>Rank in the Domain</LoreTip>}
                   value={stats.rank ? `#${stats.rank}` : '—'}
                   icon={Award}
-                  accent={stats.rank && stats.rank <= 3 ? 'var(--color-warroom-crimson-bright)' : 'var(--color-warroom-gold)'}
+                  accent={stats.rank && stats.rank <= 3 ? 'var(--color-chessboard-crimson-bright)' : 'var(--color-chessboard-gold)'}
                   hint={batch ? batch.code : 'Join a batch to rank'}
                 />
                 <StatTile
                   label={<LoreTip tip={LORE.founderRank}>Founder Rank</LoreTip>}
                   value={
                     <span
-                      className="text-base tracking-[0.04em] text-[color:var(--color-warroom-ivory)]"
+                      className="text-base tracking-[0.04em] text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       {progression ? progression.rank.title : '—'}
                     </span>
                   }
                   icon={Crown}
-                  accent="var(--color-warroom-gold)"
-                  hint={progression ? `${progression.renown.toLocaleString()} Renown` : 'Begin to earn Renown'}
+                  accent="var(--color-chessboard-gold)"
+                  hint={progression ? `${progression.rating.toLocaleString()} Rating` : 'Begin to earn Rating'}
                 />
               </div>
             </FadeInUp>
 
-            {/* Recently earned sigils */}
-            {progression && earnedSigils.length > 0 && (
+            {/* Recently earned emblems */}
+            {progression && earnedEmblems.length > 0 && (
               <FadeInUp delay={0.2}>
-                <div id="dashboard-sigils" className="space-y-3">
+                <div id="dashboard-emblems" className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <SigilBadge icon={Award} tone="gold">
-                      Sigils Earned ({earnedSigils.length})
+                      Emblems Earned ({earnedEmblems.length})
                     </SigilBadge>
                     <Link
                       href="/profile"
-                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                      className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       The Founder&apos;s Record →
                     </Link>
                   </div>
                   <div className="flex flex-wrap gap-4">
-                    {earnedSigils.slice(0, 6).map((s) => {
+                    {earnedEmblems.slice(0, 6).map((s) => {
                       const def = sigilById(s.id)
                       const style = SIGIL_TIER_COLOR[s.tier]
                       return (
@@ -503,7 +503,7 @@ export default function DashboardPage() {
                             title={def ? `${def.name} — ${def.description}` : s.id}
                           />
                           <span
-                            className="text-center text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-warroom-smoke)]"
+                            className="text-center text-[9px] uppercase tracking-[0.08em] text-[color:var(--color-chessboard-smoke)]"
                             style={{ fontFamily: 'var(--font-display)' }}
                           >
                             {def?.name ?? s.id}
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <SigilBadge tone="crimson">Active Campaign</SigilBadge>
                     <span
-                      className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)]"
+                      className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       {STAGE_NARRATIVES[currentSim.currentStage]?.month ?? ''}
@@ -544,27 +544,27 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-4">
                         <div className="flex-1 min-w-0">
                           <div
-                            className="text-sm font-semibold text-[color:var(--color-warroom-ghost)]"
+                            className="text-sm font-semibold text-[color:var(--color-chessboard-ghost)]"
                             style={{ fontFamily: 'var(--font-display)' }}
                           >
                             {stageLabel(a.currentStage)}
                           </div>
                           <div
-                            className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                            className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                             style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
                           >
                             Began {new Date(a.createdAt).toLocaleDateString()}
                             {a.revenueProjection && a.revenueProjection > 0 ? (
                               <>
                                 {' • '}
-                                <span className="text-[color:var(--color-warroom-verdant)]">
+                                <span className="text-[color:var(--color-chessboard-verdant)]">
                                   {formatRevenue(a.revenueProjection)} projected
                                 </span>
                               </>
                             ) : null}
                           </div>
                         </div>
-                        <WarRoomCTA
+                        <ChessboardCTA
                           size="sm"
                           variant="ghost"
                           iconRight={ArrowRight}
@@ -572,7 +572,7 @@ export default function DashboardPage() {
                           onClick={() => router.push(`/assessment/${a.id}`)}
                         >
                           {a.status === 'IN_PROGRESS' ? 'Continue' : 'Begin'}
-                        </WarRoomCTA>
+                        </ChessboardCTA>
                       </div>
                     </StoneCard>
                   ))}
@@ -589,7 +589,7 @@ export default function DashboardPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0.25, 0.5, 0.25] }}
                     transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
-                    className="h-24 rounded-sm border border-[color:var(--color-warroom-slate)]/40 bg-[color:var(--color-warroom-stone)]/40"
+                    className="h-24 rounded-sm border border-[color:var(--color-chessboard-slate)]/40 bg-[color:var(--color-chessboard-stone)]/40"
                   />
                 ))}
               </div>
@@ -599,22 +599,22 @@ export default function DashboardPage() {
             {!loading && activeAssessments.length === 0 && completedAssessments.length === 0 && (
               <FadeInUp delay={0.2}>
                 <StoneCard className="py-12 text-center">
-                  <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-sm border border-[color:var(--color-warroom-gold)]/30 bg-[color:var(--color-warroom-gold)]/[0.06]">
-                    <Swords className="h-6 w-6 text-[color:var(--color-warroom-gold)]" aria-hidden />
+                  <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-sm border border-[color:var(--color-chessboard-gold)]/30 bg-[color:var(--color-chessboard-gold)]/[0.06]">
+                    <Swords className="h-6 w-6 text-[color:var(--color-chessboard-gold)]" aria-hidden />
                   </div>
                   <h3
-                    className="text-lg font-semibold mb-2 text-[color:var(--color-warroom-ghost)]"
+                    className="text-lg font-semibold mb-2 text-[color:var(--color-chessboard-ghost)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     No Trials Begun
                   </h3>
                   <p
-                    className="text-sm text-[color:var(--color-warroom-smoke)] mb-5 max-w-md mx-auto"
+                    className="text-sm text-[color:var(--color-chessboard-smoke)] mb-5 max-w-md mx-auto"
                     style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
                   >
                     Your war record is empty. Step into the chamber and stake your claim.
                   </p>
-                  <WarRoomCTA
+                  <ChessboardCTA
                     size="md"
                     variant="primary"
                     icon={Plus}
@@ -622,7 +622,7 @@ export default function DashboardPage() {
                     onClick={() => setStartDialogOpen(true)}
                   >
                     Start Your First Trial
-                  </WarRoomCTA>
+                  </ChessboardCTA>
                 </StoneCard>
               </FadeInUp>
             )}
@@ -643,17 +643,17 @@ export default function DashboardPage() {
                     <FadeInUp key={a.id} delay={0.35 + idx * 0.05}>
                       <StoneCard padding="md" interactive>
                         <div className="flex items-center gap-3">
-                          <CheckCircle2 className="h-4 w-4 text-[color:var(--color-warroom-verdant)] flex-shrink-0" aria-hidden />
+                          <CheckCircle2 className="h-4 w-4 text-[color:var(--color-chessboard-verdant)] flex-shrink-0" aria-hidden />
                           <div className="flex-1 min-w-0">
                             <div
-                              className="text-sm font-medium text-[color:var(--color-warroom-ivory)]"
+                              className="text-sm font-medium text-[color:var(--color-chessboard-ivory)]"
                               style={{ fontFamily: 'var(--font-display)' }}
                             >
                               Trial sealed {new Date(a.completedAt || a.createdAt).toLocaleDateString()}
                             </div>
                             {a.revenueProjection && a.revenueProjection > 0 ? (
                               <div
-                                className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                                className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                                 style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
                               >
                                 Final ARR: {formatRevenue(a.revenueProjection)}
@@ -662,7 +662,7 @@ export default function DashboardPage() {
                           </div>
                           <Link href={`/results/${a.id}`} className="shrink-0">
                             <span
-                              className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-gold)] hover:text-[color:var(--color-warroom-gold-bright)] transition-colors"
+                              className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-gold)] hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
                               style={{ fontFamily: 'var(--font-display)' }}
                             >
                               View Verdict →
@@ -677,12 +677,12 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Side rail: Iron Rankings */}
+          {/* Side rail: Elo Rankings */}
           <div className="space-y-6">
             <FadeInUp delay={0.2}>
               <div id="dashboard-leaderboard" className="space-y-4">
                 <SigilBadge icon={ScrollText} tone="gold">
-                  <LoreTip tip={LORE.ironRankings}>Iron Rankings</LoreTip>
+                  <LoreTip tip={LORE.ironRankings}>Elo Rankings</LoreTip>
                 </SigilBadge>
                 {batch ? (
                   <LeaderboardPanel
@@ -690,19 +690,19 @@ export default function DashboardPage() {
                     currentUserId={user?.id}
                     connected={connected}
                     updatedAt={updatedAt}
-                    currentUserHouse={progression?.house}
+                    currentUserClub={progression?.house}
                     className={cn('h-[520px]')}
                   />
                 ) : (
                   <StoneCard className="py-10 text-center">
                     <p
-                      className="text-sm text-[color:var(--color-warroom-smoke)] mb-1"
+                      className="text-sm text-[color:var(--color-chessboard-smoke)] mb-1"
                       style={{ fontFamily: 'var(--font-body, var(--font-display))' }}
                     >
                       The Rankings are sealed.
                     </p>
                     <p
-                      className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                      className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Enter a batch code at sign-in to reveal the standings.

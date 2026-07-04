@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { investorPortraitSrc } from '@/src/lib/investorAssets'
@@ -49,9 +50,9 @@ interface Whisper {
 }
 
 const FALLBACK_LINES = [
-  'A familiar lord shifts in his seat.',
-  'The brazier crackles. No one speaks.',
-  'A raven beats against the stained glass.',
+  'A grandmaster analyzes the position.',
+  'The clock ticks. No one speaks.',
+  'A tactical murmur ripples through the hall.',
 ]
 
 export function CouncilWhispers({
@@ -156,18 +157,18 @@ export function CouncilWhispers({
             exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: w.side === 'left' ? -20 : 20 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={cn(
-              'flex max-w-md items-center gap-3 rounded-md border border-[color:var(--color-warroom-gold)]/30 bg-card/85 p-3 backdrop-blur-md',
+              'flex max-w-md items-center gap-3 rounded-md border border-[color:var(--color-chessboard-silver)]/30 bg-card/85 p-3 backdrop-blur-md',
               w.side === 'left' ? 'self-start' : 'self-end',
             )}
             style={{ boxShadow: '0 6px 24px rgba(0,0,0,0.5)' }}
           >
-            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-[color:var(--color-warroom-gold)]/30 bg-muted">
+            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-[color:var(--color-chessboard-silver)]/30 bg-muted">
               {w.investor.id || w.investor.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={investorPortraitSrc(w.investor)}
                   alt={w.investor.name}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  className="object-cover"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                 />
               ) : (
@@ -177,8 +178,8 @@ export function CouncilWhispers({
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-display text-[0.62rem] uppercase tracking-[0.18em] text-[color:var(--color-warroom-gold)]/70">
-                {w.investor.name} whispers
+              <p className="font-display text-[0.62rem] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-silver)]/70">
+                {w.investor.name} notes
               </p>
               <p className="text-sm italic leading-snug text-foreground/85">&ldquo;{w.line}&rdquo;</p>
             </div>

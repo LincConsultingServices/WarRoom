@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import confetti from 'canvas-confetti'
+
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import { useMicPermission } from '@/src/hooks/useMicPermission'
@@ -15,25 +15,25 @@ import type {
     InvestorScorecard,
 } from '@/src/types'
 import { Volume2, VolumeX } from 'lucide-react'
-import { WarRoomEntrance } from '@/src/components/warroom/WarRoomEntrance'
+import { ChessboardEntrance } from '@/src/components/chessboard/ChessboardEntrance'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
-import { AmbientAudioManager } from '@/src/components/warroom/AmbientAudioManager'
-import { AudioControls } from '@/src/components/warroom/AudioControls'
+import { AmbientAudioManager } from '@/src/components/chessboard/AmbientAudioManager'
+import { AudioControls } from '@/src/components/chessboard/AudioControls'
 import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
 
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
 // the same; the chamber is a presentational shell that wraps the existing
 // recording / question UI with the cinematic 3-panel layout.
-import { CouncilChamberLayout } from '@/src/components/warroom/CouncilChamberLayout'
-import { ActiveInvestor } from '@/src/components/warroom/ActiveInvestor'
-import { ConversationZone } from '@/src/components/warroom/ConversationZone'
-import { CouncilRoster } from '@/src/components/warroom/CouncilRoster'
-import { CouncilDeliberatesLoader } from '@/src/components/warroom/CouncilDeliberatesLoader'
+import { CouncilChamberLayout } from '@/src/components/chessboard/CouncilChamberLayout'
+import { ActiveInvestor } from '@/src/components/chessboard/ActiveInvestor'
+import { ConversationZone } from '@/src/components/chessboard/ConversationZone'
+import { CouncilRoster } from '@/src/components/chessboard/CouncilRoster'
+import { CouncilDeliberatesLoader } from '@/src/components/chessboard/CouncilDeliberatesLoader'
 import { useCouncilMoods } from '@/src/hooks/useCouncilMoods'
 import { useFeedbackSentiment } from '@/src/hooks/useFeedbackSentiment'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
-import { narratorPhaseForWarRoom } from '@/lib/narrator/scripts'
+import { narratorPhaseForChessboard } from '@/lib/narrator/scripts'
 import { investorPortraitSrc } from '@/src/lib/investorAssets'
 import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 
@@ -139,7 +139,7 @@ function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[
   );
 }
 
-type WarRoomPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
+type ChessboardPhase = 'LOADING' | 'PITCH' | 'INVESTOR_QA' | 'DEAL_RESULTS' | 'COMPLETE'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PreviousResponseEntry = Record<string, any>
@@ -170,7 +170,7 @@ function normalizePreviousResponses(raw: unknown): PreviousResponseEntry[] {
 const normalizeVoiceSlug = sharedNormalizeVoiceSlug
 
 function getPreparedPitchFromState(state: AssessmentState | null): string {
-    const directPitch = state?.assessment?.warRoomPitch?.trim()
+    const directPitch = state?.assessment?.chessboardPitch?.trim()
     if (directPitch) return directPitch
 
     const previousResponses = normalizePreviousResponses(state?.assessment?.previousResponses)
@@ -190,7 +190,7 @@ function getPreparedPitchFromState(state: AssessmentState | null): string {
     return ''
 }
 
-export default function WarRoomSimulation() {
+export default function ChessboardSimulation() {
     const params = useParams()
     const router = useRouter()
     const assessmentId = params?.assessmentId as string
@@ -199,17 +199,17 @@ export default function WarRoomSimulation() {
     const mic = useMicPermission()
 
     // State
-    const [phase, setPhase] = useState<WarRoomPhase>('LOADING')
+    const [phase, setPhase] = useState<ChessboardPhase>('LOADING')
 
-    // ── Narrator — keep only ONE war-room intro (the pitch entry); the qa /
+    // ── Narrator — keep only ONE chessboard intro (the pitch entry); the qa /
     // deal / complete lines fired mid-flow and felt like spam. ──
-    const narratorPhase = narratorPhaseForWarRoom(phase)
-    useNarratorOnboarding(narratorPhase ?? '', { enabled: narratorPhase === 'warroom.pitch' })
+    const narratorPhase = narratorPhaseForChessboard(phase)
+    useNarratorOnboarding(narratorPhase ?? '', { enabled: narratorPhase === 'chessboard.pitch' })
 
-    // ── First-hover Oracle intros for the War Room's key controls ──
+    // ── First-hover Oracle intros for the Chessboard's key controls ──
     const offerIntro = useFeatureIntro('negotiation-offer')
-    const pitchRecordIntro = useFeatureIntro('warroom-pitch-record')
-    const investorMicIntro = useFeatureIntro('warroom-investor-mic')
+    const pitchRecordIntro = useFeatureIntro('chessboard-pitch-record')
+    const investorMicIntro = useFeatureIntro('chessboard-investor-mic')
 
     // Cinematic entrance overlay — shown until the door video / fallback completes.
     const [showEntrance, setShowEntrance] = useState(true)
@@ -421,7 +421,7 @@ export default function WarRoomSimulation() {
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const audioRef = useRef<HTMLAudioElement | null>(null)
 
-    // Fix 1: Force dark theme for the entire War Room phase
+    // Fix 1: Force dark theme for the entire Chessboard phase
     useEffect(() => {
         document.documentElement.classList.add('dark')
         return () => {
@@ -450,7 +450,7 @@ export default function WarRoomSimulation() {
                     } catch { return [] }
                 })()
 
-                // Fix 2: If buyout was chosen, skip War Room entirely
+                // Fix 2: If buyout was chosen, skip Chessboard entirely
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const buyoutChosen = (state as any)?.assessment?.buyoutChosen
                 if (buyoutChosen) {
@@ -458,7 +458,7 @@ export default function WarRoomSimulation() {
                     return
                 }
 
-                // War Room always faces the full Council (all 7 investors).
+                // Chessboard always faces the full Council (all 7 investors).
                 // Older assessments that captured only a 4-investor subset are
                 // augmented up to the full list so the chamber renders correctly.
                 const FULL_COUNCIL_SIZE = 7
@@ -472,7 +472,7 @@ export default function WarRoomSimulation() {
                 setInvestors(finalList)
                 setPhase('PITCH')
             } catch (err: unknown) {
-                setError(err instanceof Error ? err.message : 'Failed to load War Room data')
+                setError(err instanceof Error ? err.message : 'Failed to load Chessboard data')
                 setPhase('PITCH') // Still show pitch even if load fails
             }
         }
@@ -621,10 +621,10 @@ export default function WarRoomSimulation() {
                         return
                     }
                 } catch (followupErr) {
-                    console.warn('[war-room] follow-up generation failed, skipping', followupErr)
+                    console.warn('[chessboard] follow-up generation failed, skipping', followupErr)
                 }
             } else {
-                console.warn('[war-room] empty initial transcription, skipping follow-up')
+                console.warn('[chessboard] empty initial transcription, skipping follow-up')
             }
 
             // No follow-up — show immediate reaction
@@ -713,7 +713,7 @@ export default function WarRoomSimulation() {
             setResponseTranscription('')
         } else {
             try {
-                const fetchedOffers = await api.assessments.getWarRoomOffers(assessmentId)
+                const fetchedOffers = await api.assessments.getChessboardOffers(assessmentId)
                 setOffers(fetchedOffers)
             } catch (err) {
                 console.error("Failed to fetch offers", err)
@@ -811,26 +811,26 @@ export default function WarRoomSimulation() {
         activeInvestorSentiment: feedbackSentiment.label,
     })
 
-    // Map War Room phase → ambient audio scene. Empty (null) while the entrance
+    // Map Chessboard phase → ambient audio scene. Empty (null) while the entrance
     // is still playing so we don't fight the door-video atmospherics.
     const ambientScene = useMemo<AmbientScene>(() => {
         if (showEntrance) return null
-        if (phase === 'LOADING') return 'warroom-lobby'
-        if (phase === 'INVESTOR_QA') return isAnalyzing ? 'warroom-deliberation' : 'warroom-active'
-        if (phase === 'PITCH') return 'warroom-active'
-        if (phase === 'DEAL_RESULTS') return 'warroom-deliberation'
+        if (phase === 'LOADING') return 'chessboard-lobby'
+        if (phase === 'INVESTOR_QA') return isAnalyzing ? 'chessboard-deliberation' : 'chessboard-active'
+        if (phase === 'PITCH') return 'chessboard-active'
+        if (phase === 'DEAL_RESULTS') return 'chessboard-deliberation'
         return null
     }, [showEntrance, phase, isAnalyzing])
 
     return (
-        <div className="warroom-page warroom-shell">
+        <div className="chessboard-page chessboard-shell">
             {/* Side wave accents */}
-            <div className="warroom-wave-left" aria-hidden />
-            <div className="warroom-wave-right" aria-hidden />
-            <RouteBackground bg="warroom" brightness={0.08} />
+            <div className="chessboard-wave-left" aria-hidden />
+            <div className="chessboard-wave-right" aria-hidden />
+
             <AnimatePresence>
                 {showEntrance && (
-                    <WarRoomEntrance
+                    <ChessboardEntrance
                         key="entrance"
                         onComplete={() => setShowEntrance(false)}
                     />
@@ -850,11 +850,11 @@ export default function WarRoomSimulation() {
                         <div className="flex flex-col items-center gap-3 text-center">
                             <span
                                 aria-hidden
-                                className="font-display text-3xl text-[color:var(--color-warroom-gold)] opacity-80"
+                                className="font-display text-3xl text-[color:var(--color-chessboard-gold)] opacity-80"
                             >
                                 ⚜
                             </span>
-                            <p className="font-display text-xs uppercase tracking-[0.32em] text-[color:var(--color-warroom-gold)]/85">
+                            <p className="font-display text-xs uppercase tracking-[0.32em] text-[color:var(--color-chessboard-gold)]/85">
                                 The council retires to deliberate
                             </p>
                         </div>
@@ -869,10 +869,10 @@ export default function WarRoomSimulation() {
                 hideTextOption
             />
             {/* Top Bar */}
-            <header className="warroom-header">
+            <header className="chessboard-header">
                 <div className="header-left">
-                    <h1 className="warroom-title">War Room</h1>
-                    <span className="warroom-subtitle">Live Investor Pitch Simulation</span>
+                    <h1 className="chessboard-title">Chessboard</h1>
+                    <span className="chessboard-subtitle">Live Investor Pitch Simulation</span>
                 </div>
                 <div className="header-center">
                     {/* timer removed */}
@@ -885,7 +885,7 @@ export default function WarRoomSimulation() {
                 </div>
             </header>
 
-            <main className="warroom-main">
+            <main className="chessboard-main">
                 {/* ============================================ */}
                 {/* LOADING */}
                 {/* ============================================ */}
@@ -931,7 +931,7 @@ export default function WarRoomSimulation() {
                     >
                         <motion.div className="phase-badge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring' }}>PHASE 1 — YOUR PITCH</motion.div>
                         <motion.h2 className="phase-title" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                            Record Your 1-Minute War Room Pitch
+                            Record Your 1-Minute Chessboard Pitch
                         </motion.h2>
                         <motion.p className="phase-desc" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
                             You are standing before the investor panel. Tap the microphone and deliver your pitch out loud.
@@ -940,11 +940,11 @@ export default function WarRoomSimulation() {
 
                         {/* Pitch Template - Collapsible */}
                         <motion.details className="pitch-template" open={!!preparedPitch} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                            <summary className="pitch-template-summary">{preparedPitch ? 'Your prepared War Room pitch' : 'Pitch Template Guide (tap to expand)'}</summary>
+                            <summary className="pitch-template-summary">{preparedPitch ? 'Your prepared Chessboard pitch' : 'Pitch Template Guide (tap to expand)'}</summary>
                             <div className="template-text" style={{ marginTop: '0.8rem' }}>
                                 {preparedPitch ? (
                                     <>
-                                        <p className="template-helper-label">Using your saved War Room prep pitch:</p>
+                                        <p className="template-helper-label">Using your saved Chessboard prep pitch:</p>
                                         <pre className="template-user-pitch" style={{ whiteSpace: 'pre-wrap' }}>{preparedPitch}</pre>
                                     </>
                                 ) : (
@@ -1304,7 +1304,7 @@ export default function WarRoomSimulation() {
                                                     borderRadius: '4px',
                                                     border: '1px solid rgba(201,162,39,0.5)',
                                                     background: 'rgba(201,162,39,0.12)',
-                                                    color: '#c9a227',
+                                                    color: '#c8a84a',
                                                     fontSize: '0.85rem',
                                                     cursor: 'pointer',
                                                 }}
@@ -1565,7 +1565,7 @@ export default function WarRoomSimulation() {
                                                 </motion.button>
                                                 <motion.button 
                                                     className="respond-btn" 
-                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#c23b3b' : '#c9a227' }}
+                                                    style={{ flex: 2, background: negRound >= MAX_NEG_ROUNDS - 1 ? '#b03030' : '#c8a84a' }}
                                                     onClick={handleNegotiateAudio} 
                                                     disabled={isNegVoiceSubmitting}
                                                     initial={{ scale: 0.9, opacity: 0 }}
@@ -1659,7 +1659,7 @@ export default function WarRoomSimulation() {
             </main>
 
             <style jsx>{`
-                .warroom-shell {
+                .chessboard-shell {
                     position: relative;
                     min-height: 100vh;
                     background:
@@ -1669,7 +1669,7 @@ export default function WarRoomSimulation() {
                     overflow: hidden;
                 }
 
-                .warroom-shell::before {
+                .chessboard-shell::before {
                     content: '';
                     position: fixed;
                     top: 0;
@@ -1687,14 +1687,14 @@ export default function WarRoomSimulation() {
                         transparent 100%
                     );
                     background-size: 200% 100%;
-                    animation: warroomWaveTop 3s ease-in-out infinite;
+                    animation: chessboardWaveTop 3s ease-in-out infinite;
                     box-shadow:
                         0 0 20px rgba(239,68,68,0.35),
                         0 0 60px rgba(239,68,68,0.15);
                     z-index: 100;
                 }
 
-                .warroom-shell::after {
+                .chessboard-shell::after {
                     content: '';
                     position: fixed;
                     bottom: 0;
@@ -1712,25 +1712,25 @@ export default function WarRoomSimulation() {
                         transparent 100%
                     );
                     background-size: 200% 100%;
-                    animation: warroomWaveBottom 3s ease-in-out infinite;
+                    animation: chessboardWaveBottom 3s ease-in-out infinite;
                     box-shadow:
                         0 0 20px rgba(239,68,68,0.35),
                         0 0 60px rgba(239,68,68,0.15);
                     z-index: 100;
                 }
 
-                .warroom-shell > * {
+                .chessboard-shell > * {
                     position: relative;
                     z-index: 1;
                 }
 
-                @keyframes warroomWaveTop {
+                @keyframes chessboardWaveTop {
                     0% { background-position: 0% 0%; }
                     50% { background-position: 100% 0%; }
                     100% { background-position: 0% 0%; }
                 }
 
-                @keyframes warroomWaveBottom {
+                @keyframes chessboardWaveBottom {
                     0% { background-position: 100% 0%; }
                     50% { background-position: 0% 0%; }
                     100% { background-position: 100% 0%; }

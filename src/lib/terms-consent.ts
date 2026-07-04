@@ -1,4 +1,4 @@
-export const TERMS_CONSENT_STORAGE_KEY = 'warRoomTermsConsentAt'
+export const TERMS_CONSENT_STORAGE_KEY = 'chessboardTermsConsentAt'
 
 export function hasAcceptedTerms(): boolean {
   if (typeof window === 'undefined') return false

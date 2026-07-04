@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { EarnedSigil } from '@/src/types'
 
-const SEEN_KEY = 'warroom_seen_sigils'
+const SEEN_KEY = 'chessboard_seen_sigils'
 
 function readSeen(): string[] | null {
   if (typeof window === 'undefined') return null

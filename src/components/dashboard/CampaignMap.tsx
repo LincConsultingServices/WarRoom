@@ -34,7 +34,7 @@ function stageStatus(currentStage: StageName | null, stageIndex: number): NodeSt
  * <CampaignMap /> — horizontal ribbon of 9 hexagonal stage nodes.
  *
  * Visualizes the user's progression: Ideation → Vision → Commitment →
- * Validation → Growth → Expansion → Scale → War Room Prep → War Room.
+ * Validation → Growth → Expansion → Scale → Assessment Prep → Assessment.
  * Completed nodes glow gold; the current node pulses; locked nodes
  * stay dim. Clickable completed nodes call `onStageClick`.
  */
@@ -53,7 +53,7 @@ export function CampaignMap({
         className="absolute left-4 right-4 top-1/2 h-[2px] -translate-y-1/2 pointer-events-none"
         style={{
           background:
-            'linear-gradient(90deg, rgba(74,63,56,0.6) 0%, rgba(201,162,39,0.35) 50%, rgba(74,63,56,0.6) 100%)',
+            'linear-gradient(90deg, rgba(74,63,56,0.6) 0%, rgba(200,168,74,0.35) 50%, rgba(74,63,56,0.6) 100%)',
         }}
       />
 
@@ -65,7 +65,7 @@ export function CampaignMap({
       >
         {STAGE_ORDER.map((stage, i) => {
           const status = stageStatus(currentStage, i)
-          const accent = STAGE_THEMES[stage] ?? '#c9a227'
+          const accent = STAGE_THEMES[stage] ?? '#c8a84a'
           const label = NARRATION_STAGE_LABELS[i] ?? STAGE_NARRATIVES[stage]?.title
           const month = STAGE_NARRATIVES[stage]?.month ?? ''
           const fullTitle = STAGE_NARRATIVES[stage]?.title ?? label
@@ -95,7 +95,7 @@ export function CampaignMap({
                   'transition-transform',
                   clickable && 'hover:scale-110 cursor-pointer',
                   !clickable && 'cursor-default',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60',
                 )}
               >
                 {/* Hexagon outline */}
@@ -105,9 +105,9 @@ export function CampaignMap({
                 <span
                   className={cn(
                     'absolute inset-0 grid place-items-center text-[10px] font-bold uppercase tracking-tight',
-                    status === 'completed' && 'text-[color:var(--color-warroom-ghost)]',
-                    status === 'current' && 'text-[color:var(--color-warroom-ghost)]',
-                    status === 'locked' && 'text-[color:var(--color-warroom-smoke)]',
+                    status === 'completed' && 'text-[color:var(--color-chessboard-ghost)]',
+                    status === 'current' && 'text-[color:var(--color-chessboard-ghost)]',
+                    status === 'locked' && 'text-[color:var(--color-chessboard-smoke)]',
                   )}
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
@@ -118,9 +118,9 @@ export function CampaignMap({
               <span
                 className={cn(
                   'text-[9px] sm:text-[10px] uppercase tracking-[0.14em] whitespace-nowrap',
-                  status === 'current' && 'text-[color:var(--color-warroom-gold)] font-semibold',
-                  status === 'completed' && 'text-[color:var(--color-warroom-ivory)]/80',
-                  status === 'locked' && 'text-[color:var(--color-warroom-smoke)]',
+                  status === 'current' && 'text-[color:var(--color-chessboard-gold)] font-semibold',
+                  status === 'completed' && 'text-[color:var(--color-chessboard-ivory)]/80',
+                  status === 'locked' && 'text-[color:var(--color-chessboard-smoke)]',
                 )}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
@@ -154,10 +154,10 @@ function HexagonNode({
         : '#1a1511'
   const stroke =
     status === 'current'
-      ? 'var(--color-warroom-gold-bright)'
+      ? 'var(--color-chessboard-gold-bright)'
       : status === 'completed'
         ? accent
-        : 'var(--color-warroom-ash)'
+        : 'var(--color-chessboard-ash)'
 
   return (
     <>
@@ -192,7 +192,7 @@ function HexagonNode({
           <polygon
             points={hexPoints}
             fill="none"
-            stroke="var(--color-warroom-gold-bright)"
+            stroke="var(--color-chessboard-gold-bright)"
             strokeWidth="0.5"
             strokeLinejoin="round"
             opacity="0.7"

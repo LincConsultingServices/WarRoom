@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { BarChart3, Download, TrendingUp, Users, ScrollText } from 'lucide-react'
 import api from '@/src/lib/api'
 import type { AdminBatch } from '@/src/types'
-import { StoneCard, WarRoomCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
+import { StoneCard, ChessboardCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
 
 interface ReportMetric {
@@ -66,13 +66,13 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <ScrollText className="h-6 w-6 text-[color:var(--color-warroom-gold)]" />
+              <ScrollText className="h-6 w-6 text-[color:var(--color-chessboard-gold)]" />
               <h1
                 className="text-xl font-semibold tracking-[0.04em]"
                 style={{
                   fontFamily: 'var(--font-display)',
                   background:
-                    'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                    'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -81,15 +81,15 @@ export default function ReportsPage() {
               </h1>
             </div>
             <p
-              className="text-sm text-[color:var(--color-warroom-smoke)]"
+              className="text-sm text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               View and manage simulation reports
             </p>
           </div>
-          <WarRoomCTA size="sm" variant="ghost" icon={Download} disabled={loading}>
+          <ChessboardCTA size="sm" variant="ghost" icon={Download} disabled={loading}>
             Export Summary
-          </WarRoomCTA>
+          </ChessboardCTA>
         </div>
         <div className="mt-5">
           <GoldDivider variant="line" />
@@ -99,9 +99,9 @@ export default function ReportsPage() {
       {loading ? (
         <div className="flex justify-center py-20">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-7 h-7 border-2 border-[color:var(--color-warroom-gold)]/30 border-t-[color:var(--color-warroom-gold)] rounded-full animate-spin" />
+            <div className="w-7 h-7 border-2 border-[color:var(--color-chessboard-gold)]/30 border-t-[color:var(--color-chessboard-gold)] rounded-full animate-spin" />
             <p
-              className="text-sm text-[color:var(--color-warroom-smoke)]"
+              className="text-sm text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Loading report data&hellip;
@@ -128,19 +128,19 @@ export default function ReportsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p
-                        className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                        className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {stat.label}
                       </p>
                       <p
-                        className="text-3xl font-bold text-[color:var(--color-warroom-gold)] mt-2"
+                        className="text-3xl font-bold text-[color:var(--color-chessboard-gold)] mt-2"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {stat.value}
                       </p>
                     </div>
-                    <Icon className="h-8 w-8 text-[color:var(--color-warroom-gold)]/20" />
+                    <Icon className="h-8 w-8 text-[color:var(--color-chessboard-gold)]/20" />
                   </div>
                 </StoneCard>
               )
@@ -150,9 +150,9 @@ export default function ReportsPage() {
           {/* Reports Table */}
           <motion.div variants={staggerItem}>
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Recent Cohort Reports
@@ -161,7 +161,7 @@ export default function ReportsPage() {
               <div className="p-6">
                 {reports.length === 0 ? (
                   <p
-                    className="text-[color:var(--color-warroom-smoke)] text-center py-6 text-sm"
+                    className="text-[color:var(--color-chessboard-smoke)] text-center py-6 text-sm"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     No reports available. Create a batch to see analytics.
@@ -170,12 +170,12 @@ export default function ReportsPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-[color:var(--color-warroom-ash)]/20">
+                        <tr className="border-b border-[color:var(--color-chessboard-ash)]/20">
                           {['Report', 'Type', 'Cohort', 'Participants', 'Generated', 'Actions'].map(
                             (h, i) => (
                               <th
                                 key={h}
-                                className={`py-3 px-4 font-medium text-[color:var(--color-warroom-smoke)] text-[10px] uppercase tracking-[0.14em] ${i === 5 ? 'text-right' : 'text-left'}`}
+                                className={`py-3 px-4 font-medium text-[color:var(--color-chessboard-smoke)] text-[10px] uppercase tracking-[0.14em] ${i === 5 ? 'text-right' : 'text-left'}`}
                                 style={{ fontFamily: 'var(--font-display)' }}
                               >
                                 {h}
@@ -188,10 +188,10 @@ export default function ReportsPage() {
                         {reports.map((report) => (
                           <tr
                             key={report.id}
-                            className="border-b border-[color:var(--color-warroom-ash)]/10 last:border-0 hover:bg-[color:var(--color-warroom-gold)]/[0.02] transition-colors"
+                            className="border-b border-[color:var(--color-chessboard-ash)]/10 last:border-0 hover:bg-[color:var(--color-chessboard-gold)]/[0.02] transition-colors"
                           >
                             <td
-                              className="py-4 px-4 font-medium text-[color:var(--color-warroom-ivory)]"
+                              className="py-4 px-4 font-medium text-[color:var(--color-chessboard-ivory)]"
                               style={{ fontFamily: 'var(--font-display)' }}
                             >
                               {report.name}
@@ -200,22 +200,22 @@ export default function ReportsPage() {
                               <SigilBadge tone="gold">Cohort</SigilBadge>
                             </td>
                             <td
-                              className="py-4 px-4 text-[color:var(--color-warroom-smoke)]"
+                              className="py-4 px-4 text-[color:var(--color-chessboard-smoke)]"
                               style={{ fontFamily: 'var(--font-body, serif)' }}
                             >
                               {report.cohort}
                             </td>
-                            <td className="py-4 px-4 text-[color:var(--color-warroom-smoke)] font-mono text-xs">
+                            <td className="py-4 px-4 text-[color:var(--color-chessboard-smoke)] font-mono text-xs">
                               {report.participantCount}
                             </td>
-                            <td className="py-4 px-4 text-[color:var(--color-warroom-smoke)] font-mono text-xs">
+                            <td className="py-4 px-4 text-[color:var(--color-chessboard-smoke)] font-mono text-xs">
                               {report.generatedAt}
                             </td>
                             <td className="py-4 px-4 text-right">
                               <Link href={`/admin/cohorts/${report.id}`}>
-                                <WarRoomCTA size="sm" variant="ghost" icon={BarChart3}>
+                                <ChessboardCTA size="sm" variant="ghost" icon={BarChart3}>
                                   View Data
-                                </WarRoomCTA>
+                                </ChessboardCTA>
                               </Link>
                             </td>
                           </tr>

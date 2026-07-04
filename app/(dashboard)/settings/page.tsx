@@ -30,7 +30,7 @@ import { CURSOR_DISABLED_STORAGE_KEY } from '@/src/components/effects/CustomCurs
 import { cn } from '@/lib/utils'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
 } from '@/src/components/primitives'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
@@ -39,7 +39,7 @@ import { easeDramatic } from '@/lib/animations/variants'
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const INPUT_CLASSES =
-  'bg-[color:var(--color-warroom-rampart)]/60 border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-ivory)] placeholder:text-[color:var(--color-warroom-smoke)] focus-visible:border-[color:var(--color-warroom-gold)]/60 focus-visible:ring-[color:var(--color-warroom-gold)]/20'
+  'bg-[color:var(--color-chessboard-rampart)]/60 border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-ivory)] placeholder:text-[color:var(--color-chessboard-smoke)] focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20'
 
 type TabKey = 'profile' | 'notifications' | 'appearance' | 'audio' | 'privacy'
 
@@ -54,23 +54,23 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 // Curated SFX preview buttons — one per major audio category so the
 // player can audition the sound design before committing volume changes.
 const SFX_PREVIEWS: { key: SfxKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: 'wr.verdict', label: 'Dragon Roar', icon: Crown },
-  { key: 'sim.stage-begin', label: 'War Horn', icon: Swords },
+  { key: 'wr.verdict', label: 'Gambit Roar', icon: Crown },
+  { key: 'sim.stage-begin', label: 'Pitch Bell', icon: Swords },
   { key: 'sim.stage-clear', label: 'Triumph', icon: Crown },
-  { key: 'ui.click', label: 'Sword Clash', icon: Swords },
+  { key: 'ui.click', label: 'Market Clash', icon: Swords },
   { key: 'wr.vote-lock', label: 'Coin Drop', icon: Music },
   { key: 'narrator.appear', label: 'Raven Wings', icon: Music },
 ]
 
 type AmbientPreview = {
-  key: 'ambient.hall' | 'ambient.warroom' | 'ambient.deliberate' | 'ambient.victory' | null
+  key: 'ambient.hall' | 'ambient.chessboard' | 'ambient.deliberate' | 'ambient.victory' | null
   label: string
 }
 
 const AMBIENT_PREVIEWS: AmbientPreview[] = [
   { key: null, label: 'Silence' },
   { key: 'ambient.hall', label: 'The Hall' },
-  { key: 'ambient.warroom', label: 'War Room' },
+  { key: 'ambient.chessboard', label: 'Assessment' },
   { key: 'ambient.deliberate', label: 'Deliberation' },
   { key: 'ambient.victory', label: 'Verdict' },
 ]
@@ -182,7 +182,7 @@ export default function SettingsPage() {
       >
         <div className="flex items-center gap-3 mb-4">
           <Settings
-            className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+            className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
             aria-hidden
           />
           <h1
@@ -190,7 +190,7 @@ export default function SettingsPage() {
             style={{
               fontFamily: 'var(--font-display)',
               background:
-                'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -199,7 +199,7 @@ export default function SettingsPage() {
           </h1>
         </div>
         <p
-          className="text-sm text-[color:var(--color-warroom-smoke)] mb-4"
+          className="text-sm text-[color:var(--color-chessboard-smoke)] mb-4"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
           Manage your account settings and preferences.
@@ -214,7 +214,7 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4, ease: easeDramatic }}
       >
-        <div className="flex flex-wrap gap-1 p-1 rounded-[4px] bg-[color:var(--color-warroom-rampart)]/60 border border-[color:var(--color-warroom-ash)]/25 w-fit">
+        <div className="flex flex-wrap gap-1 p-1 rounded-[4px] bg-[color:var(--color-chessboard-rampart)]/60 border border-[color:var(--color-chessboard-ash)]/25 w-fit">
           {TABS.map((tab) => {
             const Icon = tab.icon
             return (
@@ -225,8 +225,8 @@ export default function SettingsPage() {
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-2 text-[10px] uppercase tracking-[0.14em] rounded-[3px] transition-all',
                   activeTab === tab.key
-                    ? 'bg-[color:var(--color-warroom-gold)]/[0.12] text-[color:var(--color-warroom-gold)] border border-[color:var(--color-warroom-gold)]/30'
-                    : 'text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)] border border-transparent',
+                    ? 'bg-[color:var(--color-chessboard-gold)]/[0.12] text-[color:var(--color-chessboard-gold)] border border-[color:var(--color-chessboard-gold)]/30'
+                    : 'text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)] border border-transparent',
                 )}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
@@ -251,15 +251,15 @@ export default function SettingsPage() {
             className="space-y-6"
           >
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Profile Information
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Update your personal information and contact details.
@@ -270,7 +270,7 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="name"
-                      className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                      className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Full Name
@@ -286,7 +286,7 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="email"
-                      className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                      className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Email
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="organization"
-                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Organization
@@ -321,7 +321,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="role"
-                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)]"
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Role
@@ -334,26 +334,26 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="pt-2 border-t border-[color:var(--color-warroom-ash)]/20">
-                  <WarRoomCTA type="submit" size="sm" disabled={isSaving}>
+                <div className="pt-2 border-t border-[color:var(--color-chessboard-ash)]/20">
+                  <ChessboardCTA type="submit" size="sm" disabled={isSaving}>
                     {isSaving ? 'Forging Changes…' : 'Save Changes'}
-                  </WarRoomCTA>
+                  </ChessboardCTA>
                 </div>
               </form>
             </StoneCard>
 
             {/* Danger zone */}
-            <StoneCard accent="var(--color-warroom-crimson)" padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-crimson)]/20">
+            <StoneCard accent="var(--color-chessboard-crimson)" padding="none">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-crimson)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-crimson-bright)] tracking-[0.04em] flex items-center gap-2"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-crimson-bright)] tracking-[0.04em] flex items-center gap-2"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   <AlertTriangle className="h-4 w-4" />
                   Danger Zone
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Irreversible actions that affect your account.
@@ -362,22 +362,22 @@ export default function SettingsPage() {
               <div className="px-6 py-5 flex items-center justify-between gap-4">
                 <div>
                   <p
-                    className="text-sm font-semibold text-[color:var(--color-warroom-ivory)]"
+                    className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Delete all simulation data
                   </p>
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     This will permanently delete all your simulations and
                     results.
                   </p>
                 </div>
-                <WarRoomCTA size="sm" variant="ghost">
+                <ChessboardCTA size="sm" variant="ghost">
                   Delete Data
-                </WarRoomCTA>
+                </ChessboardCTA>
               </div>
             </StoneCard>
           </motion.div>
@@ -393,21 +393,21 @@ export default function SettingsPage() {
             transition={{ duration: 0.3, ease: easeDramatic }}
           >
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Email Notifications
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Choose what messages the ravens deliver.
                 </p>
               </div>
-              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 {[
                   {
                     id: 'email-simulation',
@@ -441,13 +441,13 @@ export default function SettingsPage() {
                     <div className="space-y-0.5">
                       <Label
                         htmlFor={item.id}
-                        className="text-sm text-[color:var(--color-warroom-ivory)]"
+                        className="text-sm text-[color:var(--color-chessboard-ivory)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {item.label}
                       </Label>
                       <p
-                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         {item.desc}
@@ -457,14 +457,14 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
-              <div className="px-6 py-4 border-t border-[color:var(--color-warroom-ash)]/20">
-                <WarRoomCTA
+              <div className="px-6 py-4 border-t border-[color:var(--color-chessboard-ash)]/20">
+                <ChessboardCTA
                   size="sm"
                   onClick={handleSaveNotifications}
                   disabled={isSaving}
                 >
                   {isSaving ? 'Sending Ravens…' : 'Save Preferences'}
-                </WarRoomCTA>
+                </ChessboardCTA>
               </div>
             </StoneCard>
           </motion.div>
@@ -480,37 +480,37 @@ export default function SettingsPage() {
             transition={{ duration: 0.3, ease: easeDramatic }}
           >
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Theme & Effects
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
-                  Customize the appearance of the War Room.
+                  Customize the appearance of the Assessment.
                 </p>
               </div>
-              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 <div className="pb-4">
                   <Label
-                    className="text-sm text-[color:var(--color-warroom-ivory)]"
+                    className="text-sm text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Color Mode
                   </Label>
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-1 mb-3"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] mt-1 mb-3"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
-                    The War Room is forged in darkness. Theme control is
+                    The Assessment is forged in darkness. Theme control is
                     available in the sidebar.
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-[color:var(--color-warroom-smoke)]">
-                    <Palette className="h-3.5 w-3.5 text-[color:var(--color-warroom-gold)]" />
+                  <div className="flex items-center gap-2 text-xs text-[color:var(--color-chessboard-smoke)]">
+                    <Palette className="h-3.5 w-3.5 text-[color:var(--color-chessboard-gold)]" />
                     <span style={{ fontFamily: 'var(--font-display)' }}>
                       Theme toggle available in sidebar
                     </span>
@@ -521,13 +521,13 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <Label
                       htmlFor="animations"
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Animations
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
                       Enable or disable interface animations
@@ -540,13 +540,13 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <Label
                       htmlFor="typewriter"
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Typewriter Effects
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
                       Show typewriter animation in Oracle narratives
@@ -559,13 +559,13 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <Label
                       htmlFor="custom-cursor"
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Custom Cursor
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
                       The gold ring + dot cursor. Turn off to use your
@@ -595,15 +595,15 @@ export default function SettingsPage() {
           >
             {/* Master mute */}
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Hall of Sound
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Silence the war horns, or let them ring. Settings persist
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 {/* Master mute toggle */}
                 <div className="flex items-center justify-between pb-5">
                   <div className="flex items-start gap-3">
@@ -619,8 +619,8 @@ export default function SettingsPage() {
                       className={cn(
                         'mt-0.5 flex h-9 w-9 items-center justify-center rounded-sm border',
                         isMuted
-                          ? 'border-[color:var(--color-warroom-crimson)]/40 text-[color:var(--color-warroom-crimson-bright)] bg-[color:var(--color-warroom-crimson)]/[0.06]'
-                          : 'border-[color:var(--color-warroom-gold)]/40 text-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/[0.06]',
+                          ? 'border-[color:var(--color-chessboard-crimson)]/40 text-[color:var(--color-chessboard-crimson-bright)] bg-[color:var(--color-chessboard-crimson)]/[0.06]'
+                          : 'border-[color:var(--color-chessboard-gold)]/40 text-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]/[0.06]',
                       )}
                     >
                       {isMuted ? (
@@ -632,13 +632,13 @@ export default function SettingsPage() {
                     <div className="space-y-0.5">
                       <Label
                         htmlFor="master-mute"
-                        className="text-sm text-[color:var(--color-warroom-ivory)]"
+                        className="text-sm text-[color:var(--color-chessboard-ivory)]"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         Master Audio
                       </Label>
                       <p
-                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         {isMuted
@@ -659,22 +659,22 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label
-                        className="text-sm text-[color:var(--color-warroom-ivory)] flex items-center gap-2"
+                        className="text-sm text-[color:var(--color-chessboard-ivory)] flex items-center gap-2"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
-                        <Music className="h-3.5 w-3.5 text-[color:var(--color-warroom-gold)]" />
+                        <Music className="h-3.5 w-3.5 text-[color:var(--color-chessboard-gold)]" />
                         Ambient Score
                       </Label>
                       <p
-                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         Cello drone, organ pad, and piano motifs that score
-                        the war room.
+                        the assessment.
                       </p>
                     </div>
                     <span
-                      className="text-xs text-[color:var(--color-warroom-gold)] tabular-nums min-w-[2.5rem] text-right"
+                      className="text-xs text-[color:var(--color-chessboard-gold)] tabular-nums min-w-[2.5rem] text-right"
                       style={{ fontFamily: 'var(--font-mono, monospace)' }}
                     >
                       {Math.round(ambientVolume * 100)}%
@@ -699,14 +699,14 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label
-                        className="text-sm text-[color:var(--color-warroom-ivory)] flex items-center gap-2"
+                        className="text-sm text-[color:var(--color-chessboard-ivory)] flex items-center gap-2"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
-                        <Swords className="h-3.5 w-3.5 text-[color:var(--color-warroom-gold)]" />
+                        <Swords className="h-3.5 w-3.5 text-[color:var(--color-chessboard-gold)]" />
                         Sound Effects
                       </Label>
                       <p
-                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         War horns, sword clashes, raven wings, and the gavel
@@ -714,7 +714,7 @@ export default function SettingsPage() {
                       </p>
                     </div>
                     <span
-                      className="text-xs text-[color:var(--color-warroom-gold)] tabular-nums min-w-[2.5rem] text-right"
+                      className="text-xs text-[color:var(--color-chessboard-gold)] tabular-nums min-w-[2.5rem] text-right"
                       style={{ fontFamily: 'var(--font-mono, monospace)' }}
                     >
                       {Math.round(sfxVolume * 100)}%
@@ -739,17 +739,17 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label
-                        className="text-sm text-[color:var(--color-warroom-ivory)] flex items-center gap-2"
+                        className="text-sm text-[color:var(--color-chessboard-ivory)] flex items-center gap-2"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
-                        <Mic2 className="h-3.5 w-3.5 text-[color:var(--color-warroom-gold)]" />
+                        <Mic2 className="h-3.5 w-3.5 text-[color:var(--color-chessboard-gold)]" />
                         Investor Voice Lines
                       </Label>
                       <p
-                        className="text-xs text-[color:var(--color-warroom-smoke)]"
+                        className="text-xs text-[color:var(--color-chessboard-smoke)]"
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
-                        Spoken questions and verdicts from the council of investors.
+                        Spoken questions and verdicts from the panel of investors.
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -760,7 +760,7 @@ export default function SettingsPage() {
                         onCheckedChange={() => toggleVoiceMute()}
                       />
                       <span
-                        className="text-xs text-[color:var(--color-warroom-gold)] tabular-nums min-w-[2.5rem] text-right"
+                        className="text-xs text-[color:var(--color-chessboard-gold)] tabular-nums min-w-[2.5rem] text-right"
                         style={{ fontFamily: 'var(--font-mono, monospace)' }}
                       >
                         {Math.round(voiceVolume * 100)}%
@@ -782,13 +782,13 @@ export default function SettingsPage() {
                 <div className="pt-5 flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Now Playing
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
                       The ambient track currently scoring the active page.
@@ -798,8 +798,8 @@ export default function SettingsPage() {
                     className={cn(
                       'text-[10px] uppercase tracking-[0.14em] px-2.5 py-1 rounded-[3px] border',
                       scene
-                        ? 'border-[color:var(--color-warroom-gold)]/40 text-[color:var(--color-warroom-gold)] bg-[color:var(--color-warroom-gold)]/[0.06]'
-                        : 'border-[color:var(--color-warroom-ash)]/30 text-[color:var(--color-warroom-smoke)]',
+                        ? 'border-[color:var(--color-chessboard-gold)]/40 text-[color:var(--color-chessboard-gold)] bg-[color:var(--color-chessboard-gold)]/[0.06]'
+                        : 'border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-smoke)]',
                     )}
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
@@ -811,15 +811,15 @@ export default function SettingsPage() {
 
             {/* Ambient scene preview */}
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Audition the Score
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Swap between procedural ambient beds. Each layer is a
@@ -838,15 +838,15 @@ export default function SettingsPage() {
                       'flex items-center justify-center px-3 py-2.5',
                       'text-[11px] uppercase tracking-[0.12em] rounded-[3px]',
                       'border transition-all duration-200',
-                      'border-[color:var(--color-warroom-gold)]/25',
-                      'bg-[color:var(--color-warroom-rampart)]/40',
-                      'text-[color:var(--color-warroom-ivory)]',
-                      'hover:border-[color:var(--color-warroom-gold)]/55',
-                      'hover:bg-[color:var(--color-warroom-gold)]/[0.06]',
-                      'hover:text-[color:var(--color-warroom-gold)]',
-                      'hover:shadow-[0_0_18px_rgba(201,162,39,0.18)]',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
-                      'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-warroom-gold)]/25 disabled:hover:bg-[color:var(--color-warroom-rampart)]/40 disabled:hover:text-[color:var(--color-warroom-ivory)] disabled:hover:shadow-none',
+                      'border-[color:var(--color-chessboard-gold)]/25',
+                      'bg-[color:var(--color-chessboard-rampart)]/40',
+                      'text-[color:var(--color-chessboard-ivory)]',
+                      'hover:border-[color:var(--color-chessboard-gold)]/55',
+                      'hover:bg-[color:var(--color-chessboard-gold)]/[0.06]',
+                      'hover:text-[color:var(--color-chessboard-gold)]',
+                      'hover:shadow-[0_0_18px_rgba(200,168,74,0.18)]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60',
+                      'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-chessboard-gold)]/25 disabled:hover:bg-[color:var(--color-chessboard-rampart)]/40 disabled:hover:text-[color:var(--color-chessboard-ivory)] disabled:hover:shadow-none',
                     )}
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
@@ -858,15 +858,15 @@ export default function SettingsPage() {
 
             {/* SFX previews */}
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Audition the Forge
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Test each sound at your chosen volume. Heard nothing? Make
@@ -884,15 +884,15 @@ export default function SettingsPage() {
                       'flex items-center justify-center gap-2 px-3 py-2.5',
                       'text-[11px] uppercase tracking-[0.12em] rounded-[3px]',
                       'border transition-all duration-200',
-                      'border-[color:var(--color-warroom-gold)]/25',
-                      'bg-[color:var(--color-warroom-rampart)]/40',
-                      'text-[color:var(--color-warroom-ivory)]',
-                      'hover:border-[color:var(--color-warroom-gold)]/55',
-                      'hover:bg-[color:var(--color-warroom-gold)]/[0.06]',
-                      'hover:text-[color:var(--color-warroom-gold)]',
-                      'hover:shadow-[0_0_18px_rgba(201,162,39,0.18)]',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]/60',
-                      'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-warroom-gold)]/25 disabled:hover:bg-[color:var(--color-warroom-rampart)]/40 disabled:hover:text-[color:var(--color-warroom-ivory)] disabled:hover:shadow-none',
+                      'border-[color:var(--color-chessboard-gold)]/25',
+                      'bg-[color:var(--color-chessboard-rampart)]/40',
+                      'text-[color:var(--color-chessboard-ivory)]',
+                      'hover:border-[color:var(--color-chessboard-gold)]/55',
+                      'hover:bg-[color:var(--color-chessboard-gold)]/[0.06]',
+                      'hover:text-[color:var(--color-chessboard-gold)]',
+                      'hover:shadow-[0_0_18px_rgba(200,168,74,0.18)]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]/60',
+                      'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[color:var(--color-chessboard-gold)]/25 disabled:hover:bg-[color:var(--color-chessboard-rampart)]/40 disabled:hover:text-[color:var(--color-chessboard-ivory)] disabled:hover:shadow-none',
                     )}
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
@@ -915,35 +915,35 @@ export default function SettingsPage() {
             transition={{ duration: 0.3, ease: easeDramatic }}
           >
             <StoneCard padding="none">
-              <div className="px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
+              <div className="px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
                 <h2
-                  className="text-sm font-semibold text-[color:var(--color-warroom-ivory)] tracking-[0.04em]"
+                  className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)] tracking-[0.04em]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Data & Privacy
                 </h2>
                 <p
-                  className="text-xs text-[color:var(--color-warroom-smoke)] mt-0.5"
+                  className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Control how your data is used and shared.
                 </p>
               </div>
-              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="p-6 space-y-0 divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 <div className="flex items-center justify-between pb-4">
                   <div className="space-y-0.5">
                     <Label
                       htmlFor="analytics"
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Usage Analytics
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Help improve War Room by sharing anonymous usage data
+                      Help improve Assessment by sharing anonymous usage data
                     </p>
                   </div>
                   <Switch id="analytics" defaultChecked />
@@ -953,16 +953,16 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <Label
                       htmlFor="profile-public"
-                      className="text-sm text-[color:var(--color-warroom-ivory)]"
+                      className="text-sm text-[color:var(--color-chessboard-ivory)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       Public Profile
                     </Label>
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Make your profile visible on the Iron Rankings
+                      Make your profile visible on the Elo Rankings
                     </p>
                   </div>
                   <Switch id="profile-public" />
@@ -970,20 +970,20 @@ export default function SettingsPage() {
 
                 <div className="pt-4">
                   <Label
-                    className="text-sm text-[color:var(--color-warroom-ivory)]"
+                    className="text-sm text-[color:var(--color-chessboard-ivory)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Data Export
                   </Label>
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)] mt-1 mb-3"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)] mt-1 mb-3"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
                     Download a copy of your simulation data and results.
                   </p>
-                  <WarRoomCTA size="sm" variant="ghost" icon={Zap}>
+                  <ChessboardCTA size="sm" variant="ghost" icon={Zap}>
                     Export My Data
-                  </WarRoomCTA>
+                  </ChessboardCTA>
                 </div>
               </div>
             </StoneCard>

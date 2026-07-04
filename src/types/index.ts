@@ -1,5 +1,5 @@
 // ============================================
-// KK's War Room 2.0 - TypeScript Types
+// KK's Assessment 2.0 - TypeScript Types
 // Aligned with SOP 2.0 (8 Competencies, 7 Stages)
 // ============================================
 
@@ -161,7 +161,7 @@ export interface Assessment {
   productState?: ProductState;
   marketState?: MarketState;
   mentorLifelinesRemaining: number;
-  warRoomPitch?: string;
+  chessboardPitch?: string;
   dealResult?: DealResult;
 
   // Restructured Flow Fields
@@ -654,7 +654,7 @@ export interface UpdateBatchRequest {
 // ============================================
 // V3: FOUNDER PROGRESSION (gamification)
 // ----------------------------------------------------------------
-// Additive only. Renown + earned state are server-authoritative
+// Additive only. Rating + earned state are server-authoritative
 // (anti-tamper for a credible cohort assessment). Until the backend
 // ships /progression/*, api.progression.me() derives this shape from
 // existing endpoints via src/lib/progressionMock.ts.
@@ -665,10 +665,10 @@ export type SigilTierName = 'BRONZE' | 'SILVER' | 'GOLD' | 'OBSIDIAN';
 export interface RankProgress {
   tier: number;
   title: string;
-  /** Renown accrued within the current rank. */
-  renownIntoTier: number;
-  /** Renown span of the current rank (null at the final rank). */
-  renownForNextTier: number | null;
+  /** Rating accrued within the current rank. */
+  ratingIntoTier: number;
+  /** Rating span of the current rank (null at the final rank). */
+  ratingForNextTier: number | null;
 }
 
 export interface CompetencyMastery {
@@ -686,7 +686,7 @@ export interface EarnedSigil {
   earnedAt: string;
 }
 
-export interface HearthState {
+export interface StreakState {
   /** Consecutive active weeks. */
   current: number;
   longest: number;
@@ -702,7 +702,7 @@ export interface HouseConfig {
   paletteId: string;
 }
 
-export interface RenownEvent {
+export interface RatingEvent {
   date: string;
   delta: number;
   reason: string;
@@ -710,15 +710,15 @@ export interface RenownEvent {
 
 export interface FounderProgression {
   userId: string;
-  /** Total Renown (our prestige "XP" — never surfaced as "XP" in-product). */
-  renown: number;
+  /** Total Rating (our prestige "XP" — never surfaced as "XP" in-product). */
+  rating: number;
   rank: RankProgress;
   competencyMastery: Partial<Record<CompetencyCode, CompetencyMastery>>;
   sigils: EarnedSigil[];
-  hearth: HearthState;
+  streak: StreakState;
   house: HouseConfig;
-  /** Most-recent-first renown deltas (for the profile micro-history). */
-  renownHistory: RenownEvent[];
+  /** Most-recent-first rating deltas (for the profile micro-history). */
+  ratingHistory: RatingEvent[];
 }
 
 // ============================================
@@ -729,7 +729,7 @@ export interface FounderProgression {
 
 export interface CohortFounderStanding {
   userId: string;
-  renown: number;
+  rating: number;
   rankTier: number;
   rankTitle: string;
   sigilCount: number;
@@ -748,7 +748,7 @@ export interface CohortProgression {
   standings: CohortFounderStanding[];
   competencies: CohortCompetencyAggregate[];
   totalFounders: number;
-  /** Founders who have earned any renown. */
+  /** Founders who have earned any rating. */
   withProgress: number;
 }
 

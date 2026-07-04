@@ -41,20 +41,20 @@ export function AudioControls({ className }: { className?: string }) {
         onClick={() => setOpen((v) => !v)}
         className={cn(
           'inline-flex h-10 items-center gap-2 rounded-sm px-3',
-          'border border-[color:var(--color-warroom-gold)]/30',
-          'bg-[color:var(--color-warroom-obsidian)]/60 backdrop-blur-md',
-          'text-[color:var(--color-warroom-gold)] font-display text-[0.6rem] uppercase tracking-[0.16em]',
+          'border border-[color:var(--color-chessboard-gold)]/30',
+          'bg-[color:var(--color-chessboard-obsidian)]/60 backdrop-blur-md',
+          'text-[color:var(--color-chessboard-gold)] font-display text-[0.6rem] uppercase tracking-[0.16em]',
           'transition-all duration-200',
-          'hover:border-[color:var(--color-warroom-gold)]/60 hover:bg-[color:var(--color-warroom-obsidian)]/80',
+          'hover:border-[color:var(--color-chessboard-gold)]/60 hover:bg-[color:var(--color-chessboard-obsidian)]/80',
           'hover:shadow-[0_0_18px_rgba(201,162,39,0.25)]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-warroom-gold)]',
-          open && 'border-[color:var(--color-warroom-gold)]/60 shadow-[0_0_18px_rgba(201,162,39,0.25)]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-chessboard-gold)]',
+          open && 'border-[color:var(--color-chessboard-gold)]/60 shadow-[0_0_18px_rgba(201,162,39,0.25)]',
         )}
       >
         {allMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
         <span className="hidden sm:inline">Audio</span>
         {activeCount > 0 && (
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--color-warroom-gold)] text-[9px] font-bold text-[color:var(--color-warroom-obsidian)]">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--color-chessboard-gold)] text-[9px] font-bold text-[color:var(--color-chessboard-obsidian)]">
             {activeCount}
           </span>
         )}
@@ -70,8 +70,8 @@ export function AudioControls({ className }: { className?: string }) {
               aria-label="Audio channel controls"
               className={cn(
                 'absolute right-0 top-[calc(100%+8px)] z-50 w-52 overflow-hidden rounded-md',
-                'border border-[color:var(--color-warroom-gold)]/25',
-                'bg-[color:var(--color-warroom-obsidian)] backdrop-blur-xl',
+                'border border-[color:var(--color-chessboard-gold)]/25',
+                'bg-[color:var(--color-chessboard-obsidian)] backdrop-blur-xl',
                 'shadow-[0_8px_40px_rgba(0,0,0,0.7),0_0_30px_rgba(201,162,39,0.08)]',
               )}
               initial={{ opacity: 0, y: -8, scale: 0.96 }}
@@ -80,15 +80,15 @@ export function AudioControls({ className }: { className?: string }) {
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-[color:var(--color-warroom-gold)]/15 px-4 py-2.5">
-                <span className="font-display text-[0.58rem] uppercase tracking-[0.2em] text-[color:var(--color-warroom-gold)]/70">
+              <div className="flex items-center justify-between border-b border-[color:var(--color-chessboard-gold)]/15 px-4 py-2.5">
+                <span className="font-display text-[0.58rem] uppercase tracking-[0.2em] text-[color:var(--color-chessboard-gold)]/70">
                   Audio Channels
                 </span>
                 <div
                   className="h-1.5 w-1.5 rounded-full"
                   style={{
-                    background: allMuted ? 'var(--color-warroom-crimson)' : '#4ade80',
-                    boxShadow: allMuted ? '0 0 6px var(--color-warroom-crimson)' : '0 0 6px #4ade80',
+                    background: allMuted ? 'var(--color-chessboard-crimson)' : '#4ade80',
+                    boxShadow: allMuted ? '0 0 6px var(--color-chessboard-crimson)' : '0 0 6px #4ade80',
                   }}
                 />
               </div>
@@ -109,10 +109,10 @@ export function AudioControls({ className }: { className?: string }) {
                       onClick={toggle}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left',
-                        'transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-warroom-gold)]',
+                        'transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--color-chessboard-gold)]',
                         isMuted
-                          ? 'bg-transparent text-[color:var(--color-warroom-ash)] hover:bg-white/5'
-                          : 'bg-[color:var(--color-warroom-gold)]/8 text-[color:var(--color-warroom-gold)] hover:bg-[color:var(--color-warroom-gold)]/15',
+                          ? 'bg-transparent text-[color:var(--color-chessboard-ash)] hover:bg-white/5'
+                          : 'bg-[color:var(--color-chessboard-gold)]/8 text-[color:var(--color-chessboard-gold)] hover:bg-[color:var(--color-chessboard-gold)]/15',
                       )}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -130,7 +130,7 @@ export function AudioControls({ className }: { className?: string }) {
                           : (
                             <span
                               className="inline-flex h-1.5 w-1.5 rounded-full"
-                              style={{ background: 'var(--color-warroom-gold)', boxShadow: '0 0 6px rgba(201,162,39,0.8)' }}
+                              style={{ background: 'var(--color-chessboard-gold)', boxShadow: '0 0 6px rgba(201,162,39,0.8)' }}
                             />
                           )
                         }
@@ -141,8 +141,8 @@ export function AudioControls({ className }: { className?: string }) {
               </div>
 
               {/* Footer */}
-              <div className="border-t border-[color:var(--color-warroom-gold)]/10 px-4 py-2">
-                <p className="text-[9px] uppercase tracking-[0.1em] text-[color:var(--color-warroom-smoke)]">
+              <div className="border-t border-[color:var(--color-chessboard-gold)]/10 px-4 py-2">
+                <p className="text-[9px] uppercase tracking-[0.1em] text-[color:var(--color-chessboard-smoke)]">
                   Settings saved automatically
                 </p>
               </div>

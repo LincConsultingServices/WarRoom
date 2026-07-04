@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 // useMicPermission — module-level singleton tracking whether the user has
 // granted microphone access (or chosen text fallback) for this session.
 //
-// The war-room page (and any other audio-driven flow) calls this once and
+// The chessboard page (and any other audio-driven flow) calls this once and
 // renders <MicPermissionDialog open={needsPrompt} ... /> at the top. While
 // `idle`, audio recorders should not be reachable; while `text-fallback`,
 // callers render <textarea> branches instead of the mic UI.

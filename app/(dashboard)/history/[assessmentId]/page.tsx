@@ -22,7 +22,7 @@ import { Progress } from '@/components/ui/progress'
 import { format } from 'date-fns'
 import {
   StoneCard,
-  WarRoomCTA,
+  ChessboardCTA,
   GoldDivider,
   SigilBadge,
 } from '@/src/components/primitives'
@@ -56,14 +56,14 @@ interface SimulationDetail {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const PROGRESS_CLASSES =
-  'h-1.5 bg-[color:var(--color-warroom-rampart)] [&>div]:bg-[color:var(--color-warroom-gold)]'
+  'h-1.5 bg-[color:var(--color-chessboard-rampart)] [&>div]:bg-[color:var(--color-chessboard-gold)]'
 
 const LEVEL_TONES: Record<string, string> = {
-  Expert: 'text-[color:var(--color-warroom-gold-bright)]',
-  Advanced: 'text-[color:var(--color-warroom-gold)]',
-  Intermediate: 'text-[color:var(--color-warroom-silver)]',
-  Developing: 'text-[color:var(--color-warroom-ember)]',
-  Beginner: 'text-[color:var(--color-warroom-crimson-bright)]',
+  Expert: 'text-[color:var(--color-chessboard-gold-bright)]',
+  Advanced: 'text-[color:var(--color-chessboard-gold)]',
+  Intermediate: 'text-[color:var(--color-chessboard-silver)]',
+  Developing: 'text-[color:var(--color-chessboard-ember)]',
+  Beginner: 'text-[color:var(--color-chessboard-crimson-bright)]',
 }
 
 type TabKey = 'overview' | 'responses' | 'competencies'
@@ -109,8 +109,8 @@ export default function HistoryDetailPage() {
     return (
       <div className="py-6 max-w-4xl mx-auto px-2 sm:px-0 space-y-6">
         <div className="flex items-center gap-3">
-          <Archive className="h-5 w-5 text-[color:var(--color-warroom-gold)]" />
-          <div className="h-6 w-48 rounded bg-[color:var(--color-warroom-rampart)] animate-pulse" />
+          <Archive className="h-5 w-5 text-[color:var(--color-chessboard-gold)]" />
+          <div className="h-6 w-48 rounded bg-[color:var(--color-chessboard-rampart)] animate-pulse" />
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
@@ -131,18 +131,18 @@ export default function HistoryDetailPage() {
   if (error || !simulation) {
     return (
       <div className="py-12 max-w-md mx-auto text-center">
-        <StoneCard accent="var(--color-warroom-crimson)" className="py-10">
-          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-crimson-bright)]" />
+        <StoneCard accent="var(--color-chessboard-crimson)" className="py-10">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-chessboard-crimson-bright)]" />
           <p
-            className="text-sm text-[color:var(--color-warroom-crimson-bright)] mb-5"
+            className="text-sm text-[color:var(--color-chessboard-crimson-bright)] mb-5"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {error || 'Campaign not found'}
           </p>
           <Link href="/history">
-            <WarRoomCTA size="sm" variant="ghost">
+            <ChessboardCTA size="sm" variant="ghost">
               Return to Archives
-            </WarRoomCTA>
+            </ChessboardCTA>
           </Link>
         </StoneCard>
       </div>
@@ -174,7 +174,7 @@ export default function HistoryDetailPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <Archive
-                className="h-6 w-6 text-[color:var(--color-warroom-gold)]"
+                className="h-6 w-6 text-[color:var(--color-chessboard-gold)]"
                 aria-hidden
               />
               <h1
@@ -182,7 +182,7 @@ export default function HistoryDetailPage() {
                 style={{
                   fontFamily: 'var(--font-display)',
                   background:
-                    'linear-gradient(135deg, var(--color-warroom-gold), var(--color-warroom-gold-bright))',
+                    'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright))',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -192,7 +192,7 @@ export default function HistoryDetailPage() {
             </div>
 
             <div
-              className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--color-warroom-smoke)]"
+              className="flex flex-wrap items-center gap-4 text-xs text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
               <span className="flex items-center gap-1">
@@ -213,15 +213,15 @@ export default function HistoryDetailPage() {
 
           {/* Action buttons */}
           <div className="flex gap-2">
-            <WarRoomCTA size="sm" variant="ghost" icon={Printer}>
+            <ChessboardCTA size="sm" variant="ghost" icon={Printer}>
               Print
-            </WarRoomCTA>
-            <WarRoomCTA size="sm" variant="ghost" icon={Share2}>
+            </ChessboardCTA>
+            <ChessboardCTA size="sm" variant="ghost" icon={Share2}>
               Share
-            </WarRoomCTA>
-            <WarRoomCTA size="sm" variant="ghost" icon={Download}>
+            </ChessboardCTA>
+            <ChessboardCTA size="sm" variant="ghost" icon={Download}>
               Export
-            </WarRoomCTA>
+            </ChessboardCTA>
           </div>
         </div>
         <GoldDivider variant="line" />
@@ -234,7 +234,7 @@ export default function HistoryDetailPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4, ease: easeDramatic }}
       >
-        <div className="flex gap-1 p-1 rounded-[4px] bg-[color:var(--color-warroom-rampart)]/60 border border-[color:var(--color-warroom-ash)]/25 w-fit">
+        <div className="flex gap-1 p-1 rounded-[4px] bg-[color:var(--color-chessboard-rampart)]/60 border border-[color:var(--color-chessboard-ash)]/25 w-fit">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -243,8 +243,8 @@ export default function HistoryDetailPage() {
               className={cn(
                 'px-4 py-2 text-[10px] uppercase tracking-[0.14em] rounded-[3px] transition-all',
                 activeTab === tab.key
-                  ? 'bg-[color:var(--color-warroom-gold)]/[0.12] text-[color:var(--color-warroom-gold)] border border-[color:var(--color-warroom-gold)]/30'
-                  : 'text-[color:var(--color-warroom-smoke)] hover:text-[color:var(--color-warroom-ivory)] border border-transparent',
+                  ? 'bg-[color:var(--color-chessboard-gold)]/[0.12] text-[color:var(--color-chessboard-gold)] border border-[color:var(--color-chessboard-gold)]/30'
+                  : 'text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)] border border-transparent',
               )}
               style={{ fontFamily: 'var(--font-display)' }}
             >
@@ -268,17 +268,17 @@ export default function HistoryDetailPage() {
             {/* Stat tiles */}
             <div className="grid md:grid-cols-3 gap-4">
               <StoneCard
-                accent="var(--color-warroom-gold)"
+                accent="var(--color-chessboard-gold)"
                 className="text-center py-6"
               >
                 <div
-                  className="text-3xl font-bold text-[color:var(--color-warroom-gold-bright)]"
+                  className="text-3xl font-bold text-[color:var(--color-chessboard-gold-bright)]"
                   style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                 >
                   {simulation.score}%
                 </div>
                 <div
-                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mt-1"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Overall Score
@@ -288,8 +288,8 @@ export default function HistoryDetailPage() {
               <StoneCard
                 accent={
                   simulation.mistakes.length > 0
-                    ? 'var(--color-warroom-crimson)'
-                    : 'var(--color-warroom-verdant)'
+                    ? 'var(--color-chessboard-crimson)'
+                    : 'var(--color-chessboard-verdant)'
                 }
                 className="text-center py-6"
               >
@@ -297,15 +297,15 @@ export default function HistoryDetailPage() {
                   className={cn(
                     'text-3xl font-bold',
                     simulation.mistakes.length > 0
-                      ? 'text-[color:var(--color-warroom-crimson-bright)]'
-                      : 'text-[color:var(--color-warroom-verdant)]',
+                      ? 'text-[color:var(--color-chessboard-crimson-bright)]'
+                      : 'text-[color:var(--color-chessboard-verdant)]',
                   )}
                   style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
                 >
                   {simulation.mistakes.length}
                 </div>
                 <div
-                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mt-1"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Critical Mistakes
@@ -313,17 +313,17 @@ export default function HistoryDetailPage() {
               </StoneCard>
 
               <StoneCard
-                accent="var(--color-warroom-gold)"
+                accent="var(--color-chessboard-gold)"
                 className="text-center py-6"
               >
                 <div
-                  className="text-2xl font-bold text-[color:var(--color-warroom-ivory)]"
+                  className="text-2xl font-bold text-[color:var(--color-chessboard-ivory)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {isCompleted ? 'Complete' : 'Partial'}
                 </div>
                 <div
-                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mt-1"
+                  className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mt-1"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {simulation.completedAt
@@ -336,13 +336,13 @@ export default function HistoryDetailPage() {
             {/* Mistakes detail */}
             {simulation.mistakes.length > 0 && (
               <StoneCard
-                accent="var(--color-warroom-crimson)"
+                accent="var(--color-chessboard-crimson)"
                 padding="none"
               >
-                <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
-                  <AlertTriangle className="h-4 w-4 text-[color:var(--color-warroom-crimson-bright)]" />
+                <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
+                  <AlertTriangle className="h-4 w-4 text-[color:var(--color-chessboard-crimson-bright)]" />
                   <h3
-                    className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-crimson-bright)]"
+                    className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-crimson-bright)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     Critical Mistakes Identified
@@ -352,23 +352,23 @@ export default function HistoryDetailPage() {
                   {simulation.mistakes.map((mistake, idx) => (
                     <div
                       key={idx}
-                      className="flex gap-4 items-start p-3 rounded-[3px] border border-[color:var(--color-warroom-crimson)]/20 bg-[color:var(--color-warroom-crimson)]/[0.05]"
+                      className="flex gap-4 items-start p-3 rounded-[3px] border border-[color:var(--color-chessboard-crimson)]/20 bg-[color:var(--color-chessboard-crimson)]/[0.05]"
                     >
                       <div
-                        className="h-6 w-6 rounded-full border border-[color:var(--color-warroom-crimson)]/40 text-[color:var(--color-warroom-crimson-bright)] flex items-center justify-center shrink-0 text-xs font-bold"
+                        className="h-6 w-6 rounded-full border border-[color:var(--color-chessboard-crimson)]/40 text-[color:var(--color-chessboard-crimson-bright)] flex items-center justify-center shrink-0 text-xs font-bold"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         !
                       </div>
                       <div>
                         <h4
-                          className="text-sm font-semibold text-[color:var(--color-warroom-ivory)]"
+                          className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {mistake.name}
                         </h4>
                         <p
-                          className="text-xs text-[color:var(--color-warroom-smoke)] mt-1"
+                          className="text-xs text-[color:var(--color-chessboard-smoke)] mt-1"
                           style={{ fontFamily: 'var(--font-body, serif)' }}
                         >
                           {mistake.impact}
@@ -391,28 +391,28 @@ export default function HistoryDetailPage() {
             transition={{ duration: 0.3, ease: easeDramatic }}
           >
             <StoneCard padding="none">
-              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
-                <MessageSquare className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
+                <MessageSquare className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
                 <h3
-                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Session Transcript
                 </h3>
                 <span
-                  className="text-[10px] text-[color:var(--color-warroom-smoke)] ml-auto"
+                  className="text-[10px] text-[color:var(--color-chessboard-smoke)] ml-auto"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
                   Every question, answer, and the Council&apos;s feedback
                 </span>
               </div>
 
-              <div className="divide-y divide-[color:var(--color-warroom-ash)]/15">
+              <div className="divide-y divide-[color:var(--color-chessboard-ash)]/15">
                 {simulation.responses.length === 0 ? (
                   <div className="py-10 text-center">
-                    <MessageSquare className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-ash)]" />
+                    <MessageSquare className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-chessboard-ash)]" />
                     <p
-                      className="text-xs text-[color:var(--color-warroom-smoke)]"
+                      className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       No responses recorded for this campaign.
@@ -435,10 +435,10 @@ export default function HistoryDetailPage() {
                           onClick={() =>
                             setExpandedResponse(isOpen ? null : resp.id)
                           }
-                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[color:var(--color-warroom-gold)]/[0.02] transition-colors text-left"
+                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[color:var(--color-chessboard-gold)]/[0.02] transition-colors text-left"
                         >
                           <div
-                            className="w-8 h-8 rounded-full border border-[color:var(--color-warroom-ash)]/30 flex items-center justify-center text-xs font-bold text-[color:var(--color-warroom-smoke)] shrink-0"
+                            className="w-8 h-8 rounded-full border border-[color:var(--color-chessboard-ash)]/30 flex items-center justify-center text-xs font-bold text-[color:var(--color-chessboard-smoke)] shrink-0"
                             style={{ fontFamily: 'var(--font-display)' }}
                           >
                             {index + 1}
@@ -446,13 +446,13 @@ export default function HistoryDetailPage() {
 
                           <div className="flex-1 min-w-0">
                             <p
-                              className="text-sm text-[color:var(--color-warroom-ivory)] line-clamp-1"
+                              className="text-sm text-[color:var(--color-chessboard-ivory)] line-clamp-1"
                               style={{ fontFamily: 'var(--font-body, serif)' }}
                             >
                               {resp.questionText}
                             </p>
                             <p
-                              className="text-[10px] text-[color:var(--color-warroom-smoke)] mt-0.5"
+                              className="text-[10px] text-[color:var(--color-chessboard-smoke)] mt-0.5"
                               style={{ fontFamily: 'var(--font-display)' }}
                             >
                               Stage {resp.stage}
@@ -467,7 +467,7 @@ export default function HistoryDetailPage() {
 
                           <ChevronDown
                             className={cn(
-                              'h-4 w-4 text-[color:var(--color-warroom-smoke)] transition-transform shrink-0',
+                              'h-4 w-4 text-[color:var(--color-chessboard-smoke)] transition-transform shrink-0',
                               isOpen && 'rotate-180',
                             )}
                           />
@@ -489,7 +489,7 @@ export default function HistoryDetailPage() {
                                 {/* Your answer */}
                                 <div>
                                   <h4
-                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-2"
+                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mb-2"
                                     style={{
                                       fontFamily: 'var(--font-display)',
                                     }}
@@ -497,7 +497,7 @@ export default function HistoryDetailPage() {
                                     Your Answer
                                   </h4>
                                   <div
-                                    className="p-4 rounded-[3px] border border-[color:var(--color-warroom-ash)]/20 bg-[color:var(--color-warroom-rampart)]/40 text-sm text-[color:var(--color-warroom-ivory)] whitespace-pre-wrap"
+                                    className="p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/20 bg-[color:var(--color-chessboard-rampart)]/40 text-sm text-[color:var(--color-chessboard-ivory)] whitespace-pre-wrap"
                                     style={{
                                       fontFamily: 'var(--font-body, serif)',
                                     }}
@@ -509,16 +509,16 @@ export default function HistoryDetailPage() {
                                 {/* Council feedback */}
                                 <div>
                                   <h4
-                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-warroom-smoke)] mb-2 flex items-center gap-1.5"
+                                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)] mb-2 flex items-center gap-1.5"
                                     style={{
                                       fontFamily: 'var(--font-display)',
                                     }}
                                   >
-                                    <Star className="h-3 w-3 text-[color:var(--color-warroom-gold)]" />
+                                    <Star className="h-3 w-3 text-[color:var(--color-chessboard-gold)]" />
                                     Council Feedback
                                   </h4>
                                   <div
-                                    className="p-4 rounded-[3px] border border-[color:var(--color-warroom-gold)]/15 bg-[color:var(--color-warroom-gold)]/[0.03] text-sm text-[color:var(--color-warroom-ivory)]"
+                                    className="p-4 rounded-[3px] border border-[color:var(--color-chessboard-gold)]/15 bg-[color:var(--color-chessboard-gold)]/[0.03] text-sm text-[color:var(--color-chessboard-ivory)]"
                                     style={{
                                       fontFamily: 'var(--font-body, serif)',
                                     }}
@@ -549,10 +549,10 @@ export default function HistoryDetailPage() {
             transition={{ duration: 0.3, ease: easeDramatic }}
           >
             <StoneCard padding="none">
-              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-warroom-ash)]/20">
-                <BarChart3 className="h-4 w-4 text-[color:var(--color-warroom-gold)]" />
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[color:var(--color-chessboard-ash)]/20">
+                <BarChart3 className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
                 <h3
-                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-warroom-smoke)]"
+                  className="text-xs uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Competency Breakdown
@@ -561,9 +561,9 @@ export default function HistoryDetailPage() {
 
               {simulation.competencies.length === 0 ? (
                 <div className="py-10 text-center">
-                  <BarChart3 className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-warroom-ash)]" />
+                  <BarChart3 className="h-8 w-8 mx-auto mb-3 text-[color:var(--color-chessboard-ash)]" />
                   <p
-                    className="text-xs text-[color:var(--color-warroom-smoke)]"
+                    className="text-xs text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     No competency data available.
@@ -575,13 +575,13 @@ export default function HistoryDetailPage() {
                     <div key={i} className="space-y-2">
                       <div className="flex justify-between items-end">
                         <h4
-                          className="text-sm font-semibold text-[color:var(--color-warroom-ivory)]"
+                          className="text-sm font-semibold text-[color:var(--color-chessboard-ivory)]"
                           style={{ fontFamily: 'var(--font-display)' }}
                         >
                           {comp.name}
                         </h4>
                         <span
-                          className="text-xs text-[color:var(--color-warroom-smoke)]"
+                          className="text-xs text-[color:var(--color-chessboard-smoke)]"
                           style={{
                             fontFamily: 'var(--font-data, var(--font-mono))',
                           }}
@@ -597,7 +597,7 @@ export default function HistoryDetailPage() {
                         className={cn(
                           'text-[10px] uppercase tracking-[0.12em]',
                           LEVEL_TONES[comp.level] ||
-                            'text-[color:var(--color-warroom-smoke)]',
+                            'text-[color:var(--color-chessboard-smoke)]',
                         )}
                         style={{ fontFamily: 'var(--font-display)' }}
                       >

@@ -11,7 +11,7 @@ import {
 import type { StageName } from '@/src/types'
 
 // ============================================================
-// <WarMap />
+// <ChessMap />
 // ----------------------------------------------------------------
 // A campaign map of the trial's 9 stages, rendered as an SVG
 // path with one waypoint per stage. State per node:
@@ -32,14 +32,14 @@ import type { StageName } from '@/src/types'
 // completed (from the assessment state).
 // ============================================================
 
-export type WarMapVariant = 'horizontal' | 'campaign'
+export type ChessMapVariant = 'horizontal' | 'campaign'
 
-interface WarMapProps {
+interface ChessMapProps {
   /** Stages that have been finished. Order doesn't matter. */
   completedStages: StageName[]
   /** The stage the founder is currently inside. null = none active. */
   currentStage: StageName | null
-  variant?: WarMapVariant
+  variant?: ChessMapVariant
   /** Click a node to navigate to a stage's report etc. Optional. */
   onStageClick?: (stage: StageName) => void
   className?: string
@@ -65,7 +65,7 @@ interface NodeGeo {
 function computeGeometry(
   completed: Set<string>,
   current: StageName | null,
-  variant: WarMapVariant,
+  variant: ChessMapVariant,
 ): NodeGeo[] {
   const count = STAGE_ORDER.length
   const usableW = VIEW_W - PAD_X * 2
@@ -90,21 +90,21 @@ function computeGeometry(
       x,
       y,
       state,
-      color: STAGE_THEMES[stage] ?? '#c9a227',
+      color: STAGE_THEMES[stage] ?? '#c8a84a',
       label: NARRATION_STAGE_LABELS[i] ?? stage,
       narrative: STAGE_NARRATIVES[stage] ?? null,
     }
   })
 }
 
-export function WarMap({
+export function ChessMap({
   completedStages,
   currentStage,
   variant = 'horizontal',
   onStageClick,
   className,
   showLabels = true,
-}: WarMapProps) {
+}: ChessMapProps) {
   const reducedMotion = useReducedMotion()
   const completedSet = new Set<string>(completedStages)
   const nodes = computeGeometry(completedSet, currentStage, variant)
@@ -142,13 +142,13 @@ export function WarMap({
       >
         <defs>
           <linearGradient id="warmapProgress" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8b6914" />
-            <stop offset="50%" stopColor="#c9a227" />
-            <stop offset="100%" stopColor="#e8c84a" />
+            <stop offset="0%" stopColor="#7a6020" />
+            <stop offset="50%" stopColor="#c8a84a" />
+            <stop offset="100%" stopColor="#d4aa40" />
           </linearGradient>
           <radialGradient id="warmapGlow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stopColor="#e8c84a" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#c9a227" stopOpacity="0" />
+            <stop offset="0%" stopColor="#d4aa40" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#c8a84a" stopOpacity="0" />
           </radialGradient>
         </defs>
 
@@ -176,7 +176,7 @@ export function WarMap({
 
         {/* Nodes */}
         {nodes.map((n) => (
-          <WarMapNode
+          <ChessMapNode
             key={n.stage}
             node={n}
             reducedMotion={!!reducedMotion}
@@ -192,7 +192,7 @@ export function WarMap({
               key={`label-${n.stage}`}
               className={cn(
                 'flex flex-1 flex-col items-center text-center font-display text-[0.55rem] uppercase tracking-[0.18em] sm:text-[0.62rem]',
-                n.state === 'completed' && 'text-[color:var(--color-warroom-gold)]',
+                n.state === 'completed' && 'text-[color:var(--color-chessboard-gold)]',
                 n.state === 'current' && 'text-foreground',
                 n.state === 'locked' && 'text-foreground/35',
               )}
@@ -209,20 +209,20 @@ export function WarMap({
   )
 }
 
-interface WarMapNodeProps {
+interface ChessMapNodeProps {
   node: NodeGeo
   reducedMotion: boolean
   onClick?: () => void
 }
 
-function WarMapNode({ node, reducedMotion, onClick }: WarMapNodeProps) {
+function ChessMapNode({ node, reducedMotion, onClick }: ChessMapNodeProps) {
   const { x, y, state, color, label, narrative } = node
   const isCurrent = state === 'current'
   const isCompleted = state === 'completed'
 
   const radius = isCurrent ? 9 : 6
-  const fill = isCompleted ? '#c9a227' : isCurrent ? color : '#5a5048'
-  const stroke = isCompleted ? '#e8c84a' : isCurrent ? '#e8c84a' : '#3d3530'
+  const fill = isCompleted ? '#c8a84a' : isCurrent ? color : '#5a5048'
+  const stroke = isCompleted ? '#d4aa40' : isCurrent ? '#d4aa40' : '#3d3530'
   const ariaLabel = narrative ? `${narrative.title} (${state})` : `${label} (${state})`
 
   return (

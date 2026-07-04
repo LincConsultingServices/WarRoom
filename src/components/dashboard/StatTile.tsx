@@ -20,7 +20,7 @@ export interface StatTileProps {
 /**
  * <StatTile /> — a stone-card statistic tile.
  *
- * Layout: top accent rule, large monospace numeric value, small Cinzel
+ * Layout: top accent rule, large monospace numeric value, small display font
  * label, optional icon and hint. Designed for the 2×2 dashboard grid.
  */
 export function StatTile({
@@ -28,7 +28,7 @@ export function StatTile({
   value,
   icon: Icon,
   hint,
-  accent = 'var(--color-warroom-gold)',
+  accent = 'var(--color-chessboard-gold)',
   className,
 }: StatTileProps) {
   const prefersReducedMotion = useReducedMotion()
@@ -48,14 +48,14 @@ export function StatTile({
 
       <div className="flex items-start justify-between gap-3">
         <span
-          className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-warroom-smoke)]"
+          className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {label}
         </span>
         {Icon && (
           <span
-            className="rounded-sm p-1.5 border border-[color:var(--color-warroom-gold)]/20"
+            className="rounded-sm p-1.5 border border-[color:var(--color-chessboard-gold)]/20"
             style={{ background: `${accent}14` }}
           >
             <Icon
@@ -68,7 +68,7 @@ export function StatTile({
       </div>
 
       <div
-        className="mt-3 text-3xl font-semibold text-[color:var(--color-warroom-ghost)] leading-none"
+        className="mt-3 text-3xl font-semibold text-[color:var(--color-chessboard-ghost)] leading-none"
         style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
       >
         {value}
@@ -76,7 +76,7 @@ export function StatTile({
 
       {hint && (
         <div
-          className="mt-2 text-[10px] tracking-[0.08em] text-[color:var(--color-warroom-smoke)]"
+          className="mt-2 text-[10px] tracking-[0.08em] text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {hint}

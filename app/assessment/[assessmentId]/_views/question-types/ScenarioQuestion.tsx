@@ -53,7 +53,7 @@ export function ScenarioQuestion({
         )
       })}
       {mcqFeedback && selectedOptionId && !followupScenario && (
-        <div className="mt-3 p-3 rounded-lg bg-[color:var(--color-warroom-gold)]/[0.08] border border-[color:var(--color-warroom-gold)]/30 text-sm text-[color:var(--color-warroom-ivory)]/85">
+        <div className="mt-3 p-3 rounded-lg bg-[color:var(--color-chessboard-gold)]/[0.08] border border-[color:var(--color-chessboard-gold)]/30 text-sm text-[color:var(--color-chessboard-ivory)]/85">
           <span className="font-medium">Mentor insight: </span>{mcqFeedback}
         </div>
       )}
