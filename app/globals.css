@@ -434,9 +434,8 @@
   /* Chess Panel — premium dark surface */
   .got-stone-card {
     background: #FFFFFF;
-    border: 1px solid var(--wr-ash);
+    border: 1px solid var(--color-chessboard-ash);
     border-radius: 4px;
-    box-shadow: 4px 4px 0px var(--wr-ash);
     position: relative;
     overflow: hidden;
   }

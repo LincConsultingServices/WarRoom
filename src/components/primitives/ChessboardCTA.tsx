@@ -70,7 +70,7 @@ export const ChessboardCTA = forwardRef<HTMLButtonElement, ChessboardCTAProps>(
           variant === 'primary' && [
             'text-[color:var(--btn-primary-text)]',
             'border-[color:var(--color-chessboard-gold)]/40',
-            'shadow-[0_4px_20px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]',
+            'shadow-none dark:shadow-[0_4px_20px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]',
           ],
           variant === 'ghost' && [
             'text-[color:var(--color-chessboard-silver)] border-[color:var(--color-chessboard-gold)]/25 bg-[color:var(--color-chessboard-gold)]/[0.04]',

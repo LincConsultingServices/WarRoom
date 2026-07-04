@@ -108,7 +108,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
   }
 
   return (
-    <Sidebar variant="inset" collapsible="icon">
+    <Sidebar variant="inset" collapsible="icon" className="bg-white border-r border-zinc-200 shadow-none dark:bg-[color:var(--color-chessboard-void)] dark:border-[color:var(--color-chessboard-gold)]/10">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -147,19 +147,19 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
           <SidebarMenu>
             {navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={item.isActive}
-                  tooltip={item.title}
-                  className={
-                    item.isActive
-                      ? 'border-l-2 border-[color:var(--color-chessboard-gold)] text-[color:var(--color-chessboard-gold-bright)] data-[active=true]:bg-[color:var(--color-chessboard-gold)]/[0.08] data-[active=true]:text-[color:var(--color-chessboard-gold-bright)]'
-                      : 'hover:text-[color:var(--color-chessboard-gold)]'
-                  }
-                >
-                  <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
-                    <item.icon className={item.isActive ? 'text-[color:var(--color-chessboard-gold-bright)]' : ''} />
-                    <span className="tracking-[0.06em]">{item.title}</span>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={item.isActive}
+                    tooltip={item.title}
+                    className={
+                      item.isActive
+                        ? 'dark:border-l-2 dark:border-[color:var(--color-chessboard-gold)] bg-zinc-950 text-white data-[active=true]:bg-zinc-950 data-[active=true]:text-white dark:data-[active=true]:bg-[color:var(--color-chessboard-gold)]/[0.08] dark:data-[active=true]:text-[color:var(--color-chessboard-gold-bright)]'
+                        : 'text-zinc-600 hover:bg-zinc-100 hover:text-black dark:text-[color:var(--color-chessboard-ivory)] dark:hover:bg-transparent dark:hover:text-[color:var(--color-chessboard-gold)]'
+                    }
+                  >
+                    <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
+                      <item.icon className={item.isActive ? 'text-white dark:text-[color:var(--color-chessboard-gold-bright)]' : ''} />
+                      <span className="tracking-[0.06em]">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -174,7 +174,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                   <SidebarMenuButton
                     asChild
                     size="sm"
-                    className="hover:text-[color:var(--color-chessboard-gold)]"
+                    className="text-zinc-600 hover:bg-zinc-200 hover:text-black dark:text-[color:var(--color-chessboard-ivory)] dark:hover:bg-transparent dark:hover:text-[color:var(--color-chessboard-gold)]"
                   >
                     <Link href={item.url} style={{ fontFamily: 'var(--font-display)' }}>
                       <item.icon />

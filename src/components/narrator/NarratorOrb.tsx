@@ -67,7 +67,7 @@ export function NarratorOrb() {
 
       <div
         className={cn(
-          'fixed z-[60] pointer-events-none',
+          'fixed z-[60] pointer-events-none hidden dark:block',
           'bottom-6 left-6',
           'sm:bottom-8 sm:left-8',
         )}
