@@ -70,7 +70,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen overflow-hidden" style={{ background: 'transparent' }}>
-      <RouteBackground bg="landing" />
+
 
       {/* NAV */}
       <motion.nav

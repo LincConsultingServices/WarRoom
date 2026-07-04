@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useRef } from 'react'
 import api from '@/src/lib/api'
@@ -42,7 +42,7 @@ export function useAudioSettings() {
       initialLoadDone.current = true
       
     }).catch(err => {
-      console.error('[AudioSettings] Failed to load settings from backend', err)
+      console.warn('[AudioSettings] Failed to load settings from backend. Using local defaults.')
       // Allow retry if it failed (e.g. transient network error)
       initialLoadDone.current = false 
     })

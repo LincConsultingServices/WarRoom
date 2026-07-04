@@ -369,7 +369,7 @@ export default function BatchDetailPage() {
             { label: 'In Progress', value: stats.inProgress },
             { label: 'Not Started', value: stats.notStarted },
             { label: 'Avg Revenue', value: `$${Math.round(stats.avgRevenue).toLocaleString()}` },
-            { label: 'Max Revenue', value: `$${stats.maxRevenue.toLocaleString()}` },
+            { label: 'Max Revenue', value: `$${(stats.maxRevenue ?? 0).toLocaleString()}` },
           ].map((s) => (
             <motion.div key={s.label} variants={staggerItem}>
               <StoneCard>
@@ -455,7 +455,7 @@ export default function BatchDetailPage() {
                         </div>
                       </td>
                       <td className="py-3 px-2 text-right font-mono font-bold text-[color:var(--color-chessboard-gold)]">
-                        {s.rating.toLocaleString()}
+                        {(s.rating ?? 0).toLocaleString()}
                       </td>
                       <td className="py-3 px-2 text-right font-mono text-xs text-[color:var(--color-chessboard-ivory)]">
                         {s.sigilCount}

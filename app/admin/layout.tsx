@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!checked || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[color:var(--color-chessboard-void)]">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-7 h-7 border-2 border-[color:var(--color-chessboard-gold)]/30 border-t-[color:var(--color-chessboard-gold)] rounded-full animate-spin" />
           <p
@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-shell bg-[color:var(--color-chessboard-void)] text-[color:var(--color-chessboard-ivory)] min-h-screen">
+    <div className="admin-shell text-[color:var(--color-chessboard-ivory)] min-h-screen">
       <SidebarProvider>
         <AdminSidebar user={user} />
         <SidebarInset>
@@ -81,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Breadcrumb>
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-[color:var(--color-chessboard-void)]">
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             {children}
           </div>
         </SidebarInset>

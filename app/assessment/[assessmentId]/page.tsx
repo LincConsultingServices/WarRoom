@@ -289,9 +289,9 @@ export default function SimulationPage() {
 
   return (
     <>
-      <RouteBackground bg="simulation" />
+
       {sharedOverlays}
-      <div className="h-screen flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, var(--color-chessboard-void) 0%, var(--color-chessboard-black) 100%)' }}>
+      <div className="h-screen flex flex-col overflow-hidden">
         <div className="fixed inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-chessboard-gold) 15%, transparent), transparent)', zIndex: 31 }} />
         <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council deliberates..." subtitle="Your answers are being judged" />
         {isCrisisQuestion && <div className="crisis-vignette" />}

@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/src/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { RouteBackground } from '@/src/components/effects/RouteBackground'
+
 
 export default async function DashboardLayout({
   children
@@ -12,7 +12,7 @@ export default async function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <RouteBackground bg="dashboard" />
+
       <AppSidebar user={undefined} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b border-[color:var(--color-chessboard-gold)]/8 bg-[color:var(--color-chessboard-rampart)]/40 backdrop-blur-sm">

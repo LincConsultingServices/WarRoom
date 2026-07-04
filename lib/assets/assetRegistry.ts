@@ -41,7 +41,7 @@ export const ASSET_REGISTRY = {
   },
 
   crests: {
-    chessboard: '/assets/images/crests/chessboard-crest.svg',
+    chessboard: '/assets/images/crests/warroom-crest.svg',
   },
 } as const
 

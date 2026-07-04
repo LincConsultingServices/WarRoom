@@ -112,12 +112,12 @@ export const api = {
   },
 
   settings: {
-    getSettings: () => request<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>('/settings'),
+    getSettings: () => request<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>('/settings').catch(() => ({ sfxMuted: false, ambientMuted: false, narratorMuted: false, voiceMuted: false })),
     updateSettings: (data: Partial<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>) => 
       request<{ sfxMuted: boolean; ambientMuted: boolean; narratorMuted: boolean; voiceMuted: boolean }>('/settings', {
         method: 'PATCH',
         body: JSON.stringify(data),
-      }),
+      }).catch(() => ({ sfxMuted: false, ambientMuted: false, narratorMuted: false, voiceMuted: false })),
   },
 
   // ============================================

@@ -827,7 +827,7 @@ export default function ChessboardSimulation() {
             {/* Side wave accents */}
             <div className="chessboard-wave-left" aria-hidden />
             <div className="chessboard-wave-right" aria-hidden />
-            <RouteBackground bg="chessboard" brightness={0.08} />
+
             <AnimatePresence>
                 {showEntrance && (
                     <ChessboardEntrance
