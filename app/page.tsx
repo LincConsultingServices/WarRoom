@@ -17,6 +17,7 @@ import {
 } from '@/src/components/primitives'
 import { audioManager } from '@/lib/audio/audioManager'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 
 export default function HomePage() {
@@ -78,7 +79,7 @@ export default function HomePage() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
         className="fixed w-full z-50 backdrop-blur-md"
-        style={{ borderBottom: '1px solid rgba(200,200,200,0.10)', background: 'rgba(8,8,8,0.88)' }}
+        style={{ borderBottom: '1px solid color-mix(in srgb, var(--wr-ash) 10%, transparent)', background: 'color-mix(in srgb, var(--wr-black) 88%, transparent)' }}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -87,9 +88,9 @@ export default function HomePage() {
                 whileHover={{ scale: 1.08 }}
                 className="h-9 w-9 rounded-sm flex items-center justify-center font-bold text-sm"
                 style={{
-                  background: 'linear-gradient(135deg, #1a1a1a, #2a2a2a)',
-                  color: '#e0e0e0',
-                  border: '1px solid rgba(200,200,200,0.3)',
+                  background: 'linear-gradient(135deg, var(--wr-black), var(--wr-rampart))',
+                  color: 'var(--wr-ivory)',
+                  border: '1px solid color-mix(in srgb, var(--wr-ash) 30%, transparent)',
                   boxShadow: '0 0 16px rgba(200,200,200,0.15)',
                   fontFamily: "var(--font-inter, 'Inter', sans-serif)",
                   fontWeight: 800,
@@ -98,13 +99,14 @@ export default function HomePage() {
                 KK
               </motion.div>
               <div>
-                <span className="font-bold text-base" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '0.04em' }}>
+                <span className="font-bold text-base" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: 'var(--wr-ivory)', letterSpacing: '0.04em' }}>
                   Assessment
                 </span>
                 <div className="text-[9px] tracking-[0.18em] text-neutral-500 uppercase -mt-0.5">Assessment Platform</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <Link href="/terms" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors" style={{ letterSpacing: '0.06em' }}>
                 Terms
               </Link>
@@ -124,12 +126,10 @@ export default function HomePage() {
       </motion.nav>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pt-40 pb-28 sm:px-6 lg:px-8 min-h-screen flex items-center">
+      <section className="relative overflow-hidden px-4 pt-32 pb-24 sm:px-6 lg:px-8 min-h-screen flex items-center">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
-          <div className="absolute top-1/3 left-0 w-64 h-64 opacity-10 blur-3xl" style={{ background: 'radial-gradient(circle, #e0e0e0, transparent)' }} />
-          <div className="absolute top-1/3 right-0 w-64 h-64 opacity-10 blur-3xl" style={{ background: 'radial-gradient(circle, #e0e0e0, transparent)' }} />
-          <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(200,200,200,0.3), transparent)' }} />
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--wr-void) 65%, transparent) 100%)' }} />
+          <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--wr-ivory) 30%, transparent), transparent)' }} />
         </div>
 
         <div className="mx-auto max-w-4xl text-center relative z-10">
@@ -147,7 +147,7 @@ export default function HomePage() {
 
           <FadeInUp delay={0.25}>
             <h1 ref={heroTitleRef} className="mb-6" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", fontSize: 'clamp(2.4rem, 7vw, 5rem)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-              <span style={{ color: '#e8e8e8' }}>Prove Your Edge to the</span>
+              <span style={{ color: 'var(--wr-ivory)' }}>Prove Your Edge to the</span>
               <br />
               <span className="gradient-text-animate" style={{ display: 'inline-block', paddingBottom: '0.1em' }}>
                 Expert Panel
@@ -156,7 +156,7 @@ export default function HomePage() {
           </FadeInUp>
 
           <FadeInUp delay={0.4}>
-            <p className="mt-2 text-base max-w-xl mx-auto leading-relaxed" style={{ color: '#888888', letterSpacing: '0.01em' }}>
+            <p className="mt-2 text-base max-w-xl mx-auto leading-relaxed" style={{ color: 'var(--wr-smoke)', letterSpacing: '0.01em' }}>
               Face a panel of seasoned investors, mentors, and operators.
               Your business model is under review. Pitch every detail with precision.
             </p>
@@ -185,7 +185,7 @@ export default function HomePage() {
                 Watch Demo
               </ChessboardCTA>
             </div>
-            <p className="mt-5 text-xs" style={{ color: 'rgba(136,136,136,0.5)', letterSpacing: '0.06em' }}>
+            <p className="mt-5 text-xs" style={{ color: 'color-mix(in srgb, var(--wr-smoke) 80%, transparent)', letterSpacing: '0.06em' }}>
               By entering, you agree to the{' '}
               <Link href="/terms" className="text-neutral-500 hover:text-neutral-300">Terms &amp; Conditions</Link>
             </p>
@@ -194,7 +194,7 @@ export default function HomePage() {
           {/* Panelists */}
           <FadeInUp delay={0.75}>
             <div className="mt-14 flex justify-center items-center gap-1 flex-wrap">
-              <span className="text-xs mr-3" style={{ color: 'rgba(136,136,136,0.6)', letterSpacing: '0.06em' }}>Your panel:</span>
+              <span className="text-xs mr-3" style={{ color: 'var(--wr-smoke)', letterSpacing: '0.06em' }}>Your panel:</span>
               {panelists.map((p, i) => (
                 <motion.div
                   key={i}
@@ -206,7 +206,7 @@ export default function HomePage() {
                   style={{
                     background: `radial-gradient(circle at 30% 30%, ${p.color}60, ${p.color}20)`,
                     borderColor: `${p.color}50`,
-                    color: '#e8e8e8',
+                    color: 'var(--wr-ivory)',
                     boxShadow: `0 0 10px ${p.color}30`,
                     fontFamily: "var(--font-inter, 'Inter', sans-serif)",
                     fontSize: '0.6rem',
@@ -221,7 +221,7 @@ export default function HomePage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.7 }}
                 className="text-xs ml-3"
-                style={{ color: 'rgba(136,136,136,0.5)', letterSpacing: '0.04em' }}
+                style={{ color: 'color-mix(in srgb, var(--wr-smoke) 80%, transparent)', letterSpacing: '0.04em' }}
               >
                 + 15 Evaluators
               </motion.span>
@@ -231,16 +231,16 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8 relative" style={{ background: 'linear-gradient(180deg, rgba(13,13,13,0.3), rgba(17,17,17,0.5), rgba(13,13,13,0.3))' }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center top, rgba(200,200,200,0.03), transparent 60%)' }} />
+      <section className="px-4 py-24 sm:px-6 lg:px-8 relative" style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--wr-black) 30%, transparent), color-mix(in srgb, var(--wr-obsidian) 50%, transparent), color-mix(in srgb, var(--wr-black) 30%, transparent))' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center top, color-mix(in srgb, var(--wr-ivory) 3%, transparent), transparent 60%)' }} />
         <div className="mx-auto max-w-6xl relative">
           <FadeInUp>
             <div className="text-center mb-16">
               <SigilBadge tone="silver" className="mb-4">The Process</SigilBadge>
-              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.02em' }}>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: 'var(--wr-ivory)', letterSpacing: '-0.02em' }}>
                 Three Stages to Your Verdict
               </h2>
-              <p style={{ color: '#888888', fontSize: '0.9rem', letterSpacing: '0.01em' }}>
+              <p style={{ color: 'var(--wr-smoke)', fontSize: '0.9rem', letterSpacing: '0.01em' }}>
                 Not a quiz. A rigorous evaluation. Designed to reveal your true founder profile.
               </p>
             </div>
@@ -263,19 +263,19 @@ export default function HomePage() {
                         className="flex h-10 w-10 items-center justify-center rounded-sm font-bold text-base shrink-0"
                         style={{
                           background: stage.accent,
-                          color: '#0d0d0d',
+                          color: stage.num === 2 ? '#000000' : '#FFFFFF',
                           fontFamily: "var(--font-inter, 'Inter', sans-serif)",
                           boxShadow: `0 0 18px ${stage.accent}44, inset 0 1px 0 rgba(255,255,255,0.15)`,
                         }}
                       >
                         {stage.num}
                       </div>
-                      <Icon className="h-5 w-5" style={{ color: stage.accent, opacity: 0.85 }} aria-hidden />
+                      <Icon className="h-5 w-5" style={{ color: stage.accent, opacity: 1 }} aria-hidden />
                     </div>
-                    <h3 className="font-semibold text-lg mb-2" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.01em' }}>
+                    <h3 className="font-semibold text-lg mb-2 text-[#F4F4F5]" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", letterSpacing: '-0.01em' }}>
                       {stage.title}
                     </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#888888' }}>
+                    <p className="text-sm leading-relaxed text-[#A1A1AA]">
                       {stage.desc}
                     </p>
                   </StoneCard>
@@ -293,10 +293,10 @@ export default function HomePage() {
           <FadeInUp>
             <div className="text-center mb-16">
               <SigilBadge tone="gold" className="mb-4">The Panel</SigilBadge>
-              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.02em' }}>
+              <h2 className="text-3xl font-bold mb-4 text-white" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", letterSpacing: '-0.02em' }}>
                 Three Perspectives. One Verdict.
               </h2>
-              <p style={{ color: '#888888', fontSize: '0.9rem' }}>
+              <p className="text-zinc-400" style={{ fontSize: '0.9rem' }}>
                 Their priorities will conflict. Your judgment determines the outcome.
               </p>
             </div>
@@ -315,8 +315,8 @@ export default function HomePage() {
                   >
                     <Icon className="h-6 w-6" style={{ color: h.color }} aria-hidden />
                   </motion.div>
-                  <h3 className="font-bold text-lg mb-2" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.01em' }}>{h.name}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#888888' }}>{h.desc}</p>
+                  <h3 className="font-bold text-lg mb-2" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: 'var(--wr-ivory)', letterSpacing: '-0.01em' }}>{h.name}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--wr-smoke)', letterSpacing: '0.01em' }}>{h.desc}</p>
                 </StoneCard>
               )
             })}
@@ -334,14 +334,12 @@ export default function HomePage() {
             </Floating>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
-              <AnimatedGradientText from="#c8a84a" via="#e8e8e8" to="#a0a0a0">
-                Conflicting Priorities. One Decision.
-              </AnimatedGradientText>
+            <h2 className="text-3xl font-bold mb-4 text-zinc-950 dark:text-zinc-100" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
+              Conflicting Priorities. One Decision.
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.2}>
-            <p className="text-base mb-6" style={{ color: '#888888', maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 1.8 }}>
+            <p className="text-base mb-6 text-zinc-800 dark:text-zinc-400" style={{ maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 1.8 }}>
               The Financial Strategist demands unit economics above all. The Brand Builder insists culture drives retention.
               The Scale Operator warns against premature growth. The Market Analyst sees a closing window.
             </p>
@@ -357,21 +355,20 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(15,15,15,0.45), rgba(20,20,20,0.6), rgba(15,15,15,0.45))' }}>
+      <section className="px-4 py-24 sm:px-6 lg:px-8 relative overflow-hidden bg-black">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(200,168,74,0.04), transparent 60%)' }} />
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(200,168,74,0.02), transparent 60%)' }} />
           <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(200,168,74,0.25), transparent)' }} />
         </div>
         <div className="mx-auto max-w-3xl text-center relative z-10">
           <FadeInUp>
-            <div className="mb-4 flex justify-center text-4xl opacity-50">♔</div>
-            <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: '#e8e8e8', letterSpacing: '-0.02em' }}>
+            <div className="mb-4 flex justify-center text-4xl text-zinc-100">♔</div>
+            <h2 className="text-3xl font-bold mb-4 text-white" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", letterSpacing: '-0.02em' }}>
               Ready for Your Assessment?
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="mb-10 text-sm" style={{ color: '#888888', letterSpacing: '0.02em' }}>
+            <p className="text-base mb-10 max-w-lg mx-auto text-zinc-400" style={{ letterSpacing: '0.01em' }}>
               Two attempts. Six stages. One verdict. Your roadmap starts here.
             </p>
           </FadeInUp>
@@ -386,12 +383,12 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="px-4 py-10 sm:px-6 lg:px-8 text-center" style={{ borderTop: '1px solid rgba(200,168,74,0.08)', background: 'rgba(6,6,6,0.5)' }}>
-        <div className="text-3xl mb-3 opacity-20">♟</div>
-        <p className="text-xs" style={{ color: 'rgba(136,136,136,0.4)', letterSpacing: '0.08em', fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
+      <footer className="px-4 py-10 sm:px-6 lg:px-8 text-center bg-black" style={{ borderTop: '1px solid rgba(200,168,74,0.15)' }}>
+        <div className="text-3xl mb-3 text-zinc-700">♟</div>
+        <p className="text-xs text-zinc-400" style={{ letterSpacing: '0.08em', fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
           © 2026 KK&apos;s Assessment — All Rights Reserved
         </p>
-        <p className="mt-1 text-xs" style={{ color: 'rgba(136,136,136,0.25)', letterSpacing: '0.04em' }}>
+        <p className="mt-1 text-xs text-zinc-500" style={{ letterSpacing: '0.04em' }}>
           Precision under pressure. Powered by AI.
         </p>
       </footer>

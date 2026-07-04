@@ -81,7 +81,7 @@ export function SigilCrest({
   const top = locked ? '#3a352c' : secondary ?? primary
   const mid = locked ? '#2a261e' : primary
   const stroke = locked ? '#4a4336' : secondary ?? primary
-  const tint = locked ? '#6b6353' : iconColor ?? '#e8e8e8'
+  const tint = locked ? '#6b6353' : iconColor ?? 'var(--wr-ivory)'
 
   return (
     <div

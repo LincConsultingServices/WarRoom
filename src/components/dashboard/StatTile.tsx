@@ -48,7 +48,7 @@ export function StatTile({
 
       <div className="flex items-start justify-between gap-3">
         <span
-          className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)]"
+          className="text-[10px] uppercase tracking-[0.18em] text-zinc-600 dark:text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {label}
@@ -59,7 +59,7 @@ export function StatTile({
             style={{ background: `${accent}14` }}
           >
             <Icon
-              className="h-3.5 w-3.5"
+              className="h-3.5 w-3.5 !text-zinc-900 dark:!text-[inherit]"
               style={{ color: accent }}
               aria-hidden
             />
@@ -68,7 +68,7 @@ export function StatTile({
       </div>
 
       <div
-        className="mt-3 text-3xl font-semibold text-[color:var(--color-chessboard-ghost)] leading-none"
+        className="mt-3 text-3xl font-semibold text-zinc-950 dark:text-[color:var(--color-chessboard-ghost)] leading-none"
         style={{ fontFamily: 'var(--font-data, var(--font-mono))' }}
       >
         {value}
@@ -76,7 +76,7 @@ export function StatTile({
 
       {hint && (
         <div
-          className="mt-2 text-[10px] tracking-[0.08em] text-[color:var(--color-chessboard-smoke)]"
+          className="mt-2 text-[10px] tracking-[0.08em] text-zinc-500 dark:text-[color:var(--color-chessboard-smoke)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {hint}

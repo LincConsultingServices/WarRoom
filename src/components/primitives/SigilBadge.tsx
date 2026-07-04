@@ -14,13 +14,13 @@ export interface SigilBadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const TONE_STYLES: Record<SigilTone, string> = {
   gold:
-    'bg-[color:var(--color-chessboard-gold)]/[0.10] text-[color:var(--color-chessboard-gold)] border-[color:var(--color-chessboard-gold)]/30',
+    'bg-transparent dark:bg-[color:var(--color-chessboard-gold)]/[0.10] text-zinc-700 dark:text-[color:var(--color-chessboard-gold)] border-zinc-300 dark:border-[color:var(--color-chessboard-gold)]/30',
   crimson:
-    'bg-[color:var(--color-chessboard-crimson)]/[0.15] text-[color:var(--color-chessboard-crimson-bright)] border-[color:var(--color-chessboard-crimson)]/35',
+    'bg-transparent dark:bg-[color:var(--color-chessboard-crimson)]/[0.15] text-zinc-700 dark:text-[color:var(--color-chessboard-crimson-bright)] border-zinc-300 dark:border-[color:var(--color-chessboard-crimson)]/35',
   verdant:
-    'bg-[color:var(--color-chessboard-verdant)]/[0.15] text-[color:var(--color-chessboard-verdant)] border-[color:var(--color-chessboard-verdant)]/35',
+    'bg-transparent dark:bg-[color:var(--color-chessboard-verdant)]/[0.15] text-zinc-700 dark:text-[color:var(--color-chessboard-verdant)] border-zinc-300 dark:border-[color:var(--color-chessboard-verdant)]/35',
   amethyst:
-    'bg-[color:var(--color-chessboard-amethyst)]/[0.15] text-[color:var(--color-chessboard-amethyst)] border-[color:var(--color-chessboard-amethyst)]/35',
+    'bg-transparent dark:bg-[color:var(--color-chessboard-amethyst)]/[0.15] text-zinc-700 dark:text-[color:var(--color-chessboard-amethyst)] border-zinc-300 dark:border-[color:var(--color-chessboard-amethyst)]/35',
 }
 
 /**

@@ -51,40 +51,84 @@
   --info-foreground: oklch(0.97 0 0);
 
   /* Chess surface tokens — light */
-  --wr-void: #f8f8f8;
-  --wr-black: #f2f2f2;
-  --wr-obsidian: #e8e8e8;
-  --wr-rampart: #dcdcdc;
-  --wr-stone: #d0d0d0;
-  --wr-slate: #c0c0c0;
-  --wr-ash: #a0a0a0;
-  --wr-smoke: #606060;
-  --wr-ivory: #1a1a1a;
-  --wr-ghost: #0d0d0d;
-  --wr-electrum: #8a7040;
-  --wr-parchment: #2a2a2a;
-  --wr-ink: #f0f0f0;
-  --wr-gold: #6b5520;
-  --wr-gold-bright: #5a4418;
-  --wr-silver: #5a5a5a;
-  --wr-ember: #7a5a20;
-  --wr-gold-glow: rgba(160, 130, 60, 0.12);
-  --wr-dragonglass: #1a2030;
-  --wr-shadow-gold: 0 0 12px rgba(140, 110, 40, 0.15), 0 0 40px rgba(140, 110, 40, 0.06);
-  --wr-shadow-crimson: 0 0 12px rgba(80, 80, 80, 0.2);
-  --wr-shadow-deep: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --wr-glow-ember: 0 0 20px rgba(140, 110, 40, 0.18);
-  --wr-page-grad-end: #e0e0e0;
-  --wr-header-bg: linear-gradient(180deg, rgba(248, 248, 248, 0.96), rgba(240, 240, 240, 0.88));
-  --wr-panel-bg: rgba(240, 240, 240, 0.65);
-  --wr-panel-bg-heavy: rgba(232, 232, 232, 0.85);
-  --wr-panel-bg-darker: rgba(220, 220, 220, 0.4);
-  --wr-offer-portrait-bg: linear-gradient(160deg, rgba(160, 130, 60, 0.10), rgba(220, 220, 220, 0.7));
-  --wr-parchment-wash: linear-gradient(rgba(252, 252, 252, 0.88), rgba(252, 252, 252, 0.92));
-  --wr-overlay-bg: rgba(248, 248, 248, 0.85);
-  --wr-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(248, 248, 248, 0.72) 0%, rgba(248, 248, 248, 0.45) 50%, transparent 100%);
-  --wr-checker-1: #f8f8f8;
-  --wr-checker-2: #eeeeee;
+  --wr-void: #FFFFFF;
+  --wr-black: #FFFFFF;
+  --wr-obsidian: #FAFAFA;
+  --wr-rampart: #FFFFFF;
+  --wr-stone: #FFFFFF;
+  --wr-slate: #FAFAFA;
+  --wr-ash: #E4E4E7;
+  --wr-smoke: #71717A;
+  --wr-ivory: #09090B;
+  --wr-ghost: #18181B;
+  --wr-electrum: #A67C00;
+  --wr-parchment: #FFFFFF;
+  --wr-ink: #000000;
+  --wr-gold: #B8860B;
+  --wr-gold-bright: #A67C00;
+  --wr-silver: #71717A;
+  --wr-ember: #A67C00;
+  --wr-gold-glow: transparent;
+  --wr-dragonglass: #FAFAFA;
+  --wr-shadow-gold: 4px 4px 0px #E4E4E7;
+  --wr-shadow-crimson: 4px 4px 0px #E4E4E7;
+  --wr-shadow-deep: 4px 4px 0px #E4E4E7;
+  --wr-glow-ember: 0 0 0px transparent;
+  --wr-page-grad-end: #FAFAFA;
+  --wr-header-bg: rgba(255, 255, 255, 0.96);
+  --wr-panel-bg: #FFFFFF;
+  --wr-panel-bg-heavy: #FFFFFF;
+  --wr-panel-bg-darker: #FAFAFA;
+  --wr-offer-portrait-bg: #FAFAFA;
+  --wr-parchment-wash: #FFFFFF;
+  --wr-overlay-bg: rgba(255, 255, 255, 0.85);
+  --wr-vignette: transparent;
+  --wr-checker-1: transparent;
+  --wr-checker-2: rgba(0, 0, 0, 0.02);
+  
+  /* Buttons */
+  --btn-primary-bg: #09090B;
+  --btn-primary-text: #FFFFFF;
+
+  /* Orb */
+  --wr-orb-bg: radial-gradient(circle at 35% 35%, #FFFFFF, #E4E4E7 40%, #A0A0A0 85%);
+  --wr-orb-shadow-normal: inset -2px -2px 10px rgba(0,0,0,0.1), 0 2px 10px rgba(0,0,0,0.05);
+  --wr-orb-shadow-warning: inset -2px -2px 10px rgba(0,0,0,0.1), 0 0 10px rgba(200,75,15,0.5);
+  
+  /* Light mode hero gradient: Muted Gold/Brown */
+  --wr-hero-grad-1: var(--wr-gold-bright);
+  --wr-hero-grad-2: var(--wr-gold);
+  --wr-hero-grad-3: #4a3610; 
+
+  /* DOM Variable Mappings for arbitrary Tailwind classes */
+  --color-chessboard-void: var(--wr-void);
+  --color-chessboard-black: var(--wr-black);
+  --color-chessboard-obsidian: var(--wr-obsidian);
+  --color-chessboard-rampart: var(--wr-rampart);
+  --color-chessboard-stone: var(--wr-stone);
+  --color-chessboard-slate: var(--wr-slate);
+  --color-chessboard-ash: var(--wr-ash);
+  --color-chessboard-smoke: var(--wr-smoke);
+  --color-chessboard-ivory: var(--wr-ivory);
+  --color-chessboard-ghost: var(--wr-ghost);
+  --color-chessboard-electrum: var(--wr-electrum);
+  --color-chessboard-parchment: var(--wr-parchment);
+  --color-chessboard-ink: var(--wr-ink);
+  --color-chessboard-gold: var(--wr-gold);
+  --color-chessboard-gold-bright: var(--wr-gold-bright);
+  --color-chessboard-silver: var(--wr-silver);
+  --color-chessboard-ember: var(--wr-ember);
+  --color-chessboard-verdant: #2d6a4f;
+  --color-chessboard-sapphire: #1a3a5c;
+  --color-chessboard-amethyst: #3a2858;
+  --color-chessboard-crimson: #3a3a3a;
+  --color-chessboard-crimson-bright: #606060;
+  --color-chessboard-dragonglass: var(--wr-dragonglass);
+  --color-chessboard-page-grad-end: var(--wr-page-grad-end);
+  --color-chessboard-panel-bg: var(--wr-panel-bg);
+  --color-chessboard-panel-bg-heavy: var(--wr-panel-bg-heavy);
+  --color-chessboard-panel-bg-darker: var(--wr-panel-bg-darker);
+  --color-chessboard-overlay-bg: var(--wr-overlay-bg);
 }
 
 .dark {
@@ -161,8 +205,22 @@
   --wr-parchment-wash: linear-gradient(rgba(12, 12, 12, 0.82), rgba(12, 12, 12, 0.86));
   --wr-overlay-bg: rgba(0, 0, 0, 0.65);
   --wr-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(8, 8, 8, 0.72) 0%, rgba(8, 8, 8, 0.45) 50%, transparent 100%);
-  --wr-checker-1: #0d0d0d;
-  --wr-checker-2: #141414;
+  --wr-checker-1: #080808;
+  --wr-checker-2: #0f0f0f;
+
+  /* Buttons */
+  --btn-primary-bg: linear-gradient(135deg, #141414, #1e1e1e, #282828, #1e1e1e, #141414);
+  --btn-primary-text: var(--wr-ivory);
+
+  /* Orb */
+  --wr-orb-bg: radial-gradient(circle at 35% 35%, #f0c040, #c9962a 40%, #0e0b09 75%);
+  --wr-orb-shadow-normal: 0 0 20px rgba(201,150,42,0.6), 0 0 60px rgba(201,150,42,0.2);
+  --wr-orb-shadow-warning: 0 0 22px rgba(200,75,15,0.8), 0 0 60px rgba(200,75,15,0.35);
+
+  /* Dark mode hero gradient: Silver/White */
+  --wr-hero-grad-1: #a0a0a0;
+  --wr-hero-grad-2: #e0e0e0;
+  --wr-hero-grad-3: #ffffff;
 }
 
 @theme inline {
@@ -375,15 +433,16 @@
 
   /* Chess Panel — premium dark surface */
   .got-stone-card {
-    background: linear-gradient(135deg, var(--card) 0%, color-mix(in oklch, var(--card), #c8a84a08 100%) 100%);
-    border: 1px solid color-mix(in oklch, var(--border), #c8a84a 10%);
+    background: #FFFFFF;
+    border: 1px solid var(--color-chessboard-ash);
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(200,168,74,0.06), inset 0 -1px 0 rgba(0,0,0,0.03);
     position: relative;
     overflow: hidden;
   }
 
   :is(.dark) .got-stone-card {
+    background: linear-gradient(135deg, var(--card) 0%, color-mix(in oklch, var(--card), #c8a84a08 100%) 100%);
+    border: 1px solid color-mix(in oklch, var(--border), #c8a84a 10%);
     box-shadow: 0 4px 16px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,168,74,0.08), inset 0 -1px 0 rgba(0,0,0,0.2);
   }
 
@@ -482,12 +541,12 @@
 .gradient-text-animate {
   background: linear-gradient(
     90deg,
-    #a0a0a0 0%,
-    #e0e0e0 18%,
-    #ffffff 38%,
-    #d0d0d0 58%,
-    #e0e0e0 80%,
-    #a0a0a0 100%
+    var(--wr-hero-grad-1) 0%,
+    var(--wr-hero-grad-2) 18%,
+    var(--wr-hero-grad-3) 38%,
+    var(--wr-hero-grad-2) 58%,
+    var(--wr-hero-grad-3) 80%,
+    var(--wr-hero-grad-1) 100%
   );
   background-size: 300% auto;
   -webkit-background-clip: text;

@@ -93,7 +93,7 @@ export function CompetencyConstellation({
             <stop offset="100%" stopColor="rgba(201,162,39,0)" />
           </radialGradient>
         </defs>
-        <rect x="0" y="0" width="206" height="196" fill="url(#constellation-haze)" />
+        <rect x="0" y="0" width="206" height="196" fill="url(#constellation-haze)" className="hidden dark:block" />
 
         {/* Edges (the crown) */}
         {CONSTELLATION_EDGES.map(([a, b], i) => {
@@ -180,7 +180,7 @@ export function CompetencyConstellation({
             </>
           ) : (
             <p
-              className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
+              className="text-[11px] uppercase tracking-[0.16em] text-zinc-600 dark:text-[color:var(--color-chessboard-smoke)]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {litCount === 0
