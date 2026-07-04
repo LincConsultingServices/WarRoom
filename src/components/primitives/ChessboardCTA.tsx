@@ -68,7 +68,7 @@ export const ChessboardCTA = forwardRef<HTMLButtonElement, ChessboardCTAProps>(
           'border rounded-[3px] overflow-visible',
           SIZE_CLASSES[size],
           variant === 'primary' && [
-            'text-[#e8e8e8]',
+            'text-[color:var(--btn-primary-text)]',
             'border-[color:var(--color-chessboard-gold)]/40',
             'shadow-[0_4px_20px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]',
           ],
@@ -82,7 +82,7 @@ export const ChessboardCTA = forwardRef<HTMLButtonElement, ChessboardCTAProps>(
           fontFamily: 'var(--font-display)',
           ...(variant === 'primary'
             ? {
-                background: 'linear-gradient(135deg, #141414, #1e1e1e, #282828, #1e1e1e, #141414)',
+                background: 'var(--btn-primary-bg)',
                 backgroundSize: '200% 100%',
               }
             : {}),

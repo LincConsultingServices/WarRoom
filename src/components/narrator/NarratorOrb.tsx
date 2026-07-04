@@ -119,12 +119,11 @@ export function NarratorOrb() {
             <motion.span
               className="absolute inset-0 rounded-full"
               style={{
-                background:
-                  'radial-gradient(circle at 35% 35%, #f0c040, #c9962a 40%, #0e0b09 75%)',
+                background: 'var(--wr-orb-bg)',
                 boxShadow:
                   currentMood === 'warning'
-                    ? '0 0 22px rgba(200,75,15,0.8), 0 0 60px rgba(200,75,15,0.35)'
-                    : '0 0 20px rgba(201,150,42,0.6), 0 0 60px rgba(201,150,42,0.2)',
+                    ? 'var(--wr-orb-shadow-warning)'
+                    : 'var(--wr-orb-shadow-normal)',
               }}
               animate={
                 prefersReducedMotion
