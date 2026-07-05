@@ -91,11 +91,11 @@ export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
 // voice assets and other id-keyed resources.
 export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
   'The Arbiter of Identity': 'mirror_identity',
-  'The Queen of Coin': 'master_coin',
+  'The King of Coin': 'master_coin',
   'The Knight of Hustle': 'lord_hustle',
   'The Blindfold Master': 'mother_instinct',
   'The Rook of Execution': 'hand_execution',
-  'The Bishop of Strategy': 'spider_strategy',
+  'The Queen of Strategy': 'spider_strategy',
   'The Warden of the King': 'warden_trust',
 }
 
