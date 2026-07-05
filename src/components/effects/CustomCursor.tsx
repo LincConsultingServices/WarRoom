@@ -1,11 +1,13 @@
 'use client'
 
 /**
- * CustomCursor — chess piece cursor with canvas-based silver particle trail.
+ * CustomCursor — standard pointer-arrow cursor, chess gold/brass themed,
+ * with a canvas-based silver/gold particle trail.
  *
- * Renders a minimal chess knight SVG at the pointer hot-spot.
- * A full-viewport canvas draws silver/gold motes that drift upward.
- * Only activates on fine-pointer (mouse) devices.
+ * Renders a normal arrow-cursor silhouette (not a chess piece) tinted with
+ * the app's gold/brass palette, at the pointer hot-spot. A full-viewport
+ * canvas draws silver/gold motes that drift upward. Only activates on
+ * fine-pointer (mouse) devices.
  */
 
 import { useEffect, useRef } from 'react'
@@ -182,7 +184,7 @@ export function CustomCursor() {
           pointerEvents: 'none', zIndex: 9998,
         }}
       />
-      {/* Chess piece cursor — knight silhouette */}
+      {/* Standard arrow cursor, chess gold/brass themed */}
       <div
         ref={arrowRef}
         className="wr-cursor"
@@ -190,25 +192,25 @@ export function CustomCursor() {
         style={{ transform: 'translate(-200px, -200px)' }}
       >
         <svg
-          viewBox="0 0 24 28"
-          width={32}
-          height={36}
+          viewBox="0 0 24 24"
+          width={24}
+          height={24}
           aria-hidden="true"
           className="wr-cursor__arrow"
         >
           <defs>
-            <linearGradient id="wrCursorSilver" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="35%" stopColor="#d4d4d4" />
-              <stop offset="70%" stopColor="#a0a0a0" />
-              <stop offset="100%" stopColor="#7a7a7a" />
+            <linearGradient id="wrCursorGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fff3d6" />
+              <stop offset="35%" stopColor="var(--wr-gold-bright)" />
+              <stop offset="75%" stopColor="var(--wr-gold)" />
+              <stop offset="100%" stopColor="var(--wr-electrum)" />
             </linearGradient>
           </defs>
-          {/* Pawn shape */}
+          {/* Standard pointer-arrow silhouette */}
           <path
-            d="M12,2a3,3,0,1,0,3,3A3,3,0,0,0,12,2Zm0,5A3.16,3.16,0,0,0,9,9c0,2,1,4.42,1,7H8v2h8V16H14c0-2.58,1-5,1-7A3.16,3.16,0,0,0,12,7ZM7,19v2H17V19Z"
-            fill="url(#wrCursorSilver)"
-            stroke="rgba(0,0,0,0.8)"
+            d="m4 4 7.07 17 2.51-7.39L21 11.07Z"
+            fill="url(#wrCursorGold)"
+            stroke="rgba(0,0,0,0.75)"
             strokeWidth="1"
             strokeLinejoin="round"
           />
