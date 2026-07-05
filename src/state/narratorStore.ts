@@ -12,6 +12,7 @@
 
 import { create } from 'zustand'
 import { useAudioStore } from '@/src/state/audioStore'
+import { claimVoiceTurn, waitForTurn } from '@/lib/audio/voiceTurn'
 
 export type NarratorMood =
   | 'idle'
@@ -88,9 +89,14 @@ function initialNarratorMuted(): boolean {
 // Shared HTMLAudioElement for narrator voiceovers. One instance so a new line
 // instantly cancels any in-flight playback (no overlapping voices).
 let narratorAudio: HTMLAudioElement | null = null
+// Bumped on every request so a stale, still-waiting play() from an earlier
+// line can never fire after being superseded by a newer one.
+let playToken = 0
 
 function playNarratorVoice(url: string | undefined): void {
   if (!url || typeof window === 'undefined') return
+  playToken += 1
+  const myToken = playToken
   try {
     if (narratorAudio) {
       narratorAudio.pause()
@@ -99,16 +105,25 @@ function playNarratorVoice(url: string | undefined): void {
       narratorAudio = new Audio()
       narratorAudio.preload = 'auto'
     }
-    narratorAudio.src = url
-    narratorAudio.volume = 0.85
-    // Autoplay can be rejected before the first user gesture — fail silently.
-    void narratorAudio.play().catch(() => { /* gated by browser */ })
+    const audio = narratorAudio
+    audio.src = url
+    audio.volume = 0.85
+    // Never talk over an investor line already in progress — wait our turn,
+    // then claim it so an investor line can't start until we're done.
+    void waitForTurn('narrator')
+      .then(() => {
+        if (myToken !== playToken) return // superseded by a newer line
+        claimVoiceTurn('narrator', audio)
+        return audio.play()
+      })
+      .catch(() => { /* gated by browser, or superseded */ })
   } catch {
     /* never throw from the store */
   }
 }
 
 function stopNarratorVoice(): void {
+  playToken += 1 // invalidate any pending wait-then-play
   if (narratorAudio) {
     try {
       narratorAudio.pause()
@@ -117,31 +132,6 @@ function stopNarratorVoice(): void {
       /* ignore */
     }
   }
-}
-
-/** True while a Grandmaster voiceover clip is actively playing. Lets other
- *  voice channels (e.g. investor TTS lines) check before starting so they
- *  never talk over the narrator. */
-export function isNarratorVoicePlaying(): boolean {
-  return !!narratorAudio && !narratorAudio.paused && !narratorAudio.ended
-}
-
-/** Resolves once the current narrator clip stops (naturally or via pause/
- *  cancellation) — resolves immediately if nothing is playing. Callers
- *  (investor voice lines) should await this before starting playback so the
- *  Grandmaster always finishes a line before an investor speaks. */
-export function waitForNarratorVoice(): Promise<void> {
-  const audio = narratorAudio
-  if (!audio || !isNarratorVoicePlaying()) return Promise.resolve()
-  return new Promise((resolve) => {
-    const onDone = () => {
-      audio.removeEventListener('ended', onDone)
-      audio.removeEventListener('pause', onDone)
-      resolve()
-    }
-    audio.addEventListener('ended', onDone)
-    audio.addEventListener('pause', onDone)
-  })
 }
 
 export const useNarratorStore = create<NarratorState>((set, get) => ({

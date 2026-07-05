@@ -65,7 +65,7 @@ interface StageViewProps {
 
 export function StageView({
   questions, qIndex, currentQ, currentAnswer, answers, isCrisisQuestion,
-  submitting, submitError, isLastQuestion, isFirstQuestion,
+  submitting, submitError, isLastQuestion, isFirstQuestion, answeredCount,
   dynamicScenario, loadingScenario, dynamicScenarioError,
   loadingFollowup, followupScenarios, followupError, mcqFeedback,
   capital, budgetAllocations, buyoutCompany, buyoutAmount, accent,
@@ -75,6 +75,29 @@ export function StageView({
 }: StageViewProps) {
   const submitIntro = useFeatureIntro('stage-submit')
   const qType: string = ((currentQ as unknown as Record<string, unknown>)?.type as string) || ''
+
+  // A question only counts as answered once the user has actually made a
+  // choice / typed something for it — not merely visited it. Previously
+  // "Next" and "Submit Phase" only checked `submitting`, so a dynamic
+  // scenario (or any other question) could be skipped entirely by clicking
+  // through without selecting an option.
+  const isCurrentAnswered = (() => {
+    if (!currentQ) return false
+    switch (qType) {
+      case 'dynamic_scenario':
+      case 'scenario':
+      case 'multiple_choice':
+        return Boolean(currentAnswer?.selectedOptionId)
+      case 'budget_allocation':
+        return Boolean(currentAnswer)
+      case 'info':
+      case 'ai_scenario':
+        return Boolean(currentAnswer)
+      default:
+        return Boolean(currentAnswer?.text?.trim())
+    }
+  })()
+  const allQuestionsAnswered = answeredCount >= questions.length
 
   function renderQuestionContent() {
     if (!currentQ) return <div className="text-muted-foreground text-sm">No questions available</div>
@@ -201,13 +224,30 @@ export function StageView({
                 ))}
               </div>
               {isLastQuestion ? (
-                <Button {...submitIntro} onClick={onSubmitPhase} disabled={submitting} size="sm" style={{ backgroundColor: accent }}>
+                <Button
+                  {...submitIntro}
+                  onClick={onSubmitPhase}
+                  disabled={submitting || !isCurrentAnswered || !allQuestionsAnswered}
+                  size="sm"
+                  style={{ backgroundColor: accent }}
+                  title={!isCurrentAnswered || !allQuestionsAnswered ? 'Answer every question in this phase to continue' : undefined}
+                >
                   {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Evaluating...</> : <><Send className="h-4 w-4 mr-2" />Submit Phase</>}
                 </Button>
               ) : (
-                <Button onClick={onGoNext} size="sm">Next <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                <Button
+                  onClick={onGoNext}
+                  disabled={!isCurrentAnswered}
+                  size="sm"
+                  title={!isCurrentAnswered ? 'Answer this question to continue' : undefined}
+                >
+                  Next <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               )}
             </div>
+            {!isCurrentAnswered && (
+              <div className="px-6 pb-3"><p className="text-xs text-muted-foreground">Answer this question before continuing.</p></div>
+            )}
             {submitError && <div className="px-6 pb-4"><p className="text-sm text-red-500">{submitError}</p></div>}
           </motion.div>
         ) : (

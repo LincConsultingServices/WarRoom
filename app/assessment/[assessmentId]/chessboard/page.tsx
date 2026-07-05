@@ -20,7 +20,7 @@ import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import { AmbientAudioManager } from '@/src/components/chessboard/AmbientAudioManager'
 import { AudioControls } from '@/src/components/chessboard/AudioControls'
 import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
-import { waitForNarratorVoice } from '@/src/state/narratorStore'
+import { claimVoiceTurn, waitForTurn } from '@/lib/audio/voiceTurn'
 
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
@@ -121,7 +121,10 @@ function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[
     } else {
       const toPlay = audioRef.current;
       // Never talk over the Grandmaster — let his current line finish first.
-      void waitForNarratorVoice().then(() => toPlay.play()).then(() => {
+      void waitForTurn('investor').then(() => {
+        claimVoiceTurn('investor', toPlay)
+        return toPlay.play();
+      }).then(() => {
         setIsPlaying(true);
       }).catch(() => {
         setIsPlaying(false);
@@ -354,7 +357,8 @@ export default function ChessboardSimulation() {
                 audio.volume = getVoiceLineVolume()
                 audioRef.current = audio
                 // Never talk over the Grandmaster — let his current line finish first.
-                await waitForNarratorVoice()
+                await waitForTurn('investor')
+                claimVoiceTurn('investor', audio)
                 audio.play().catch(e => console.error("Auto-play failed:", e))
             }
 
@@ -622,7 +626,8 @@ export default function ChessboardSimulation() {
                             audio.onended = () => setIsPlayingAudio(false)
                             audio.onerror = () => setIsPlayingAudio(false)
                             // Never talk over the Grandmaster — let his current line finish first.
-                            await waitForNarratorVoice()
+                            await waitForTurn('investor')
+                            claimVoiceTurn('investor', audio)
                             audio.play().catch(() => setIsPlayingAudio(false))
                         }
                         return
@@ -647,7 +652,8 @@ export default function ChessboardSimulation() {
                 audio.onended = () => setIsPlayingAudio(false)
                 audio.onerror = () => setIsPlayingAudio(false)
                 // Never talk over the Grandmaster — let his current line finish first.
-                await waitForNarratorVoice()
+                await waitForTurn('investor')
+                claimVoiceTurn('investor', audio)
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
         } catch (err: unknown) {
@@ -697,7 +703,8 @@ export default function ChessboardSimulation() {
                 audio.onended = () => setIsPlayingAudio(false)
                 audio.onerror = () => setIsPlayingAudio(false)
                 // Never talk over the Grandmaster — let his current line finish first.
-                await waitForNarratorVoice()
+                await waitForTurn('investor')
+                claimVoiceTurn('investor', audio)
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
         } catch (err: unknown) {
@@ -1002,6 +1009,8 @@ export default function ChessboardSimulation() {
                                         </>
                                     ) : pitchRecorder.audioBlob ? (
                                         <span className="rec-done">Pitch recorded ({pitchRecorder.recordingTime}s) — Select Record Again to re-record</span>
+                                    ) : pitchRecorder.error ? (
+                                        <span className="rec-hint" style={{ color: '#f87171' }}>{pitchRecorder.error}</span>
                                     ) : (
                                         <span className="rec-hint">Select Start Recording to begin your pitch</span>
                                     )}
@@ -1244,8 +1253,16 @@ export default function ChessboardSimulation() {
                         </AnimatePresence>
 
                         {/* Audio Recording for Response */}
-                        {!currentInvestorReaction && !isAnalyzing && (
+                        {!currentInvestorReaction && (
                             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+                                {isAnalyzing ? (
+                                    <div className="recording-zone" style={{ marginBottom: '1rem', minHeight: '220px' }}>
+                                        <CouncilDeliberatesLoader
+                                            message={followupPhase === 'followup_pending' ? `${currentInvestor.name} weighs your follow-up…` : `${currentInvestor.name} weighs your words…`}
+                                        />
+                                    </div>
+                                ) : (
+                                <>
                                 <div className="recording-zone" style={{ marginBottom: '1rem' }}>
                                     <div className={`mic-button-wrapper ${responseRecorder.isRecording ? 'recording' : ''}`}>
                                         {responseRecorder.isRecording && (
@@ -1280,9 +1297,11 @@ export default function ChessboardSimulation() {
                                         {responseSubmitted && followupPhase !== 'followup_pending' ? (
                                             <span className="rec-done">Response submitted. You cannot submit another response for this investor.</span>
                                         ) : responseRecorder.isRecording ? (
-                                            <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 30 - responseRecorder.recordingTime)}s left</span></>
+                                            <><span className="rec-dot" /><span className="rec-text">Recording... {Math.max(0, 15 - responseRecorder.recordingTime)}s left</span></>
                                         ) : responseRecorder.audioBlob ? (
                                             <span className="rec-done">Response recorded ({responseRecorder.recordingTime}s)</span>
+                                        ) : responseRecorder.error ? (
+                                            <span className="rec-hint" style={{ color: '#f87171' }}>{responseRecorder.error}</span>
                                         ) : (
                                             <span className="rec-hint">Select Start Recording to record your response (15s max)</span>
                                         )}
@@ -1353,6 +1372,8 @@ export default function ChessboardSimulation() {
                                                     : 'Submit Response'}
                                         </motion.button>
                                     </div>
+                                )}
+                                </>
                                 )}
                             </motion.div>
                         )}
@@ -1543,6 +1564,10 @@ export default function ChessboardSimulation() {
                                         ) : negRound >= MAX_NEG_ROUNDS ? (
                                             <div className="recording-status">
                                                 <span style={{ color: '#f87171', fontSize: '0.85rem' }}>All rounds exhausted — offer expired</span>
+                                            </div>
+                                        ) : negotiationRecorder.error ? (
+                                            <div className="recording-status">
+                                                <span className="rec-hint" style={{ color: '#f87171' }}>{negotiationRecorder.error}</span>
                                             </div>
                                         ) : (
                                             <div className="recording-status">

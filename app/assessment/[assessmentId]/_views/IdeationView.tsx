@@ -31,9 +31,10 @@ interface IdeationViewProps {
 }
 
 export function IdeationView({
-  questions, answers, submitting, submitError, accent,
+  questions, answers, answeredCount, submitting, submitError, accent,
   onTextChange, onSelectOption, onSubmitPhase,
 }: IdeationViewProps) {
+  const allAnswered = answeredCount >= questions.length
   // Group by section
   const sections: Record<string, SimQuestion[]> = {}
   questions.forEach(q => {
@@ -123,11 +124,19 @@ export function IdeationView({
 
       <div className="flex justify-center pb-6">
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Button onClick={onSubmitPhase} disabled={submitting} size="lg" className="px-8" style={{ backgroundColor: accent }}>
+          <Button
+            onClick={onSubmitPhase}
+            disabled={submitting || !allAnswered}
+            size="lg"
+            className="px-8"
+            style={{ backgroundColor: accent }}
+            title={!allAnswered ? 'Answer every question above to continue' : undefined}
+          >
             {submitting ? <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Evaluating Ideation...</> : <><Send className="h-5 w-5 mr-2" />Submit Ideation & Enter Simulation</>}
           </Button>
         </motion.div>
       </div>
+      {!allAnswered && <p className="text-center text-xs text-muted-foreground">Answer every question above to continue.</p>}
       {submitError && <div className="text-center"><p className="text-sm text-red-500">{submitError}</p></div>}
     </div>
   )

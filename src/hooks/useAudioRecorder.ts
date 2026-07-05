@@ -8,6 +8,39 @@ import { toast } from '@/hooks/use-toast'
 const MIN_RECORDING_MS = 1200
 const MIN_RECORDING_BYTES = 1500
 
+// A full-length recording of silence or room tone passes the duration/size
+// guard above (it's a normal-sized file), yet still contains no real speech —
+// the backend's "no speech detected" instruction is a prompt, not a
+// guarantee, and Gemini isn't reliably able to self-report true silence on
+// every clip. Verify it deterministically here instead: decode the actual
+// samples and check their loudness before ever handing the clip to the AI.
+const SILENCE_RMS_THRESHOLD = 0.01
+
+// Root-mean-square loudness of the decoded audio, across all channels.
+// Returns null if decoding fails (unsupported format, etc.) so the caller can
+// fail open rather than block a legitimate recording over a decode quirk.
+async function measureRms(blob: Blob): Promise<number | null> {
+    const AudioCtxCtor = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!AudioCtxCtor) return null
+    const ctx = new AudioCtxCtor()
+    try {
+        const arrayBuffer = await blob.arrayBuffer()
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+        let sumSquares = 0
+        let sampleCount = 0
+        for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
+            const data = audioBuffer.getChannelData(ch)
+            for (let i = 0; i < data.length; i++) sumSquares += data[i] * data[i]
+            sampleCount += data.length
+        }
+        return sampleCount > 0 ? Math.sqrt(sumSquares / sampleCount) : 0
+    } catch {
+        return null
+    } finally {
+        void ctx.close()
+    }
+}
+
 interface UseAudioRecorderReturn {
     isRecording: boolean
     isStarting: boolean
@@ -114,30 +147,43 @@ export function useAudioRecorder(maxDurationSec: number = 60): UseAudioRecorderR
                 }
             }
 
-            mediaRecorder.onstop = () => {
+            mediaRecorder.onstop = async () => {
                 const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' })
                 const durationMs = recordStartRef.current ? Date.now() - recordStartRef.current : 0
+
+                const finish = () => {
+                    setIsRecording(false)
+                    if (streamRef.current) {
+                        streamRef.current.getTracks().forEach(track => track.stop())
+                        streamRef.current = null
+                    }
+                    if (timerRef.current) {
+                        clearInterval(timerRef.current)
+                        timerRef.current = null
+                    }
+                }
+
                 // Reject near-empty clips (quick start+stop) so nothing downstream
                 // can submit a recording the model would only hallucinate over.
                 if (durationMs < MIN_RECORDING_MS || blob.size < MIN_RECORDING_BYTES) {
                     setAudioBlob(null)
                     setError('Recording too short — hold and speak for at least a second, then stop.')
-                } else {
-                    setAudioBlob(blob)
-                }
-                setIsRecording(false)
-
-                // Stop all tracks
-                if (streamRef.current) {
-                    streamRef.current.getTracks().forEach(track => track.stop())
-                    streamRef.current = null
+                    finish()
+                    return
                 }
 
-                // Clear timer
-                if (timerRef.current) {
-                    clearInterval(timerRef.current)
-                    timerRef.current = null
+                // Full-length but silent (dead air / room tone) — same outcome,
+                // different reason: no actual speech was ever captured.
+                const rms = await measureRms(blob)
+                if (rms !== null && rms < SILENCE_RMS_THRESHOLD) {
+                    setAudioBlob(null)
+                    setError('No voice detected — please speak clearly and try again.')
+                    finish()
+                    return
                 }
+
+                setAudioBlob(blob)
+                finish()
             }
 
             recordStartRef.current = Date.now()
