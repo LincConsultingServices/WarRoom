@@ -98,7 +98,7 @@ export function LeaderboardPanel({
             className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[color:var(--color-chessboard-ivory)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Elo Rankings
+            Elo Ladder
           </span>
         </div>
         <div className="flex items-center gap-1.5">

@@ -279,7 +279,7 @@ export default function DashboardPage() {
                 className="px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-silver)] hover:text-[color:var(--color-chessboard-ghost)] transition-colors"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                Elo Ratings
+                Elo Ladder
               </button>
             </Link>
             <ThemeToggle />
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                   className="text-3xl sm:text-4xl font-bold tracking-[0.02em] text-[color:var(--color-chessboard-ghost)]"
                   style={{ fontFamily: 'var(--font-display)', lineHeight: 1.1 }}
                 >
-                  Welcome back, Lord{' '}
+                  Welcome back,{' '}
                   <span
                     style={{
                       background:
@@ -677,12 +677,12 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Side rail: Elo Rankings */}
+          {/* Side rail: Elo Ladder */}
           <div className="space-y-6">
             <FadeInUp delay={0.2}>
               <div id="dashboard-leaderboard" className="space-y-4">
                 <SigilBadge icon={ScrollText} tone="gold">
-                  <LoreTip tip={LORE.ironRankings}>Elo Rankings</LoreTip>
+                  <LoreTip tip={LORE.ironRankings}>Elo Ladder</LoreTip>
                 </SigilBadge>
                 {batch ? (
                   <LeaderboardPanel

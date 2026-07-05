@@ -5,7 +5,7 @@ import { useNarratorStore } from '@/src/state/narratorStore'
 import { FEATURE_INTROS } from '@/lib/narrator/featureIntros'
 
 // ============================================================
-// useFeatureIntro — first-hover Oracle explanation for a control.
+// useFeatureIntro — first-hover Grandmaster explanation for a control.
 //
 // Spread the returned props onto any interactive element:
 //
@@ -13,7 +13,7 @@ import { FEATURE_INTROS } from '@/lib/narrator/featureIntros'
 //   <div {...intro}> … </div>
 //
 // On the FIRST hover/focus (per device, tracked in localStorage), the
-// Oracle speaks the matching line from FEATURE_INTROS and spotlights
+// Grandmaster speaks the matching line from FEATURE_INTROS and spotlights
 // the element. Every visit after that is silent. Respects the narrator
 // mute flag and only fires on fine-pointer (mouse) devices for hover —
 // focus always works for keyboard users.

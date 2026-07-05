@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * narratorStore — Zustand store for the Oracle/Narrator subsystem.
+ * narratorStore — Zustand store for the Grandmaster/Narrator subsystem.
  *
  * Manages: dialogue queue, current mood, spotlight target, visibility,
  * onboarding completion flags. Plays `narrator.appear` SFX through the
@@ -33,7 +33,7 @@ export interface NarratorLine {
   /** ms to wait before this line starts (after the prior one ends). */
   delay?: number
   /** Pre-recorded voiceover MP3 path (e.g. `/audio/narrator/landing-first-visit-01-idle.mp3`). When set, it
-   *  is played in addition to the appear SFX so the Oracle actually speaks. */
+   *  is played in addition to the appear SFX so the Grandmaster actually speaks. */
   voiceUrl?: string
 }
 

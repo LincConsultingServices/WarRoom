@@ -23,14 +23,14 @@ export const STAGE_THEMES: Record<string, string> = {
 // Cinematic narration metadata per stage
 export const STAGE_NARRATIVES: Record<string, { month: string; title: string; desc: string }> = {
   STAGE_NEG2_IDEATION: { month: 'Month 0', title: 'Ideation', desc: 'Every great company starts with an idea. Define your vision, target market, and initial model.' },
-  STAGE_NEG1_VISION: { month: 'Month 1', title: 'Vision & Alignment', desc: 'Align your goals. Decide what kind of company you want to build before taking the leap.' },
-  STAGE_0_COMMITMENT: { month: 'Month 2', title: 'The Commitment', desc: 'It is time to decide if you are all-in. Are you ready to commit your time and capital?' },
-  STAGE_1_VALIDATION: { month: 'Month 3', title: 'Market Validation', desc: 'Get out of the building. Talk to customers and prove they actually want what you are building.' },
-  STAGE_2A_GROWTH: { month: 'Month 6', title: 'Initial Growth', desc: 'You have a product. Now you need to find your first true believers and early adopters.' },
-  STAGE_2B_EXPANSION: { month: 'Month 9', title: 'Expansion & Churn', desc: 'Growth brings problems. Deal with scaling issues, team dynamics, and keeping customers happy.' },
-  STAGE_3_SCALE: { month: 'Month 12', title: 'Scaling Up', desc: 'You have hit early product-market fit. Now it is time to pour fuel on the fire and scale operations.' },
-  STAGE_WARROOM_PREP: { month: 'Month 15', title: 'Pitch Prep', desc: 'You need outside capital to truly win the market. Perfect your pitch before facing the Sharks.' },
-  STAGE_4_WARROOM: { month: 'Month 18', title: 'The Boardroom Pitch', desc: 'Face the investors. Defend your valuation, handle tough questions, and secure the bag.' },
+  STAGE_NEG1_VISION: { month: 'Month 1', title: 'Vision', desc: 'Align your goals. Decide what kind of company you want to build before taking the leap.' },
+  STAGE_0_COMMITMENT: { month: 'Month 2', title: 'Commitment', desc: 'It is time to decide if you are all-in. Are you ready to commit your time and capital?' },
+  STAGE_1_VALIDATION: { month: 'Month 3', title: 'Validation', desc: 'Get out of the building. Talk to customers and prove they actually want what you are building.' },
+  STAGE_2A_GROWTH: { month: 'Month 6', title: 'Growth', desc: 'You have a product. Now you need to find your first true believers and early adopters.' },
+  STAGE_2B_EXPANSION: { month: 'Month 9', title: 'Expansion', desc: 'Growth brings problems. Deal with scaling issues, team dynamics, and keeping customers happy.' },
+  STAGE_3_SCALE: { month: 'Month 12', title: 'Scale', desc: 'You have hit early product-market fit. Now it is time to pour fuel on the fire and scale operations.' },
+  STAGE_WARROOM_PREP: { month: 'Month 15', title: 'War Room Prep', desc: 'You need outside capital to truly win the market. Perfect your pitch before facing the War Room.' },
+  STAGE_4_WARROOM: { month: 'Month 18', title: 'War Room', desc: 'Face the investors. Defend your valuation, handle tough questions, and secure the bag.' },
 }
 
 // Stage-specific mentor tip messages
@@ -90,13 +90,13 @@ export const INVESTOR_VOICE_BY_ID: Record<string, string> = {
 // Investor panel context_text shows the title; we resolve it here to look up
 // voice assets and other id-keyed resources.
 export const INVESTOR_TITLE_TO_ID: Record<string, string> = {
-  'The Identity Mirror': 'mirror_identity',
-  'The Capital Strategist': 'master_coin',
-  'The Execution Driver': 'lord_hustle',
-  'The Market Instinct': 'mother_instinct',
-  'The Operations Lead': 'hand_execution',
-  'The Strategic Advisor': 'spider_strategy',
-  'The Trust Builder': 'warden_trust',
+  'The Arbiter of Identity': 'mirror_identity',
+  'The Queen of Coin': 'master_coin',
+  'The Knight of Hustle': 'lord_hustle',
+  'The Blindfold Master': 'mother_instinct',
+  'The Rook of Execution': 'hand_execution',
+  'The Bishop of Strategy': 'spider_strategy',
+  'The Warden of the King': 'warden_trust',
 }
 
 // Scenario step styling — icons are lucide components (on-brand SVG, no emoji).

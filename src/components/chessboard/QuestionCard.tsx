@@ -29,7 +29,7 @@ import { QuestionWordReveal } from './QuestionWordReveal'
 interface QuestionCardProps {
   investorName: string
   questionText: string
-  /** Pre-text label like "Lord Bartlett asks:" */
+  /** Pre-text label like "The Queen of Coin asks:" */
   label?: string
   /** Optional emblem watermark URL (svg/png). */
   emblemUrl?: string | null

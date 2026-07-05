@@ -100,7 +100,7 @@ export default function HomePage() {
               </motion.div>
               <div>
                 <span className="font-bold text-base" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: 'var(--wr-ivory)', letterSpacing: '0.04em' }}>
-                  Assessment
+                  KK's WarRoom
                 </span>
                 <div className="text-[9px] tracking-[0.18em] text-neutral-500 uppercase -mt-0.5">Assessment Platform</div>
               </div>

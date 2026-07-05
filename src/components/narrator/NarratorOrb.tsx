@@ -17,7 +17,7 @@ type NarratorMood = keyof typeof ASSET_REGISTRY.narrator
 const narratorMoodSrc: Record<NarratorMood, string> = ASSET_REGISTRY.narrator
 
 /**
- * <NarratorOrb /> — the persistent floating Oracle.
+ * <NarratorOrb /> — the persistent floating Grandmaster.
  *
  * Sits in the bottom-left on desktop, bottom-center on mobile.
  * Renders the dialogue panel and spotlight as siblings when active.
@@ -76,8 +76,8 @@ export function NarratorOrb() {
           {/* Orb */}
           <motion.button
             type="button"
-            aria-label="The Oracle"
-            title="The Oracle"
+            aria-label="The Grandmaster"
+            title="The Grandmaster"
             onDoubleClick={() => dismiss()}
             initial={{ opacity: 0, scale: 0.6, y: 12 }}
             animate={{

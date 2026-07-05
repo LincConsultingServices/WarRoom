@@ -54,7 +54,7 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 // Curated SFX preview buttons — one per major audio category so the
 // player can audition the sound design before committing volume changes.
 const SFX_PREVIEWS: { key: SfxKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: 'wr.verdict', label: 'Gambit Roar', icon: Crown },
+  { key: 'wr.verdict', label: 'War Room Roar', icon: Crown },
   { key: 'sim.stage-begin', label: 'Pitch Bell', icon: Swords },
   { key: 'sim.stage-clear', label: 'Triumph', icon: Crown },
   { key: 'ui.click', label: 'Market Clash', icon: Swords },
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                       className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Show typewriter animation in Oracle narratives
+                      Show typewriter animation in Grandmaster narratives
                     </p>
                   </div>
                   <Switch id="typewriter" defaultChecked />
@@ -962,7 +962,7 @@ export default function SettingsPage() {
                       className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Make your profile visible on the Elo Rankings
+                      Make your profile visible on the Elo Ladder
                     </p>
                   </div>
                   <Switch id="profile-public" />

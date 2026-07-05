@@ -205,7 +205,7 @@ interface SnapshotDashboardProps {
   leaderboardEntries: SnapshotEntry[]
   currentUserId?: string
   stageName: string
-  /** The stage the founder is about to enter — the Oracle previews it. */
+  /** The stage the founder is about to enter — the Grandmaster previews it. */
   nextStage?: SnapshotNextStage
   budgetAllocations?: Record<string, number>
   capital?: number
@@ -218,11 +218,11 @@ function fmtRev(amount: number): string {
   return `$${amount.toLocaleString()}`
 }
 
-// ── Middle column: the Oracle previewing the next month / stage / goal.
+// ── Middle column: the Grandmaster previewing the next month / stage / goal.
 // Mounted only while the snapshot is open so its typewriter + voiceover
 // fire fresh on each reveal.
 function SnapshotNextStagePanel({ nextStage }: { nextStage?: SnapshotNextStage }) {
-  const goal = nextStage?.desc ?? 'The next trial awaits, lord. Steel yourself.'
+  const goal = nextStage?.desc ?? 'The next trial awaits, founder. Steel yourself.'
   const { revealedText, isComplete } = useTypewriterReveal(goal, { charDelayMs: 24 })
 
   useEffect(() => {
@@ -248,7 +248,7 @@ function SnapshotNextStagePanel({ nextStage }: { nextStage?: SnapshotNextStage }
     >
       <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 20%, rgba(200,168,74,0.14), transparent 60%)' }} />
 
-      {/* Oracle orb */}
+      {/* Grandmaster orb */}
       <motion.div
         animate={{ scale: [1, 1.06, 1], boxShadow: ['0 0 24px rgba(200,168,74,0.35)', '0 0 38px rgba(200,168,74,0.55)', '0 0 24px rgba(200,168,74,0.35)'] }}
         transition={{ repeat: Infinity, duration: 3.2, ease: 'easeInOut' }}
@@ -258,7 +258,7 @@ function SnapshotNextStagePanel({ nextStage }: { nextStage?: SnapshotNextStage }
         <span className="text-2xl" aria-hidden>🜂</span>
       </motion.div>
 
-      <p className="relative z-10 mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">The Oracle Foretells</p>
+      <p className="relative z-10 mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">The Grandmaster Foretells</p>
 
       {nextStage && (
         <span
@@ -359,7 +359,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
                 )}
               </motion.div>
 
-              {/* ── MIDDLE: Oracle previews the next stage ── */}
+              {/* ── MIDDLE: Grandmaster previews the next stage ── */}
               <SnapshotNextStagePanel nextStage={nextStage} />
 
               {/* ── RIGHT: live leaderboard ── */}

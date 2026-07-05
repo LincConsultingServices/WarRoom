@@ -1,5 +1,5 @@
 // ============================================
-// KK's Assessment 2.0 - TypeScript Types
+// KK's WarRoom - TypeScript Types
 // Aligned with SOP 2.0 (8 Competencies, 7 Stages)
 // ============================================
 

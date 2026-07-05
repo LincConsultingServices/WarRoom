@@ -206,7 +206,7 @@ export default function ChessboardSimulation() {
     const narratorPhase = narratorPhaseForChessboard(phase)
     useNarratorOnboarding(narratorPhase ?? '', { enabled: narratorPhase === 'chessboard.pitch' })
 
-    // ── First-hover Oracle intros for the Chessboard's key controls ──
+    // ── First-hover Grandmaster intros for the Chessboard's key controls ──
     const offerIntro = useFeatureIntro('negotiation-offer')
     const pitchRecordIntro = useFeatureIntro('chessboard-pitch-record')
     const investorMicIntro = useFeatureIntro('chessboard-investor-mic')

@@ -30,7 +30,7 @@ const jetBrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "KK's Chessboard — Prove Your Edge",
+  title: "KK's WarRoom — Prove Your Edge",
   description: 'Enter the assessment. Face expert evaluators, defend your strategy, and forge your entrepreneurial path in the ultimate pressure simulation.',
   keywords: ['entrepreneurship', 'simulation', 'pitch', 'assessment', 'war room', 'gamified'],
   generator: 'v0.app'

@@ -7,7 +7,7 @@ import { TermsBackLink } from './TermsBackLink'
 const SECTION_A = [
   {
     title: '1. Nature of the Experience',
-    body: "KK's WAR ROOM is a high-pressure, simulation-based experience designed to evaluate decision-making, problem-solving, and entrepreneurial thinking under time and situational constraints. This is not a standardized psychometric, academic, or clinical assessment.",
+    body: "KK's WarRoom is a high-pressure, simulation-based experience designed to evaluate decision-making, problem-solving, and entrepreneurial thinking under time and situational constraints. This is not a standardized psychometric, academic, or clinical assessment.",
   },
   {
     title: '2. Voluntary Participation',
@@ -42,7 +42,7 @@ const SECTION_A = [
   },
   {
     title: '7. Use of AI in the Experience (No Human Review)',
-    body: "KK's WAR ROOM uses AI-driven systems for:",
+    body: "KK's WarRoom uses AI-driven systems for:",
     list: [
       'Scenario generation',
       'Response analysis',
@@ -65,7 +65,7 @@ const SECTION_A = [
   },
   {
     title: '10. Code of Conduct',
-    body: "Participants must engage respectfully and professionally. KK's WAR ROOM reserves the right to remove participants for inappropriate or disruptive behavior.",
+    body: "Participants must engage respectfully and professionally. KK's WarRoom reserves the right to remove participants for inappropriate or disruptive behavior.",
   },
   {
     title: '11. Emotional & Psychological Acknowledgment',
@@ -82,11 +82,11 @@ const SECTION_A = [
   },
   {
     title: '13. Limitation of Liability',
-    body: "To the maximum extent permitted by law: KK's WAR ROOM and its facilitators shall not be liable for any direct, indirect, incidental, or consequential loss, damage, or impact arising from participation in the simulation or use of its outputs. All actions taken based on the insights provided are the sole responsibility of the participant or organization.",
+    body: "To the maximum extent permitted by law: KK's WarRoom and its facilitators shall not be liable for any direct, indirect, incidental, or consequential loss, damage, or impact arising from participation in the simulation or use of its outputs. All actions taken based on the insights provided are the sole responsibility of the participant or organization.",
   },
   {
     title: '14. Indemnification',
-    body: "Participants and sponsoring organizations agree to indemnify and hold harmless KK's WAR ROOM from any claims, damages, or liabilities arising from:",
+    body: "Participants and sponsoring organizations agree to indemnify and hold harmless KK's WarRoom from any claims, damages, or liabilities arising from:",
     list: [
       'Participation in the program.',
       'Use or misuse of outputs or reports.',
@@ -159,12 +159,12 @@ const SECTION_B = [
     list: [
       'The report is intended only for development discussions.',
       'It must be combined with other evaluation methods and professional judgment.',
-      "KK's WAR ROOM is not responsible for decisions made by third parties using this report.",
+      "KK's WarRoom is not responsible for decisions made by third parties using this report.",
     ],
   },
   {
     title: '8. Limitation of Liability',
-    body: "KK's WAR ROOM shall not be liable for any decisions, actions, or outcomes arising from the use or interpretation of this report.",
+    body: "KK's WarRoom shall not be liable for any decisions, actions, or outcomes arising from the use or interpretation of this report.",
   },
   {
     title: '9. Confidentiality & Use',

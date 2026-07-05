@@ -54,7 +54,7 @@ export function PhaseTransitionView({
               </h2>
               <div className="h-px max-w-xs mx-auto" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.4), transparent)' }} />
               <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: '#8c8075', letterSpacing: '0.02em' }}>
-                You have forged the foundation. Before you commit your forces and enter the 60-minute battle phase — make your choice, Lord Commander.
+                You have forged the foundation. Before you commit your forces and enter the 60-minute battle phase — make your choice, founder.
               </p>
             </div>
 

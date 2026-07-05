@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              The Elo Rankings
+              The Elo Ladder
             </h1>
           </div>
 

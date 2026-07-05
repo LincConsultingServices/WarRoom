@@ -17,7 +17,7 @@ import type { Mentor, MentorLifelineResult } from '@/src/types'
 // card, the floating "Counsel" button, and the transient tip popup)
 // into one always-present block: the mentor delivers the stage tip as
 // a scroll, shows remaining lifelines, and offers the "Ask a Mentor"
-// action. First hover triggers the Oracle's feature intro.
+// action. First hover triggers the Grandmaster's feature intro.
 // ============================================
 
 interface MentorBlockProps {

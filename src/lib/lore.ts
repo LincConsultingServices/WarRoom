@@ -13,13 +13,13 @@ export const LORE = {
   constellation:
     'Each node represents one of your eight founder competencies. It strengthens as you demonstrate mastery across stages.',
   sigil:
-    'Emblems are achievements for genuine tactical feats — earned through merit, never shortcuts.',
+    'Norms are achievements for genuine tactical feats — earned through merit, never shortcuts.',
   hearth:
-    'The Streak tracks your weekly consistency. Keep it active by returning each week to the boardroom.',
+    'The Study Candle tracks your weekly consistency. Keep it burning by returning each week to the study.',
   house:
-    'Your Startup Profile is your identity — brand, motto, and colors. New options unlock as your valuation rises.',
+    'Your Club is your identity — brand, motto, and colors. New options unlock as your valuation rises.',
   ironRankings:
-    'The Elo Ratings place every founder in your cohort by projected performance.',
+    'The Elo Ladder places every founder in your cohort by projected performance.',
   legacyScore:
     'Your performance score is the evaluators\' average verdict from a completed assessment.',
 } as const
