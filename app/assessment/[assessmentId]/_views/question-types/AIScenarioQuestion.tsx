@@ -190,7 +190,7 @@ export function AIScenarioQuestion({
                         className="text-2xl md:text-3xl font-bold tracking-wide text-red-200"
                         style={{ fontFamily: "var(--font-display)", letterSpacing: '0.04em' }}
                       >
-                        Enter the Boardroom
+                        Enter the War Room
                       </h3>
                       <p className="text-sm text-red-100/70 mt-2 max-w-sm">
                         Reject the buyout. Fight for valuation and retain control of the championship.

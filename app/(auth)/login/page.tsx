@@ -123,7 +123,7 @@ function LoginContent() {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Return to the Boardroom
+          Return to the War Room
         </motion.h1>
 
         <motion.p
@@ -336,7 +336,7 @@ function LoginContent() {
                 ? 'Accessing your assessment…'
                 : isAdmin
                   ? 'Sign In as Admin'
-                  : 'Enter the Boardroom'}
+                  : 'Enter the War Room'}
             </ChessboardCTA>
           </form>
         </StoneCard>
