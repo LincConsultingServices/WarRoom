@@ -20,6 +20,7 @@ import { RouteBackground } from '@/src/components/effects/RouteBackground'
 import { AmbientAudioManager } from '@/src/components/chessboard/AmbientAudioManager'
 import { AudioControls } from '@/src/components/chessboard/AudioControls'
 import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
+import { waitForNarratorVoice } from '@/src/state/narratorStore'
 
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
@@ -118,7 +119,9 @@ function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().then(() => {
+      const toPlay = audioRef.current;
+      // Never talk over the Grandmaster — let his current line finish first.
+      void waitForNarratorVoice().then(() => toPlay.play()).then(() => {
         setIsPlaying(true);
       }).catch(() => {
         setIsPlaying(false);
@@ -350,6 +353,8 @@ export default function ChessboardSimulation() {
                 const audio = new Audio(`data:audio/mp3;base64,${result.audioBase64}`)
                 audio.volume = getVoiceLineVolume()
                 audioRef.current = audio
+                // Never talk over the Grandmaster — let his current line finish first.
+                await waitForNarratorVoice()
                 audio.play().catch(e => console.error("Auto-play failed:", e))
             }
 
@@ -616,6 +621,8 @@ export default function ChessboardSimulation() {
                             audio.onplay = () => setIsPlayingAudio(true)
                             audio.onended = () => setIsPlayingAudio(false)
                             audio.onerror = () => setIsPlayingAudio(false)
+                            // Never talk over the Grandmaster — let his current line finish first.
+                            await waitForNarratorVoice()
                             audio.play().catch(() => setIsPlayingAudio(false))
                         }
                         return
@@ -639,6 +646,8 @@ export default function ChessboardSimulation() {
                 audio.onplay = () => setIsPlayingAudio(true)
                 audio.onended = () => setIsPlayingAudio(false)
                 audio.onerror = () => setIsPlayingAudio(false)
+                // Never talk over the Grandmaster — let his current line finish first.
+                await waitForNarratorVoice()
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
         } catch (err: unknown) {
@@ -687,6 +696,8 @@ export default function ChessboardSimulation() {
                 audio.onplay = () => setIsPlayingAudio(true)
                 audio.onended = () => setIsPlayingAudio(false)
                 audio.onerror = () => setIsPlayingAudio(false)
+                // Never talk over the Grandmaster — let his current line finish first.
+                await waitForNarratorVoice()
                 audio.play().catch(() => setIsPlayingAudio(false))
             }
         } catch (err: unknown) {

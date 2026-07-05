@@ -119,6 +119,31 @@ function stopNarratorVoice(): void {
   }
 }
 
+/** True while a Grandmaster voiceover clip is actively playing. Lets other
+ *  voice channels (e.g. investor TTS lines) check before starting so they
+ *  never talk over the narrator. */
+export function isNarratorVoicePlaying(): boolean {
+  return !!narratorAudio && !narratorAudio.paused && !narratorAudio.ended
+}
+
+/** Resolves once the current narrator clip stops (naturally or via pause/
+ *  cancellation) — resolves immediately if nothing is playing. Callers
+ *  (investor voice lines) should await this before starting playback so the
+ *  Grandmaster always finishes a line before an investor speaks. */
+export function waitForNarratorVoice(): Promise<void> {
+  const audio = narratorAudio
+  if (!audio || !isNarratorVoicePlaying()) return Promise.resolve()
+  return new Promise((resolve) => {
+    const onDone = () => {
+      audio.removeEventListener('ended', onDone)
+      audio.removeEventListener('pause', onDone)
+      resolve()
+    }
+    audio.addEventListener('ended', onDone)
+    audio.addEventListener('pause', onDone)
+  })
+}
+
 export const useNarratorStore = create<NarratorState>((set, get) => ({
   isVisible: false,
   isAnimating: false,

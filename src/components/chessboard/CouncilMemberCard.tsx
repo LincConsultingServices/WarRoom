@@ -56,7 +56,7 @@ const MOOD_LABEL: Record<CouncilMood, string> = {
   interested: 'Interested',
   skeptical:  'Skeptical',
   impressed:  'Impressed',
-  hostile:    'Hostile',
+  hostile:    'Unconvinced',
 }
 
 export function CouncilMemberCard({

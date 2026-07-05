@@ -43,7 +43,7 @@ function describe(value: number): { label: string; tone: string } {
   if (value >= 58) return { label: 'Interested', tone: 'text-amber-200' }
   if (value >= 42) return { label: 'Neutral',    tone: 'text-white/80' }
   if (value >= 25) return { label: 'Skeptical',  tone: 'text-orange-300' }
-  return                  { label: 'Hostile',    tone: 'text-red-400' }
+  return                  { label: 'Unconvinced', tone: 'text-red-400' }
 }
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
