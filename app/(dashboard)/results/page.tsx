@@ -38,7 +38,7 @@ interface SimulationResult {
   id: string
   attemptNumber: number
   status: string
-  currentStage: number
+  currentStage: string
   startedAt: string | null
   completedAt: string | null
   stages: {
@@ -75,6 +75,21 @@ const STAGE_NAMES: Record<number, string> = {
   1: 'Validating',
   2: 'Scaling',
   3: 'Establishing',
+}
+
+// currentStage from the API is the raw backend stage ID (e.g.
+// "STAGE_2A_GROWTH"), not the -2..3 grid position used for this overview —
+// map it here rather than changing the API's field type, which every other
+// consumer of this endpoint (dashboard, profile, history) already relies on
+// being that raw string.
+const STAGE_ID_TO_NUMBER: Record<string, number> = {
+  STAGE_NEG2_IDEATION: -2,
+  STAGE_NEG1_VISION: -1,
+  STAGE_0_COMMITMENT: 0,
+  STAGE_1_VALIDATION: 1,
+  STAGE_2A_GROWTH: 2,
+  STAGE_2B_EXPANSION: 2,
+  STAGE_3_SCALE: 3,
 }
 
 const PROGRESS_CLASSES =
@@ -366,7 +381,7 @@ function SimulationCard({
               )
               const isDone = Boolean(stage?.completedAt)
               const isCurrent =
-                !isDone && simulation.currentStage === stageNum
+                !isDone && STAGE_ID_TO_NUMBER[simulation.currentStage] === stageNum
               const stageResponses =
                 simulation.responses?.filter(
                   (r) => r.stage?.stageNumber === stageNum,
