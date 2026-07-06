@@ -228,9 +228,12 @@ export function useSimulation(assessmentId: string) {
     setAnswers((prev) => ({ ...prev, [qId]: { ...prev[qId], questionId: qId, type: (isScenario ? qType : 'multiple_choice') as any, selectedOptionId: opt.id } }))
     if (!questionId) setMcqFeedback(opt.feedback || null)
     if (qId === 'Q_0_1' || qId === 'Q_0_CAPITAL') {
+      const parsedCapital = typeof opt.impact?.capital === 'number'
+        ? opt.impact.capital
+        : Number((opt.text.match(/[0-9][0-9,]*/)?.[0] || '').replace(/,/g, '')) || 0
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setState((p: any) => p ? { ...p, simulation: { ...p.simulation, capital: 50000 } } : p)
-      setPrevRevenue(revenue); setRevenue(50000)
+      setState((p: any) => p ? { ...p, simulation: { ...p.simulation, capital: parsedCapital } } : p)
+      setPrevRevenue(revenue); setRevenue(parsedCapital)
       setShowCapitalAnimation(true); setTimeout(() => setShowCapitalAnimation(false), 3000)
     }
   }

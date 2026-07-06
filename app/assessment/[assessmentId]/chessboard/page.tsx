@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
@@ -80,11 +81,11 @@ function QuestionAudioPlayer({ audioKeys, className = '' }: { audioKeys: string[
       }
     };
 
-    void probe().finally(() => {
-      if (!cancelled) {
-        setIsCheckingAudio(false);
-      }
-    });
+        void probe().finally(() => {
+            if (!cancelled) {
+                setIsCheckingAudio(false);
+            }
+        });
 
     return () => {
       cancelled = true;
@@ -262,7 +263,7 @@ export default function ChessboardSimulation() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
     const [negRound, setNegRound] = useState(0)
-    const [negHistory, setNegHistory] = useState<{sender: string, msg: string, type: 'investor'|'user'}[]>([])
+    const [negHistory, setNegHistory] = useState<{sender: string, msg: string, type: 'investor'|'user', capital?: number, equity?: number}[]>([])
     const [dealFinalized, setDealFinalized] = useState(false)
     const [isNegVoiceSubmitting, setIsNegVoiceSubmitting] = useState(false)
     const [acceptedDealTerms, setAcceptedDealTerms] = useState<{capital: number, equity: number, investorName: string} | null>(null)
@@ -283,7 +284,7 @@ export default function ChessboardSimulation() {
         setSelectedOffer(offer)
         setNegRound(0) // Round increments on each voice submission
         setNegHistory([
-            { sender: offer.investorName, msg: offer.message, type: 'investor' }
+            { sender: offer.investorName, msg: offer.message, type: 'investor', capital: offer.capital, equity: offer.equity }
         ])
     }
 
@@ -313,7 +314,9 @@ export default function ChessboardSimulation() {
             const result = await api.assessments.counterNegotiateAudio(
                 assessmentId,
                 selectedOffer.investorId,
-                negotiationRecorder.audioBlob
+                negotiationRecorder.audioBlob,
+                selectedOffer.capital,
+                selectedOffer.equity
             )
 
             // Walk-away detection disabled per user request to remove hardcoded walkout triggers
@@ -339,13 +342,17 @@ export default function ChessboardSimulation() {
             const newHistory = [...negHistory, {
                 sender: 'You',
                 msg: result.transcription,
-                type: 'user' as const
+                type: 'user' as const,
+                capital: result.currentCapital ?? selectedOffer.capital,
+                equity: result.currentEquity ?? selectedOffer.equity,
             }]
 
             newHistory.push({
                 sender: selectedOffer.investorName,
                 msg: result.message,
-                type: 'investor'
+                type: 'investor',
+                capital: result.capital,
+                equity: result.equity
             })
 
             setNegHistory(newHistory)
@@ -1502,6 +1509,11 @@ export default function ChessboardSimulation() {
                                         }}>
                                             <strong style={{ display: 'block', marginBottom: '0.3rem', color: item.type === 'user' ? '#60a5fa' : '#34d399' }}>{item.sender}</strong>
                                             {item.msg}
+                                            {item.capital != null && item.equity != null && (
+                                                <div style={{ marginTop: '0.45rem', fontSize: '0.78rem', color: '#d1d5db' }}>
+                                                    Terms: ${item.capital.toLocaleString()} for {item.equity}% equity
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

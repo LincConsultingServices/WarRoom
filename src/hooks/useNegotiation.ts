@@ -23,7 +23,7 @@ export function useNegotiation(assessmentId: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedOffer, setSelectedOffer] = useState<any | null>(null)
   const [negRound, setNegRound] = useState(0)
-  const [negHistory, setNegHistory] = useState<{ sender: string; msg: string; type: 'investor' | 'user' }[]>([])
+  const [negHistory, setNegHistory] = useState<{ sender: string; msg: string; type: 'investor' | 'user'; capital?: number; equity?: number }[]>([])
   const [dealFinalized, setDealFinalized] = useState(false)
   const [isNegVoiceSubmitting, setIsNegVoiceSubmitting] = useState(false)
   const [acceptedDealTerms, setAcceptedDealTerms] = useState<{ capital: number; equity: number; investorName: string } | null>(null)
@@ -54,7 +54,7 @@ export function useNegotiation(assessmentId: string) {
   function handleSelectOffer(offer: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     setSelectedOffer(offer)
     setNegRound(0)
-    setNegHistory([{ sender: offer.investorName, msg: offer.message, type: 'investor' }])
+    setNegHistory([{ sender: offer.investorName, msg: offer.message, type: 'investor', capital: offer.capital, equity: offer.equity }])
   }
 
   async function handleNegotiateAudio() {
@@ -63,11 +63,11 @@ export function useNegotiation(assessmentId: string) {
     if (nextRound > MAX_NEG_ROUNDS) { setError('Maximum rounds reached.'); return }
     setIsNegVoiceSubmitting(true); setError('')
     try {
-      const result = await api.assessments.counterNegotiateAudio(assessmentId, selectedOffer.investorId, negotiationRecorder.audioBlob)
+      const result = await api.assessments.counterNegotiateAudio(assessmentId, selectedOffer.investorId, negotiationRecorder.audioBlob, selectedOffer.capital, selectedOffer.equity)
       const newHistory = [
         ...negHistory,
-        { sender: 'You', msg: result.transcription, type: 'user' as const },
-        { sender: selectedOffer.investorName, msg: result.message, type: 'investor' as const },
+        { sender: 'You', msg: result.transcription, type: 'user' as const, capital: result.currentCapital ?? selectedOffer.capital, equity: result.currentEquity ?? selectedOffer.equity },
+        { sender: selectedOffer.investorName, msg: result.message, type: 'investor' as const, capital: result.capital, equity: result.equity },
       ]
       setNegHistory(newHistory)
       setNegRound(nextRound)

@@ -248,11 +248,13 @@ export const api = {
         body: JSON.stringify({ offerId }),
       }),
 
-    counterNegotiateAudio: async (id: string, investorId: string, audioBlob: Blob) => {
+    counterNegotiateAudio: async (id: string, investorId: string, audioBlob: Blob, capital: number, equity: number) => {
       const token = await getIdToken()
       const formData = new FormData()
       formData.append('audio', audioBlob, 'counter.webm')
       formData.append('investorId', investorId)
+      formData.append('capital', String(capital))
+      formData.append('equity', String(equity))
       const headers: Record<string, string> = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
       const controller = new AbortController()
@@ -275,6 +277,8 @@ export const api = {
           isFinal: boolean
           capital: number
           equity: number
+          currentCapital?: number
+          currentEquity?: number
           audioBase64?: string
         }
         if (!data.message) {
