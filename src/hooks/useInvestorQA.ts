@@ -5,6 +5,7 @@ import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import type { Investor, InvestorScorecard } from '@/src/types'
 import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
+import { displayTranscript, isNoSpeechTranscript } from '@/src/lib/transcription'
 
 
 // ============================================
@@ -57,12 +58,19 @@ export function useInvestorQA(assessmentId: string) {
     try {
       const result = await api.assessments.respondToInvestorAudio(assessmentId, investor.id, responseBlob)
       setScorecards((prev) => [...prev, result.scorecard])
-      setResponseTranscription(result.transcription)
-      setInitialTranscription(result.transcription)
+      const transcription = displayTranscript(result.transcription)
+      setResponseTranscription(transcription)
+      setInitialTranscription(transcription)
       setResponseSubmitted(true)
       responseRecorder.resetRecording()
 
       try {
+        if (isNoSpeechTranscript(result.transcription)) {
+          setCurrentInvestorReaction(result.scorecard.investorReaction || `${investor.name} has considered your response.`)
+          if (result.audioBase64) playAudioBase64(result.audioBase64)
+          return
+        }
+
         const followup = await api.assessments.generateInvestorFollowupAudio(assessmentId, investor.id, responseBlob)
         const question = followup.followup_question || followup.followupQuestion
         if (question) {
@@ -93,7 +101,7 @@ export function useInvestorQA(assessmentId: string) {
       const result = await api.assessments.respondToInvestorFinalAudio(
         assessmentId, investor.id, initialTranscription, followupQuestion, responseRecorder.audioBlob
       )
-      setResponseTranscription(result.transcription)
+      setResponseTranscription(displayTranscript(result.transcription))
       setCurrentInvestorReaction(result.scorecard.investorReaction || `${investor.name} has considered your follow-up.`)
       setFollowupActive(false)
       responseRecorder.resetRecording()

@@ -21,6 +21,7 @@ import { AmbientAudioManager } from '@/src/components/chessboard/AmbientAudioMan
 import { AudioControls } from '@/src/components/chessboard/AudioControls'
 import { isVoiceLineMuted, getVoiceLineVolume } from '@/src/state/audioStore'
 import { claimVoiceTurn, waitForTurn } from '@/lib/audio/voiceTurn'
+import { displayTranscript, isNoSpeechTranscript } from '@/src/lib/transcription'
 
 import type { AmbientScene } from '@/src/hooks/useAmbientAudio'
 // Chamber components — Phase B integration. The pitch route's data flow stays
@@ -547,8 +548,9 @@ export default function ChessboardSimulation() {
 
         try {
             const result = await api.assessments.submitPitchAudio(assessmentId, pitchRecorder.audioBlob)
-            setPitchAnalysis(result.analysis)
-            setPitchText(result.analysis.transcription)
+            const transcription = displayTranscript(result.analysis.transcription)
+            setPitchAnalysis({ ...result.analysis, transcription })
+            setPitchText(transcription)
             resetPitchFollowupState()
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to analyze pitch')
@@ -594,8 +596,9 @@ export default function ChessboardSimulation() {
                 responseBlob
             )
             setScorecards(prev => [...prev, result.scorecard])
-            setResponseTranscription(result.transcription)
-            setInitialTranscription(result.transcription)
+            const transcription = displayTranscript(result.transcription)
+            setResponseTranscription(transcription)
+            setInitialTranscription(transcription)
             setResponseSubmitted(true)
             responseRecorder.resetRecording()
 
@@ -606,7 +609,7 @@ export default function ChessboardSimulation() {
             // Only attempt a follow-up if the initial response actually
             // transcribed to something. An empty transcription would leave
             // the user stranded on the follow-up phase with no way to submit.
-            if (result.transcription && result.transcription.trim().length > 0) {
+            if (!isNoSpeechTranscript(result.transcription) && transcription.length > 0) {
                 try {
                     const followup = await api.assessments.generateInvestorFollowupAudio(
                         assessmentId,
@@ -691,7 +694,7 @@ export default function ChessboardSimulation() {
             setCurrentInvestorReaction(
                 result.scorecard.investorReaction || `${investor.name} has considered your follow-up.`
             )
-            setResponseTranscription(result.transcription)
+            setResponseTranscription(displayTranscript(result.transcription))
             setFollowupPhase('followup_answered')
             responseRecorder.resetRecording()
             if (result.audioBase64 && !isVoiceLineMuted()) {
@@ -1043,10 +1046,12 @@ export default function ChessboardSimulation() {
                                     <div className="score-item"><span className="score-label">Confidence</span><span className="score-value">{pitchAnalysis.confidence}/5</span></div>
                                     <div className="score-item"><span className="score-label">Persuasion</span><span className="score-value">{pitchAnalysis.persuasion}/5</span></div>
                                 </div>
-                                <div className="analysis-transcript">
-                                    <span className="analysis-label">What you said:</span>
-                                    <p>{pitchAnalysis.transcription}</p>
-                                </div>
+                                {pitchAnalysis.transcription && (
+                                    <div className="analysis-transcript">
+                                        <span className="analysis-label">What you said:</span>
+                                        <p>{pitchAnalysis.transcription}</p>
+                                    </div>
+                                )}
                                 
                                 {pitchAnalysis.strengths?.length > 0 && (
                                     <div className="analysis-list strengths">

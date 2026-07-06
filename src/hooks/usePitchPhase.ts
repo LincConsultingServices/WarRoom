@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import api from '@/src/lib/api'
 import { useAudioRecorder } from '@/src/hooks/useAudioRecorder'
 import type { Investor } from '@/src/types'
+import { displayTranscript } from '@/src/lib/transcription'
 
 // ============================================
 // usePitchPhase — manages pitch recording and AI analysis.
@@ -32,8 +33,9 @@ export function usePitchPhase(assessmentId: string) {
     setIsAnalyzing(true); setIsSubmitting(true); setError('')
     try {
       const result = await api.assessments.submitPitchAudio(assessmentId, pitchRecorder.audioBlob)
-      setPitchAnalysis(result.analysis)
-      setPitchText(result.analysis.transcription)
+      const transcription = displayTranscript(result.analysis.transcription)
+      setPitchAnalysis({ ...result.analysis, transcription })
+      setPitchText(transcription)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to analyze pitch')
     } finally {
