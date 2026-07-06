@@ -7,14 +7,12 @@ import Link from 'next/link'
 import {
   ArrowLeft,
   ScrollText,
-  Swords,
   Brain,
   Sparkles,
   MessageSquare,
 } from 'lucide-react'
 import api from '@/src/lib/api'
 import type { EvaluationReport } from '@/src/types'
-import { DealSummaryTab } from './_sections/DealSummaryTab'
 import { CompetencyTab } from './_sections/CompetencyTab'
 import { AIAnalysisTab } from './_sections/AIAnalysisTab'
 import { ResponsesTab } from './_sections/ResponsesTab'
@@ -29,10 +27,9 @@ import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 // ============================================
 
 const TABS = [
-  { id: 1, label: 'Deal Summary', icon: Swords },
-  { id: 2, label: 'Competency Profile', icon: Brain },
-  { id: 3, label: 'AI Analysis', icon: Sparkles },
-  { id: 4, label: 'Your Responses', icon: MessageSquare },
+  { id: 1, label: 'Competency Profile', icon: Brain },
+  { id: 2, label: 'AI Analysis', icon: Sparkles },
+  { id: 3, label: 'Your Responses', icon: MessageSquare },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -196,10 +193,9 @@ export default function FinalReportPage() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.25, ease: easeDramatic }}
             >
-              {activeTab === 1 && <DealSummaryTab report={report} />}
-              {activeTab === 2 && <CompetencyTab report={report} />}
-              {activeTab === 3 && <AIAnalysisTab report={report} />}
-              {activeTab === 4 && <ResponsesTab report={report} />}
+              {activeTab === 1 && <CompetencyTab report={report} />}
+              {activeTab === 2 && <AIAnalysisTab report={report} />}
+              {activeTab === 3 && <ResponsesTab report={report} />}
             </motion.div>
           </AnimatePresence>
         </main>
