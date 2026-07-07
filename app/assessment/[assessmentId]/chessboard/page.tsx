@@ -268,6 +268,9 @@ export default function ChessboardSimulation() {
     const [isNegVoiceSubmitting, setIsNegVoiceSubmitting] = useState(false)
     const [acceptedDealTerms, setAcceptedDealTerms] = useState<{capital: number, equity: number, investorName: string} | null>(null)
     const [walkedAwayInvestor, setWalkedAwayInvestor] = useState<string | null>(null)
+    // When the AI makes a final Round-4 "take it or leave it" offer, we surface
+    // Accept / Reject buttons instead of auto-rejecting the whole negotiation.
+    const [isFinalOffer, setIsFinalOffer] = useState(false)
 
     // Auto-reset negotiation recorder when offer changes
     useEffect(() => {
@@ -283,6 +286,7 @@ export default function ChessboardSimulation() {
     const handleSelectOffer = (offer: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setSelectedOffer(offer)
         setNegRound(0) // Round increments on each voice submission
+        setIsFinalOffer(false)
         setNegHistory([
             { sender: offer.investorName, msg: offer.message, type: 'investor', capital: offer.capital, equity: offer.equity }
         ])
@@ -319,6 +323,14 @@ export default function ChessboardSimulation() {
                 selectedOffer.equity
             )
 
+            // No-speech / too-short guard: if transcription is < 5 words, skip processing.
+            const negWordCount = (result.transcription ?? '').trim().split(/\s+/).filter(Boolean).length
+            if (negWordCount < 5 && !result.accepted) {
+                setError('Recording too short — please record a full counter-offer (at least a few seconds).')
+                negotiationRecorder.resetRecording()
+                return
+            }
+
             // Walk-away detection disabled per user request to remove hardcoded walkout triggers
             const isWalkAway = false
 
@@ -333,6 +345,7 @@ export default function ChessboardSimulation() {
                 }
                 setSelectedOffer(null)
                 setNegRound(0)
+                setIsFinalOffer(false)
                 negotiationRecorder.resetRecording()
                 // Clear walk-away message after 3 seconds
                 setTimeout(() => setWalkedAwayInvestor(null), 3000)
@@ -371,8 +384,7 @@ export default function ChessboardSimulation() {
             }
 
             if (result.accepted) {
-                // Use the current selectedOffer amounts (or AI-returned if they're reasonable)
-                // Prefer the AI response amounts since they represent the negotiated terms
+                // Use the negotiated terms from the AI response
                 const finalCapital = result.capital || selectedOffer.capital
                 const finalEquity = result.equity || selectedOffer.equity
                 
@@ -390,6 +402,7 @@ export default function ChessboardSimulation() {
                 }
                 
                 setDealFinalized(true)
+                setIsFinalOffer(false)
             } else {
                 // Update offer with counter-proposed terms
                 const updatedOffer = { 
@@ -399,16 +412,10 @@ export default function ChessboardSimulation() {
                 }
                 setSelectedOffer(updatedOffer)
 
-                if (nextRound >= MAX_NEG_ROUNDS) {
-                    // Max rounds exhausted without acceptance — auto-reject this offer
-                    try {
-                        await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
-                        setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
-                        setSelectedOffer(null)
-                        setNegRound(0)
-                    } catch (e) {
-                        console.error('Auto-reject failed:', e)
-                    }
+                if (result.isFinal || nextRound >= MAX_NEG_ROUNDS) {
+                    // AI made a final "take it or leave it" offer.
+                    // Surface Accept / Reject buttons — do NOT auto-reject.
+                    setIsFinalOffer(true)
                 }
             }
 
@@ -418,6 +425,38 @@ export default function ChessboardSimulation() {
         } finally {
             setIsNegVoiceSubmitting(false)
         }
+    }
+
+    // User clicks Accept on the AI's final offer
+    const handleAcceptFinalOffer = async () => {
+        if (!selectedOffer) return
+        const finalCapital = selectedOffer.capital
+        const finalEquity = selectedOffer.equity
+        setAcceptedDealTerms({ capital: finalCapital, equity: finalEquity, investorName: selectedOffer.investorName })
+        try {
+            await api.assessments.acceptDeal(assessmentId, selectedOffer.investorId, finalCapital, finalEquity)
+        } catch (e) {
+            console.error('Accept final deal failed:', e)
+        }
+        setDealFinalized(true)
+        setIsFinalOffer(false)
+    }
+
+    // User clicks Reject on the AI's final offer
+    const handleRejectFinalOffer = async () => {
+        if (!selectedOffer) return
+        const investorName = selectedOffer.investorName
+        try {
+            await api.assessments.rejectOffer(assessmentId, selectedOffer.offerId || selectedOffer.type)
+            setOffers(offers.filter(o => o.offerId !== selectedOffer.offerId && o.offerId !== selectedOffer.type))
+        } catch (e) {
+            console.error('Reject final deal failed:', e)
+        }
+        setSelectedOffer(null)
+        setIsFinalOffer(false)
+        setNegRound(0)
+        setWalkedAwayInvestor(investorName)
+        setTimeout(() => setWalkedAwayInvestor(null), 3000)
     }
 
     const handleRejectDeal = async () => {
@@ -1476,7 +1515,7 @@ export default function ChessboardSimulation() {
                             </div>
                         )}
 
-                        {selectedOffer && !dealFinalized && (
+                         {selectedOffer && !dealFinalized && (
                             <motion.div
                                 className="negotiation-room"
                                 initial={{ opacity: 0, y: 20 }}
@@ -1491,11 +1530,11 @@ export default function ChessboardSimulation() {
                                             fontSize: '0.75rem',
                                             fontWeight: 700,
                                             letterSpacing: '1px',
-                                            background: negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-                                            color: negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#60a5fa',
-                                            border: `1px solid ${negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`,
+                                            background: isFinalOffer ? 'rgba(239, 68, 68, 0.2)' : negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                                            color: isFinalOffer ? '#fca5a5' : negRound >= MAX_NEG_ROUNDS - 1 ? '#ef4444' : '#60a5fa',
+                                            border: `1px solid ${isFinalOffer ? 'rgba(239,68,68,0.5)' : negRound >= MAX_NEG_ROUNDS - 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`,
                                         }}>
-                                            ROUND {Math.min(negRound + 1, MAX_NEG_ROUNDS)} / {MAX_NEG_ROUNDS}
+                                            {isFinalOffer ? 'FINAL OFFER' : `ROUND ${Math.min(negRound + 1, MAX_NEG_ROUNDS)} / ${MAX_NEG_ROUNDS}`}
                                         </div>
                                     </div>
                                     <p>Current Offer: ${selectedOffer.capital.toLocaleString()} for {selectedOffer.equity}%</p>
@@ -1521,6 +1560,49 @@ export default function ChessboardSimulation() {
                                     ))}
                                 </div>
 
+                                {/* ── Final Offer Panel ── shown after AI makes take-it-or-leave-it */}
+                                {isFinalOffer ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        style={{
+                                            padding: '1.5rem',
+                                            borderRadius: '14px',
+                                            background: 'rgba(239,68,68,0.08)',
+                                            border: '1px solid rgba(239,68,68,0.35)',
+                                            marginBottom: '1rem',
+                                        }}
+                                    >
+                                        <p style={{ color: '#fca5a5', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>⚠ Final Offer — Take It or Leave It</p>
+                                        <p style={{ color: '#d1d5db', fontSize: '0.9rem', marginBottom: '1.2rem' }}>
+                                            <strong style={{ color: 'white' }}>${selectedOffer.capital.toLocaleString()}</strong> for{' '}
+                                            <strong style={{ color: 'white' }}>{selectedOffer.equity}%</strong> equity
+                                        </p>
+                                        <div style={{ display: 'flex', gap: '1rem' }}>
+                                            <motion.button
+                                                className="respond-btn"
+                                                style={{ flex: 1, background: 'rgba(255,255,255,0.07)', color: '#f87171', border: '1px solid rgba(239,68,68,0.4)' }}
+                                                onClick={handleRejectFinalOffer}
+                                                disabled={isNegVoiceSubmitting}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                Walk Away
+                                            </motion.button>
+                                            <motion.button
+                                                className="respond-btn"
+                                                style={{ flex: 2, background: '#16a34a', color: '#fff', border: 'none' }}
+                                                onClick={handleAcceptFinalOffer}
+                                                disabled={isNegVoiceSubmitting}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                ✓ Accept This Deal
+                                            </motion.button>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                <>
                                 {/* Voice instruction banner */}
                                 {negRound < MAX_NEG_ROUNDS && (
                                     <div style={{
@@ -1534,11 +1616,11 @@ export default function ChessboardSimulation() {
                                     }}>
                                         {negRound >= MAX_NEG_ROUNDS - 1 ? (
                                             <p style={{ fontSize: '0.85rem', color: '#f87171', fontWeight: 600, margin: 0 }}>
-                                                <strong>Final Round!</strong> Say <em>"I accept this deal"</em> to secure it, or <em>"I walk away"</em> to reject.
+                                                <strong>Final Round!</strong> Say <em>&ldquo;I accept this deal&rdquo;</em> to secure it, or make your best counter-offer.
                                             </p>
                                         ) : (
                                             <p style={{ fontSize: '0.85rem', color: '#93c5fd', margin: 0 }}>
-                                                Speak your counter-offer, or say <em>"I accept"</em> / <em>"I walk away"</em> to finalize.
+                                                Speak your counter-offer, or say <em>&ldquo;I accept&rdquo;</em> / <em>&ldquo;deal&rdquo;</em> to finalize.
                                             </p>
                                         )}
                                     </div>
@@ -1548,7 +1630,7 @@ export default function ChessboardSimulation() {
                                     <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
                                         <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
                                             {negRound >= MAX_NEG_ROUNDS - 1
-                                                ? 'This is your final round — say "I accept this deal" or "I walk away"'
+                                                ? 'Final round — say "I accept this deal" or make your last counter-offer'
                                                 : 'Speak your counter offer (e.g., "I\'d like $1.2M for 25% equity because...")'
                                             }
                                         </p>
@@ -1629,7 +1711,7 @@ export default function ChessboardSimulation() {
                                                     whileHover={{ scale: 1.02 }} 
                                                     whileTap={{ scale: 0.98 }}
                                                 >
-                                                    {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Decision' : 'Submit Voice Counter'}
+                                                    {isNegVoiceSubmitting ? 'Analyzing...' : negRound >= MAX_NEG_ROUNDS - 1 ? 'Submit Final Counter' : 'Submit Voice Counter'}
                                                 </motion.button>
                                             </div>
                                         )}
@@ -1653,6 +1735,7 @@ export default function ChessboardSimulation() {
                                         Walk Away from This Offer
                                     </motion.button>
                                 </div>
+                                </>)}
                             </motion.div>
                         )}
 
