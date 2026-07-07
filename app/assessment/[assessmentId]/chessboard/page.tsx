@@ -614,9 +614,12 @@ export default function ChessboardSimulation() {
             }
 
             // Only attempt a follow-up if the initial response actually
-            // transcribed to something. An empty transcription would leave
-            // the user stranded on the follow-up phase with no way to submit.
-            if (!isNoSpeechTranscript(result.transcription) && transcription.length > 0) {
+            // transcribed to a meaningful answer (≥5 words). A very short
+            // transcription (e.g. just "good morning") means the audio was
+            // too brief or the model returned a near-empty result — skip the
+            // follow-up to avoid building a Q&A cycle on a fabricated base.
+            const initialWordCount = transcription.trim().split(/\s+/).filter(Boolean).length
+            if (!isNoSpeechTranscript(result.transcription) && initialWordCount >= 5) {
                 try {
                     const followup = await api.assessments.generateInvestorFollowupAudio(
                         assessmentId,
