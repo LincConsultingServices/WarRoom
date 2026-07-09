@@ -425,7 +425,7 @@ export default function SimulationStartPage() {
               'flex items-start gap-4 p-5 rounded-[3px] border mb-4 transition-all duration-300 cursor-pointer select-none',
               acceptedTerms
                 ? 'border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-gold)]/[0.04]'
-                : 'border-[color:var(--color-chessboard-ash)]/30 bg-[color:var(--color-chessboard-rampart)]/50',
+                : 'border-border bg-card',
             )}
             onClick={toggleTerms}
             whileTap={prefersReducedMotion ? undefined : { scale: 0.997 }}

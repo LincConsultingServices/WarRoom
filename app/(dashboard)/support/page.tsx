@@ -38,7 +38,7 @@ const FAQ_ITEMS = [
     id: 'faq-1',
     question: 'How long does the simulation take?',
     answer:
-      'The Assessment simulation typically takes 60-90 minutes to complete. You can pause and resume at any time, and your progress will be saved automatically.',
+      'The simulation typically takes 60-90 minutes to complete. You can pause and resume at any time, and your progress will be saved automatically.',
   },
   {
     id: 'faq-2',
@@ -125,7 +125,7 @@ export default function SupportPage() {
           className="text-sm text-[color:var(--color-chessboard-smoke)] mb-4"
           style={{ fontFamily: 'var(--font-body, serif)' }}
         >
-          Get help with Assessment simulation and troubleshooting.
+          Get help with your simulation and troubleshooting.
         </p>
         <GoldDivider variant="line" />
       </motion.div>

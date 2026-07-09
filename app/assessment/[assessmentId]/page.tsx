@@ -255,7 +255,7 @@ export default function SimulationPage() {
         {sharedOverlays}
         <div className="h-screen flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, var(--color-chessboard-void) 0%, var(--color-chessboard-black) 100%)' }}>
           <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-chessboard-gold) 20%, transparent), transparent)', zIndex: 40 }} />
-          <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council weighs your idea..." subtitle="Forging your founder assessment" />
+          <CinemaOverlay show={submitting} icon={<div className="text-4xl animate-torch-glow">⚔</div>} title="The Council weighs your idea..." subtitle="Forging your founder simulation" />
           <SimulationHeader
             stageName="Stage -2: IDEATION"
             progressLabel={`${answeredCount}/${questions.length} answered`}

@@ -17,7 +17,6 @@ import {
 } from '@/src/components/primitives'
 import { audioManager } from '@/lib/audio/audioManager'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
-import { ThemeToggle } from '@/components/theme-toggle'
 
 
 export default function HomePage() {
@@ -58,7 +57,7 @@ export default function HomePage() {
     {
       num: 2, icon: MessageSquare, sigil: '♜',
       title: 'Defend Your Strategy',
-      desc: 'Navigate 6 rigorous stages. Answer under pressure. Your decisions shape your assessment outcome.',
+      desc: 'Navigate 6 rigorous stages. Answer under pressure. Your decisions shape your outcome.',
       accent: '#c8a84a', border: 'rgba(200,168,74,0.2)',
     },
     {
@@ -102,11 +101,10 @@ export default function HomePage() {
                 <span className="font-bold text-base" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", color: 'var(--wr-ivory)', letterSpacing: '0.04em' }}>
                   KK's WarRoom
                 </span>
-                <div className="text-[9px] tracking-[0.18em] text-neutral-500 uppercase -mt-0.5">Assessment Platform</div>
+                <div className="text-[9px] tracking-[0.18em] text-neutral-500 uppercase -mt-0.5">Entrepreneurship Experience Platform</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <ThemeToggle />
               <Link href="/terms" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors" style={{ letterSpacing: '0.06em' }}>
                 Terms
               </Link>
@@ -140,7 +138,7 @@ export default function HomePage() {
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <SigilBadge icon={Target} tone="silver" className="mb-8">
-              The Founder Assessment
+              The Founder Simulation
               <Star className="h-3 w-3 fill-zinc-400 text-zinc-400 ml-1" />
             </SigilBadge>
           </FadeInUp>
@@ -178,7 +176,7 @@ export default function HomePage() {
                   iconRight={ArrowRight}
                   sfxKey="nav.page-enter"
                 >
-                  Enter the Assessment
+                  Enter the Simulation
                 </ChessboardCTA>
               </Link>
               <ChessboardCTA size="md" variant="ghost" sfxKey="ui.hover">
@@ -364,7 +362,7 @@ export default function HomePage() {
           <FadeInUp>
             <div className="mb-4 flex justify-center text-4xl text-zinc-100">♔</div>
             <h2 className="text-3xl font-bold mb-4 text-white" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", letterSpacing: '-0.02em' }}>
-              Ready for Your Assessment?
+              Ready to Enter the Room?
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
@@ -375,7 +373,7 @@ export default function HomePage() {
           <FadeInUp delay={0.2}>
             <Link href="/dashboard">
               <ChessboardCTA size="lg" variant="primary" icon={Target} iconRight={ArrowRight} sfxKey="wr.door-creak">
-                Enter the Assessment
+                Enter the Simulation
               </ChessboardCTA>
             </Link>
           </FadeInUp>
@@ -386,7 +384,7 @@ export default function HomePage() {
       <footer className="px-4 py-10 sm:px-6 lg:px-8 text-center bg-black" style={{ borderTop: '1px solid rgba(200,168,74,0.15)' }}>
         <div className="text-3xl mb-3 text-zinc-700">♟</div>
         <p className="text-xs text-zinc-400" style={{ letterSpacing: '0.08em', fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
-          © 2026 KK&apos;s Assessment — All Rights Reserved
+          © 2026 KK&apos;s WarRoom — All Rights Reserved
         </p>
         <p className="mt-1 text-xs text-zinc-500" style={{ letterSpacing: '0.04em' }}>
           Precision under pressure. Powered by AI.

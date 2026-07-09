@@ -157,7 +157,7 @@ export function ChessboardEntrance({
         onKeyDown={begin}
         tabIndex={-1}
         role="dialog"
-        aria-label="Entering the Assessment"
+        aria-label="Entering the Simulation"
       >
         {!videoFailed ? (
           <video

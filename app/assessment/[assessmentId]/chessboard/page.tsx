@@ -1126,7 +1126,7 @@ export default function ChessboardSimulation() {
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                     <motion.button 
                                         className="submit-pitch-btn" 
-                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        style={{ flex: 1, backgroundColor: 'color-mix(in srgb, var(--color-chessboard-parchment) 10%, transparent)', color: 'var(--color-chessboard-parchment)', border: '1px solid color-mix(in srgb, var(--color-chessboard-parchment) 22%, transparent)' }}
                                         onClick={() => {
                                             setPitchAnalysis(null);
                                             resetPitchFollowupState();
@@ -1281,7 +1281,7 @@ export default function ChessboardSimulation() {
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                     <motion.button 
                                         className="respond-btn" 
-                                        style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                        style={{ flex: 1, backgroundColor: 'color-mix(in srgb, var(--color-chessboard-parchment) 10%, transparent)', color: 'var(--color-chessboard-parchment)', border: '1px solid color-mix(in srgb, var(--color-chessboard-parchment) 22%, transparent)' }}
                                         onClick={() => {
                                             setCurrentInvestorReaction('');
                                             setResponseTranscription('');
@@ -1403,7 +1403,7 @@ export default function ChessboardSimulation() {
                                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                         <motion.button
                                             className="respond-btn"
-                                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                            style={{ flex: 1, backgroundColor: 'color-mix(in srgb, var(--color-chessboard-parchment) 10%, transparent)', color: 'var(--color-chessboard-parchment)', border: '1px solid color-mix(in srgb, var(--color-chessboard-parchment) 22%, transparent)' }}
                                             onClick={() => responseRecorder.resetRecording()}
                                             disabled={isSubmitting || isAnalyzing}
                                             whileHover={{ scale: 1.03 }}
@@ -1549,10 +1549,10 @@ export default function ChessboardSimulation() {
                                             alignSelf: item.type === 'user' ? 'flex-end' : 'flex-start',
                                             maxWidth: '80%'
                                         }}>
-                                            <strong style={{ display: 'block', marginBottom: '0.3rem', color: item.type === 'user' ? '#60a5fa' : '#34d399' }}>{item.sender}</strong>
-                                            {item.msg}
+                                            <strong style={{ display: 'block', marginBottom: '0.3rem', color: item.type === 'user' ? 'color-mix(in srgb, #60a5fa 60%, var(--color-chessboard-parchment))' : 'color-mix(in srgb, #34d399 60%, var(--color-chessboard-parchment))' }}>{item.sender}</strong>
+                                            <span style={{ color: 'var(--color-chessboard-parchment)' }}>{item.msg}</span>
                                             {item.capital != null && item.equity != null && (
-                                                <div style={{ marginTop: '0.45rem', fontSize: '0.78rem', color: '#d1d5db' }}>
+                                                <div style={{ marginTop: '0.45rem', fontSize: '0.78rem', color: 'color-mix(in srgb, var(--color-chessboard-parchment) 65%, transparent)' }}>
                                                     Terms: ${item.capital.toLocaleString()} for {item.equity}% equity
                                                 </div>
                                             )}
@@ -1573,10 +1573,10 @@ export default function ChessboardSimulation() {
                                             marginBottom: '1rem',
                                         }}
                                     >
-                                        <p style={{ color: '#fca5a5', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>⚠ Final Offer — Take It or Leave It</p>
-                                        <p style={{ color: '#d1d5db', fontSize: '0.9rem', marginBottom: '1.2rem' }}>
-                                            <strong style={{ color: 'white' }}>${selectedOffer.capital.toLocaleString()}</strong> for{' '}
-                                            <strong style={{ color: 'white' }}>{selectedOffer.equity}%</strong> equity
+                                        <p style={{ color: 'color-mix(in srgb, #f87171 65%, var(--color-chessboard-parchment))', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>⚠ Final Offer — Take It or Leave It</p>
+                                        <p style={{ color: 'color-mix(in srgb, var(--color-chessboard-parchment) 75%, transparent)', fontSize: '0.9rem', marginBottom: '1.2rem' }}>
+                                            <strong style={{ color: 'var(--color-chessboard-parchment)' }}>${selectedOffer.capital.toLocaleString()}</strong> for{' '}
+                                            <strong style={{ color: 'var(--color-chessboard-parchment)' }}>{selectedOffer.equity}%</strong> equity
                                         </p>
                                         <div style={{ display: 'flex', gap: '1rem' }}>
                                             <motion.button
@@ -1619,7 +1619,7 @@ export default function ChessboardSimulation() {
                                                 <strong>Final Round!</strong> Say <em>&ldquo;I accept this deal&rdquo;</em> to secure it, or make your best counter-offer.
                                             </p>
                                         ) : (
-                                            <p style={{ fontSize: '0.85rem', color: '#93c5fd', margin: 0 }}>
+                                            <p style={{ fontSize: '0.85rem', color: 'color-mix(in srgb, #60a5fa 55%, var(--color-chessboard-parchment))', margin: 0 }}>
                                                 Speak your counter-offer, or say <em>&ldquo;I accept&rdquo;</em> / <em>&ldquo;deal&rdquo;</em> to finalize.
                                             </p>
                                         )}
@@ -1627,7 +1627,7 @@ export default function ChessboardSimulation() {
                                 )}
 
                                 <div className="neg-controls" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem', width: '100%' }}>
-                                    <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                                    <div className="recording-zone" style={{ padding: '1rem', border: '1px dashed color-mix(in srgb, var(--color-chessboard-parchment) 15%, transparent)', borderRadius: '12px', background: 'color-mix(in srgb, var(--color-chessboard-parchment) 3%, transparent)' }}>
                                         <p className="rec-hint" style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
                                             {negRound >= MAX_NEG_ROUNDS - 1
                                                 ? 'Final round — say "I accept this deal" or make your last counter-offer'
@@ -1691,7 +1691,7 @@ export default function ChessboardSimulation() {
                                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                                 <motion.button 
                                                     className="respond-btn" 
-                                                    style={{ flex: 1, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                                                    style={{ flex: 1, background: 'color-mix(in srgb, var(--color-chessboard-parchment) 10%, transparent)', color: 'var(--color-chessboard-parchment)', border: '1px solid color-mix(in srgb, var(--color-chessboard-parchment) 22%, transparent)' }}
                                                     onClick={() => negotiationRecorder.resetRecording()} 
                                                     disabled={isNegVoiceSubmitting}
                                                     initial={{ scale: 0.9, opacity: 0 }}
@@ -1747,8 +1747,8 @@ export default function ChessboardSimulation() {
                                 style={{ textAlign: 'center', padding: '2rem', background: 'rgba(239,68,68,0.1)', borderRadius: '16px', border: '1px solid rgba(239,68,68,0.3)', marginBottom: '1.5rem' }}
                             >
                                 <h3 style={{ fontSize: '1.5rem', color: '#f87171', marginBottom: '0.5rem' }}>Walked Away</h3>
-                                <p style={{ color: '#fca5a5', fontSize: '1rem' }}>You walked away from <strong>{walkedAwayInvestor}</strong>&apos;s offer.</p>
-                                <p style={{ color: '#a1a1aa', fontSize: '0.85rem', marginTop: '0.5rem' }}>Select another offer to continue negotiating, or walk away from all offers.</p>
+                                <p style={{ color: 'color-mix(in srgb, #f87171 65%, var(--color-chessboard-parchment))', fontSize: '1rem' }}>You walked away from <strong>{walkedAwayInvestor}</strong>&apos;s offer.</p>
+                                <p style={{ color: 'color-mix(in srgb, var(--color-chessboard-parchment) 60%, transparent)', fontSize: '0.85rem', marginTop: '0.5rem' }}>Select another offer to continue negotiating, or walk away from all offers.</p>
                             </motion.div>
                         )}
 
@@ -1759,17 +1759,17 @@ export default function ChessboardSimulation() {
                                 style={{ textAlign: 'center', padding: '3rem', background: 'rgba(16,185,129,0.1)', borderRadius: '16px', border: '1px solid #10b981', position: 'relative', overflow: 'hidden' }}
                             >
                                 <h2 style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '1.5rem', fontWeight: 'bold' }}>Deal Secured!</h2>
-                                <div style={{ fontSize: '1.2rem', marginBottom: '2rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '12px' }}>
-                                    <p style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Congratulations! You finalized a deal with <strong style={{ color: 'white' }}>{acceptedDealTerms?.investorName || selectedOffer?.investorName}</strong>.</p>
+                                <div style={{ fontSize: '1.2rem', marginBottom: '2rem', background: 'color-mix(in srgb, var(--color-chessboard-parchment) 6%, transparent)', padding: '2rem', borderRadius: '12px', color: 'var(--color-chessboard-parchment)' }}>
+                                    <p style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Congratulations! You finalized a deal with <strong style={{ color: 'var(--color-chessboard-parchment)' }}>{acceptedDealTerms?.investorName || selectedOffer?.investorName}</strong>.</p>
                                     <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem' }}>
                                         <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '0.9rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '1px' }}>Investment</div>
-                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#34d399' }}>${(acceptedDealTerms?.capital || selectedOffer?.capital || 0).toLocaleString()}</div>
+                                            <div style={{ fontSize: '0.9rem', color: 'color-mix(in srgb, var(--color-chessboard-parchment) 60%, transparent)', textTransform: 'uppercase', letterSpacing: '1px' }}>Investment</div>
+                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'color-mix(in srgb, #34d399 60%, var(--color-chessboard-parchment))' }}>${(acceptedDealTerms?.capital || selectedOffer?.capital || 0).toLocaleString()}</div>
                                         </div>
-                                        <div style={{ width: '1px', background: 'rgba(255,255,255,0.2)' }}></div>
+                                        <div style={{ width: '1px', background: 'color-mix(in srgb, var(--color-chessboard-parchment) 20%, transparent)' }}></div>
                                         <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '0.9rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '1px' }}>Equity</div>
-                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#60a5fa' }}>{acceptedDealTerms?.equity || selectedOffer?.equity}%</div>
+                                            <div style={{ fontSize: '0.9rem', color: 'color-mix(in srgb, var(--color-chessboard-parchment) 60%, transparent)', textTransform: 'uppercase', letterSpacing: '1px' }}>Equity</div>
+                                            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'color-mix(in srgb, #60a5fa 60%, var(--color-chessboard-parchment))' }}>{acceptedDealTerms?.equity || selectedOffer?.equity}%</div>
                                         </div>
                                     </div>
                                 </div>

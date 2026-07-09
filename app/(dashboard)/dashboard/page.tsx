@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
 import { StartSimulationDialog } from '@/src/components/StartSimulationDialog'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
@@ -282,7 +281,6 @@ export default function DashboardPage() {
                 Elo Ladder
               </button>
             </Link>
-            <ThemeToggle />
             <button
               type="button"
               onClick={handleLogout}

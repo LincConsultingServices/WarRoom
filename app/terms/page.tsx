@@ -7,7 +7,7 @@ import { TermsBackLink } from './TermsBackLink'
 const SECTION_A = [
   {
     title: '1. Nature of the Experience',
-    body: "KK's WarRoom is a high-pressure, simulation-based experience designed to evaluate decision-making, problem-solving, and entrepreneurial thinking under time and situational constraints. This is not a standardized psychometric, academic, or clinical assessment.",
+    body: "KK's WarRoom is a high-pressure, simulation-based experience designed to evaluate decision-making, problem-solving, and entrepreneurial thinking under time and situational constraints. This is not a standardized psychometric, academic, or clinical evaluation.",
   },
   {
     title: '2. Voluntary Participation',
@@ -38,7 +38,7 @@ const SECTION_A = [
   },
   {
     title: '6. Data Protection & Privacy',
-    body: 'Personal and assessment data will be used only for program delivery, reporting, and improvement. Data will not be sold or shared with unauthorized third parties. Access is restricted to authorized personnel and relevant stakeholders (where applicable). Reasonable measures will be taken to protect stored data. You may request access to or deletion of your data, subject to legal and operational requirements.',
+    body: 'Personal and simulation data will be used only for program delivery, reporting, and improvement. Data will not be sold or shared with unauthorized third parties. Access is restricted to authorized personnel and relevant stakeholders (where applicable). Reasonable measures will be taken to protect stored data. You may request access to or deletion of your data, subject to legal and operational requirements.',
   },
   {
     title: '7. Use of AI in the Experience (No Human Review)',
@@ -118,7 +118,7 @@ const SECTION_A = [
 const SECTION_B = [
   {
     title: '1. Nature of the Report',
-    body: 'This report reflects observed behavioral tendencies within a specific simulation context. It is not a standardized, scientific, or diagnostic assessment.',
+    body: 'This report reflects observed behavioral tendencies within a specific simulation context. It is not a standardized, scientific, or diagnostic evaluation.',
   },
   {
     title: '2. Developmental Use Only',

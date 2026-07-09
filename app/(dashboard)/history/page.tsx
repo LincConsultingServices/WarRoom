@@ -289,7 +289,7 @@ function HistoryCard({
         </div>
 
         {/* ── Quick stats ── */}
-        <div className="grid grid-cols-3 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-[color:var(--color-chessboard-ash)]/25">
+        <div className="grid grid-cols-3 gap-px mx-6 mb-4 rounded-[3px] overflow-hidden border border-border">
           {[
             { label: 'Stage', value: item.stage },
             {
@@ -306,7 +306,7 @@ function HistoryCard({
           ].map((stat) => (
             <div
               key={stat.label}
-              className="text-center py-3 bg-[color:var(--color-chessboard-rampart)]/50"
+              className="text-center py-3 bg-muted"
             >
               <div
                 className="text-sm font-bold text-[color:var(--color-chessboard-gold)]"

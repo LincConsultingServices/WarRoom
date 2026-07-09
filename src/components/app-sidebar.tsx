@@ -70,7 +70,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
       isActive: pathname === '/dashboard',
     },
     {
-      title: 'Assessment',
+      title: 'Simulation',
       url: '/assessment/start',
       icon: Target,
       isActive: pathname.startsWith('/assessment'),
@@ -128,7 +128,7 @@ export function AppSidebar({ user: userProp }: AppSidebarProps) {
                     className="truncate text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
-                    Assessment Platform
+                    Experience Platform
                   </span>
                 </div>
               </Link>

@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/src/context/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
+import { GlobalControls } from '@/src/components/GlobalControls'
 import dynamic from 'next/dynamic'
 const CustomCursor = dynamic(() => import('@/src/components/effects/CustomCursor').then(mod => mod.CustomCursor))
 const EmberParticles = dynamic(() => import('@/src/components/effects/EmberParticles').then(mod => mod.EmberParticles))
@@ -31,8 +32,8 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "KK's WarRoom — Prove Your Edge",
-  description: 'Enter the assessment. Face expert evaluators, defend your strategy, and forge your entrepreneurial path in the ultimate pressure simulation.',
-  keywords: ['entrepreneurship', 'simulation', 'pitch', 'assessment', 'war room', 'gamified'],
+  description: 'An AI-Powered Entrepreneurship Experience Platform. Face expert evaluators, defend your strategy, and forge your entrepreneurial path in the ultimate pressure simulation.',
+  keywords: ['entrepreneurship', 'simulation', 'pitch', 'experience platform', 'war room', 'gamified'],
   generator: 'v0.app'
 }
 
@@ -60,6 +61,7 @@ export default function RootLayout({
           <AuthProvider>
             <MotionConfig reducedMotion="user">
               <AudioSettingsLoader />
+              <GlobalControls />
               {children}
               <NarratorOrb />
               <CustomCursor />

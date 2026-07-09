@@ -62,8 +62,14 @@
   --wr-ivory: #09090B;
   --wr-ghost: #18181B;
   --wr-electrum: #A67C00;
-  --wr-parchment: #FFFFFF;
+  --wr-parchment: #18181B;         /* readable dark ink — text sits on adaptive light panels */
   --wr-ink: #000000;
+  --wr-button-ink: #f4f4f4;        /* theme-invariant: chess CTA buttons stay dark in both modes */
+  /* Theme-invariant: darkens the ivory.webp parchment texture enough for the
+     gold label copy layered on top (QuestionCard / AnswerScrollInput) to stay
+     legible regardless of site theme — defined once here, not re-declared in
+     .dark since the value doesn't change. */
+  --wr-ivory-wash: linear-gradient(160deg, rgba(10,8,4,0.82) 0%, rgba(10,8,4,0.60) 55%, rgba(10,8,4,0.78) 100%);
   --wr-gold: #B8860B;
   --wr-gold-bright: #A67C00;
   --wr-silver: #71717A;
@@ -129,6 +135,7 @@
   --color-chessboard-panel-bg-heavy: var(--wr-panel-bg-heavy);
   --color-chessboard-panel-bg-darker: var(--wr-panel-bg-darker);
   --color-chessboard-overlay-bg: var(--wr-overlay-bg);
+  --color-chessboard-button-ink: var(--wr-button-ink);
 }
 
 .dark {
@@ -190,6 +197,7 @@
   --wr-gold-bright: #d4aa40;
   --wr-silver: #a0a0a0;
   --wr-ember: #b8922a;
+  --wr-button-ink: #f4f4f4;        /* theme-invariant: same value as light mode */
   --wr-gold-glow: rgba(200, 168, 74, 0.18);
   --wr-dragonglass: #0a1020;
   --wr-shadow-gold: 0 0 20px rgba(184, 146, 42, 0.25), 0 0 60px rgba(184, 146, 42, 0.08);
@@ -267,6 +275,7 @@
   --color-chessboard-panel-bg-heavy: var(--wr-panel-bg-heavy);
   --color-chessboard-panel-bg-darker: var(--wr-panel-bg-darker);
   --color-chessboard-overlay-bg: var(--wr-overlay-bg);
+  --color-chessboard-button-ink: var(--wr-button-ink);
 
   /* Cinematic shadows + glows (theme-responsive) */
   --shadow-gold: var(--wr-shadow-gold);
@@ -653,7 +662,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 0.9rem 1.75rem;
+  /* Extra right padding reserves room for the fixed GlobalControls dock
+     (top-3 right-3, ~68px wide) so it doesn't sit on top of Audio/End
+     Simulation. The mobile breakpoint below resets this via its own
+     shorthand padding once header-right wraps to its own row. */
+  padding: 0.9rem calc(1.75rem + 84px) 0.9rem 1.75rem;
   backdrop-filter: blur(14px);
   background: var(--wr-header-bg);
   border-bottom: 1px solid rgba(200, 168, 74, 0.18);
@@ -711,7 +724,7 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-chessboard-parchment);
+  color: var(--color-chessboard-button-ink);
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
   border: 1px solid rgba(160, 160, 160, 0.25);
   border-radius: 3px;
@@ -999,7 +1012,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-chessboard-ivory);
+  color: var(--color-chessboard-button-ink);
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
   background-size: 200% 100%;
   border: 1px solid rgba(200, 168, 74, 0.45);
@@ -1028,7 +1041,7 @@
 .mic-button.active {
   background: linear-gradient(135deg, #631414 0%, #c23b3b 50%, #631414 100%);
   border-color: rgba(160, 160, 160, 0.40);
-  color: var(--color-chessboard-parchment);
+  color: var(--color-chessboard-button-ink);
   box-shadow:
     0 0 24px rgba(160, 160, 160, 0.35),
     inset 0 1px 0 rgba(255, 140, 140, 0.22);
@@ -1037,7 +1050,7 @@
 .mic-button.done {
   background: linear-gradient(135deg, #1f5a3f 0%, #2d6a4f 50%, #1f5a3f 100%);
   border-color: rgba(45, 106, 79, 0.6);
-  color: var(--color-chessboard-parchment);
+  color: var(--color-chessboard-button-ink);
   box-shadow: 0 0 18px rgba(45, 106, 79, 0.45);
 }
 
@@ -1153,7 +1166,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-chessboard-ivory);
+  color: var(--color-chessboard-button-ink);
   background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 45%, #383838 55%, #1c1c1c 100%);
   background-size: 200% 100%;
   border: 1px solid rgba(200, 168, 74, 0.45);

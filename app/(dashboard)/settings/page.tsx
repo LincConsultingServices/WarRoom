@@ -70,7 +70,7 @@ type AmbientPreview = {
 const AMBIENT_PREVIEWS: AmbientPreview[] = [
   { key: null, label: 'Silence' },
   { key: 'ambient.hall', label: 'The Hall' },
-  { key: 'ambient.chessboard', label: 'Assessment' },
+  { key: 'ambient.chessboard', label: 'Simulation' },
   { key: 'ambient.deliberate', label: 'Deliberation' },
   { key: 'ambient.victory', label: 'Verdict' },
 ]
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                   className="text-xs text-[color:var(--color-chessboard-smoke)] mt-0.5"
                   style={{ fontFamily: 'var(--font-body, serif)' }}
                 >
-                  Customize the appearance of the Assessment.
+                  Customize the appearance of the simulation.
                 </p>
               </div>
               <div className="p-6 space-y-0 divide-y divide-[color:var(--color-chessboard-ash)]/15">
@@ -506,7 +506,7 @@ export default function SettingsPage() {
                     className="text-xs text-[color:var(--color-chessboard-smoke)] mt-1 mb-3"
                     style={{ fontFamily: 'var(--font-body, serif)' }}
                   >
-                    The Assessment is forged in darkness. Theme control is
+                    The simulation is forged in darkness. Theme control is
                     available in the sidebar.
                   </p>
                   <div className="flex items-center gap-2 text-xs text-[color:var(--color-chessboard-smoke)]">
@@ -670,7 +670,7 @@ export default function SettingsPage() {
                         style={{ fontFamily: 'var(--font-body, serif)' }}
                       >
                         Cello drone, organ pad, and piano motifs that score
-                        the assessment.
+                        the simulation.
                       </p>
                     </div>
                     <span
@@ -943,7 +943,7 @@ export default function SettingsPage() {
                       className="text-xs text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-body, serif)' }}
                     >
-                      Help improve Assessment by sharing anonymous usage data
+                      Help improve WarRoom by sharing anonymous usage data
                     </p>
                   </div>
                   <Switch id="analytics" defaultChecked />

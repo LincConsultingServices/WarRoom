@@ -137,7 +137,7 @@ function LoginContent() {
         >
           {isAdmin
             ? 'Sign in to the admin panel'
-            : 'Sign in to your entrepreneurial assessment'}
+            : 'Sign in to your entrepreneurial simulation'}
         </motion.p>
       </div>
 
@@ -146,7 +146,7 @@ function LoginContent() {
         initial={prefersReducedMotion ? false : { y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.4, ease: easeDramatic }}
-        className="flex rounded-[3px] border border-[color:var(--color-chessboard-ash)]/40 bg-[color:var(--color-chessboard-rampart)]/60 p-1 mb-5"
+        className="flex rounded-[3px] border border-border bg-card p-1 mb-5"
       >
         {(['Participant', 'Admin'] as const).map((label) => {
           const active = label === 'Participant' ? !isAdmin : isAdmin
@@ -348,7 +348,7 @@ function LoginContent() {
               className="w-full justify-center"
             >
               {loading
-                ? 'Accessing your assessment…'
+                ? 'Accessing your simulation…'
                 : isAdmin
                   ? 'Sign In as Admin'
                   : 'Enter the War Room'}

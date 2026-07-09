@@ -455,7 +455,7 @@ export default function CohortsPage() {
             </DialogTitle>
             <DialogDescription className="text-[color:var(--color-chessboard-smoke)]" style={{ fontFamily: 'var(--font-body, serif)' }}>
               Disabling <strong className="text-[color:var(--color-chessboard-ivory)]">{confirmDisable?.name}</strong> ({confirmDisable?.code}) will prevent all participants
-              in this batch from starting new assessments. Existing in-progress simulations will not be affected.
+              in this batch from starting new simulations. Existing in-progress ones will not be affected.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">

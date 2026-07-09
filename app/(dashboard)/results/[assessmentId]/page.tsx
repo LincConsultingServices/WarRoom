@@ -323,7 +323,7 @@ export default function SimulationResultPage() {
                     'bg-[color:var(--color-chessboard-ember)]/[0.08] border-[color:var(--color-chessboard-ember)]/40 ring-1 ring-[color:var(--color-chessboard-ember)]/25',
                   !isDone &&
                     !isActive &&
-                    'bg-[color:var(--color-chessboard-rampart)]/40 border-[color:var(--color-chessboard-ash)]/20',
+                    'bg-muted border-border',
                 )}
               >
                 <div
@@ -493,7 +493,7 @@ export default function SimulationResultPage() {
             {report.actionPlan.map((item, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-3 rounded-[3px] bg-[color:var(--color-chessboard-rampart)]/40 border border-[color:var(--color-chessboard-ash)]/20"
+                className="flex items-start gap-3 p-3 rounded-[3px] bg-muted border border-border"
               >
                 <div
                   className="h-6 w-6 rounded-full bg-[color:var(--color-chessboard-gold)]/[0.12] flex items-center justify-center text-[10px] font-bold text-[color:var(--color-chessboard-gold)] shrink-0"
@@ -534,7 +534,7 @@ export default function SimulationResultPage() {
             {report.stageNarrations.map((narration, i) => (
               <div
                 key={i}
-                className="p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/25 bg-[color:var(--color-chessboard-rampart)]/30"
+                className="p-4 rounded-[3px] border border-border bg-muted"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <SigilBadge tone="gold">
@@ -616,7 +616,7 @@ export default function SimulationResultPage() {
                 return (
                   <div
                     key={comp.competencyCode}
-                    className="space-y-3 p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/20 bg-[color:var(--color-chessboard-rampart)]/30"
+                    className="space-y-3 p-4 rounded-[3px] border border-border bg-muted"
                   >
                     <div className="flex items-center justify-between">
                       <div>

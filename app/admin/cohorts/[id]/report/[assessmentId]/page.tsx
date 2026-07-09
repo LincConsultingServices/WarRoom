@@ -43,7 +43,7 @@ export default function AdminUserReportPage() {
         setReport(data)
       } catch (err: unknown) {
         console.error(err)
-        setError('Failed to load user report for assessment ' + assessmentId)
+        setError('Failed to load user report for simulation ' + assessmentId)
       } finally {
         setLoading(false)
       }
@@ -52,7 +52,7 @@ export default function AdminUserReportPage() {
       fetchReport()
     } else {
       setLoading(false)
-      setError('No assessment ID associated with this user yet.')
+      setError('No simulation ID associated with this user yet.')
     }
   }, [assessmentId])
 
@@ -121,7 +121,7 @@ export default function AdminUserReportPage() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            User Assessment Report
+            User Simulation Report
           </h1>
           <p className="text-sm text-[color:var(--color-chessboard-smoke)]" style={{ fontFamily: 'var(--font-body, serif)' }}>
             Detailed evaluation and competency breakdown

@@ -497,7 +497,7 @@ export default function HistoryDetailPage() {
                                     Your Answer
                                   </h4>
                                   <div
-                                    className="p-4 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/20 bg-[color:var(--color-chessboard-rampart)]/40 text-sm text-[color:var(--color-chessboard-ivory)] whitespace-pre-wrap"
+                                    className="p-4 rounded-[3px] border border-border bg-muted text-sm text-[color:var(--color-chessboard-ivory)] whitespace-pre-wrap"
                                     style={{
                                       fontFamily: 'var(--font-body, serif)',
                                     }}

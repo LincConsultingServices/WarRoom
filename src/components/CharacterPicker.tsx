@@ -185,7 +185,7 @@ export function CharacterPicker({
     >
       <CharacterGroup
         title="Mentors"
-        subtitle="They provide guidance during assessments"
+        subtitle="They provide guidance during the simulation"
         items={mentors}
         selected={selMentors}
         maxSelect={2}
@@ -209,7 +209,7 @@ export function CharacterPicker({
 
       <CharacterGroup
         title="Investors"
-        subtitle="They will evaluate your pitch in the Assessment"
+        subtitle="They will evaluate your pitch in the simulation"
         items={investors}
         selected={selInvestors}
         maxSelect={7}
