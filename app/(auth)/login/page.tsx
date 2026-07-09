@@ -39,7 +39,9 @@ function LoginContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [batchCode, setBatchCode] = useState('')
-  const [batchValid, setBatchValid] = useState<boolean | null>(null)
+  // true = confirmed valid, false = confirmed invalid, 'unreachable' = the
+  // check itself failed (server down / network) — not the user's fault.
+  const [batchValid, setBatchValid] = useState<boolean | 'unreachable' | null>(null)
   const [batchName, setBatchName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -56,7 +58,7 @@ function LoginContent() {
         setBatchName('')
       }
     } catch {
-      setBatchValid(false)
+      setBatchValid('unreachable')
       setBatchName('')
     }
   }
@@ -255,6 +257,8 @@ function LoginContent() {
                       'border-[color:var(--color-chessboard-verdant)] focus-visible:border-[color:var(--color-chessboard-verdant)]',
                     batchValid === false &&
                       'border-[color:var(--color-chessboard-crimson)] focus-visible:border-[color:var(--color-chessboard-crimson)]',
+                    batchValid === 'unreachable' &&
+                      'border-[color:var(--color-chessboard-ember)] focus-visible:border-[color:var(--color-chessboard-ember)]',
                   )}
                 />
                 <AnimatePresence>
@@ -278,6 +282,17 @@ function LoginContent() {
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
                       <X className="w-3 h-3" /> Invalid or inactive batch code
+                    </motion.p>
+                  )}
+                  {batchValid === 'unreachable' && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-1 text-[10px] tracking-[0.1em] text-[color:var(--color-chessboard-ember)] mt-1.5"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      <X className="w-3 h-3" /> Could not verify — server temporarily unavailable. Try again shortly.
                     </motion.p>
                   )}
                 </AnimatePresence>
