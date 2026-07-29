@@ -3,7 +3,13 @@
 // ============================================
 
 import { FileText, AlertTriangle, Target, DollarSign, Lightbulb } from 'lucide-react'
-import { INVESTOR_VOICE_BY_ID, INVESTOR_TITLE_TO_ID } from './constants'
+import {
+  INVESTOR_VOICE_BY_ID,
+  INVESTOR_TITLE_TO_ID,
+  BUDGET_QUESTION_CAPITAL,
+  BUDGET_QUESTION_ORDER,
+  DEFAULT_STARTING_CAPITAL,
+} from './constants'
 import type { AssessmentState } from '@/src/types'
 
 // ---- Stage / Question labels ----
@@ -16,6 +22,46 @@ export function formatRevenue(amount: number): string {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(2)}M`
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(1)}K`
   return `$${amount.toLocaleString('en-US')}`
+}
+
+// ---- Budget allocation ----
+
+// Slider steps are fractional (budget / 20), so allocation totals are
+// compared with a tolerance rather than `===`.
+const ALLOCATION_EPSILON = 0.01
+
+export function sumAllocations(allocations: Record<string, number> | undefined): number {
+  if (!allocations) return 0
+  return Object.values(allocations).reduce((sum, v) => sum + (Number(v) || 0), 0)
+}
+
+export function isAllocationComplete(total: number, capital: number): boolean {
+  return capital > 0 && Math.abs(total - capital) < ALLOCATION_EPSILON
+}
+
+// How much the player can allocate at a given budget question: the budget for
+// that question, plus anything left unspent at earlier ones. Falls back to the
+// live simulation capital when the question isn't in the known set.
+export function getAllocatableCapital(
+  questionId: string,
+  budgetAllocations: Record<string, Record<string, number>>,
+  fallbackCapital?: number,
+): number {
+  const base =
+    BUDGET_QUESTION_CAPITAL[questionId] ??
+    (fallbackCapital && fallbackCapital > 0 ? fallbackCapital : DEFAULT_STARTING_CAPITAL)
+
+  const index = BUDGET_QUESTION_ORDER.indexOf(questionId)
+  if (index <= 0) return base
+
+  let carriedOver = 0
+  for (let i = 0; i < index; i++) {
+    const priorId = BUDGET_QUESTION_ORDER[i]
+    const priorBudget = BUDGET_QUESTION_CAPITAL[priorId] ?? 0
+    const priorSpent = sumAllocations(budgetAllocations[priorId])
+    carriedOver += Math.max(0, priorBudget - priorSpent)
+  }
+  return base + carriedOver
 }
 
 export function getQuestionTypeLabel(type: string): string {
