@@ -13,7 +13,7 @@ import { DynamicScenarioQuestion } from './question-types/DynamicScenarioQuestio
 import { BudgetQuestion } from './question-types/BudgetQuestion'
 import { AIScenarioQuestion } from './question-types/AIScenarioQuestion'
 import { InfoQuestion } from './question-types/InfoQuestion'
-import { getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from '@/src/lib/helpers'
+import { getAllocatableCapital, getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel, sumAllocations } from '@/src/lib/helpers'
 import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 import type { SimQuestion, SimOption, PhaseResponse } from '@/src/types'
 
@@ -76,6 +76,13 @@ export function StageView({
   const submitIntro = useFeatureIntro('stage-submit')
   const qType: string = ((currentQ as unknown as Record<string, unknown>)?.type as string) || ''
 
+  // Money available at this budget question: the budget authored for it plus
+  // anything left unspent at earlier ones. Not the global simulation capital,
+  // which is only the Month-2 startup raise.
+  const budgetCapital = currentQ && qType === 'budget_allocation'
+    ? getAllocatableCapital(currentQ.q_id, budgetAllocations, capital)
+    : 0
+
   // A question only counts as answered once the user has actually made a
   // choice / typed something for it — not merely visited it. Previously
   // "Next" and "Submit Phase" only checked `submitting`, so a dynamic
@@ -88,8 +95,13 @@ export function StageView({
       case 'scenario':
       case 'multiple_choice':
         return Boolean(currentAnswer?.selectedOptionId)
-      case 'budget_allocation':
-        return Boolean(currentAnswer)
+      case 'budget_allocation': {
+        // Nudging a single slider used to be enough to advance, because the
+        // answer object exists as soon as onAllocate fires. Require the player
+        // to actually put money somewhere; unspent budget carries forward.
+        const allocated = sumAllocations(budgetAllocations[currentQ.q_id])
+        return allocated > 0 && allocated <= budgetCapital
+      }
       case 'info':
       case 'ai_scenario':
         return Boolean(currentAnswer)
@@ -144,7 +156,7 @@ export function StageView({
       return <MCQQuestion options={currentQ.options} selectedOptionId={currentAnswer?.selectedOptionId} mcqFeedback={mcqFeedback} onSelect={(opt: SimOption) => onSelectOption(opt)} />
     }
     if (qType === 'budget_allocation' && currentQ.options) {
-      return <BudgetQuestion options={currentQ.options} capital={capital} allocations={budgetAllocations[currentQ.q_id] || {}} onAllocate={(optId: string, val: number) => onBudgetAllocation(currentQ.q_id, optId, val)} />
+      return <BudgetQuestion options={currentQ.options} capital={budgetCapital} allocations={budgetAllocations[currentQ.q_id] || {}} onAllocate={(optId: string, val: number) => onBudgetAllocation(currentQ.q_id, optId, val)} />
     }
     if (qType === 'ai_scenario') {
       return (

@@ -7,6 +7,26 @@ import { Globe, AlertTriangle, Target, BarChart3 } from 'lucide-react'
 import type { StageName } from '@/src/types'
 
 
+// ---- Capital / budget ----
+
+// Startup capital granted by the Q_0_1 "generate capital" question. Every
+// option raises the same amount — they differ in *how* the money is raised
+// (equity, debt, revenue share), never in *how much*. Mirrors the server's
+// assessment_service.go, which sets Capital = 50000 for every option.
+export const DEFAULT_STARTING_CAPITAL = 50_000
+
+// Money available to allocate at each budget_allocation question. The
+// scenario content carries no budget field, so the amount has to live
+// somewhere — here, rather than being scraped out of the question prose.
+export const BUDGET_QUESTION_CAPITAL: Record<string, number> = {
+  Q_0_3: DEFAULT_STARTING_CAPITAL, // Month 2 — the startup capital just raised
+  Q_2A_BUDGET: 100_000, // Month 5 — larger budget for the next five months
+}
+
+// Budget questions in the order the player reaches them. Used to carry any
+// unspent money forward from one allocation to the next.
+export const BUDGET_QUESTION_ORDER = ['Q_0_3', 'Q_2A_BUDGET']
+
 // Stage accent colours — chess/strategy themed
 export const STAGE_THEMES: Record<string, string> = {
   STAGE_NEG2_IDEATION: '#6b5a8e',

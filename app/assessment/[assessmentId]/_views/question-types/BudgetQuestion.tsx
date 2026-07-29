@@ -2,7 +2,7 @@
 
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
-import { formatRevenue } from '@/src/lib/helpers'
+import { formatRevenue, isAllocationComplete, sumAllocations } from '@/src/lib/helpers'
 import type { SimOption } from '@/src/types'
 
 interface BudgetQuestionProps {
@@ -13,9 +13,13 @@ interface BudgetQuestionProps {
 }
 
 export function BudgetQuestion({ options, capital, allocations, onAllocate }: BudgetQuestionProps) {
-  const total = Object.values(allocations).reduce((s, v) => s + v, 0)
-  const isComplete = total === capital
+  const total = sumAllocations(allocations)
+  const isComplete = isAllocationComplete(total, capital)
   const isExceeded = total > capital
+  const remaining = Math.max(0, capital - total)
+  // Slider granularity: 20 notches across the budget, never 0 (a 0 step makes
+  // the slider unusable when capital hasn't loaded yet).
+  const step = capital > 0 ? capital / 20 : 1
 
   return (
     <div className="space-y-4">
@@ -28,7 +32,17 @@ export function BudgetQuestion({ options, capital, allocations, onAllocate }: Bu
               <span>{opt.text}</span>
               <span className="font-mono font-medium text-primary">{formatRevenue(val)}</span>
             </div>
-            <Slider value={[val]} onValueChange={([v]) => onAllocate(opt.id, v)} max={capital} step={capital / 20} className="w-full" />
+            {/* Clamp to what this category already holds plus what is still
+                unspent, so the categories can never sum past the budget.
+                Previously every slider ran to the full capital independently,
+                letting six categories allocate six times the money. */}
+            <Slider
+              value={[val]}
+              onValueChange={([v]) => onAllocate(opt.id, Math.min(v, val + remaining))}
+              max={capital}
+              step={step}
+              className="w-full"
+            />
           </div>
         )
       })}

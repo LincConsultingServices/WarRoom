@@ -16,8 +16,8 @@ import { RestartConfirmDialog } from './_views/RestartConfirmDialog'
 import { InvolvementWarningDialog } from './_views/InvolvementWarningDialog'
 import { BuyoutLockoutDialog } from './_views/BuyoutLockoutDialog'
 import { useSimulation } from '@/src/hooks/useSimulation'
-import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATION_STAGE_LABELS } from '@/src/lib/constants'
-import { stageLabel } from '@/src/lib/helpers'
+import { STAGE_THEMES, STAGE_NARRATIVES, STAGE_ORDER, STAGE_MENTOR_TIPS, NARRATION_STAGE_LABELS, DEFAULT_STARTING_CAPITAL } from '@/src/lib/constants'
+import { formatRevenue, getAllocatableCapital, stageLabel } from '@/src/lib/helpers'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
 import { narratorPhaseForStage } from '@/lib/narrator/scripts'
 import { RouteBackground } from '@/src/components/effects/RouteBackground'
@@ -88,6 +88,17 @@ export default function SimulationPage() {
   const nextStageData = nextStageNarr
     ? { ...nextStageNarr, voiceUrl: `/audio/narrator/snapshot-${nextStageName.toLowerCase()}-01-speaking.mp3` }
     : undefined
+
+  // `simulation.budgetAllocations` only ever holds the current stage's
+  // allocations, so the figure it is measured against has to be that stage's
+  // budget — not the Month-2 startup capital. Using the latter made "Capital
+  // Remaining" go negative during the second (larger) allocation.
+  const activeBudgetQuestion = questions.find(
+    (q) => (q as unknown as Record<string, unknown>).type === 'budget_allocation',
+  )
+  const displayCapital = activeBudgetQuestion
+    ? getAllocatableCapital(activeBudgetQuestion.q_id, budgetAllocations, simulation.capital)
+    : simulation.capital
 
   // ---- Panel Selection ----
   if (showPanelSelection) {
@@ -194,7 +205,7 @@ export default function SimulationPage() {
         stageName={stageLabel(simulation.currentStage)}
         nextStage={nextStageData}
         budgetAllocations={simulation.budgetAllocations}
-        capital={simulation.capital}
+        capital={displayCapital}
         onContinue={() => snapshotContinueRef.current?.()}
       />
       {/* Capital animation */}
@@ -203,7 +214,7 @@ export default function SimulationPage() {
           <motion.div initial={{ opacity: 0, scale: 0.5, y: 50 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.5, y: -50 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
             <div className="text-center" style={{ background: 'color-mix(in srgb, var(--color-chessboard-void) 90%, transparent)', border: '2px solid color-mix(in srgb, var(--color-chessboard-gold) 60%, transparent)', borderRadius: '4px', padding: '2rem 3rem', boxShadow: 'var(--shadow-gold)' }}>
               <div className="mb-2 flex justify-center"><Coins className="h-8 w-8" style={{ color: 'var(--color-chessboard-gold)' }} /></div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 900, color: 'var(--color-chessboard-gold)', letterSpacing: '0.08em', textShadow: 'var(--glow-ember)' }}>+$50,000 PLEDGED!</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 900, color: 'var(--color-chessboard-gold)', letterSpacing: '0.08em', textShadow: 'var(--glow-ember)' }}>+{formatRevenue(simulation.capital || DEFAULT_STARTING_CAPITAL)} PLEDGED!</div>
               <div style={{ fontSize: '0.7rem', color: 'var(--color-chessboard-smoke)', letterSpacing: '0.15em', marginTop: '4px' }}>THE COUNCIL INVESTS IN YOUR REALM</div>
             </div>
           </motion.div>
@@ -233,7 +244,7 @@ export default function SimulationPage() {
   const sidebar = {
     left: (
       <div className="hidden lg:flex flex-col gap-4">
-        <RevenueSidePanel revenue={revenue} previousRevenue={prevRevenue} currentStage={simulation.currentStage} capital={simulation.capital} budgetAllocations={simulation.budgetAllocations} />
+        <RevenueSidePanel revenue={revenue} previousRevenue={prevRevenue} currentStage={simulation.currentStage} capital={displayCapital} budgetAllocations={simulation.budgetAllocations} />
       </div>
     ),
     right: (
@@ -325,7 +336,7 @@ export default function SimulationPage() {
             followupScenarios={followupScenarios}
             followupError={followupError}
             mcqFeedback={mcqFeedback}
-            capital={simulation.capital || 100000}
+            capital={simulation.capital || DEFAULT_STARTING_CAPITAL}
             budgetAllocations={budgetAllocations}
             buyoutCompany={buyoutCompany}
             buyoutAmount={buyoutAmount}

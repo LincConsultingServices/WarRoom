@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/src/lib/api'
-import { STAGE_ORDER, STAGE_DURATIONS } from '@/src/lib/constants'
+import { STAGE_ORDER, STAGE_DURATIONS, DEFAULT_STARTING_CAPITAL } from '@/src/lib/constants'
 import { useStageTimer } from '@/src/hooks/useStageTimer'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
 import { useMentorLifeline } from '@/src/hooks/useMentorLifeline'
@@ -228,12 +228,17 @@ export function useSimulation(assessmentId: string) {
     setAnswers((prev) => ({ ...prev, [qId]: { ...prev[qId], questionId: qId, type: (isScenario ? qType : 'multiple_choice') as any, selectedOptionId: opt.id } }))
     if (!questionId) setMcqFeedback(opt.feedback || null)
     if (qId === 'Q_0_1' || qId === 'Q_0_CAPITAL') {
-      const parsedCapital = typeof opt.impact?.capital === 'number'
-        ? opt.impact.capital
-        : Number((opt.text.match(/[0-9][0-9,]*/)?.[0] || '').replace(/,/g, '')) || 0
+      // Every capital-generation option raises the same amount — the options
+      // differ in *how* the money is raised, not *how much*. Previously this
+      // scraped the first integer out of the option prose, which picked up
+      // equity percentages and interest rates ("20–30% equity" → $20), so the
+      // budget screen offered $20 to allocate right after announcing $50,000.
+      const raised = typeof opt.impact?.capital === 'number' && Number.isFinite(opt.impact.capital)
+        ? Math.max(0, opt.impact.capital)
+        : DEFAULT_STARTING_CAPITAL
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setState((p: any) => p ? { ...p, simulation: { ...p.simulation, capital: parsedCapital } } : p)
-      setPrevRevenue(revenue); setRevenue(parsedCapital)
+      setState((p: any) => p ? { ...p, simulation: { ...p.simulation, capital: raised, capitalSource: opt.text } } : p)
+      setPrevRevenue(revenue); setRevenue(raised)
       setShowCapitalAnimation(true); setTimeout(() => setShowCapitalAnimation(false), 3000)
     }
   }
