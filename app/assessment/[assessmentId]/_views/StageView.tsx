@@ -13,7 +13,8 @@ import { DynamicScenarioQuestion } from './question-types/DynamicScenarioQuestio
 import { BudgetQuestion } from './question-types/BudgetQuestion'
 import { AIScenarioQuestion } from './question-types/AIScenarioQuestion'
 import { InfoQuestion } from './question-types/InfoQuestion'
-import { getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from '@/src/lib/helpers'
+import { CrossroadsQuestion, isCrossroadsQuestion } from './question-types/CrossroadsQuestion'
+import { getQuestionHeading, getQuestionTypeColor, getQuestionTypeIcon, getQuestionTypeLabel } from '@/src/lib/helpers'
 import { useFeatureIntro } from '@/src/hooks/useFeatureIntro'
 import type { SimQuestion, SimOption, PhaseResponse } from '@/src/types'
 
@@ -141,6 +142,9 @@ export function StageView({
       )
     }
     if (qType === 'multiple_choice' && currentQ.options) {
+      if (isCrossroadsQuestion(currentQ.options)) {
+        return <CrossroadsQuestion options={currentQ.options} selectedOptionId={currentAnswer?.selectedOptionId} mcqFeedback={mcqFeedback} onSelect={(opt: SimOption) => onSelectOption(opt)} />
+      }
       return <MCQQuestion options={currentQ.options} selectedOptionId={currentAnswer?.selectedOptionId} mcqFeedback={mcqFeedback} onSelect={(opt: SimOption) => onSelectOption(opt)} />
     }
     if (qType === 'budget_allocation' && currentQ.options) {
@@ -202,7 +206,7 @@ export function StageView({
                 {currentAnswer && <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />}
               </div>
               <div className="flex items-start justify-between gap-4">
-                <h2 className="text-lg font-semibold leading-snug">{currentQ.text}</h2>
+                <h2 className="text-lg font-semibold leading-snug">{getQuestionHeading(qType, currentQ.text)}</h2>
                 {currentQ.scenario_group !== 'investor_panel' && <QuestionAudioPlayer audioKey={currentQ.q_id} />}
               </div>
               {currentQ.context_text && qType !== 'ai_scenario' && qType !== 'info' && (

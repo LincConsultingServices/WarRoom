@@ -2,7 +2,7 @@
 // Assessment – Shared Helper Functions
 // ============================================
 
-import { FileText, AlertTriangle, Target, DollarSign, Lightbulb } from 'lucide-react'
+import { FileText, AlertTriangle, Target, DollarSign, Lightbulb, History } from 'lucide-react'
 import { INVESTOR_VOICE_BY_ID, INVESTOR_TITLE_TO_ID } from './constants'
 import type { AssessmentState } from '@/src/types'
 
@@ -22,6 +22,7 @@ export function getQuestionTypeLabel(type: string): string {
   switch (type) {
     case 'multiple_choice': return 'Multiple Choice'
     case 'scenario': return 'Scenario Based'
+    case 'dynamic_scenario': return 'Scenario Based'
     case 'budget_allocation': return 'Budget Allocation'
     case 'open_text': return 'Open Response'
     case 'ai_scenario': return 'AI Scenario'
@@ -33,6 +34,7 @@ export function getQuestionTypeLabel(type: string): string {
 export function getQuestionTypeIcon(type: string) {
   switch (type) {
     case 'scenario': return <AlertTriangle className="h-3.5 w-3.5" />
+    case 'dynamic_scenario': return <History className="h-3.5 w-3.5" />
     case 'multiple_choice': return <Target className="h-3.5 w-3.5" />
     case 'budget_allocation': return <DollarSign className="h-3.5 w-3.5" />
     case 'ai_scenario': return <Lightbulb className="h-3.5 w-3.5" />
@@ -44,12 +46,23 @@ export function getQuestionTypeIcon(type: string) {
 export function getQuestionTypeColor(type: string): string {
   switch (type) {
     case 'scenario': return '#c8a84a'
+    case 'dynamic_scenario': return '#c8a84a'
     case 'multiple_choice': return '#c8a84a'
     case 'budget_allocation': return '#2d6a4f'
     case 'ai_scenario': return '#7a2020'
     case 'info': return '#3d6b8e'
     default: return '#7c5a9e'
   }
+}
+
+// `dynamic_scenario` questions carry an internal placeholder title in
+// simulation.json ("Dynamic Scenario 1") — the real prompt is the
+// AI-generated body rendered inside the card, built from what the founder
+// decided in earlier phases. Show a player-facing heading instead of the
+// backend's authoring placeholder.
+export function getQuestionHeading(type: string, text: string): string {
+  if (type === 'dynamic_scenario') return 'Previous Decisions'
+  return text
 }
 
 // ---- Voice / Audio helpers ----

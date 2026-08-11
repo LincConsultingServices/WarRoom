@@ -1278,25 +1278,22 @@ export default function ChessboardSimulation() {
                                     </span>
                                     <p>{currentInvestorReaction}</p>
                                 </div>
+                                {/*
+                                  One scored response per investor — the backend writes a
+                                  scorecard on every submit, so there is no "retry" once the
+                                  Council has answered. The old Retry button cleared the
+                                  reaction but left `responseSubmitted` true, which stranded
+                                  the player: the mic was locked as "Response Submitted" and
+                                  the only way forward (this button) had just been unmounted.
+                                  Re-recording lives before submission — Record Again /
+                                  Discard Recording.
+                                */}
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                                    <motion.button 
-                                        className="respond-btn" 
-                                        style={{ flex: 1, backgroundColor: 'color-mix(in srgb, var(--color-chessboard-parchment) 10%, transparent)', color: 'var(--color-chessboard-parchment)', border: '1px solid color-mix(in srgb, var(--color-chessboard-parchment) 22%, transparent)' }}
-                                        onClick={() => {
-                                            setCurrentInvestorReaction('');
-                                            setResponseTranscription('');
-                                            responseRecorder.resetRecording();
-                                        }}
-                                        whileHover={{ scale: 1.03 }} 
-                                        whileTap={{ scale: 0.97 }}
-                                    >
-                                        Retry Response
-                                    </motion.button>
-                                    <motion.button 
-                                        className="respond-btn" 
-                                        style={{ flex: 2 }}
-                                        onClick={handleContinueToNextInvestor} 
-                                        whileHover={{ scale: 1.03 }} 
+                                    <motion.button
+                                        className="respond-btn"
+                                        style={{ flex: 1 }}
+                                        onClick={handleContinueToNextInvestor}
+                                        whileHover={{ scale: 1.03 }}
                                         whileTap={{ scale: 0.97 }}
                                     >
                                         {currentInvestorIndex < investors.length - 1 ? `Continue to Next Investor` : `View Panel Decisions`}
@@ -1364,6 +1361,27 @@ export default function ChessboardSimulation() {
                                         <div className="countdown-bar"><div className="countdown-fill" style={{ width: `${Math.max(0, ((15 - responseRecorder.recordingTime) / 15) * 100)}%` }} /></div>
                                     )}
                                 </div>
+
+                                {/*
+                                  Escape hatch. This branch means the response is already
+                                  scored (mic locked) but no reaction is on screen — e.g. the
+                                  reaction/TTS leg failed after the scorecard was written.
+                                  The player must always have a way forward to the next
+                                  investor rather than a dead-ended chamber.
+                                */}
+                                {responseSubmitted && followupPhase !== 'followup_pending' && (
+                                    <div style={{ display: 'flex', marginTop: '1rem' }}>
+                                        <motion.button
+                                            className="respond-btn"
+                                            style={{ flex: 1 }}
+                                            onClick={handleContinueToNextInvestor}
+                                            whileHover={{ scale: 1.03 }}
+                                            whileTap={{ scale: 0.97 }}
+                                        >
+                                            {currentInvestorIndex < investors.length - 1 ? 'Continue to Next Investor' : 'View Panel Decisions'}
+                                        </motion.button>
+                                    </div>
+                                )}
 
                                 {error && (
                                     <div className="error-msg" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
