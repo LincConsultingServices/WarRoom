@@ -8,7 +8,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { NarratorOrb } from '@/src/components/narrator/NarratorOrb'
 import { GlobalControls } from '@/src/components/GlobalControls'
 import dynamic from 'next/dynamic'
-const CustomCursor = dynamic(() => import('@/src/components/effects/CustomCursor').then(mod => mod.CustomCursor))
 const EmberParticles = dynamic(() => import('@/src/components/effects/EmberParticles').then(mod => mod.EmberParticles))
 const AudioSettingsLoader = dynamic(() => import('@/src/components/AudioSettingsLoader').then(mod => mod.AudioSettingsLoader))
 import './globals.css'
@@ -41,7 +40,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#0d0d0d'
+  themeColor: '#f8f7f3'
 }
 
 export default function RootLayout({
@@ -50,11 +49,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="bg-background" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jetBrainsMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
+          forcedTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
@@ -64,7 +64,6 @@ export default function RootLayout({
               <GlobalControls />
               {children}
               <NarratorOrb />
-              <CustomCursor />
               <EmberParticles density={20} />
               <Toaster />
             </MotionConfig>
