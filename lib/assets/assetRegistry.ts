@@ -20,11 +20,11 @@ export const ASSET_REGISTRY = {
   },
 
   backgrounds: {
-    landing:    '/assets/images/bg/landing-hall.webp',
-    dashboard:  '/assets/images/bg/dashboard-chamber.webp',
-    simulation: '/assets/images/bg/simulation-stone.webp',
-    chessboard:    '/assets/images/bg/chessboard-throne.webp',
-    verdict:    '/assets/images/bg/verdict-hall.webp',
+    landing:    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-uPIq1QYtYyk7dGOLhU6AhXOq6jGQ5m.png',
+    dashboard:  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-wI7IQgt44XI7Tnz7l6PC5KWQgLtcob.png',
+    simulation: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-yOgZyRBJNY0iECvKTLjC4siQx4C1sa.png',
+    chessboard: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-RSRu9o1FG9r7HgQUB0v0Mbxd9rQPSv.png',
+    verdict:    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7dZmJREIntjPKO2gDxXbtvhc5n3Ymq.png',
   },
 
   textures: {

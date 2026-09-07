@@ -12,14 +12,22 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden text-[color:var(--color-chessboard-ivory)]">
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(18, 8, 5, 0.52), rgba(18, 8, 5, 0.52)), url("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7pq7XSWhoqp6ptltiyRZLmWEEGZppJ.png")',
-        }}
-      />
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[color:var(--color-chessboard-charcoal)]">
+        <video
+          className="h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Stone_chess_battlefield_flags_fl%E2%80%A6_202608302334%20%281%29-SRNFBsWTA12ERjKdVbMCx9852yO3fh.mp4"
+            type="video/mp4"
+          />
+        </video>
+        <div className="absolute inset-0 bg-[rgba(18,8,5,0.52)]" />
+      </div>
       <WarRoomAtmosphere className="fixed z-[1]" />
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-12">
         {children}
