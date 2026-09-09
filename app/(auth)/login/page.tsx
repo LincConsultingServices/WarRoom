@@ -65,19 +65,19 @@ function LoginContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!isAdmin && !batchCode.trim()) {
-      setError('Batch code is required')
-      return
-    }
     setLoading(true)
     setError('')
 
     try {
       // Authenticate against Firebase, then reconcile with the Chessboard backend.
+      // The batch code is optional: returning participants keep the cohort already
+      // on their profile, and an individual participant who types one here joins
+      // that cohort. Send the field only when it was actually filled in.
+      const trimmedBatch = batchCode.trim().toUpperCase()
       const profile = await login(
         email,
         password,
-        isAdmin ? undefined : batchCode.trim().toUpperCase(),
+        !isAdmin && trimmedBatch ? trimmedBatch : undefined,
       )
 
       audioManager.playSfx('wr.door-creak')
@@ -192,7 +192,7 @@ function LoginContent() {
             >
               {isAdmin
                 ? 'Enter your admin credentials.'
-                : 'Enter your batch code and credentials to access your simulations.'}
+                : 'Enter your credentials to access your simulations. A batch code is optional — add one to join a cohort.'}
             </p>
           </div>
 
@@ -234,10 +234,13 @@ function LoginContent() {
               <div>
                 <label
                   htmlFor="login-batch"
-                  className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
+                  className="flex items-baseline gap-2 text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Batch Code
+                  <span className="text-[9px] tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]/60">
+                    Optional
+                  </span>
                 </label>
                 <Input
                   id="login-batch"
@@ -250,7 +253,6 @@ function LoginContent() {
                     setBatchName('')
                   }}
                   onBlur={handleBatchCodeBlur}
-                  required={!isAdmin}
                   className={cn(
                     INPUT_CLASSES,
                     batchValid === true &&

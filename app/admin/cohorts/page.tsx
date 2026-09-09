@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import api from '@/src/lib/api'
-import type { AdminBatch, CreateBatchRequest } from '@/src/types'
+import type { AdminBatch, BatchParticipant, CreateBatchRequest } from '@/src/types'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
@@ -21,6 +21,7 @@ import {
   Loader2,
   AlertTriangle,
   Shield,
+  UserRound,
 } from 'lucide-react'
 import { StoneCard, ChessboardCTA, GoldDivider, SigilBadge } from '@/src/components/primitives'
 import { easeDramatic, staggerContainer, staggerItem } from '@/lib/animations/variants'
@@ -49,6 +50,10 @@ export default function CohortsPage() {
   const [newName, setNewName] = useState('')
   const [newLevel, setNewLevel] = useState(1)
 
+  // Participants who signed up without a cohort. They belong to no batch, so the
+  // batch cards below can never show them.
+  const [individuals, setIndividuals] = useState<BatchParticipant[]>([])
+
   const fetchBatches = useCallback(async () => {
     try {
       const data = await api.admin.listBatches()
@@ -60,9 +65,20 @@ export default function CohortsPage() {
     }
   }, [])
 
+  const fetchIndividuals = useCallback(async () => {
+    try {
+      setIndividuals(await api.admin.getIndividualParticipants())
+    } catch (err: unknown) {
+      // Older backends have no such route — leave the section empty rather than
+      // failing the whole page.
+      console.error('Failed to fetch individual participants:', err)
+    }
+  }, [])
+
   useEffect(() => {
     fetchBatches()
-  }, [fetchBatches])
+    fetchIndividuals()
+  }, [fetchBatches, fetchIndividuals])
 
   const handleCreate = async () => {
     if (!newCode.trim() || !newName.trim()) {
@@ -201,7 +217,7 @@ export default function CohortsPage() {
         {[
           { label: 'Total Batches', value: batches.length, tone: undefined },
           { label: 'Enabled', value: batches.filter((b) => b.active).length, tone: 'verdant' as const },
-          { label: 'Total Participants', value: batches.reduce((sum, b) => sum + b.participantCount, 0), tone: undefined },
+          { label: 'Total Participants', value: batches.reduce((sum, b) => sum + b.participantCount, 0) + individuals.length, tone: undefined },
           { label: 'Disabled', value: batches.filter((b) => !b.active).length, tone: 'crimson' as const },
         ].map((stat) => (
           <motion.div key={stat.label} variants={staggerItem}>
@@ -350,6 +366,65 @@ export default function CohortsPage() {
             )}
           </div>
         </StoneCard>
+      )}
+
+      {/* ── Individual founders ── */}
+      {individuals.length > 0 && (
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: easeDramatic }}
+          className="space-y-3"
+        >
+          <div className="flex items-center gap-2">
+            <UserRound className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" />
+            <h2
+              className="text-sm font-semibold tracking-[0.06em] text-[color:var(--color-chessboard-ivory)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Individual Founders
+            </h2>
+            <span className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]">
+              {individuals.length} with no batch
+            </span>
+          </div>
+          <StoneCard>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr
+                    className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-smoke)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    <th className="py-2 pr-4 font-normal">Name</th>
+                    <th className="py-2 pr-4 font-normal">Email</th>
+                    <th className="py-2 pr-4 font-normal">Joined</th>
+                    <th className="py-2 font-normal">Latest simulation</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[color:var(--color-chessboard-ivory)]">
+                  {individuals.map((p) => (
+                    <tr
+                      key={p.userId}
+                      className="border-t border-[color:var(--color-chessboard-ash)]/20"
+                    >
+                      <td className="py-2 pr-4">{p.userName}</td>
+                      <td className="py-2 pr-4 text-[color:var(--color-chessboard-smoke)]">
+                        {p.email}
+                      </td>
+                      <td className="py-2 pr-4 text-[color:var(--color-chessboard-smoke)]">
+                        {new Date(p.joinedAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 text-[color:var(--color-chessboard-smoke)]">
+                        {p.status ? p.status.replace(/_/g, ' ').toLowerCase() : 'not started'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </StoneCard>
+        </motion.div>
       )}
 
       {/* ── Create Dialog ── */}
