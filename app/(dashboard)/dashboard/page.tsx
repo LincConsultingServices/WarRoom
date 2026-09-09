@@ -451,7 +451,7 @@ export default function DashboardPage() {
                   value={stats.rank ? `#${stats.rank}` : '—'}
                   icon={Award}
                   accent={stats.rank && stats.rank <= 3 ? 'var(--color-chessboard-crimson-bright)' : 'var(--color-chessboard-gold)'}
-                  hint={batch ? batch.code : 'Join a batch to rank'}
+                  hint={batch ? batch.code : 'Join a cohort to rank'}
                 />
                 <StatTile
                   label={<LoreTip tip={LORE.founderRank}>Founder Rank</LoreTip>}
@@ -703,7 +703,7 @@ export default function DashboardPage() {
                       className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--color-chessboard-smoke)]"
                       style={{ fontFamily: 'var(--font-display)' }}
                     >
-                      Enter a batch code at sign-in to reveal the standings.
+                      Join a cohort from the Rankings page to reveal the standings.
                     </p>
                   </StoneCard>
                 )}

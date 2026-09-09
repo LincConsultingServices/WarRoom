@@ -483,6 +483,11 @@ export const api = {
     getParticipants: (id: string) =>
       request<BatchParticipant[]>(`/admin/batches/${id}/participants`),
 
+    // Participants who signed up without a cohort. Every other participant view is
+    // batch-scoped, so this is where admins see them.
+    getIndividualParticipants: () =>
+      request<BatchParticipant[]>('/admin/participants/individual'),
+
     getStats: (id: string) =>
       request<BatchStats>(`/admin/batches/${id}/stats`),
 
