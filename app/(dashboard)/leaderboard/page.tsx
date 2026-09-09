@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Trophy, Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/src/context/AuthContext'
+import { authErrorMessage } from '@/src/lib/firebase'
+import { ChessboardCTA } from '@/src/components/primitives'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
 import { useNarratorOnboarding } from '@/src/hooks/useNarratorOnboarding'
@@ -17,10 +21,34 @@ export default function LeaderboardPage() {
   const router = useRouter()
   const prefersReducedMotion = useReducedMotion()
 
+  const { joinBatch } = useAuth()
+
   const [user, setUser] = useState<{ name: string; id?: string } | null>(null)
   const [batch, setBatch] = useState<{ code: string; name: string } | null>(
     null,
   )
+
+  // Individual participants have no cohort board. Rather than a dead end, the empty
+  // state lets them enrol in one here.
+  const [joinCode, setJoinCode] = useState('')
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState('')
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!joinCode.trim()) return
+    setJoining(true)
+    setJoinError('')
+    try {
+      await joinBatch(joinCode)
+      // joinBatch refreshes the cached profile; re-read it for this page's state.
+      setBatch(JSON.parse(localStorage.getItem('batch') || 'null'))
+    } catch (err: unknown) {
+      setJoinError(authErrorMessage(err))
+    } finally {
+      setJoining(false)
+    }
+  }
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
@@ -197,14 +225,48 @@ export default function LeaderboardPage() {
               className="text-sm text-[color:var(--color-chessboard-smoke)] mb-1"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              No batch associated with your account.
+              You&apos;re running as an individual founder.
             </p>
             <p
-              className="text-xs text-[color:var(--color-chessboard-smoke)]"
+              className="text-xs text-[color:var(--color-chessboard-smoke)] mb-6"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
-              Sign in with a batch code to see live rankings.
+              Live rankings are cohort-only. Enter a batch code to join one.
             </p>
+
+            <form
+              onSubmit={handleJoin}
+              className="mx-auto flex max-w-xs flex-col gap-2 px-6"
+            >
+              <label htmlFor="join-batch" className="sr-only">
+                Batch code
+              </label>
+              <Input
+                id="join-batch"
+                type="text"
+                placeholder="e.g. BATCH2024A"
+                value={joinCode}
+                onChange={(e) => {
+                  setJoinCode(e.target.value.toUpperCase())
+                  setJoinError('')
+                }}
+                className="bg-transparent border-white/35 text-center text-white placeholder:text-white/50 caret-white"
+              />
+              <ChessboardCTA
+                type="submit"
+                size="sm"
+                variant="primary"
+                disabled={joining || !joinCode.trim()}
+                className="w-full justify-center"
+              >
+                {joining ? 'Joining…' : 'Join cohort'}
+              </ChessboardCTA>
+              {joinError && (
+                <p className="text-[11px] text-[color:var(--color-chessboard-crimson-bright)]">
+                  {joinError}
+                </p>
+              )}
+            </form>
           </StoneCard>
         </motion.div>
       )}

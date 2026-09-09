@@ -397,7 +397,7 @@ export function SnapshotDashboard({ show, revenue, previousRevenue, leaderboardE
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] italic text-muted-foreground">Join a batch to see live rankings.</p>
+                  <p className="text-[11px] italic text-muted-foreground">Join a cohort to see live rankings.</p>
                 )}
               </motion.div>
             </div>

@@ -37,6 +37,10 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  // How this account enrols. 'cohort' redeems a batch code issued by an instructor;
+  // 'individual' signs up with no cohort at all. Cohort-only surfaces (leaderboard,
+  // rankings) render an empty state for individuals, who can join one later.
+  const [enrolment, setEnrolment] = useState<'cohort' | 'individual'>('cohort')
   const [batchCode, setBatchCode] = useState('')
   // true = confirmed valid, false = confirmed invalid, 'unreachable' = the
   // check itself failed (server down / network) — not the user's fault.
@@ -69,11 +73,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!batchCode.trim()) {
-      setError('Batch code is required')
+    const joiningCohort = enrolment === 'cohort'
+    if (joiningCohort && !batchCode.trim()) {
+      setError('Enter your batch code, or continue as an individual founder')
       return
     }
-    if (batchValid === false) {
+    if (joiningCohort && batchValid === false) {
       setError('Please enter a valid batch code')
       return
     }
@@ -85,8 +90,15 @@ export default function RegisterPage() {
     setError('')
 
     try {
-      // Create the Firebase account, then provision the backend profile (with batch code + name).
-      await register(email, password, batchCode.trim().toUpperCase(), name)
+      // Create the Firebase account, then provision the backend profile. The batch
+      // code is sent only for a cohort signup; without one the backend provisions an
+      // individual participant.
+      await register(
+        email,
+        password,
+        joiningCohort ? batchCode.trim().toUpperCase() : undefined,
+        name,
+      )
       acceptTerms()
       audioManager.playSfx('ui.click')
       router.push('/dashboard')
@@ -159,7 +171,8 @@ export default function RegisterPage() {
               className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
-              Enter your batch code and details to begin your simulation. Review the{' '}
+              Choose how you are joining, then enter your details to begin your
+              simulation. Review the{' '}
               <Link
                 href="/terms"
                 className="text-[color:var(--color-chessboard-gold)] underline underline-offset-2 hover:text-[color:var(--color-chessboard-gold-bright)] transition-colors"
@@ -187,7 +200,78 @@ export default function RegisterPage() {
           </AnimatePresence>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Batch Code */}
+            {/* How you're joining */}
+            <div>
+              <span
+                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                How are you joining?
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {(
+                  [
+                    {
+                      key: 'cohort' as const,
+                      title: 'With a batch code',
+                      hint: 'Issued by your instructor',
+                    },
+                    {
+                      key: 'individual' as const,
+                      title: 'Individual founder',
+                      hint: 'No code needed',
+                    },
+                  ]
+                ).map((option) => {
+                  const active = enrolment === option.key
+                  return (
+                    <button
+                      key={option.key}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => {
+                        setEnrolment(option.key)
+                        setError('')
+                        audioManager.playSfx('ui.click')
+                      }}
+                      className={cn(
+                        'rounded-[3px] border p-3 text-left transition-all duration-300',
+                        active
+                          ? 'border-[color:var(--color-chessboard-gold)]/50 bg-[color:var(--color-chessboard-gold)]/[0.08]'
+                          : 'border-border bg-card hover:border-white/25',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'block text-[11px] font-semibold uppercase tracking-[0.1em]',
+                          active
+                            ? 'text-[color:var(--color-chessboard-gold)]'
+                            : 'text-[color:var(--color-chessboard-ivory)]',
+                        )}
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {option.title}
+                      </span>
+                      <span className="mt-1 block text-[10px] leading-snug text-[color:var(--color-chessboard-smoke)]">
+                        {option.hint}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* What choosing 'individual' actually costs you */}
+            {enrolment === 'individual' && (
+              <p className="text-[11px] leading-relaxed text-[color:var(--color-chessboard-smoke)]">
+                You&apos;ll run the full simulation on your own. Cohort rankings stay
+                empty until you join one — you can do that any time from the Rankings
+                page.
+              </p>
+            )}
+
+            {/* Batch Code — cohort signups only */}
+            {enrolment === 'cohort' && (
             <div>
               <label
                 htmlFor="reg-batch"
@@ -207,7 +291,7 @@ export default function RegisterPage() {
                   setBatchName('')
                 }}
                 onBlur={handleBatchCodeBlur}
-                required
+                required={enrolment === 'cohort'}
                 className={cn(
                   INPUT_CLASSES,
                   batchValid === true &&
@@ -254,6 +338,7 @@ export default function RegisterPage() {
                 )}
               </AnimatePresence>
             </div>
+            )}
 
             {/* Full Name */}
             <div>

@@ -7,6 +7,10 @@
 // It keeps localStorage['user'] and localStorage['batch'] populated as the app's
 // profile cache, so every existing component that reads those keys (sidebars,
 // route guards, useSimulation, leaderboard) keeps working unchanged.
+//
+// A batch code is optional throughout: a participant either belongs to a cohort or
+// runs solo as an individual participant, in which case 'batch' is absent and the
+// cohort-only surfaces (leaderboard, rankings) render their empty state.
 // ============================================
 
 import {
@@ -43,9 +47,11 @@ interface AuthContextValue {
   batch: BatchInfo | null
   loading: boolean
   login: (email: string, password: string, batchCode?: string) => Promise<AuthProfile>
-  register: (email: string, password: string, batchCode: string, name?: string) => Promise<AuthProfile>
+  register: (email: string, password: string, batchCode?: string, name?: string) => Promise<AuthProfile>
   logout: () => Promise<void>
   refresh: () => Promise<AuthProfile>
+  /** Attach a cohort to an account that has none. Rejects an invalid code. */
+  joinBatch: (batchCode: string) => Promise<AuthProfile>
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -117,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // A returning user or admin: refresh the backend profile silently. Brand-new
-      // signups are provisioned by register() (which carries the batch code), so we
+      // signups are provisioned by register() (which carries any batch code), so we
       // skip auto-sync while that explicit flow is running and ignore a
       // not-yet-provisioned error here.
       if (!manualAuthInFlight.current) {
@@ -146,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const register = useCallback(
-    async (email: string, password: string, batchCode: string, name?: string): Promise<AuthProfile> => {
+    async (email: string, password: string, batchCode?: string, name?: string): Promise<AuthProfile> => {
       manualAuthInFlight.current = true
       const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password)
       try {
@@ -178,9 +184,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback((): Promise<AuthProfile> => applySync(), [applySync])
 
+  // Individual participants can enrol in a cohort at any point. /auth/sync applies a
+  // code only to an account that has none, so this can never move someone between
+  // cohorts — that stays an admin action.
+  const joinBatch = useCallback(
+    (batchCode: string): Promise<AuthProfile> => applySync(batchCode.trim().toUpperCase()),
+    [applySync],
+  )
+
   return (
     <AuthContext.Provider
-      value={{ firebaseUser, profile, batch, loading, login, register, logout, refresh }}
+      value={{ firebaseUser, profile, batch, loading, login, register, logout, refresh, joinBatch }}
     >
       {children}
     </AuthContext.Provider>
