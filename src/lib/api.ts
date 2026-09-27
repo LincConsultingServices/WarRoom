@@ -9,6 +9,7 @@ import type {
   MentorLifelineResult,
   InvestorScorecard,
   EvaluationReport,
+  ImplementationRoadmap,
   ResponseData,
   Mentor,
   Investor,
@@ -424,6 +425,11 @@ export const api = {
 
     // Report
     getReport: (id: string) => request<EvaluationReport>(`/assessments/${id}/report`),
+
+    // 30-day implementation roadmap. Reports generated before the roadmap
+    // existed have none inline; this builds (and saves) one on first request.
+    getRoadmap: (id: string) =>
+      request<ImplementationRoadmap>(`/assessments/${id}/roadmap`),
 
     // Regenerate the report from scratch — drops any cached row and rebuilds from
     // the current assessment state. Use after late answer changes (e.g. user
