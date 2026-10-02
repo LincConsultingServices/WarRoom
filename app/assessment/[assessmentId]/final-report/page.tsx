@@ -10,12 +10,15 @@ import {
   Brain,
   Sparkles,
   MessageSquare,
+  CalendarRange,
+  ChevronRight,
 } from 'lucide-react'
 import api from '@/src/lib/api'
-import type { EvaluationReport } from '@/src/types'
+import type { EvaluationReport, ImplementationRoadmap } from '@/src/types'
 import { CompetencyTab } from './_sections/CompetencyTab'
 import { AIAnalysisTab } from './_sections/AIAnalysisTab'
 import { ResponsesTab } from './_sections/ResponsesTab'
+import { RoadmapTab } from './_sections/RoadmapTab'
 import { GoldDivider } from '@/src/components/primitives'
 import { easeDramatic } from '@/lib/animations/variants'
 import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
@@ -29,10 +32,13 @@ import { NoiseOverlay } from '@/src/components/effects/NoiseOverlay'
 const TABS = [
   { id: 1, label: 'Competency Profile', icon: Brain },
   { id: 2, label: 'AI Analysis', icon: Sparkles },
+  { id: 4, label: '30-Day Roadmap', icon: CalendarRange },
   { id: 3, label: 'Your Responses', icon: MessageSquare },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
+
+const ROADMAP_TAB: TabId = 4
 
 export default function FinalReportPage() {
   const params = useParams()
@@ -43,6 +49,10 @@ export default function FinalReportPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<TabId>(1)
+
+  // Keep a lazily-fetched roadmap (older reports) across tab switches.
+  const handleRoadmapLoaded = (roadmap: ImplementationRoadmap) =>
+    setReport((prev) => (prev ? { ...prev, implementationRoadmap: roadmap } : prev))
 
   useEffect(() => {
     api.assessments
@@ -150,6 +160,18 @@ export default function FinalReportPage() {
           >
             {report.entrepreneurType} &bull; {report.organizationalRole}
           </p>
+          {activeTab !== ROADMAP_TAB && (
+            <button
+              type="button"
+              onClick={() => setActiveTab(ROADMAP_TAB)}
+              className="group mt-4 inline-flex items-center gap-2 rounded-lg border border-[color:var(--color-chessboard-gold)]/35 bg-[color:var(--color-chessboard-gold)]/[0.06] px-3.5 py-2 text-xs font-semibold text-[color:var(--color-chessboard-gold)] transition-colors hover:bg-[color:var(--color-chessboard-gold)]/[0.12]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              <CalendarRange className="h-3.5 w-3.5" />
+              Your 30-day implementation roadmap is ready
+              <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          )}
           <div className="mt-5">
             <GoldDivider variant="line" />
           </div>
@@ -164,6 +186,8 @@ export default function FinalReportPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                aria-label={tab.label}
+                aria-pressed={isActive}
                 className={`
                   flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border
                   ${
@@ -195,6 +219,13 @@ export default function FinalReportPage() {
             >
               {activeTab === 1 && <CompetencyTab report={report} />}
               {activeTab === 2 && <AIAnalysisTab report={report} />}
+              {activeTab === ROADMAP_TAB && (
+                <RoadmapTab
+                  report={report}
+                  assessmentId={assessmentId}
+                  onRoadmapLoaded={handleRoadmapLoaded}
+                />
+              )}
               {activeTab === 3 && <ResponsesTab report={report} />}
             </motion.div>
           </AnimatePresence>

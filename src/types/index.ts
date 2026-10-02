@@ -380,7 +380,84 @@ export interface EvaluationReport {
   // All User Responses
   userResponses: UserResponseEntry[];
 
+  // 30-day implementation roadmap. Null on reports generated before the
+  // roadmap existed — fetch it via api.assessments.getRoadmap (backfills).
+  implementationRoadmap?: ImplementationRoadmap | null;
+
   generatedAt: string;
+}
+
+// ============================================
+// 30-DAY IMPLEMENTATION ROADMAP
+// ============================================
+
+export type RoadmapSupportType =
+  | 'hire'
+  | 'cofounder'
+  | 'outsource'
+  | 'advisor'
+  | 'partner'
+  | 'tool'
+  | 'upskill';
+
+export interface RoadmapSupportOption {
+  type: RoadmapSupportType;
+  label: string;
+  detail: string;
+}
+
+export interface RoadmapTask {
+  days: string;
+  title: string;
+  detail: string;
+  owner: string;
+}
+
+export interface RoadmapWeek {
+  week: number;
+  startDay: number;
+  endDay: number;
+  theme: string;
+  objective: string;
+  tasks: RoadmapTask[];
+  milestone: string;
+  metric: string;
+}
+
+export interface RoadmapStrength {
+  code: string;
+  name: string;
+  score: number;
+  howToUse: string;
+}
+
+export interface RoadmapSkillGap {
+  code: string;
+  name: string;
+  score: number;
+  severity: 'critical' | 'developing' | 'watch';
+  risk: string;
+  recommendation: RoadmapSupportOption;
+  alternatives: RoadmapSupportOption[];
+  whenInPlan: string;
+}
+
+export interface ImplementationRoadmap {
+  version: number;
+  source: 'ai' | 'template';
+  generatedAt: string;
+  headline: string;
+  summary: string;
+  northStar: string;
+  ideaSnapshot: { key: string; label: string; value: string }[];
+  weeks: RoadmapWeek[];
+  strengths: RoadmapStrength[];
+  skillGaps: RoadmapSkillGap[];
+  checkpoint: {
+    successCriteria: string[];
+    ifOnTrack: string;
+    ifBehind: string;
+  };
 }
 
 export interface UserResponseEntry {
