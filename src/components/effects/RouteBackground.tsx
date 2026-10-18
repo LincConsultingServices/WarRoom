@@ -107,13 +107,14 @@ export function RouteBackground({ bg, opacity, brightness }: RouteBackgroundProp
   const plateBrightness = brightness ?? (isLight ? 1.03 : 0.45)
   const plateSaturation = isLight ? 0.97 : 1
 
-  // Light: a warm wash, heaviest in the middle where headings sit directly on
-  // the backdrop, thinning toward the edges so the pieces and banners keep
-  // their sunset. Tuned for the bright chess-battlefield plates — the earlier
-  // values were set for dark hall art and bleach these to grey.
+  // Light: a frosted warm wash. Body copy, labels and small gold text sit
+  // directly on this backdrop on several routes, so it has to keep them at
+  // WCAG AA (4.5:1) even over the darkest stone in the plate — the earlier
+  // 20–50% wash let the photo drop that copy to ~2:1. The plate still reads
+  // through, softened, with a little more of it left at the edges.
   // Dark: the original black vignette.
   const scrim = isLight
-    ? 'radial-gradient(ellipse 90% 85% at 50% 42%, rgba(252,251,248,0.50) 0%, rgba(252,251,248,0.38) 45%, rgba(250,247,240,0.20) 75%, rgba(196,178,140,0.18) 100%)'
+    ? 'radial-gradient(ellipse 90% 85% at 50% 42%, rgba(251,250,247,0.86) 0%, rgba(251,250,247,0.84) 55%, rgba(250,247,240,0.78) 100%)'
     : 'radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 40%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.85) 100%)'
 
   return (
@@ -139,7 +140,11 @@ export function RouteBackground({ bg, opacity, brightness }: RouteBackgroundProp
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0"
-        style={{ zIndex: -10, background: scrim }}
+        style={{
+          zIndex: -10,
+          background: scrim,
+          backdropFilter: isLight ? 'blur(3px)' : undefined,
+        }}
       />
     </>
   )

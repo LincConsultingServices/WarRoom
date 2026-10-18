@@ -136,12 +136,7 @@ export function StartSimulationView({ onClose, onCreated }: StartSimulationViewP
 
   return (
     <div className="relative flex min-h-[100dvh] w-full flex-col text-[color:var(--color-chessboard-ivory)]">
-      {/* Frosted scrim + glow over the route backdrop — the battlefield stays
-          visible at the edges but the copy and input read cleanly. */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-background/75 backdrop-blur-[3px]"
-      />
+      {/* Atmospheric glow over the route backdrop */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"

@@ -221,7 +221,7 @@ export default function DashboardPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-40 border-b backdrop-blur-md bg-[color:var(--color-chessboard-black)]/80 border-[color:var(--color-chessboard-silver)]/15"
+        className="sticky top-0 z-40 border-b backdrop-blur-md bg-[color:var(--color-chessboard-void)]/90 border-[color:var(--color-chessboard-ash)]/60"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                   <span
                     style={{
                       background:
-                        'linear-gradient(135deg, #c8a84a, #f0c040, #c8a84a)',
+                        'linear-gradient(135deg, var(--color-chessboard-gold), var(--color-chessboard-gold-bright), var(--color-chessboard-gold))',
                       WebkitBackgroundClip: 'text',
                       backgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
