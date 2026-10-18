@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { LeaderboardPanel } from '@/src/components/LeaderboardPanel'
-import { StartSimulationDialog } from '@/src/components/StartSimulationDialog'
 import { useLeaderboard } from '@/src/hooks/useLeaderboard'
 import {
   ArrowRight,
@@ -82,7 +81,6 @@ export default function DashboardPage() {
   const router = useRouter()
   const [simulations, setSimulations] = useState<AssessmentWithRevenue[]>([])
   const [loading, setLoading] = useState(true)
-  const [startDialogOpen, setStartDialogOpen] = useState(false)
   const [user, setUser] = useState<{
     name: string
     email: string
@@ -113,11 +111,6 @@ export default function DashboardPage() {
       .catch(() => setSimulations([]))
       .finally(() => setLoading(false))
   }, [router])
-
-  const handleSimulationCreated = (assessmentId: string) => {
-    setStartDialogOpen(false)
-    router.push(`/assessment/${assessmentId}`)
-  }
 
   const handleLogout = async () => {
     await signOutUser()
@@ -207,7 +200,7 @@ export default function DashboardPage() {
     if (currentSim) {
       router.push(`/assessment/${currentSim.id}`)
     } else {
-      setStartDialogOpen(true)
+      router.push('/assessment/new')
     }
   }
 
@@ -617,7 +610,7 @@ export default function DashboardPage() {
                     variant="primary"
                     icon={Plus}
                     sfxKey="nav.door-open"
-                    onClick={() => setStartDialogOpen(true)}
+                    onClick={() => router.push('/assessment/new')}
                   >
                     Start Your First Trial
                   </ChessboardCTA>
@@ -712,12 +705,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      <StartSimulationDialog
-        open={startDialogOpen}
-        onOpenChange={setStartDialogOpen}
-        onCreated={handleSimulationCreated}
-      />
 
       {newSigils.length > 0 && (
         <SigilUnlockOverlay sigils={newSigils} onClose={acknowledgeSigils} />
