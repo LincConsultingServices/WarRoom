@@ -4,4 +4,5 @@ export type {
   RankedCompetency,
   ActionItem,
   StageNarration,
+  ImplementationRoadmap,
 } from './index';
