@@ -163,7 +163,7 @@ export default function SimulationStartPage() {
             Dashboard
           </span>
         </Link>
-        <span className="text-[color:var(--color-chessboard-ash)] text-xs">/</span>
+        <span aria-hidden className="text-[color:var(--color-chessboard-smoke)] text-xs">/</span>
         <span
           className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--color-chessboard-gold)]"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -474,6 +474,7 @@ export default function SimulationStartPage() {
                   ) : (
                     <motion.span
                       key="seal-glyph"
+                      aria-hidden
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
