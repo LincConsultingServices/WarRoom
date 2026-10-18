@@ -93,7 +93,7 @@ export default function RegisterPage() {
       // Create the Firebase account, then provision the backend profile. The batch
       // code is sent only for a cohort signup; without one the backend provisions an
       // individual participant.
-      await register(
+      const profile = await register(
         email,
         password,
         joiningCohort ? batchCode.trim().toUpperCase() : undefined,
@@ -101,6 +101,17 @@ export default function RegisterPage() {
       )
       acceptTerms()
       audioManager.playSfx('ui.click')
+      // Individuals pay per attempt: send them straight to Stripe Checkout. If that
+      // fails they land on the dashboard and can pay when they start a war room.
+      if (!joiningCohort && profile.requiresPayment !== false) {
+        try {
+          const { url } = await api.payments.checkout()
+          window.location.href = url
+          return
+        } catch {
+          /* fall through to the dashboard */
+        }
+      }
       router.push('/dashboard')
     } catch (err: unknown) {
       setError(authErrorMessage(err))
@@ -219,7 +230,7 @@ export default function RegisterPage() {
                     {
                       key: 'individual' as const,
                       title: 'Individual founder',
-                      hint: 'No code needed',
+                      hint: '$49 per war room attempt',
                     },
                   ]
                 ).map((option) => {
@@ -264,7 +275,8 @@ export default function RegisterPage() {
             {/* What choosing 'individual' actually costs you */}
             {enrolment === 'individual' && (
               <p className="text-[11px] leading-relaxed text-[color:var(--color-chessboard-smoke)]">
-                You&apos;ll run the full simulation on your own. Cohort rankings stay
+                You&apos;ll run the full simulation on your own for $49 per war room
+                attempt, paid securely through Stripe. Cohort rankings stay
                 empty until you join one — you can do that any time from the Rankings
                 page.
               </p>
