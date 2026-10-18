@@ -13,8 +13,9 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
-import api from '@/src/lib/api'
+import { Loader2, ChevronRight, ChevronLeft, CreditCard } from 'lucide-react'
+import api, { isPaymentRequired } from '@/src/lib/api'
+import { useAuth } from '@/src/context/AuthContext'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 
 interface StartSimulationDialogProps {
@@ -37,6 +38,11 @@ export function StartSimulationDialog({
 
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  // Individuals without a paid attempt go to Stripe Checkout instead of starting.
+  const { profile } = useAuth()
+  const [paymentRequired, setPaymentRequired] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const needsPayment = paymentRequired || profile?.requiresPayment === true
 
   useEffect(() => {
     setAcceptedTerms(hasAcceptedTerms())
@@ -93,9 +99,25 @@ export function StartSimulationDialog({
       reset()
       onCreated(simulation.id)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create simulation')
+      if (isPaymentRequired(err)) {
+        setPaymentRequired(true)
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to create simulation')
+      }
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleCheckout = async () => {
+    setPaying(true)
+    setError('')
+    try {
+      const { url } = await api.payments.checkout()
+      window.location.href = url
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Could not open checkout')
+      setPaying(false)
     }
   }
 
@@ -139,6 +161,13 @@ export function StartSimulationDialog({
         {error && (
           <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
             {error}
+          </div>
+        )}
+
+        {needsPayment && (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm text-muted-foreground">
+            Each war room attempt is $49 for individual founders. Pay securely through
+            Stripe, then start your simulation.
           </div>
         )}
 
@@ -221,13 +250,23 @@ export function StartSimulationDialog({
               <Button variant="outline" onClick={() => setStep('idea')}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button onClick={handleCreateSimulation} disabled={creating || !acceptedTerms}>
-                {creating ? (
-                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...</>
-                ) : (
-                  <>Start Simulation <ChevronRight className="h-4 w-4 ml-1" /></>
-                )}
-              </Button>
+              {needsPayment ? (
+                <Button onClick={handleCheckout} disabled={paying}>
+                  {paying ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Opening checkout...</>
+                  ) : (
+                    <><CreditCard className="h-4 w-4 mr-2" /> Pay $49 to start</>
+                  )}
+                </Button>
+              ) : (
+                <Button onClick={handleCreateSimulation} disabled={creating || !acceptedTerms}>
+                  {creating ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...</>
+                  ) : (
+                    <>Start Simulation <ChevronRight className="h-4 w-4 ml-1" /></>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         )}

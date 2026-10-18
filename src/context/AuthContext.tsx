@@ -30,7 +30,7 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth'
 import { getFirebaseAuth, signOutUser } from '@/src/lib/firebase'
-import api from '@/src/lib/api'
+import api, { type SyncEvent } from '@/src/lib/api'
 import type { BatchInfo } from '@/src/types'
 
 export interface AuthProfile {
@@ -39,6 +39,10 @@ export interface AuthProfile {
   name: string
   batchCode?: string
   role: string
+  /** Paid war-room attempts left. Only meaningful for individuals. */
+  attemptCredits?: number
+  /** True for an individual with no credits — starting a war room needs checkout. */
+  requiresPayment?: boolean
 }
 
 interface AuthContextValue {
@@ -87,8 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const applySync = useCallback(
-    async (batchCode?: string, name?: string): Promise<AuthProfile> => {
-      const res = await api.auth.sync(batchCode, name)
+    async (batchCode?: string, name?: string, event?: SyncEvent): Promise<AuthProfile> => {
+      const res = await api.auth.sync(batchCode, name, event)
       const p = res.user as unknown as AuthProfile
       const b = (res.batch as BatchInfo | undefined) ?? null
       setProfile(p)
@@ -122,7 +126,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      // A returning user or admin: refresh the backend profile silently. Brand-new
+      // A returning user or admin: refresh the backend profile silently (no event,
+      // so the backend does not treat a session restore as a login). Brand-new
       // signups are provisioned by register() (which carries any batch code), so we
       // skip auto-sync while that explicit flow is running and ignore a
       // not-yet-provisioned error here.
@@ -143,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       manualAuthInFlight.current = true
       try {
         await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
-        return await applySync(batchCode)
+        return await applySync(batchCode, undefined, 'login')
       } finally {
         manualAuthInFlight.current = false
       }
@@ -159,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (name) {
           await updateProfile(cred.user, { displayName: name })
         }
-        return await applySync(batchCode, name)
+        return await applySync(batchCode, name, 'signup')
       } catch (err) {
         // Roll back the orphaned Firebase account so the user can retry cleanly.
         try {

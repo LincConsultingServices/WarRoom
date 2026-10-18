@@ -56,6 +56,27 @@ const USE_LIVE_PROGRESSION = process.env.NEXT_PUBLIC_PROGRESSION_API === 'live';
 // Helper
 // ============================================
 
+/** Error thrown by request(); carries the HTTP status and the backend's error code. */
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
+  }
+}
+
+/** True when the backend refused because an individual has no paid attempts left. */
+export function isPaymentRequired(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 402 || err.code === 'payment_required');
+}
+
+/** Explicit /auth/sync triggers. The silent session-restore sync sends none. */
+export type SyncEvent = 'signup' | 'login';
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
@@ -92,7 +113,11 @@ async function request<T>(
       throw new Error('Unauthorized');
     }
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || `API error: ${res.status}`);
+    throw new ApiError(
+      errorData.error || `API error: ${res.status}`,
+      res.status,
+      typeof errorData.code === 'string' ? errorData.code : undefined,
+    );
   }
 
   return res.json();
@@ -106,16 +131,42 @@ export const api = {
   auth: {
     // Reconcile the Firebase identity with the backend. Called after Firebase
     // sign-in/sign-up; the Firebase ID token is attached automatically by request().
-    sync: (batchCode?: string, name?: string) =>
+    // `event` marks an explicit signup/login so the backend can alert admins.
+    sync: (batchCode?: string, name?: string, event?: SyncEvent) =>
       request<{ user: Record<string, unknown>; batch?: BatchInfo }>('/auth/sync', {
         method: 'POST',
         body: JSON.stringify({
           ...(batchCode ? { batchCode } : {}),
           ...(name ? { name } : {}),
+          ...(event ? { event } : {}),
         }),
       }),
 
-    me: () => request<{ id: string; email: string; name: string; batchCode: string; role: string }>('/auth/me'),
+    me: () =>
+      request<{
+        id: string;
+        email: string;
+        name: string;
+        batchCode: string;
+        role: string;
+        attemptCredits?: number;
+        requiresPayment?: boolean;
+      }>('/auth/me'),
+  },
+
+  // ============================================
+  // PAYMENTS (Stripe hosted Checkout, individuals only)
+  // ============================================
+
+  payments: {
+    // Start a Checkout session for one war-room attempt; redirect the browser to `url`.
+    checkout: () => request<{ url: string }>('/payments/checkout', { method: 'POST' }),
+
+    // Called on return from Stripe to credit the attempt.
+    confirm: (sessionId: string) =>
+      request<{ attemptCredits: number }>(
+        `/payments/confirm?session_id=${encodeURIComponent(sessionId)}`,
+      ),
   },
 
   settings: {
