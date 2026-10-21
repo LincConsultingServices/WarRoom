@@ -11,7 +11,7 @@ import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 // <ChessboardEntrance />
 // Fullscreen cinematic overlay played the FIRST time a user
 // crosses into the Assessment. Behaviour:
-//   • Plays /assets/video/chessboard-door-opening.{webm,mp4} muted.
+//   • Plays /assets/video/chessboard team.mp4 muted.
 //   • Falls back to an SVG doors-parting animation if the video
 //     is missing or fails to load — never blocks the UX.
 //   • Reveals timed subtitles over the video.
@@ -24,7 +24,7 @@ import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 // ============================================================
 
 const VIDEO_SRC_WEBM = '/assets/video/chessboard-door-opening.webm'
-const VIDEO_SRC_MP4 = '/assets/video/chessboard-door-opening.mp4'
+const VIDEO_SRC_MP4 = '/assets/video/chessboard%20team.mp4'
 const ENTERED_FLAG = 'chessboard_entered_before'
 const SKIP_GRACE_MS = 3000
 const FADE_OUT_MS = 800
@@ -248,7 +248,7 @@ function FallbackDoorsAnimation({ reducedMotion }: { reducedMotion: boolean }) {
           <AssetPlaceholder
             kind="video"
             label="Door cinematic"
-            path="public/assets/video/chessboard-door-opening.{webm,mp4}"
+            path="public/assets/video/chessboard team.mp4"
             formatHint="1080p · 8–14s · ≤6MB · muted autoplay"
           />
         </div>
