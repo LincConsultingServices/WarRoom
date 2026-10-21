@@ -4,7 +4,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export type SigilTone = 'gold' | 'crimson' | 'verdant' | 'amethyst'
+export type SigilTone = 'gold' | 'crimson' | 'verdant' | 'amethyst' | 'silver'
 
 export interface SigilBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   icon?: LucideIcon
@@ -21,6 +21,8 @@ const TONE_STYLES: Record<SigilTone, string> = {
     'bg-transparent dark:bg-[color:var(--color-chessboard-verdant)]/[0.15] text-zinc-700 dark:text-[color:var(--color-chessboard-verdant)] border-zinc-300 dark:border-[color:var(--color-chessboard-verdant)]/35',
   amethyst:
     'bg-transparent dark:bg-[color:var(--color-chessboard-amethyst)]/[0.15] text-zinc-700 dark:text-[color:var(--color-chessboard-amethyst)] border-zinc-300 dark:border-[color:var(--color-chessboard-amethyst)]/35',
+  silver:
+    'bg-transparent dark:bg-[color:var(--color-chessboard-silver)]/[0.12] text-zinc-700 dark:text-[color:var(--color-chessboard-silver)] border-zinc-300 dark:border-[color:var(--color-chessboard-silver)]/30',
 }
 
 /**

@@ -72,7 +72,6 @@ export function NarratorSpotlight({ targetElementId }: NarratorSpotlightProps) {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update, { capture: true } as never)
       if (frame) cancelAnimationFrame(frame)
-      if (ro) ro.disconnect()
     }
   }, [targetElementId, mounted])
 
