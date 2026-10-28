@@ -12,8 +12,10 @@ import {
   Crown,
   FileText,
   Swords,
+  CreditCard,
 } from 'lucide-react'
-import api from '@/src/lib/api'
+import api, { isPaymentRequired } from '@/src/lib/api'
+import { useAuth } from '@/src/context/AuthContext'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 import { cn } from '@/lib/utils'
 import { CampaignMap } from '@/src/components/dashboard/CampaignMap'
@@ -101,6 +103,11 @@ export default function SimulationStartPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(() => hasAcceptedTerms())
   const [isStarting, setIsStarting] = useState(false)
   const [error, setError] = useState('')
+  // Individuals without a paid attempt go to Stripe Checkout instead of starting.
+  const { profile } = useAuth()
+  const [paymentRequired, setPaymentRequired] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const needsPayment = paymentRequired || profile?.requiresPayment === true
 
   // Narrator onboarding for this phase
   useNarratorOnboarding('assessment', { delayMs: 1200 })
@@ -119,8 +126,24 @@ export default function SimulationStartPage() {
       audioManager.playSfx('wr.door-creak')
       router.push(`/assessment/${simulation.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to start simulation.')
+      if (isPaymentRequired(err)) {
+        setPaymentRequired(true)
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to start simulation.')
+      }
       setIsStarting(false)
+    }
+  }
+
+  const handleCheckout = async () => {
+    setPaying(true)
+    setError('')
+    try {
+      const { url } = await api.payments.checkout()
+      window.location.href = url
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Could not open checkout.')
+      setPaying(false)
     }
   }
 
@@ -528,18 +551,39 @@ export default function SimulationStartPage() {
 
           {/* Start CTA */}
           <div {...startIntro} className="flex flex-col items-stretch gap-3">
-            <ChessboardCTA
-              size="lg"
-              variant="primary"
-              icon={Swords}
-              disabled={isStarting || !acceptedTerms}
-              onClick={handleStart}
-              className="w-full justify-center"
-            >
-              {isStarting ? 'Preparing the Chessboard…' : 'Enter the Trial'}
-            </ChessboardCTA>
+            {needsPayment ? (
+              <>
+                <ChessboardCTA
+                  size="lg"
+                  variant="primary"
+                  icon={CreditCard}
+                  disabled={paying}
+                  onClick={handleCheckout}
+                  className="w-full justify-center"
+                >
+                  {paying ? 'Opening checkout…' : 'Pay $49 to start'}
+                </ChessboardCTA>
+                <p
+                  className="text-center text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Each war room attempt is $49 for individual founders
+                </p>
+              </>
+            ) : (
+              <ChessboardCTA
+                size="lg"
+                variant="primary"
+                icon={Swords}
+                disabled={isStarting || !acceptedTerms}
+                onClick={handleStart}
+                className="w-full justify-center"
+              >
+                {isStarting ? 'Preparing the Chessboard…' : 'Enter the Trial'}
+              </ChessboardCTA>
+            )}
 
-            {!acceptedTerms && (
+            {!needsPayment && !acceptedTerms && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

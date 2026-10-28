@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Loader2, ChevronRight, ChevronLeft, Check, Swords } from 'lucide-react'
-import api from '@/src/lib/api'
+import { Loader2, ChevronRight, ChevronLeft, Check, Swords, CreditCard } from 'lucide-react'
+import api, { isPaymentRequired } from '@/src/lib/api'
+import { useAuth } from '@/src/context/AuthContext'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 import { cn } from '@/lib/utils'
 import {
@@ -61,6 +62,11 @@ export function StartSimulationView({ onClose, onCreated }: StartSimulationViewP
 
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  // Individuals without a paid attempt go to Stripe Checkout instead of starting.
+  const { profile } = useAuth()
+  const [paymentRequired, setPaymentRequired] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const needsPayment = paymentRequired || profile?.requiresPayment === true
 
   useEffect(() => {
     setAcceptedTerms(hasAcceptedTerms())
@@ -125,9 +131,25 @@ export function StartSimulationView({ onClose, onCreated }: StartSimulationViewP
       acceptTerms()
       onCreated(simulation.id)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create simulation')
+      if (isPaymentRequired(err)) {
+        setPaymentRequired(true)
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to create simulation')
+      }
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleCheckout = async () => {
+    setPaying(true)
+    setError('')
+    try {
+      const { url } = await api.payments.checkout()
+      window.location.href = url
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Could not open checkout')
+      setPaying(false)
     }
   }
 
@@ -339,6 +361,13 @@ export function StartSimulationView({ onClose, onCreated }: StartSimulationViewP
 
               <GoldDivider variant="line" className="my-8" />
 
+              {needsPayment && (
+                <div className="mb-4 rounded-[3px] border border-[color:var(--color-chessboard-gold)]/40 bg-card/90 p-4 text-sm text-[color:var(--color-chessboard-smoke)]">
+                  Each war room attempt is $49 for individual founders. Pay securely through
+                  Stripe, then start your simulation.
+                </div>
+              )}
+
               <div className="flex items-start gap-3 rounded-[3px] border border-[color:var(--color-chessboard-ash)]/40 bg-card/90 p-4">
                 <Checkbox
                   id="start-terms"
@@ -370,26 +399,42 @@ export function StartSimulationView({ onClose, onCreated }: StartSimulationViewP
                   variant="ghost"
                   icon={ChevronLeft}
                   onClick={() => setStep('idea')}
-                  disabled={creating}
+                  disabled={creating || paying}
                   className="w-full sm:w-auto"
                 >
                   Back
                 </ChessboardCTA>
-                <ChessboardCTA
-                  size="md"
-                  variant="primary"
-                  sfxKey="nav.door-open"
-                  icon={creating ? Loader2 : undefined}
-                  iconRight={creating ? undefined : ChevronRight}
-                  onClick={handleCreateSimulation}
-                  disabled={creating || !acceptedTerms}
-                  className={cn(
-                    'w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed',
-                    creating && '[&>svg]:animate-spin',
-                  )}
-                >
-                  {creating ? 'Creating...' : 'Start Simulation'}
-                </ChessboardCTA>
+                {needsPayment ? (
+                  <ChessboardCTA
+                    size="md"
+                    variant="primary"
+                    icon={paying ? Loader2 : CreditCard}
+                    onClick={handleCheckout}
+                    disabled={paying}
+                    className={cn(
+                      'w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed',
+                      paying && '[&>svg]:animate-spin',
+                    )}
+                  >
+                    {paying ? 'Opening checkout...' : 'Pay $49 to start'}
+                  </ChessboardCTA>
+                ) : (
+                  <ChessboardCTA
+                    size="md"
+                    variant="primary"
+                    sfxKey="nav.door-open"
+                    icon={creating ? Loader2 : undefined}
+                    iconRight={creating ? undefined : ChevronRight}
+                    onClick={handleCreateSimulation}
+                    disabled={creating || !acceptedTerms}
+                    className={cn(
+                      'w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed',
+                      creating && '[&>svg]:animate-spin',
+                    )}
+                  >
+                    {creating ? 'Creating...' : 'Start Simulation'}
+                  </ChessboardCTA>
+                )}
               </div>
             </motion.section>
           )}
