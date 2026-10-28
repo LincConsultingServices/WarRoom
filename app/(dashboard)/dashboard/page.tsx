@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -18,10 +18,12 @@ import {
   Award,
   ScrollText,
   Target,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import api from '@/src/lib/api'
 import { signOutUser } from '@/src/lib/firebase'
+import { useAuth } from '@/src/context/AuthContext'
 import type { Assessment } from '@/src/types'
 import { STAGE_NARRATIVES } from '@/src/lib/constants'
 import { FadeInUp } from '@/src/components/AnimatedComponents'
@@ -94,6 +96,53 @@ export default function DashboardPage() {
   const { newSigils, acknowledge: acknowledgeSigils } = useNewSigils(progression?.sigils)
   useNarratorOnboarding('great-hall', { delayMs: 1800 })
   const beginIntro = useFeatureIntro('dashboard-begin', { elementId: 'dashboard-begin-cta' })
+  const { refresh } = useAuth()
+  const [paymentNotice, setPaymentNotice] = useState<{
+    tone: 'success' | 'info' | 'error'
+    text: string
+  } | null>(null)
+  const paymentHandled = useRef(false)
+
+  // Return from Stripe Checkout: credit the attempt, refresh the cached profile so
+  // requiresPayment clears, then strip the payment params from the URL.
+  useEffect(() => {
+    if (paymentHandled.current) return
+    const params = new URLSearchParams(window.location.search)
+    const payment = params.get('payment')
+    if (!payment) return
+    paymentHandled.current = true
+    const sessionId = params.get('session_id')
+    params.delete('payment')
+    params.delete('session_id')
+    const qs = params.toString()
+    window.history.replaceState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`)
+
+    if (payment === 'cancelled') {
+      setPaymentNotice({ tone: 'info', text: 'Payment cancelled — you can pay whenever you are ready to start a war room.' })
+      return
+    }
+    if (payment !== 'success' || !sessionId) return
+    api.payments
+      .confirm(sessionId)
+      .then(async ({ attemptCredits }) => {
+        try {
+          const p = await refresh()
+          setUser(p)
+        } catch {
+          /* cached profile stays; the next sync will catch up */
+        }
+        setPaymentNotice({
+          tone: 'success',
+          text: `Payment received — you have ${attemptCredits} war room attempt${attemptCredits === 1 ? '' : 's'} ready.`,
+        })
+      })
+      .catch(() =>
+        setPaymentNotice({
+          tone: 'error',
+          text: 'We could not confirm your payment yet. If you were charged, refresh in a moment or contact support.',
+        }),
+      )
+  }, [refresh])
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
@@ -290,6 +339,35 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-10">
+            {paymentNotice && (
+              <div
+                role="status"
+                className={cn(
+                  'flex items-start justify-between gap-3 rounded-[3px] border p-4 text-sm',
+                  paymentNotice.tone === 'success' &&
+                    'border-[color:var(--color-chessboard-verdant)]/40 bg-[color:var(--color-chessboard-verdant)]/[0.08] text-[color:var(--color-chessboard-verdant)]',
+                  paymentNotice.tone === 'info' &&
+                    'border-[color:var(--color-chessboard-silver)]/30 bg-[color:var(--color-chessboard-silver)]/[0.06] text-[color:var(--color-chessboard-ghost)]',
+                  paymentNotice.tone === 'error' &&
+                    'border-[color:var(--color-chessboard-crimson)]/40 bg-[color:var(--color-chessboard-crimson)]/[0.08] text-[color:var(--color-chessboard-crimson-bright)]',
+                )}
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                <span className="flex items-start gap-2">
+                  {paymentNotice.tone === 'success' && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />}
+                  {paymentNotice.text}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Dismiss"
+                  onClick={() => setPaymentNotice(null)}
+                  className="shrink-0 opacity-70 transition-opacity hover:opacity-100"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
             {/* Welcome banner */}
             <FadeInUp>
               <div className="space-y-5">
