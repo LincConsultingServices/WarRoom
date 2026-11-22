@@ -27,9 +27,17 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   updateProfile,
+  type MultiFactorResolver,
   type User as FirebaseUser,
 } from 'firebase/auth'
 import { getFirebaseAuth, signOutUser } from '@/src/lib/firebase'
+import {
+  isMfaRequiredError,
+  MfaChallenge,
+  resolverFrom,
+  resolveWithTotp,
+  sendVerificationEmail,
+} from '@/src/lib/mfa'
 import api, { type SyncEvent } from '@/src/lib/api'
 import type { BatchInfo } from '@/src/types'
 
@@ -43,6 +51,12 @@ export interface AuthProfile {
   attemptCredits?: number
   /** True for an individual with no credits — starting a war room needs checkout. */
   requiresPayment?: boolean
+  /** Email confirmed (from the Firebase token). */
+  emailVerified?: boolean
+  /** This session was signed in with a second factor. */
+  mfaSession?: boolean
+  /** Backend policy refuses gated routes (payments/admin) without an MFA session. */
+  mfaRequired?: boolean
 }
 
 interface AuthContextValue {
@@ -50,7 +64,10 @@ interface AuthContextValue {
   profile: AuthProfile | null
   batch: BatchInfo | null
   loading: boolean
+  /** Rejects with MfaChallenge when the account has two-factor authentication on. */
   login: (email: string, password: string, batchCode?: string) => Promise<AuthProfile>
+  /** Finishes a login that rejected with MfaChallenge, using a 6-digit TOTP code. */
+  completeMfaLogin: (resolver: MultiFactorResolver, code: string, batchCode?: string) => Promise<AuthProfile>
   register: (email: string, password: string, batchCode?: string, name?: string) => Promise<AuthProfile>
   logout: () => Promise<void>
   refresh: () => Promise<AuthProfile>
@@ -147,7 +164,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (email: string, password: string, batchCode?: string): Promise<AuthProfile> => {
       manualAuthInFlight.current = true
       try {
-        await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+        try {
+          await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+        } catch (err) {
+          // Password was right but the account has 2FA: nothing is signed in yet.
+          // Hand the resolver to the UI so it can collect the TOTP code.
+          if (isMfaRequiredError(err)) throw new MfaChallenge(resolverFrom(err))
+          throw err
+        }
+        return await applySync(batchCode, undefined, 'login')
+      } finally {
+        manualAuthInFlight.current = false
+      }
+    },
+    [applySync],
+  )
+
+  const completeMfaLogin = useCallback(
+    async (resolver: MultiFactorResolver, code: string, batchCode?: string): Promise<AuthProfile> => {
+      manualAuthInFlight.current = true
+      try {
+        await resolveWithTotp(resolver, code)
         return await applySync(batchCode, undefined, 'login')
       } finally {
         manualAuthInFlight.current = false
@@ -164,7 +201,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (name) {
           await updateProfile(cred.user, { displayName: name })
         }
-        return await applySync(batchCode, name, 'signup')
+        const profile = await applySync(batchCode, name, 'signup')
+        // Email verification is a prerequisite for 2FA (and may gate payments).
+        // Fire-and-forget: a mail hiccup must never fail registration.
+        sendVerificationEmail(cred.user).catch(() => {})
+        return profile
       } catch (err) {
         // Roll back the orphaned Firebase account so the user can retry cleanly.
         try {
@@ -199,7 +240,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ firebaseUser, profile, batch, loading, login, register, logout, refresh, joinBatch }}
+      value={{
+        firebaseUser,
+        profile,
+        batch,
+        loading,
+        login,
+        completeMfaLogin,
+        register,
+        logout,
+        refresh,
+        joinBatch,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -21,7 +21,9 @@ import {
   Swords,
   Crown,
   Mic2,
+  Lock,
 } from 'lucide-react'
+import { SecurityPanel } from '@/src/components/security/SecurityPanel'
 import { useAmbientAudio } from '@/src/hooks/useAmbientAudio'
 import { useAudioStore } from '@/src/state/audioStore'
 import { audioManager } from '@/lib/audio/audioManager'
@@ -41,10 +43,11 @@ import { easeDramatic } from '@/lib/animations/variants'
 const INPUT_CLASSES =
   'bg-[color:var(--color-chessboard-rampart)]/60 border-[color:var(--color-chessboard-ash)]/30 text-[color:var(--color-chessboard-ivory)] placeholder:text-[color:var(--color-chessboard-smoke)] focus-visible:border-[color:var(--color-chessboard-gold)]/60 focus-visible:ring-[color:var(--color-chessboard-gold)]/20'
 
-type TabKey = 'profile' | 'notifications' | 'appearance' | 'audio' | 'privacy'
+type TabKey = 'profile' | 'security' | 'notifications' | 'appearance' | 'audio' | 'privacy'
 
 const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: 'profile', label: 'Profile', icon: User },
+  { key: 'security', label: 'Security', icon: Lock },
   { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'appearance', label: 'Appearance', icon: Palette },
   { key: 'audio', label: 'Audio', icon: Volume2 },
@@ -86,6 +89,12 @@ export default function SettingsPage() {
   const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<TabKey>('profile')
+
+  // Deep link: /settings?tab=security (used by MFA-required prompts).
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab')
+    if (tab && TABS.some((t) => t.key === tab)) setActiveTab(tab as TabKey)
+  }, [])
 
   // Audio settings — live, bidirectional with the ambient store.
   const {
@@ -380,6 +389,19 @@ export default function SettingsPage() {
                 </ChessboardCTA>
               </div>
             </StoneCard>
+          </motion.div>
+        )}
+
+        {/* ═══ Security ═══ */}
+        {activeTab === 'security' && (
+          <motion.div
+            key="security"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: easeDramatic }}
+          >
+            <SecurityPanel />
           </motion.div>
         )}
 

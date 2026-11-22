@@ -70,6 +70,16 @@ export class ApiError extends Error {
   }
 }
 
+/** True when the backend refused because the session lacks two-factor sign-in. */
+export function isMfaRequired(err: unknown): boolean {
+  return err instanceof ApiError && err.code === 'mfa_required';
+}
+
+/** True when the backend refused because the account email is not verified. */
+export function isEmailNotVerified(err: unknown): boolean {
+  return err instanceof ApiError && err.code === 'email_not_verified';
+}
+
 /** True when the backend refused because an individual has no paid attempts left. */
 export function isPaymentRequired(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 402 || err.code === 'payment_required');
@@ -152,6 +162,9 @@ export const api = {
         role: string;
         attemptCredits?: number;
         requiresPayment?: boolean;
+        emailVerified?: boolean;
+        mfaSession?: boolean;
+        mfaRequired?: boolean;
       }>('/auth/me'),
   },
 

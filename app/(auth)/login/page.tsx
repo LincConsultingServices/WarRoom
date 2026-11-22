@@ -4,10 +4,13 @@ import React, { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Check, X } from 'lucide-react'
+import { Check, ShieldCheck, X } from 'lucide-react'
+import type { MultiFactorResolver } from 'firebase/auth'
 import api from '@/src/lib/api'
 import { useAuth } from '@/src/context/AuthContext'
 import { authErrorMessage } from '@/src/lib/firebase'
+import { MfaChallenge, sendPasswordReset } from '@/src/lib/mfa'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import {
@@ -30,7 +33,7 @@ const INPUT_CLASSES = cn(
 
 function LoginContent() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, completeMfaLogin } = useAuth()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
   const prefersReducedMotion = useReducedMotion()
@@ -45,6 +48,14 @@ function LoginContent() {
   const [batchName, setBatchName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Two-factor step: set when the password was accepted but the account has 2FA.
+  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null)
+  const [mfaCode, setMfaCode] = useState('')
+
+  // Forgot-password mode
+  const [resetMode, setResetMode] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   const handleBatchCodeBlur = async () => {
     if (!batchCode.trim()) return
@@ -73,20 +84,59 @@ function LoginContent() {
       // The batch code is optional: returning participants keep the cohort already
       // on their profile, and an individual participant who types one here joins
       // that cohort. Send the field only when it was actually filled in.
-      const trimmedBatch = batchCode.trim().toUpperCase()
-      const profile = await login(
-        email,
-        password,
-        !isAdmin && trimmedBatch ? trimmedBatch : undefined,
-      )
-
-      audioManager.playSfx('wr.door-creak')
-
-      if (profile.role === 'admin') {
-        router.push('/admin/cohorts')
-      } else {
-        router.push('/dashboard')
+      const profile = await login(email, password, batchForSync())
+      enter(profile.role)
+    } catch (err: unknown) {
+      if (err instanceof MfaChallenge) {
+        setMfaResolver(err.resolver)
+        setMfaCode('')
+        return
       }
+      setError(authErrorMessage(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const batchForSync = () => {
+    const trimmedBatch = batchCode.trim().toUpperCase()
+    return !isAdmin && trimmedBatch ? trimmedBatch : undefined
+  }
+
+  const enter = (role: string) => {
+    audioManager.playSfx('wr.door-creak')
+    router.push(role === 'admin' ? '/admin/cohorts' : '/dashboard')
+  }
+
+  const submitMfa = async (code: string) => {
+    if (!mfaResolver || code.length !== 6 || loading) return
+    setLoading(true)
+    setError('')
+    try {
+      const profile = await completeMfaLogin(mfaResolver, code, batchForSync())
+      enter(profile.role)
+    } catch (err: unknown) {
+      setError(authErrorMessage(err))
+      setMfaCode('')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const cancelMfa = () => {
+    setMfaResolver(null)
+    setMfaCode('')
+    setPassword('')
+    setError('')
+  }
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await sendPasswordReset(email)
+      setResetSent(true)
     } catch (err: unknown) {
       setError(authErrorMessage(err))
     } finally {
@@ -184,15 +234,25 @@ function LoginContent() {
               className="text-base font-semibold tracking-[0.06em] text-[color:var(--color-chessboard-ivory)] mb-1"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              {isAdmin ? 'Admin Sign In' : 'Sign In'}
+              {mfaResolver
+                ? 'Two-Factor Verification'
+                : resetMode
+                  ? 'Reset Password'
+                  : isAdmin
+                    ? 'Admin Sign In'
+                    : 'Sign In'}
             </h2>
             <p
               className="text-xs text-[color:var(--color-chessboard-smoke)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body, serif)' }}
             >
-              {isAdmin
-                ? 'Enter your admin credentials.'
-                : 'Enter your credentials to access your simulations. A batch code is optional — add one to join a cohort.'}
+              {mfaResolver
+                ? 'Enter the 6-digit code from your authenticator app to finish signing in.'
+                : resetMode
+                  ? 'Enter your account email and we will send you a link to choose a new password.'
+                  : isAdmin
+                    ? 'Enter your admin credentials.'
+                    : 'Enter your credentials to access your simulations. A batch code is optional — add one to join a cohort.'}
             </p>
           </div>
 
@@ -228,6 +288,118 @@ function LoginContent() {
             )}
           </AnimatePresence>
 
+          {mfaResolver ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                submitMfa(mfaCode)
+              }}
+              className="space-y-5"
+            >
+              <div className="flex items-center gap-2 text-xs text-[color:var(--color-chessboard-smoke)]">
+                <ShieldCheck className="h-4 w-4 text-[color:var(--color-chessboard-gold)]" aria-hidden />
+                <span style={{ fontFamily: 'var(--font-body, serif)' }}>
+                  Signing in as <span className="text-[color:var(--color-chessboard-ivory)]">{email}</span>
+                </span>
+              </div>
+              <div className="flex justify-center">
+                <InputOTP
+                  maxLength={6}
+                  value={mfaCode}
+                  onChange={(v) => setMfaCode(v.replace(/[^0-9]/g, ''))}
+                  onComplete={(v: string) => submitMfa(v)}
+                  autoFocus
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  aria-label="6-digit authentication code"
+                >
+                  <InputOTPGroup>
+                    {Array.from({ length: 6 }, (_, i) => (
+                      <InputOTPSlot
+                        key={i}
+                        index={i}
+                        className="h-11 w-10 border-white/35 text-white text-lg"
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              <ChessboardCTA
+                type="submit"
+                size="md"
+                variant="primary"
+                disabled={loading || mfaCode.length !== 6}
+                className="w-full justify-center"
+              >
+                {loading ? 'Verifying…' : 'Verify & Enter'}
+              </ChessboardCTA>
+              <button
+                type="button"
+                onClick={cancelMfa}
+                className="w-full text-center text-xs text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)] underline underline-offset-2"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Back to sign in
+              </button>
+              <p
+                className="text-[11px] leading-relaxed text-[color:var(--color-chessboard-smoke)]/80 text-center"
+                style={{ fontFamily: 'var(--font-body, serif)' }}
+              >
+                Lost access to your authenticator? Contact support to recover your account.
+              </p>
+            </form>
+          ) : resetMode ? (
+            <form onSubmit={handleResetSubmit} className="space-y-4">
+              {resetSent ? (
+                <div className="p-3 rounded-[3px] border border-[color:var(--color-chessboard-verdant)]/40 bg-[color:var(--color-chessboard-verdant)]/[0.08] text-sm text-[color:var(--color-chessboard-verdant)]">
+                  If an account exists for {email}, a reset link is on its way. Check your inbox (and spam).
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label
+                      htmlFor="reset-email"
+                      className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      Email
+                    </label>
+                    <Input
+                      id="reset-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      autoFocus
+                      className={INPUT_CLASSES}
+                    />
+                  </div>
+                  <ChessboardCTA
+                    type="submit"
+                    size="md"
+                    variant="primary"
+                    disabled={loading}
+                    className="w-full justify-center"
+                  >
+                    {loading ? 'Sending…' : 'Send Reset Link'}
+                  </ChessboardCTA>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setResetMode(false)
+                  setResetSent(false)
+                  setError('')
+                }}
+                className="w-full text-center text-xs text-[color:var(--color-chessboard-smoke)] hover:text-[color:var(--color-chessboard-ivory)] underline underline-offset-2"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Back to sign in
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Batch Code (participant only) */}
             {!isAdmin && (
@@ -323,13 +495,27 @@ function LoginContent() {
 
             {/* Password */}
             <div>
-              <label
-                htmlFor="login-password"
-                className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] mb-1.5 block"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Password
-              </label>
+              <div className="flex items-baseline justify-between mb-1.5">
+                <label
+                  htmlFor="login-password"
+                  className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--color-chessboard-smoke)] block"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetMode(true)
+                    setResetSent(false)
+                    setError('')
+                  }}
+                  className="text-[10px] tracking-[0.08em] text-[color:var(--color-chessboard-gold)]/80 hover:text-[color:var(--color-chessboard-gold-bright)] underline underline-offset-2"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Forgot password?
+                </button>
+              </div>
               <Input
                 id="login-password"
                 type="password"
@@ -337,6 +523,7 @@ function LoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className={INPUT_CLASSES}
               />
             </div>
@@ -356,6 +543,7 @@ function LoginContent() {
                   : 'Enter the War Room'}
             </ChessboardCTA>
           </form>
+          )}
         </StoneCard>
       </motion.div>
 
