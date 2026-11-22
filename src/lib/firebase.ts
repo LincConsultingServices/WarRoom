@@ -113,6 +113,31 @@ export function authErrorMessage(err: unknown): string {
       case 'auth/invalid-api-key':
       case 'auth/configuration-not-found':
         return 'Authentication is not configured. Please contact support.'
+      // ── Multi-factor / account security ──
+      case 'auth/invalid-verification-code':
+        return 'That code is incorrect or has expired. Enter the current 6-digit code from your authenticator app.'
+      case 'auth/missing-code':
+        return 'Enter the 6-digit code from your authenticator app.'
+      case 'auth/totp-challenge-timeout':
+      case 'auth/code-expired':
+        return 'The sign-in challenge timed out. Please sign in again.'
+      case 'auth/requires-recent-login':
+        return 'For your security, please confirm your password to continue.'
+      case 'auth/unverified-email':
+        return 'Verify your email address before turning on two-factor authentication.'
+      case 'auth/second-factor-already-in-use':
+        return 'This authenticator is already enrolled on your account.'
+      case 'auth/maximum-second-factor-count-exceeded':
+        return 'You have reached the maximum number of second factors. Remove one first.'
+      case 'auth/unsupported-first-factor':
+        return 'Two-factor authentication is not supported for this sign-in method.'
+      case 'auth/operation-not-allowed':
+        return 'This security feature is not enabled yet. Please contact support.'
+      case 'auth/user-token-expired':
+        return 'Your session has ended. Please sign in again.'
+      case 'auth/expired-action-code':
+      case 'auth/invalid-action-code':
+        return 'This link has expired or was already used. Request a new one.'
       default:
         return err.message.replace('Firebase: ', '')
     }

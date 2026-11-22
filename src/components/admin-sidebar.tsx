@@ -58,6 +58,12 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       icon: BarChart3,
       isActive: pathname.startsWith('/admin/reports'),
     },
+    {
+      title: 'Security',
+      url: '/admin/security',
+      icon: ShieldCheck,
+      isActive: pathname.startsWith('/admin/security'),
+    },
   ]
 
   const handleSignOut = async () => {

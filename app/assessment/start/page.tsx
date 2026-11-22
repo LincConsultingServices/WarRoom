@@ -14,7 +14,7 @@ import {
   Swords,
   CreditCard,
 } from 'lucide-react'
-import api, { isPaymentRequired } from '@/src/lib/api'
+import api, { isEmailNotVerified, isMfaRequired, isPaymentRequired } from '@/src/lib/api'
 import { useAuth } from '@/src/context/AuthContext'
 import { acceptTerms, hasAcceptedTerms } from '@/src/lib/terms-consent'
 import { cn } from '@/lib/utils'
@@ -142,6 +142,11 @@ export default function SimulationStartPage() {
       const { url } = await api.payments.checkout()
       window.location.href = url
     } catch (err: unknown) {
+      // Payments can require 2FA / a verified email — send them to set it up.
+      if (isMfaRequired(err) || isEmailNotVerified(err)) {
+        window.location.href = '/settings?tab=security'
+        return
+      }
       setError(err instanceof Error ? err.message : 'Could not open checkout.')
       setPaying(false)
     }
